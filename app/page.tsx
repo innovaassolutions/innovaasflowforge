@@ -21,12 +21,12 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-brand bg-clip-text text-transparent
                        md:text-5xl
                        lg:text-6xl">
-          InnovaasFlow Forge
+          Flow Forge
         </h1>
 
         <p className="text-xl text-mocha-subtext1 text-center max-w-2xl mb-8
                       md:text-2xl">
-          Smart Industry 4.0 Readiness Assessment Platform
+          AI Assisted Business Consulting Platform
         </p>
 
         {/* Feature Cards */}
