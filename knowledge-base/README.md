@@ -24,8 +24,29 @@ Comprehensive guide to Unified Namespace architecture for Industrial IoT includi
 - Semantic hierarchies
 - Report-by-exception
 - Device lifecycle management
+- **Payload format flexibility** (Sparkplug B, JSON, custom)
+- Alternative approaches (UMH comparison)
 
-### 2. [ISA-95 Enterprise-Control System Integration Hierarchy](./isa-95-hierarchy.md)
+### 2. [United Manufacturing Hub (UMH) Unified Namespace Architecture](./umh-unified-namespace.md)
+**~5,500 words** | Domain: `uns` | Category: `framework`
+
+Detailed exploration of UMH's open-source UNS approach including:
+- Hybrid MQTT + Kafka architecture
+- Plain MQTT with JSON payloads (no Sparkplug B requirement)
+- ISA-95 based topic structure (`umh/v1/enterprise/site/area/...`)
+- Default schemas (_historian, _analytics, _local)
+- Merge points for data consolidation
+- OT-friendly implementation philosophy
+- Comparison with Sparkplug B approach
+
+**Key Topics:**
+- Open-source UNS platform
+- JSON vs. Protocol Buffers tradeoffs
+- Data Bridge microservice
+- Flexible vs. strict specifications
+- Kubernetes deployment
+
+### 3. [ISA-95 Enterprise-Control System Integration Hierarchy](./isa-95-hierarchy.md)
 **~3,500 words** | Domain: `isa95` | Category: `standard`
 
 Detailed breakdown of the ISA-95 five-level hierarchy standard including:
