@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Catppuccin Mocha + Innovaas Blend */
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
+
+  /* Brand colors */
+  --brand-orange: #F25C05;
+  --brand-orange-dark: #D94C04;
+  --brand-teal: #1D9BA3;
+  --brand-teal-dark: #14737A;
+
+  /* Mocha base colors */
+  --mocha-base: #1e1e2e;
+  --mocha-mantle: #181825;
+  --mocha-crust: #11111b;
+
+  /* Mocha surface colors */
+  --mocha-surface0: #313244;
+  --mocha-surface1: #45475a;
+  --mocha-surface2: #585b70;
+
+  /* Mocha overlay colors */
+  --mocha-overlay0: #6c7086;
+  --mocha-overlay1: #7f849c;
+  --mocha-overlay2: #9399b2;
+
+  /* Mocha text colors */
+  --mocha-text: #cdd6f4;
+  --mocha-subtext1: #bac2de;
+  --mocha-subtext0: #a6adc8;
+}
+
+@layer base {
+  * {
+    @apply border-mocha-overlay0;
+  }
+
+  body {
+    @apply bg-mocha-base text-mocha-text;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar for Mocha theme */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-mocha-mantle;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-mocha-overlay0 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-mocha-overlay1;
+  }
+}
+
+@layer components {
+  /* Primary button - Innovaas orange */
+  .btn-primary {
+    @apply bg-brand-orange text-white px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-brand-orange-dark transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 focus:ring-offset-mocha-base;
+  }
+
+  /* Secondary button - Innovaas teal */
+  .btn-secondary {
+    @apply bg-brand-teal text-white px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-brand-teal-dark transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2 focus:ring-offset-mocha-base;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply bg-mocha-surface0 text-mocha-text px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-mocha-surface1 transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-mocha-overlay1 focus:ring-offset-2 focus:ring-offset-mocha-base;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-mocha-surface0 rounded-xl p-6 border border-mocha-overlay0;
+    @apply shadow-lg shadow-mocha-crust/50;
+  }
+
+  /* Elevated card */
+  .card-elevated {
+    @apply bg-mocha-surface1 rounded-xl p-6 border border-mocha-overlay1;
+    @apply shadow-xl shadow-mocha-crust/70;
+  }
+
+  /* Input field */
+  .input {
+    @apply bg-mocha-surface0 text-mocha-text px-4 py-2 rounded-lg;
+    @apply border border-mocha-overlay0;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent;
+    @apply placeholder:text-mocha-subtext0;
+  }
+
+  /* Link styling */
+  .link {
+    @apply text-brand-teal hover:text-brand-teal-dark transition-colors;
+    @apply underline-offset-4 hover:underline;
+  }
+
+  /* Badge component */
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-success {
+    @apply bg-mocha-green/20 text-mocha-green border border-mocha-green/30;
+  }
+
+  .badge-warning {
+    @apply bg-mocha-yellow/20 text-mocha-yellow border border-mocha-yellow/30;
+  }
+
+  .badge-error {
+    @apply bg-mocha-red/20 text-mocha-red border border-mocha-red/30;
+  }
+
+  .badge-info {
+    @apply bg-mocha-sky/20 text-mocha-sky border border-mocha-sky/30;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-brand {
+    @apply bg-gradient-to-r from-brand-orange to-brand-teal;
+  }
+
+  .bg-gradient-mocha {
+    @apply bg-gradient-to-br from-mocha-surface0 to-mocha-surface2;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-mocha-surface0/80 backdrop-blur-lg border border-mocha-overlay0/50;
+  }
+}
