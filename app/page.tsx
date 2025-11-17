@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -67,12 +68,12 @@ export default function Home() {
         {/* CTA Buttons */}
         <div className="flex flex-col gap-4 mt-12
                         xs:flex-row">
-          <button className="btn-primary">
+          <Link href="/dashboard" className="btn-primary">
             Start Assessment Campaign
-          </button>
-          <button className="btn-secondary">
-            View Demo
-          </button>
+          </Link>
+          <Link href="/dashboard" className="btn-secondary">
+            View Dashboard
+          </Link>
         </div>
 
         {/* Status Badge */}

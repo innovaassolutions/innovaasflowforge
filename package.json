@@ -10,14 +10,23 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
+    "@react-email/components": "^1.0.1",
+    "@react-pdf/renderer": "^4.3.1",
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.39.0",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
     "next": "15.0.3",
+    "openai": "^6.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-email": "^5.0.4",
+    "resend": "^6.4.2",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-shape": "^3.1.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
