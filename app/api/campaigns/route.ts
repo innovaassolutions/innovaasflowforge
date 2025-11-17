@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
-import { supabaseAdmin } from '@/lib/supabase/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 import { randomBytes } from 'crypto'
@@ -102,8 +101,8 @@ export async function POST(request: NextRequest) {
       email: user.email
     })
 
-    // Get user's organization from user_profiles
-    const { data: userProfile, error: profileError } = await supabaseAdmin
+    // Get user's organization from user_profiles using authenticated client
+    const { data: userProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('organization_id, full_name')
       .eq('id', user.id)
@@ -352,8 +351,8 @@ export async function GET(request: NextRequest) {
       email: user.email
     })
 
-    // Get user's organization from user_profiles
-    const { data: userProfile, error: profileError } = await supabaseAdmin
+    // Get user's organization from user_profiles using authenticated client
+    const { data: userProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('organization_id')
       .eq('id', user.id)
