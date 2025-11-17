@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       .from('user_profiles')
       .select('organization_id, full_name')
       .eq('id', user.id)
-      .single()
+      .single() as { data: { organization_id: string; full_name: string } | null; error: any }
 
     if (profileError || !userProfile) {
       console.error('User profile error:', profileError)
