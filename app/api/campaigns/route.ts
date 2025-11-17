@@ -130,7 +130,8 @@ export async function POST(request: NextRequest) {
     })
 
     // Create campaign with organization_id and created_by
-    const { data: campaign, error: campaignError } = await supabaseAdmin
+    // Use authenticated client so RLS policies can verify user's organization
+    const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
       .insert({
         name: body.name,
@@ -163,8 +164,8 @@ export async function POST(request: NextRequest) {
     for (const stakeholder of body.stakeholders) {
       const accessToken = generateAccessToken()
 
-      // Create stakeholder session
-      const { error: sessionError } = await supabaseAdmin
+      // Create stakeholder session using authenticated client
+      const { error: sessionError } = await supabase
         .from('stakeholder_sessions')
         .insert({
           campaign_id: campaign.id,
@@ -377,8 +378,8 @@ export async function GET(request: NextRequest) {
       organizationId: userProfile.organization_id
     })
 
-    // Query campaigns filtered by organization_id
-    const { data: campaigns, error } = await supabaseAdmin
+    // Query campaigns using authenticated client (RLS will filter by organization)
+    const { data: campaigns, error } = await supabase
       .from('campaigns')
       .select('*')
       .eq('organization_id', userProfile.organization_id)
