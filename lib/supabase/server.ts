@@ -39,13 +39,28 @@ export async function createClient() {
 }
 
 // Admin client for privileged operations (bypasses RLS)
-export const supabaseAdmin = createSupabaseClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+// NOTE: This is a function to avoid evaluating env vars during build time
+let adminClient: ReturnType<typeof createSupabaseClient<Database>> | null = null
+
+export function getSupabaseAdmin() {
+  if (!adminClient) {
+    adminClient = createSupabaseClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
   }
-)
+  return adminClient
+}
+
+// Backward compatibility export
+export const supabaseAdmin = new Proxy({} as ReturnType<typeof createSupabaseClient<Database>>, {
+  get(_target, prop) {
+    return (getSupabaseAdmin() as any)[prop]
+  }
+})
