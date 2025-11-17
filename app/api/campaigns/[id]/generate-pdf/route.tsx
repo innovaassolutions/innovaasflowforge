@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { AssessmentPDFDocument } from '@/lib/pdf-document'
 import { ReportMetadata } from '@/lib/report-generator'
 import { ReadinessAssessment } from '@/lib/agents/synthesis-agent'
-
-// Initialize Supabase admin client
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
+import { supabaseAdmin } from '@/lib/supabase/server'
 
 export async function POST(
   request: NextRequest,
