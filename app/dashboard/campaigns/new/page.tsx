@@ -75,7 +75,14 @@ export default function NewCampaignPage() {
       const supabase = createClient()
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
+      console.log('Session check:', {
+        hasSession: !!session,
+        hasError: !!sessionError,
+        tokenLength: session?.access_token?.length
+      })
+
       if (sessionError || !session) {
+        console.error('Session error:', sessionError)
         setError('Authentication required. Please sign in again.')
         setSubmitting(false)
         return
