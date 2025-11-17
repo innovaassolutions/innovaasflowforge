@@ -40,7 +40,7 @@ export default function DashboardPage() {
     const client = createClient()
     setSupabase(client)
     checkUser(client)
-    fetchCampaigns()
+    fetchCampaigns(client)
   }, [])
 
   async function checkUser(client: SupabaseClient<Database>) {
@@ -72,17 +72,19 @@ export default function DashboardPage() {
     router.refresh()
   }
 
-  async function fetchCampaigns() {
+  async function fetchCampaigns(client?: SupabaseClient<Database>) {
     try {
       setLoading(true)
 
-      if (!supabase) {
+      const supabaseClient = client || supabase
+
+      if (!supabaseClient) {
         setError('Supabase client not initialized')
         return
       }
 
       // Get the session token
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await supabaseClient.auth.getSession()
 
       if (!session) {
         setError('Not authenticated')
