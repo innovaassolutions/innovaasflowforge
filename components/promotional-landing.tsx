@@ -2,9 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import {
+  Factory,
+  Briefcase,
+  Target,
+  Check,
+  Clock,
+  Shield,
+  TrendingUp,
+  Brain
+} from 'lucide-react'
 import ManufacturingMockup from './mockups/manufacturing-mockup'
 import DashboardMockup from './mockups/dashboard-mockup'
 import ReportMockup from './mockups/report-mockup'
+import HeroBackground from './mockups/hero-background'
 
 export default function PromotionalLanding() {
   const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
@@ -16,6 +27,7 @@ export default function PromotionalLanding() {
                           md:py-28
                           lg:py-36">
         <div className="absolute inset-0 bg-gradient-to-br from-mocha-peach/10 via-transparent to-mocha-teal/10" />
+        <HeroBackground />
 
         <div className="relative max-w-7xl mx-auto px-6
                         lg:px-8">
@@ -81,8 +93,11 @@ export default function PromotionalLanding() {
             <div className="bg-mocha-surface0 p-6 rounded-lg border border-mocha-overlay0
                             hover:border-brand-teal transition-colors
                             md:p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg mb-4
-                              md:w-14 md:h-14" />
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center mb-4
+                              md:w-14 md:h-14">
+                <Factory className="w-6 h-6 text-mocha-base
+                                   md:w-7 md:h-7" />
+              </div>
               <h3 className="text-xl font-bold text-mocha-text mb-3
                              md:text-2xl">
                 Manufacturing Leaders
@@ -93,17 +108,17 @@ export default function PromotionalLanding() {
               </p>
               <ul className="space-y-2 text-sm text-mocha-subtext1
                              md:text-base">
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Digital transformation maturity
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Digital transformation maturity</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Automation readiness analysis
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Automation readiness analysis</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Stakeholder alignment mapping
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Stakeholder alignment mapping</span>
                 </li>
               </ul>
             </div>
@@ -112,8 +127,11 @@ export default function PromotionalLanding() {
             <div className="bg-mocha-surface0 p-6 rounded-lg border border-mocha-overlay0
                             hover:border-brand-teal transition-colors
                             md:p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-mocha-mauve to-mocha-blue rounded-lg mb-4
-                              md:w-14 md:h-14" />
+              <div className="w-12 h-12 bg-gradient-to-br from-mocha-mauve to-mocha-blue rounded-lg flex items-center justify-center mb-4
+                              md:w-14 md:h-14">
+                <Briefcase className="w-6 h-6 text-mocha-base
+                                     md:w-7 md:h-7" />
+              </div>
               <h3 className="text-xl font-bold text-mocha-text mb-3
                              md:text-2xl">
                 Management Consultants
@@ -124,17 +142,17 @@ export default function PromotionalLanding() {
               </p>
               <ul className="space-y-2 text-sm text-mocha-subtext1
                              md:text-base">
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Lean Six Sigma workshops
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Lean Six Sigma workshops</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Business Model Canvas sessions
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Business Model Canvas sessions</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Theory of Constraints analysis
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Theory of Constraints analysis</span>
                 </li>
               </ul>
             </div>
@@ -144,8 +162,11 @@ export default function PromotionalLanding() {
                             hover:border-brand-teal transition-colors
                             md:p-8 md:col-span-2
                             lg:col-span-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-mocha-green to-mocha-sapphire rounded-lg mb-4
-                              md:w-14 md:h-14" />
+              <div className="w-12 h-12 bg-gradient-to-br from-mocha-green to-mocha-sapphire rounded-lg flex items-center justify-center mb-4
+                              md:w-14 md:h-14">
+                <Target className="w-6 h-6 text-mocha-base
+                                  md:w-7 md:h-7" />
+              </div>
               <h3 className="text-xl font-bold text-mocha-text mb-3
                              md:text-2xl">
                 Strategic Planners
@@ -156,17 +177,17 @@ export default function PromotionalLanding() {
               </p>
               <ul className="space-y-2 text-sm text-mocha-subtext1
                              md:text-base">
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Jobs To Be Done research
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Jobs To Be Done research</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Strategic brainstorming facilitation
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Strategic brainstorming facilitation</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-brand-teal mr-2">✓</span>
-                  Multi-stakeholder synthesis
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                  <span>Multi-stakeholder synthesis</span>
                 </li>
               </ul>
             </div>
@@ -217,11 +238,11 @@ export default function PromotionalLanding() {
             {/* Step 2 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal to-sapphire rounded-full flex items-center justify-center text-base font-bold
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-teal to-mocha-sapphire rounded-full flex items-center justify-center text-base font-bold
                                 md:w-14 md:h-14 md:text-xl">
                   2
                 </div>
-                <div className="flex-1 h-1 bg-gradient-to-r from-teal to-transparent ml-4
+                <div className="flex-1 h-1 bg-gradient-to-r from-brand-teal to-transparent ml-4
                                 lg:hidden" />
               </div>
               <h3 className="text-2xl font-bold text-mocha-text mb-4
@@ -243,7 +264,7 @@ export default function PromotionalLanding() {
             {/* Step 3 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-sapphire to-mauve rounded-full flex items-center justify-center text-base font-bold
+                <div className="w-12 h-12 bg-gradient-to-br from-mocha-sapphire to-mocha-mauve rounded-full flex items-center justify-center text-mocha-base font-bold
                                 md:w-14 md:h-14 md:text-xl">
                   3
                 </div>
@@ -268,7 +289,7 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Feature Showcase with Mockups */}
-      <section className="py-16 bg-mantle
+      <section className="py-16 bg-mocha-mantle
                           md:py-20
                           lg:py-24">
         <div className="max-w-7xl mx-auto px-6
@@ -288,7 +309,7 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'dashboard'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-base'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
                             : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
                           }`}>
               Campaign Dashboard
@@ -298,7 +319,7 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'interview'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-base'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
                             : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
                           }`}>
               AI Interview
@@ -308,7 +329,7 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'report'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-base'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
                             : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
                           }`}>
               Assessment Report
@@ -384,8 +405,11 @@ export default function PromotionalLanding() {
                           md:grid-cols-2
                           lg:gap-12">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg
-                              md:w-12 md:h-12" />
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center
+                              md:w-12 md:h-12">
+                <Clock className="w-5 h-5 text-mocha-base
+                                 md:w-6 md:h-6" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold text-mocha-text mb-2
                                md:text-2xl">
@@ -400,8 +424,11 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-teal to-sapphire rounded-lg
-                              md:w-12 md:h-12" />
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-teal to-mocha-sapphire rounded-lg flex items-center justify-center
+                              md:w-12 md:h-12">
+                <Shield className="w-5 h-5 text-mocha-base
+                                  md:w-6 md:h-6" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold text-mocha-text mb-2
                                md:text-2xl">
@@ -416,8 +443,11 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-sapphire to-mauve rounded-lg
-                              md:w-12 md:h-12" />
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-sapphire to-mocha-mauve rounded-lg flex items-center justify-center
+                              md:w-12 md:h-12">
+                <TrendingUp className="w-5 h-5 text-mocha-base
+                                      md:w-6 md:h-6" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold text-mocha-text mb-2
                                md:text-2xl">
@@ -432,8 +462,11 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mauve to-pink rounded-lg
-                              md:w-12 md:h-12" />
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-mauve to-mocha-pink rounded-lg flex items-center justify-center
+                              md:w-12 md:h-12">
+                <Brain className="w-5 h-5 text-mocha-base
+                                 md:w-6 md:h-6" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold text-mocha-text mb-2
                                md:text-2xl">
@@ -451,7 +484,7 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-surface0 via-mantle to-surface0
+      <section className="py-16 bg-gradient-to-br from-mocha-surface0 via-mocha-mantle to-mocha-surface0
                           md:py-20
                           lg:py-28">
         <div className="max-w-4xl mx-auto px-6 text-center
@@ -473,7 +506,7 @@ export default function PromotionalLanding() {
                           md:gap-6">
             <Link
               href="/auth/signup"
-              className="w-full px-10 py-5 bg-gradient-to-r from-brand-orange to-brand-teal text-base font-bold rounded-lg text-lg
+              className="w-full px-10 py-5 bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base font-bold rounded-lg text-lg
                          hover:opacity-90 transition-opacity
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
@@ -483,7 +516,7 @@ export default function PromotionalLanding() {
             <Link
               href="/auth/login"
               className="w-full px-10 py-5 border-2 border-mocha-overlay0 text-mocha-text font-bold rounded-lg text-lg
-                         hover:border-teal hover:text-teal transition-colors
+                         hover:border-brand-teal hover:text-brand-teal transition-colors
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
               Sign In
