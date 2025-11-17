@@ -6,6 +6,9 @@ import Link from "next/link";
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+// Disable static generation (page checks auth state)
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const router = useRouter()
   const supabase = createClient()

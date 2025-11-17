@@ -6,6 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
+// Disable static generation (page requires auth)
+export const dynamic = 'force-dynamic'
+
 interface Campaign {
   id: string
   name: string
