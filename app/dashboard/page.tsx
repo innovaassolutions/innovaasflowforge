@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import type { User } from '@supabase/supabase-js'
 
 interface Campaign {
   id: string
@@ -12,14 +15,54 @@ interface Campaign {
   created_at: string
 }
 
+interface UserProfile {
+  full_name: string
+  email: string
+  role: string
+}
+
 export default function DashboardPage() {
+  const router = useRouter()
+  const supabase = createClient()
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   useEffect(() => {
+    checkUser()
     fetchCampaigns()
   }, [])
+
+  async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/auth/login')
+      return
+    }
+
+    setUser(user)
+
+    // Fetch user profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('full_name, email, role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      setUserProfile(profile)
+    }
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.push('/auth/login')
+    router.refresh()
+  }
 
   async function fetchCampaigns() {
     try {
@@ -54,11 +97,50 @@ export default function DashboardPage() {
                 AI-Assisted Business Consulting Platform
               </p>
             </div>
-            <Link
-              href="/dashboard/campaigns/new"
-              className="bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-              Create Campaign
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard/campaigns/new"
+                className="bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                Create Campaign
+              </Link>
+
+              {/* User Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 bg-mocha-surface0 hover:bg-mocha-surface1 px-4 py-2 rounded-lg transition-colors">
+                  <div className="w-8 h-8 bg-gradient-to-r from-brand-orange to-brand-teal rounded-full flex items-center justify-center text-white font-semibold">
+                    {userProfile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-mocha-text">
+                      {userProfile?.full_name || 'User'}
+                    </div>
+                    <div className="text-xs text-mocha-subtext1">
+                      {userProfile?.role || 'member'}
+                    </div>
+                  </div>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-mocha-surface0 border border-mocha-surface1 rounded-lg shadow-lg py-1 z-10">
+                    <div className="px-4 py-2 border-b border-mocha-surface1">
+                      <p className="text-sm font-medium text-mocha-text">
+                        {userProfile?.full_name}
+                      </p>
+                      <p className="text-xs text-mocha-subtext1">
+                        {userProfile?.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-mocha-text hover:bg-mocha-surface1 transition-colors">
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </header>

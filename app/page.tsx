@@ -1,7 +1,39 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Image from "next/image";
 import Link from "next/link";
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+  const supabase = createClient()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function checkUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        // User is logged in, redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        setLoading(false)
+      }
+    }
+
+    checkUser()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-mocha-base">
       {/* Hero Section */}
@@ -68,11 +100,11 @@ export default function Home() {
         {/* CTA Buttons */}
         <div className="flex flex-col gap-4 mt-12
                         xs:flex-row">
-          <Link href="/dashboard" className="btn-primary">
-            Start Assessment Campaign
+          <Link href="/auth/signup" className="btn-primary">
+            Get Started
           </Link>
-          <Link href="/dashboard" className="btn-secondary">
-            View Dashboard
+          <Link href="/auth/login" className="btn-secondary">
+            Sign In
           </Link>
         </div>
 
