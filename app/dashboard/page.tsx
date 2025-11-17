@@ -75,13 +75,39 @@ export default function DashboardPage() {
   async function fetchCampaigns() {
     try {
       setLoading(true)
-      const response = await fetch('/api/campaigns')
+
+      if (!supabase) {
+        setError('Supabase client not initialized')
+        return
+      }
+
+      // Get the session token
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        setError('Not authenticated')
+        router.push('/auth/login')
+        return
+      }
+
+      // Fetch campaigns with authentication
+      const response = await fetch('/api/campaigns', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
       const data = await response.json()
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setCampaigns(data.campaigns)
       } else {
-        setError('Failed to load campaigns')
+        setError(data.error || 'Failed to load campaigns')
+
+        // If unauthorized, redirect to login
+        if (response.status === 401) {
+          router.push('/auth/login')
+        }
       }
     } catch (err) {
       setError('Error loading campaigns')

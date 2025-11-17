@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import type { Database } from '@/types/database'
 import { randomBytes } from 'crypto'
 
 interface StakeholderInput {
@@ -63,7 +65,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    // Create a Supabase client with the user's JWT token
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: () => undefined,
+          set: () => {},
+          remove: () => {},
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
       console.error('❌ Auth error:', {
@@ -279,23 +299,90 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/campaigns
- * List all campaigns (optionally filtered by facilitator email)
+ * List all campaigns for the authenticated user's organization
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const facilitatorEmail = searchParams.get('facilitatorEmail')
+    // Get the authenticated user from the Authorization header
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
 
-    let query = supabaseAdmin
-      .from('campaigns')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (facilitatorEmail) {
-      query = query.eq('facilitator_email', facilitatorEmail)
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - missing authentication token' },
+        { status: 401 }
+      )
     }
 
-    const { data: campaigns, error } = await query
+    // Create a Supabase client with the user's JWT token
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: () => undefined,
+          set: () => {},
+          remove: () => {},
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('❌ Auth error:', {
+        error: authError,
+        hasUser: !!user,
+        tokenPrefix: token?.substring(0, 20)
+      })
+      return NextResponse.json(
+        { error: 'Unauthorized - invalid or expired token', details: authError?.message },
+        { status: 401 }
+      )
+    }
+
+    console.log('✅ User authenticated:', {
+      userId: user.id,
+      email: user.email
+    })
+
+    // Get user's organization from user_profiles
+    const { data: userProfile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single() as { data: { organization_id: string } | null; error: any }
+
+    if (profileError || !userProfile) {
+      console.error('❌ User profile error:', {
+        error: profileError,
+        userId: user.id,
+        hasProfile: !!userProfile
+      })
+      return NextResponse.json(
+        {
+          error: 'User profile not found. Please sign out and sign in again to complete your profile setup.',
+          details: profileError?.message
+        },
+        { status: 404 }
+      )
+    }
+
+    console.log('✅ User profile found:', {
+      organizationId: userProfile.organization_id
+    })
+
+    // Query campaigns filtered by organization_id
+    const { data: campaigns, error } = await supabaseAdmin
+      .from('campaigns')
+      .select('*')
+      .eq('organization_id', userProfile.organization_id)
+      .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Campaign fetch error:', error)
