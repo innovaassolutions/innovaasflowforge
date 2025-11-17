@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -26,7 +28,7 @@ interface UserProfile {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,12 +37,14 @@ export default function DashboardPage() {
   const [showUserMenu, setShowUserMenu] = useState(false)
 
   useEffect(() => {
-    checkUser()
+    const client = createClient()
+    setSupabase(client)
+    checkUser(client)
     fetchCampaigns()
   }, [])
 
-  async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+  async function checkUser(client: SupabaseClient<Database>) {
+    const { data: { user } } = await client.auth.getUser()
 
     if (!user) {
       router.push('/auth/login')
@@ -50,7 +54,7 @@ export default function DashboardPage() {
     setUser(user)
 
     // Fetch user profile
-    const { data: profile } = await supabase
+    const { data: profile } = await client
       .from('user_profiles')
       .select('full_name, email, role')
       .eq('id', user.id)
@@ -62,6 +66,7 @@ export default function DashboardPage() {
   }
 
   async function handleLogout() {
+    if (!supabase) return
     await supabase.auth.signOut()
     router.push('/auth/login')
     router.refresh()

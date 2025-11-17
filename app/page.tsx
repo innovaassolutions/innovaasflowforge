@@ -11,11 +11,11 @@ export const dynamic = 'force-dynamic'
 
 export default function Home() {
   const router = useRouter()
-  const supabase = createClient()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function checkUser() {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {

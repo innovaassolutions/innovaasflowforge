@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database'
 
 // Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
@@ -14,10 +16,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
+  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
+
+  // Initialize Supabase client in browser only
+  useEffect(() => {
+    setSupabase(createClient())
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    if (!supabase) return
+
     setLoading(true)
     setError(null)
 
