@@ -66,12 +66,21 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
 
     if (authError || !user) {
-      console.error('Auth error:', authError)
+      console.error('❌ Auth error:', {
+        error: authError,
+        hasUser: !!user,
+        tokenPrefix: token?.substring(0, 20)
+      })
       return NextResponse.json(
-        { error: 'Unauthorized - invalid or expired token' },
+        { error: 'Unauthorized - invalid or expired token', details: authError?.message },
         { status: 401 }
       )
     }
+
+    console.log('✅ User authenticated:', {
+      userId: user.id,
+      email: user.email
+    })
 
     // Get user's organization from user_profiles
     const { data: userProfile, error: profileError } = await supabaseAdmin
@@ -81,7 +90,11 @@ export async function POST(request: NextRequest) {
       .single() as { data: { organization_id: string; full_name: string } | null; error: any }
 
     if (profileError || !userProfile) {
-      console.error('User profile error:', profileError)
+      console.error('❌ User profile error:', {
+        error: profileError,
+        userId: user.id,
+        hasProfile: !!userProfile
+      })
       return NextResponse.json(
         {
           error: 'User profile not found. Please sign out and sign in again to complete your profile setup.',
@@ -90,6 +103,11 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       )
     }
+
+    console.log('✅ User profile found:', {
+      organizationId: userProfile.organization_id,
+      fullName: userProfile.full_name
+    })
 
     // Create campaign with organization_id and created_by
     const { data: campaign, error: campaignError } = await supabaseAdmin
