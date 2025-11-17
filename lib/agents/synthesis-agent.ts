@@ -1,9 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { anthropic } from '@/lib/anthropic'
 import { supabaseAdmin } from '@/lib/supabase/server'
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-})
 
 // ============================================================================
 // Type Definitions

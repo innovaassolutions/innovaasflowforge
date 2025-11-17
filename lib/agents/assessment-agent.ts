@@ -1,14 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { anthropic } from '@/lib/anthropic'
+import { openai } from '@/lib/openai'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import OpenAI from 'openai'
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-})
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
 
 interface ConversationState {
   phase: string
