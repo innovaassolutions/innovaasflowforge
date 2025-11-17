@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 interface Stakeholder {
   id: string
@@ -70,9 +71,22 @@ export default function NewCampaignPage() {
     setError(null)
 
     try {
+      // Get the user's session token
+      const supabase = createClient()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !session) {
+        setError('Authentication required. Please sign in again.')
+        setSubmitting(false)
+        return
+      }
+
       const response = await fetch('/api/campaigns', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
           name: campaignName,
           companyName,
