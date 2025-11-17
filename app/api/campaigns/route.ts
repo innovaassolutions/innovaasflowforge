@@ -52,7 +52,46 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create campaign
+    // Get the authenticated user from the Authorization header
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - missing authentication token' },
+        { status: 401 }
+      )
+    }
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+
+    if (authError || !user) {
+      console.error('Auth error:', authError)
+      return NextResponse.json(
+        { error: 'Unauthorized - invalid or expired token' },
+        { status: 401 }
+      )
+    }
+
+    // Get user's organization from user_profiles
+    const { data: userProfile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('organization_id, full_name')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !userProfile) {
+      console.error('User profile error:', profileError)
+      return NextResponse.json(
+        {
+          error: 'User profile not found. Please sign out and sign in again to complete your profile setup.',
+          details: profileError?.message
+        },
+        { status: 404 }
+      )
+    }
+
+    // Create campaign with organization_id and created_by
     const { data: campaign, error: campaignError } = await supabaseAdmin
       .from('campaigns')
       .insert({
@@ -62,7 +101,9 @@ export async function POST(request: NextRequest) {
         facilitator_name: body.facilitatorName,
         facilitator_email: body.facilitatorEmail,
         description: body.description,
-        status: 'active'
+        status: 'active',
+        organization_id: userProfile.organization_id,
+        created_by: user.id
       } as any)
       .select()
       .single() as any
