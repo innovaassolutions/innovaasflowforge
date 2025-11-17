@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import SocialAuthButtons from '@/components/social-auth-buttons'
 
 // Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
@@ -70,6 +71,19 @@ export default function LoginPage() {
               <p className="text-red-500 text-sm">{error}</p>
             </div>
           )}
+
+          <SocialAuthButtons />
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-mocha-overlay0"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-mocha-surface0 text-mocha-subtext1">
+                Or continue with email
+              </span>
+            </div>
+          </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
