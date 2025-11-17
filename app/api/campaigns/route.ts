@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
+import { resend } from '@/lib/resend'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { randomBytes } from 'crypto'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-// Diagnostic: Log if Resend is configured (but don't log the actual key)
-if (!process.env.RESEND_API_KEY) {
-  console.error('⚠️ RESEND_API_KEY is not configured!')
-} else {
-  console.log('✓ Resend API configured')
-}
 
 interface StakeholderInput {
   fullName: string
