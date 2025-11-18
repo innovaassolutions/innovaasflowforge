@@ -59,6 +59,13 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const [createdCampaignId, setCreatedCampaignId] = useState<string | null>(null)
+  const [stakeholderLinks, setStakeholderLinks] = useState<Array<{
+    stakeholder_name: string
+    stakeholder_email: string
+    access_link: string
+  }>>([])
 
   const [companies, setCompanies] = useState<CompanyProfile[]>([])
   const [availableStakeholders, setAvailableStakeholders] = useState<StakeholderProfile[]>([])
@@ -260,7 +267,10 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         throw new Error(data.error || 'Failed to create campaign')
       }
 
-      router.push(`/dashboard/campaigns/${data.campaign.id}`)
+      // Store campaign data and show success modal with access links
+      setCreatedCampaignId(data.campaign.id)
+      setStakeholderLinks(data.stakeholderAssignments || [])
+      setSuccess(true)
     } catch (err) {
       console.error('Error creating campaign:', err)
       setError(err instanceof Error ? err.message : 'Failed to create campaign')
@@ -559,11 +569,99 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
               disabled={submitting || selectedStakeholders.length === 0}
               className="px-6 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Creating Campaign...' : 'Create Campaign & Send Invitations'}
+              {submitting ? 'Creating Campaign...' : 'Create Campaign'}
             </button>
           </div>
         </form>
       </div>
+
+      {/* Success Modal with Access Links */}
+      {success && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-ctp-surface0 rounded-lg p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-ctp-surface1 shadow-2xl">
+            <div className="flex flex-col">
+              {/* Success Icon */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-brand-orange to-brand-teal rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Success Message */}
+              <h3 className="text-2xl font-bold text-ctp-text mb-2 text-center">
+                Campaign Created Successfully!
+              </h3>
+              <p className="text-ctp-subtext1 mb-6 text-center">
+                Share these interview access links with your stakeholders
+              </p>
+
+              {/* Stakeholder Access Links */}
+              <div className="space-y-4 mb-6">
+                {stakeholderLinks.map((stakeholder, index) => (
+                  <div
+                    key={index}
+                    className="bg-ctp-base border border-ctp-surface1 rounded-lg p-4"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-ctp-text font-medium mb-1">
+                          {stakeholder.stakeholder_name}
+                        </h4>
+                        <p className="text-sm text-ctp-subtext0 mb-3">
+                          {stakeholder.stakeholder_email}
+                        </p>
+                        <div className="bg-ctp-surface0 border border-ctp-surface1 rounded px-3 py-2">
+                          <code className="text-xs text-brand-teal break-all">
+                            {stakeholder.access_link}
+                          </code>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(stakeholder.access_link)
+                          alert(`Link copied for ${stakeholder.stakeholder_name}!`)
+                        }}
+                        className="flex-shrink-0 bg-brand-orange/20 hover:bg-brand-orange/30 text-brand-orange px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Copy Link
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    // Copy all links as formatted text
+                    const allLinks = stakeholderLinks
+                      .map(s => `${s.stakeholder_name} (${s.stakeholder_email}):\n${s.access_link}`)
+                      .join('\n\n')
+                    navigator.clipboard.writeText(allLinks)
+                    alert('All links copied to clipboard!')
+                  }}
+                  className="flex-1 bg-ctp-surface1 hover:bg-ctp-surface2 text-ctp-text px-6 py-3 rounded-lg font-medium transition-colors"
+                >
+                  Copy All Links
+                </button>
+                <button
+                  onClick={() => router.push(`/dashboard/campaigns/${createdCampaignId}`)}
+                  className="flex-1 bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity"
+                >
+                  View Campaign
+                </button>
+              </div>
+
+              <p className="text-xs text-ctp-subtext0 mt-4 text-center">
+                You can also access these links anytime from the campaign dashboard
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

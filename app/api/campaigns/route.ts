@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { resend } from '@/lib/resend'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 import { randomBytes } from 'crypto'
@@ -154,10 +153,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Process stakeholders: create profiles if needed, then create assignments
-    const emailResults: { success: string[]; failed: string[] } = {
-      success: [],
-      failed: []
-    }
+    const stakeholderAssignments: Array<{
+      stakeholder_name: string
+      stakeholder_email: string
+      access_token: string
+      access_link: string
+    }> = []
 
     for (const stakeholder of body.stakeholders) {
       let stakeholderProfileId = stakeholder.stakeholderProfileId
@@ -166,7 +167,6 @@ export async function POST(request: NextRequest) {
       if (!stakeholderProfileId) {
         if (!stakeholder.fullName || !stakeholder.email) {
           console.error('Missing stakeholder data for new profile')
-          emailResults.failed.push(stakeholder.email || 'unknown')
           continue
         }
 
@@ -186,7 +186,6 @@ export async function POST(request: NextRequest) {
 
         if (profileError) {
           console.error(`Profile creation error for ${stakeholder.email}:`, profileError)
-          emailResults.failed.push(stakeholder.email)
           continue
         }
 
@@ -215,7 +214,6 @@ export async function POST(request: NextRequest) {
 
       if (assignmentError) {
         console.error(`Assignment creation error for ${stakeholder.email}:`, assignmentError)
-        emailResults.failed.push(stakeholder.email || 'unknown')
         continue
       }
 
@@ -223,90 +221,21 @@ export async function POST(request: NextRequest) {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
       const accessLink = `${baseUrl}/session/${accessToken}`
 
-      // Send invitation email
-      try {
-        console.log(`Sending email to ${stakeholder.email}...`)
-        console.log(`Access link: ${accessLink}`)
+      // Store assignment info for response (no email sending)
+      stakeholderAssignments.push({
+        stakeholder_name: stakeholder.fullName || '',
+        stakeholder_email: stakeholder.email || '',
+        access_token: accessToken,
+        access_link: accessLink
+      })
 
-        const result = await resend.emails.send({
-          from: 'Flow Forge <onboarding@resend.dev>',
-          to: stakeholder.email!,
-          subject: `${body.facilitatorName} has invited you to participate in ${companyProfile.company_name}'s ${body.name}`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="utf-8">
-                <title>Your Input is Requested</title>
-              </head>
-              <body style="margin: 0; padding: 0; background-color: #1e1e2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                  <!-- Header -->
-                  <div style="background-color: #181825; border-radius: 12px 12px 0 0; padding: 32px 24px; text-align: center;">
-                    <h2 style="color: #F25C05; margin: 0;">Flow Forge</h2>
-                  </div>
-
-                  <!-- Content -->
-                  <div style="background-color: #313244; border-radius: 0 0 12px 12px; padding: 32px 40px;">
-                    <h1 style="color: #F25C05; font-size: 28px; margin: 0 0 24px;">Your Input is Requested</h1>
-
-                    <p style="color: #cdd6f4; font-size: 16px; line-height: 1.6; margin: 16px 0;">
-                      Hi <strong>${stakeholder.fullName}</strong>,
-                    </p>
-
-                    <p style="color: #cdd6f4; font-size: 16px; line-height: 1.6; margin: 16px 0;">
-                      ${body.facilitatorName} has invited you to participate in <strong>${companyProfile.company_name}'s ${body.name}</strong>.
-                    </p>
-
-                    <div style="background-color: #45475a; border-left: 4px solid #F25C05; border-radius: 8px; padding: 20px 24px; margin: 24px 0;">
-                      <p style="color: #bac2de; font-size: 12px; font-weight: 600; text-transform: uppercase; margin: 0 0 4px;">Your Role</p>
-                      <p style="color: #F25C05; font-size: 18px; font-weight: 700; margin: 0 0 16px;">${stakeholder.position}</p>
-                      <p style="color: #bac2de; font-size: 12px; font-weight: 600; text-transform: uppercase; margin: 0 0 4px;">Estimated Time</p>
-                      <p style="color: #F25C05; font-size: 18px; font-weight: 700; margin: 0;">20-30 minutes</p>
-                    </div>
-
-                    <p style="color: #cdd6f4; font-size: 16px; line-height: 1.6; margin: 16px 0;">
-                      This AI-guided interview will help us understand your perspective on:
-                    </p>
-
-                    <ul style="color: #cdd6f4; font-size: 16px; line-height: 1.6; margin: 16px 0; padding-left: 20px;">
-                      <li style="margin: 8px 0;">Current technology infrastructure and systems</li>
-                      <li style="margin: 8px 0;">Data integration challenges and opportunities</li>
-                      <li style="margin: 8px 0;">Operational bottlenecks and inefficiencies</li>
-                      <li style="margin: 8px 0;">Opportunities for digital transformation</li>
-                    </ul>
-
-                    <!-- CTA Button -->
-                    <div style="text-align: center; margin: 32px 0;">
-                      <a href="${accessLink}" style="background-color: #F25C05; border-radius: 8px; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; display: inline-block; padding: 14px 32px;">Start Your Interview</a>
-                    </div>
-
-                    <p style="color: #a6adc8; font-size: 14px; text-align: center; margin: 16px 0;">
-                      Or copy and paste this link: ${accessLink}
-                    </p>
-
-                    <p style="color: #a6adc8; font-size: 14px; line-height: 1.6; margin: 16px 0;">
-                      Your honest feedback is valuable and will help shape the digital transformation roadmap for ${companyProfile.company_name}.
-                    </p>
-                  </div>
-                </div>
-              </body>
-            </html>
-          `
-        })
-
-        console.log('✅ Email sent:', result)
-        emailResults.success.push(stakeholder.email!)
-      } catch (emailError) {
-        console.error(`Email send error for ${stakeholder.email}:`, emailError)
-        emailResults.failed.push(stakeholder.email!)
-      }
+      console.log(`✅ Created assignment for ${stakeholder.fullName}`)
     }
 
     return NextResponse.json({
       success: true,
       campaign,
-      emailResults
+      stakeholderAssignments
     }, { status: 201 })
 
   } catch (error) {
