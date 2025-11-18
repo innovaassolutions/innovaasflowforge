@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { CheckCircle2, Clock, Mail, Pause } from 'lucide-react'
 
 interface StakeholderSession {
   id: string
@@ -138,11 +139,46 @@ export default function CampaignDetailPage() {
         return 'bg-green-500/20 text-green-400'
       case 'in_progress':
         return 'bg-blue-500/20 text-blue-400'
-      case 'pending':
+      case 'paused':
+        return 'bg-yellow-500/20 text-yellow-400'
+      case 'invited':
         return 'bg-mocha-overlay0/20 text-mocha-overlay0'
       default:
         return 'bg-mocha-overlay0/20 text-mocha-overlay0'
     }
+  }
+
+  function getStatusIcon(status: string, startedAt: string | null) {
+    // Completed
+    if (status === 'completed') {
+      return <CheckCircle2 className="w-5 h-5 text-green-400" />
+    }
+
+    // Paused (in progress but no recent activity - placeholder for future implementation)
+    if (status === 'paused') {
+      return <Pause className="w-5 h-5 text-yellow-400" />
+    }
+
+    // In progress
+    if (status === 'in_progress') {
+      return <Clock className="w-5 h-5 text-blue-400 animate-pulse" />
+    }
+
+    // Accessed but not started (started_at exists but status is still invited)
+    if (startedAt && status === 'invited') {
+      return <Mail className="w-5 h-5 text-purple-400" />
+    }
+
+    // Not accessed yet (invited)
+    return <Mail className="w-5 h-5 text-mocha-overlay0" />
+  }
+
+  function getStatusLabel(status: string, startedAt: string | null) {
+    if (status === 'completed') return 'Complete'
+    if (status === 'paused') return 'Paused'
+    if (status === 'in_progress') return 'In Progress'
+    if (startedAt && status === 'invited') return 'Accessed'
+    return 'Invited'
   }
 
   function getRoleTypeLabel(roleType: string): string {
@@ -519,6 +555,7 @@ export default function CampaignDetailPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
+                        {getStatusIcon(stakeholder.status, stakeholder.started_at)}
                         <h3 className="text-lg font-semibold text-mocha-text">
                           {stakeholder.stakeholder_name}
                         </h3>
@@ -529,7 +566,7 @@ export default function CampaignDetailPage() {
                           className={`text-xs px-2 py-1 rounded ${getStatusColor(
                             stakeholder.status
                           )}`}>
-                          {stakeholder.status.replace('_', ' ')}
+                          {getStatusLabel(stakeholder.status, stakeholder.started_at)}
                         </span>
                       </div>
                       <p className="text-sm text-mocha-subtext1 mt-1">
