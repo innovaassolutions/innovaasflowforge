@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Building2, Users, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 interface CompanyProfile {
   id: string
@@ -267,15 +267,10 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         throw new Error(data.error || 'Failed to create campaign')
       }
 
-      console.log('✅ Campaign created successfully:', data)
-      console.log('📋 Stakeholder assignments:', data.stakeholderAssignments)
-
       // Store campaign data and show success modal with access links
       setCreatedCampaignId(data.campaign.id)
       setStakeholderLinks(data.stakeholderAssignments || [])
       setSuccess(true)
-
-      console.log('🔗 Stakeholder links state:', data.stakeholderAssignments)
     } catch (err) {
       console.error('Error creating campaign:', err)
       setError(err instanceof Error ? err.message : 'Failed to create campaign')
