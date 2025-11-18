@@ -267,10 +267,15 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         throw new Error(data.error || 'Failed to create campaign')
       }
 
+      console.log('✅ Campaign created successfully:', data)
+      console.log('📋 Stakeholder assignments:', data.stakeholderAssignments)
+
       // Store campaign data and show success modal with access links
       setCreatedCampaignId(data.campaign.id)
       setStakeholderLinks(data.stakeholderAssignments || [])
       setSuccess(true)
+
+      console.log('🔗 Stakeholder links state:', data.stakeholderAssignments)
     } catch (err) {
       console.error('Error creating campaign:', err)
       setError(err instanceof Error ? err.message : 'Failed to create campaign')

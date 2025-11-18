@@ -162,9 +162,30 @@ export async function POST(request: NextRequest) {
 
     for (const stakeholder of body.stakeholders) {
       let stakeholderProfileId = stakeholder.stakeholderProfileId
+      let stakeholderName = ''
+      let stakeholderEmail = ''
+      let stakeholderRole = ''
+      let stakeholderTitle = ''
 
-      // If no profile ID provided, create a new stakeholder profile
-      if (!stakeholderProfileId) {
+      // If profile ID provided, fetch the existing profile data
+      if (stakeholderProfileId) {
+        const { data: existingProfile, error: fetchError } = await supabase
+          .from('stakeholder_profiles')
+          .select('full_name, email, role_type, title')
+          .eq('id', stakeholderProfileId)
+          .single()
+
+        if (fetchError || !existingProfile) {
+          console.error(`Error fetching stakeholder profile ${stakeholderProfileId}:`, fetchError)
+          continue
+        }
+
+        stakeholderName = existingProfile.full_name
+        stakeholderEmail = existingProfile.email
+        stakeholderRole = existingProfile.role_type
+        stakeholderTitle = existingProfile.title || ''
+      } else {
+        // Create a new stakeholder profile
         if (!stakeholder.fullName || !stakeholder.email) {
           console.error('Missing stakeholder data for new profile')
           continue
@@ -190,6 +211,10 @@ export async function POST(request: NextRequest) {
         }
 
         stakeholderProfileId = newProfile.id
+        stakeholderName = newProfile.full_name
+        stakeholderEmail = newProfile.email
+        stakeholderRole = newProfile.role_type
+        stakeholderTitle = newProfile.title || ''
         console.log(`✅ Created stakeholder profile: ${newProfile.full_name}`)
       }
 
@@ -202,10 +227,10 @@ export async function POST(request: NextRequest) {
           campaign_id: campaign.id,
           stakeholder_profile_id: stakeholderProfileId,
           // Keep legacy fields for backward compatibility
-          stakeholder_name: stakeholder.fullName,
-          stakeholder_email: stakeholder.email,
-          stakeholder_role: stakeholder.roleType,
-          stakeholder_title: stakeholder.position,
+          stakeholder_name: stakeholderName,
+          stakeholder_email: stakeholderEmail,
+          stakeholder_role: stakeholderRole,
+          stakeholder_title: stakeholderTitle,
           access_token: accessToken,
           status: 'invited'
         } as any)
@@ -213,7 +238,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (assignmentError) {
-        console.error(`Assignment creation error for ${stakeholder.email}:`, assignmentError)
+        console.error(`Assignment creation error for ${stakeholderEmail}:`, assignmentError)
         continue
       }
 
@@ -223,13 +248,13 @@ export async function POST(request: NextRequest) {
 
       // Store assignment info for response (no email sending)
       stakeholderAssignments.push({
-        stakeholder_name: stakeholder.fullName || '',
-        stakeholder_email: stakeholder.email || '',
+        stakeholder_name: stakeholderName,
+        stakeholder_email: stakeholderEmail,
         access_token: accessToken,
         access_link: accessLink
       })
 
-      console.log(`✅ Created assignment for ${stakeholder.fullName}`)
+      console.log(`✅ Created assignment for ${stakeholderName} (${stakeholderEmail})`)
     }
 
     return NextResponse.json({
