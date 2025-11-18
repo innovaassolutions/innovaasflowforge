@@ -30,6 +30,11 @@ interface StakeholderSelection {
   isExisting: boolean
 }
 
+interface UserProfile {
+  full_name: string | null
+  email: string | null
+}
+
 const ROLE_TYPES = [
   { value: 'managing_director', label: 'Managing Director' },
   { value: 'it_operations', label: 'IT Operations' },
@@ -107,11 +112,11 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
 
       // If we have an initial company ID from URL, load user profile to pre-fill facilitator fields
       if (initialCompanyId) {
-        const { data: profile } = await supabase
+        const { data: profile } = (await supabase
           .from('user_profiles')
           .select('full_name, email')
           .eq('id', session.user.id)
-          .single()
+          .single()) as { data: UserProfile | null, error: any }
 
         if (profile) {
           setFormData(prev => ({
