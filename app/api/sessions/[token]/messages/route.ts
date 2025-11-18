@@ -21,7 +21,7 @@ export async function POST(
       )
     }
 
-    // Verify access token and get session details
+    // Verify access token and get session details with full profile context
     const { data: stakeholderSession, error: sessionError } = await supabaseAdmin
       .from('campaign_assignments')
       .select(`
@@ -31,7 +31,25 @@ export async function POST(
           name,
           company_name,
           facilitator_name,
-          description
+          description,
+          company_profiles (
+            id,
+            company_name,
+            industry,
+            description,
+            market_scope,
+            employee_count_range,
+            annual_revenue_range,
+            headquarters_location
+          )
+        ),
+        stakeholder_profiles (
+          id,
+          full_name,
+          email,
+          role_type,
+          title,
+          department
         )
       `)
       .eq('access_token', accessToken)

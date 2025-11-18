@@ -22,6 +22,24 @@ interface StakeholderSession {
     company_name: string
     facilitator_name: string
     description?: string
+    company_profiles?: {
+      id: string
+      company_name: string
+      industry: string
+      description?: string
+      market_scope: 'local' | 'regional' | 'national' | 'international'
+      employee_count_range?: string
+      annual_revenue_range?: string
+      headquarters_location?: string
+    }
+  }
+  stakeholder_profiles?: {
+    id: string
+    full_name: string
+    email: string
+    role_type: string
+    title?: string
+    department?: string
   }
 }
 
@@ -83,14 +101,31 @@ function generateSystemPrompt(
     ? `\n\nRELEVANT INDUSTRY 4.0 KNOWLEDGE:\n${knowledgeContext.join('\n\n---\n\n')}`
     : ''
 
+  // Build company context from profile data
+  const companyProfile = stakeholderSession.campaigns.company_profiles
+  const companyContext = companyProfile ? `
+Company Profile:
+- Industry: ${companyProfile.industry}
+- Market Scope: ${companyProfile.market_scope}${companyProfile.employee_count_range ? `
+- Employee Count: ${companyProfile.employee_count_range}` : ''}${companyProfile.annual_revenue_range ? `
+- Annual Revenue: ${companyProfile.annual_revenue_range}` : ''}${companyProfile.headquarters_location ? `
+- Location: ${companyProfile.headquarters_location}` : ''}${companyProfile.description ? `
+- About: ${companyProfile.description}` : ''}` : ''
+
+  // Build stakeholder context from profile data
+  const stakeholderProfile = stakeholderSession.stakeholder_profiles
+  const stakeholderContext = stakeholderProfile?.department ? `
+Department: ${stakeholderProfile.department}` : ''
+
   const basePrompt = `You are an experienced Industry 4.0 consultant conducting a stakeholder interview for ${stakeholderSession.campaigns.company_name}.
 
 INTERVIEW CONTEXT:
 Campaign: ${stakeholderSession.campaigns.name}
 Stakeholder: ${stakeholderSession.stakeholder_name}
-Position/Title: ${stakeholderSession.stakeholder_title}
+Position/Title: ${stakeholderSession.stakeholder_title}${stakeholderContext}
 Role Type: ${stakeholderSession.stakeholder_role}
 Facilitator: ${stakeholderSession.campaigns.facilitator_name}
+${companyContext}
 
 YOUR MISSION:
 Conduct a professional, insightful interview to understand this stakeholder's perspective on digital transformation readiness, challenges, and opportunities. Your insights will contribute to a comprehensive Industry 4.0 readiness assessment.
