@@ -107,8 +107,12 @@ export default function DashboardPage() {
 
       const data = await response.json()
 
-      if (response.ok && data.success) {
-        setCampaigns(data.campaigns)
+      if (response.ok) {
+        if (data.campaigns) {
+          setCampaigns(data.campaigns)
+        } else if (data.error) {
+          setError(data.error)
+        }
       } else {
         setError(data.error || 'Failed to load campaigns')
 
@@ -143,8 +147,8 @@ export default function DashboardPage() {
 
       const data = await response.json()
 
-      if (response.ok && data.success) {
-        setCompaniesCount(data.companies?.length || 0)
+      if (response.ok && data.companies) {
+        setCompaniesCount(data.companies.length || 0)
       }
     } catch (err) {
       console.error('Error fetching companies count:', err)
