@@ -12,10 +12,10 @@ interface UpdateStakeholderProfileRequest {
 }
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     companyId: string
     stakeholderId: string
-  }
+  }>
 }
 
 /**
@@ -24,7 +24,7 @@ interface RouteContext {
  */
 export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
-    const { companyId, stakeholderId } = params
+    const { companyId, stakeholderId } = await params
 
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
  */
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
-    const { companyId, stakeholderId } = params
+    const { companyId, stakeholderId } = await params
     const body: UpdateStakeholderProfileRequest = await request.json()
 
     // Validate required fields
@@ -226,7 +226,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteContext) {
   try {
-    const { companyId, stakeholderId } = params
+    const { companyId, stakeholderId } = await params
 
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')

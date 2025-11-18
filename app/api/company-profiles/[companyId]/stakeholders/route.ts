@@ -12,9 +12,9 @@ interface CreateStakeholderProfileRequest {
 }
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     companyId: string
-  }
+  }>
 }
 
 /**
@@ -23,7 +23,7 @@ interface RouteContext {
  */
 export async function POST(request: NextRequest, { params }: RouteContext) {
   try {
-    const { companyId } = params
+    const { companyId } = await params
     const body: CreateStakeholderProfileRequest = await request.json()
 
     // Validate required fields
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
  */
 export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
-    const { companyId } = params
+    const { companyId } = await params
 
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
