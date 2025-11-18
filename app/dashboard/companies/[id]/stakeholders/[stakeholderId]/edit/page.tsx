@@ -29,13 +29,15 @@ interface StakeholderProfile {
   department: string | null
 }
 
-export default function EditStakeholderPage({ params }: { params: { id: string, stakeholderId: string } }) {
+export default function EditStakeholderPage({ params }: { params: Promise<{ id: string, stakeholderId: string }> }) {
   const router = useRouter()
   const [company, setCompany] = useState<CompanyProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [companyId, setCompanyId] = useState<string | null>(null)
+  const [stakeholderId, setStakeholderId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -45,9 +47,19 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
     department: ''
   })
 
+  // Unwrap params Promise
   useEffect(() => {
-    loadData()
-  }, [params.id, params.stakeholderId])
+    params.then(p => {
+      setCompanyId(p.id)
+      setStakeholderId(p.stakeholderId)
+    })
+  }, [params])
+
+  useEffect(() => {
+    if (companyId && stakeholderId) {
+      loadData()
+    }
+  }, [companyId, stakeholderId])
 
   async function loadData() {
     try {
@@ -67,7 +79,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
       })
 
       const companyData = await companyResponse.json()
-      const foundCompany = companyData.companies?.find((c: CompanyProfile) => c.id === params.id)
+      const foundCompany = companyData.companies?.find((c: CompanyProfile) => c.id === companyId)
 
       if (!foundCompany) {
         setError('Company not found or you do not have access to it')
@@ -78,7 +90,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
 
       // Load stakeholder
       const stakeholderResponse = await fetch(
-        `/api/company-profiles/${params.id}/stakeholders/${params.stakeholderId}`,
+        `/api/company-profiles/${companyId}/stakeholders/${stakeholderId}`,
         {
           headers: {
             'Authorization': `Bearer ${session.access_token}`
@@ -137,7 +149,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
       }
 
       const response = await fetch(
-        `/api/company-profiles/${params.id}/stakeholders/${params.stakeholderId}`,
+        `/api/company-profiles/${companyId}/stakeholders/${stakeholderId}`,
         {
           method: 'PATCH',
           headers: {
@@ -155,7 +167,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
       }
 
       // Success! Navigate back to company detail page
-      router.push(`/dashboard/companies/${params.id}`)
+      router.push(`/dashboard/companies/${companyId}`)
     } catch (err) {
       console.error('Error updating stakeholder:', err)
       setError(err instanceof Error ? err.message : 'Failed to update stakeholder profile')
@@ -182,7 +194,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
       }
 
       const response = await fetch(
-        `/api/company-profiles/${params.id}/stakeholders/${params.stakeholderId}`,
+        `/api/company-profiles/${companyId}/stakeholders/${stakeholderId}`,
         {
           method: 'DELETE',
           headers: {
@@ -198,7 +210,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
       }
 
       // Success! Navigate back to company detail page
-      router.push(`/dashboard/companies/${params.id}`)
+      router.push(`/dashboard/companies/${companyId}`)
     } catch (err) {
       console.error('Error deleting stakeholder:', err)
       setError(err instanceof Error ? err.message : 'Failed to delete stakeholder profile')
@@ -223,7 +235,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
             {error}
           </div>
           <Link
-            href={`/dashboard/companies/${params.id}`}
+            href={`/dashboard/companies/${companyId}`}
             className="inline-block mt-4 text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors"
           >
             ← Back to Company
@@ -239,7 +251,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
         {/* Header */}
         <div className="mb-8">
           <Link
-            href={`/dashboard/companies/${params.id}`}
+            href={`/dashboard/companies/${companyId}`}
             className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
           >
             ← Back to {company?.company_name}
@@ -362,7 +374,7 @@ export default function EditStakeholderPage({ params }: { params: { id: string, 
 
             <div className="flex items-center gap-4">
               <Link
-                href={`/dashboard/companies/${params.id}`}
+                href={`/dashboard/companies/${companyId}`}
                 className="px-6 py-2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
               >
                 Cancel

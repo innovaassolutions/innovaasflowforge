@@ -20,12 +20,13 @@ interface CompanyProfile {
   company_name: string
 }
 
-export default function NewStakeholderPage({ params }: { params: { id: string } }) {
+export default function NewStakeholderPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [company, setCompany] = useState<CompanyProfile | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [companyId, setCompanyId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -35,9 +36,16 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
     department: ''
   })
 
+  // Unwrap params Promise
   useEffect(() => {
-    loadCompany()
-  }, [params.id])
+    params.then(p => setCompanyId(p.id))
+  }, [params])
+
+  useEffect(() => {
+    if (companyId) {
+      loadCompany()
+    }
+  }, [companyId])
 
   async function loadCompany() {
     try {
@@ -56,7 +64,7 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
       })
 
       const data = await response.json()
-      const foundCompany = data.companies?.find((c: CompanyProfile) => c.id === params.id)
+      const foundCompany = data.companies?.find((c: CompanyProfile) => c.id === companyId)
 
       if (!foundCompany) {
         setError('Company not found or you do not have access to it')
@@ -96,7 +104,7 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
         return
       }
 
-      const response = await fetch(`/api/company-profiles/${params.id}/stakeholders`, {
+      const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +120,7 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
       }
 
       // Success! Navigate back to company detail page
-      router.push(`/dashboard/companies/${params.id}`)
+      router.push(`/dashboard/companies/${companyId}`)
     } catch (err) {
       console.error('Error creating stakeholder:', err)
       setError(err instanceof Error ? err.message : 'Failed to create stakeholder profile')
@@ -153,7 +161,7 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
         {/* Header */}
         <div className="mb-8">
           <Link
-            href={`/dashboard/companies/${params.id}`}
+            href={`/dashboard/companies/${companyId}`}
             className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
           >
             ← Back to {company?.company_name}
@@ -266,7 +274,7 @@ export default function NewStakeholderPage({ params }: { params: { id: string } 
           {/* Actions */}
           <div className="flex items-center justify-end gap-4">
             <Link
-              href={`/dashboard/companies/${params.id}`}
+              href={`/dashboard/companies/${companyId}`}
               className="px-6 py-2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
             >
               Cancel

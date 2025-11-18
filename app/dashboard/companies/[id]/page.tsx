@@ -38,17 +38,25 @@ interface Campaign {
   description: string | null
 }
 
-export default function CompanyDetailPage({ params }: { params: { id: string } }) {
+export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [company, setCompany] = useState<CompanyProfile | null>(null)
   const [stakeholders, setStakeholders] = useState<StakeholderProfile[]>([])
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [companyId, setCompanyId] = useState<string | null>(null)
+
+  // Unwrap params Promise
+  useEffect(() => {
+    params.then(p => setCompanyId(p.id))
+  }, [params])
 
   useEffect(() => {
-    loadCompanyData()
-  }, [params.id])
+    if (companyId) {
+      loadCompanyData()
+    }
+  }, [companyId])
 
   async function loadCompanyData() {
     try {
@@ -68,7 +76,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
       })
 
       const companyData = await companyResponse.json()
-      const foundCompany = companyData.companies?.find((c: CompanyProfile) => c.id === params.id)
+      const foundCompany = companyData.companies?.find((c: CompanyProfile) => c.id === companyId)
 
       if (!foundCompany) {
         setError('Company not found or you do not have access to it')
@@ -78,7 +86,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
       setCompany(foundCompany)
 
       // Load stakeholders for this company
-      const stakeholdersResponse = await fetch(`/api/company-profiles/${params.id}/stakeholders`, {
+      const stakeholdersResponse = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -96,7 +104,7 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
 
       const campaignsData = await campaignsResponse.json()
       const companyCampaigns = campaignsData.campaigns?.filter(
-        (c: Campaign & { company_profile_id: string }) => c.company_profile_id === params.id
+        (c: Campaign & { company_profile_id: string }) => c.company_profile_id === companyId
       ) || []
       setCampaigns(companyCampaigns)
 

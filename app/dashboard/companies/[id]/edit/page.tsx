@@ -59,11 +59,12 @@ interface CompanyProfile {
   headquarters_location: string | null
 }
 
-export default function EditCompanyPage({ params }: { params: { id: string } }) {
+export default function EditCompanyPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [companyId, setCompanyId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -76,9 +77,16 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
     headquartersLocation: ''
   })
 
+  // Unwrap params Promise
   useEffect(() => {
-    loadCompany()
-  }, [params.id])
+    params.then(p => setCompanyId(p.id))
+  }, [params])
+
+  useEffect(() => {
+    if (companyId) {
+      loadCompany()
+    }
+  }, [companyId])
 
   async function loadCompany() {
     try {
@@ -97,7 +105,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
       })
 
       const data = await response.json()
-      const company = data.companies?.find((c: CompanyProfile) => c.id === params.id)
+      const company = data.companies?.find((c: CompanyProfile) => c.id === companyId)
 
       if (!company) {
         setError('Company not found or you do not have access to it')
@@ -148,7 +156,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
         return
       }
 
-      const response = await fetch(`/api/company-profiles/${params.id}`, {
+      const response = await fetch(`/api/company-profiles/${companyId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +172,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
       }
 
       // Success! Navigate back to company detail page
-      router.push(`/dashboard/companies/${params.id}`)
+      router.push(`/dashboard/companies/${companyId}`)
     } catch (err) {
       console.error('Error updating company:', err)
       setError(err instanceof Error ? err.message : 'Failed to update company profile')
@@ -205,7 +213,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
         {/* Header */}
         <div className="mb-8">
           <Link
-            href={`/dashboard/companies/${params.id}`}
+            href={`/dashboard/companies/${companyId}`}
             className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
           >
             ← Back to Company
@@ -382,7 +390,7 @@ export default function EditCompanyPage({ params }: { params: { id: string } }) 
           {/* Actions */}
           <div className="flex items-center justify-end gap-4">
             <Link
-              href={`/dashboard/companies/${params.id}`}
+              href={`/dashboard/companies/${companyId}`}
               className="px-6 py-2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
             >
               Cancel
