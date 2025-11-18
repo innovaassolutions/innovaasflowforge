@@ -14,7 +14,7 @@ export async function POST(
 
     // Verify session belongs to this campaign
     const { data: stakeholderSession, error: sessionError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select('*')
       .eq('id', sessionId)
       .eq('campaign_id', campaignId)
@@ -75,7 +75,7 @@ export async function POST(
 
     // Update stakeholder session status
     const { error: statusError } = await (supabaseAdmin
-      .from('stakeholder_sessions') as any)
+      .from('campaign_assignments') as any)
       .update({
         status: 'completed',
         completed_at: new Date().toISOString()

@@ -408,7 +408,7 @@ export interface Database {
         Insert: CampaignInsert
         Update: CampaignUpdate
       }
-      stakeholder_sessions: {
+      campaign_assignments: {
         Row: StakeholderSession
         Insert: StakeholderSessionInsert
         Update: StakeholderSessionUpdate

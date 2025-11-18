@@ -39,7 +39,7 @@ export async function POST(
 
     // Check if all stakeholders have completed their interviews
     const { data: sessions, error: sessionsError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select('id, status, stakeholder_name')
       .eq('campaign_id', campaignId)
 
@@ -180,7 +180,7 @@ export async function GET(
 
     // Check session status
     const { data: sessions, error: sessionsError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select('id, status, stakeholder_name, stakeholder_role')
       .eq('campaign_id', campaignId)
 

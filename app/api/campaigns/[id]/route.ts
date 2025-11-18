@@ -28,7 +28,7 @@ export async function GET(
 
     // Fetch stakeholder sessions
     const { data: sessions, error: sessionsError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select('*')
       .eq('campaign_id', campaignId)
       .order('created_at', { ascending: true }) as any
@@ -127,7 +127,7 @@ export async function DELETE(
   try {
     const { id: campaignId } = await params
 
-    // Delete campaign (cascades to stakeholder_sessions, agent_sessions, etc.)
+    // Delete campaign (cascades to campaign_assignments, agent_sessions, etc.)
     const { error } = await supabaseAdmin
       .from('campaigns')
       .delete()

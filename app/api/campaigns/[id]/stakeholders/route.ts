@@ -66,7 +66,7 @@ export async function POST(
 
       // Create stakeholder session
       const { data: newSession, error: sessionError } = await supabaseAdmin
-        .from('stakeholder_sessions')
+        .from('campaign_assignments')
         .insert({
           campaign_id: campaignId,
           stakeholder_name: stakeholder.fullName,

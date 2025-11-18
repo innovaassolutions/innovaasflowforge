@@ -22,7 +22,7 @@ export async function POST(
 
     // Verify access token and get session details
     const { data: stakeholderSession, error: sessionError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select('*')
       .eq('access_token', accessToken)
       .single() as any
@@ -83,7 +83,7 @@ export async function POST(
 
     // Update stakeholder session status
     const { error: statusError } = await (supabaseAdmin
-      .from('stakeholder_sessions') as any)
+      .from('campaign_assignments') as any)
       .update({
         status: 'completed',
         completed_at: new Date().toISOString()

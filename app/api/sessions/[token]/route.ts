@@ -13,9 +13,9 @@ export async function GET(
   try {
     const { token: accessToken } = await params
 
-    // Find stakeholder session by access token
+    // Find campaign assignment by access token
     const { data: session, error: sessionError } = await supabaseAdmin
-      .from('stakeholder_sessions')
+      .from('campaign_assignments')
       .select(`
         *,
         campaigns (
@@ -48,7 +48,7 @@ export async function GET(
     // Update session status to in_progress if it's invited
     if (session.status === 'invited') {
       const { error: updateError } = await (supabaseAdmin
-        .from('stakeholder_sessions') as any)
+        .from('campaign_assignments') as any)
         .update({
           status: 'in_progress',
           started_at: new Date().toISOString()

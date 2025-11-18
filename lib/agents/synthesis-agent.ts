@@ -144,7 +144,7 @@ const FRAMEWORK = {
  */
 async function fetchCampaignTranscripts(campaignId: string): Promise<SessionTranscript[]> {
   const { data: sessions, error } = await (supabaseAdmin
-    .from('stakeholder_sessions') as any)
+    .from('campaign_assignments') as any)
     .select(`
       id,
       stakeholder_name,
