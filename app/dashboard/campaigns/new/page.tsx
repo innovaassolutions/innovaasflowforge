@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -39,10 +39,17 @@ const ROLE_TYPES = [
   { value: 'engineering_maintenance', label: 'Engineering & Maintenance' }
 ]
 
-export default function NewCampaignPage() {
-  const router = useRouter()
+// Component that uses useSearchParams - wrapped in Suspense
+function CampaignFormWrapper() {
   const searchParams = useSearchParams()
   const companyIdFromUrl = searchParams.get('companyId')
+
+  return <NewCampaignForm initialCompanyId={companyIdFromUrl} />
+}
+
+// Main form component
+function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null }) {
+  const router = useRouter()
 
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -55,7 +62,7 @@ export default function NewCampaignPage() {
 
   const [formData, setFormData] = useState({
     campaignName: '',
-    companyProfileId: companyIdFromUrl || '',
+    companyProfileId: initialCompanyId || '',
     facilitatorName: '',
     facilitatorEmail: '',
     description: ''
@@ -98,14 +105,22 @@ export default function NewCampaignPage() {
       const data = await response.json()
       setCompanies(data.companies || [])
 
-      // If companyId was in URL and companies loaded, auto-select it
-      if (companyIdFromUrl && data.companies) {
-        const company = data.companies.find((c: CompanyProfile) => c.id === companyIdFromUrl)
-        if (company) {
-          setFormData(prev => ({ ...prev, companyProfileId: company.id }))
+      // If we have an initial company ID from URL, load user profile to pre-fill facilitator fields
+      if (initialCompanyId) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name, email')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            facilitatorName: profile.full_name || '',
+            facilitatorEmail: profile.email || ''
+          }))
         }
       }
-
     } catch (err) {
       console.error('Error loading companies:', err)
       setError('Failed to load companies')
@@ -117,11 +132,9 @@ export default function NewCampaignPage() {
   async function loadStakeholders(companyId: string) {
     try {
       const supabase = createClient()
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
-      if (sessionError || !session) {
-        return
-      }
+      if (!session) return
 
       const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
         headers: {
@@ -131,6 +144,7 @@ export default function NewCampaignPage() {
 
       const data = await response.json()
       setAvailableStakeholders(data.stakeholders || [])
+      setSelectedStakeholders([]) // Reset selections when company changes
     } catch (err) {
       console.error('Error loading stakeholders:', err)
     }
@@ -161,8 +175,8 @@ export default function NewCampaignPage() {
   }
 
   function addNewStakeholder() {
-    if (!newStakeholder.fullName || !newStakeholder.email || !newStakeholder.roleType) {
-      setError('Please fill in all required fields for the new stakeholder')
+    if (!newStakeholder.fullName || !newStakeholder.email) {
+      setError('Please fill in stakeholder name and email')
       return
     }
 
@@ -178,6 +192,7 @@ export default function NewCampaignPage() {
       }
     ])
 
+    // Reset form
     setNewStakeholder({
       fullName: '',
       email: '',
@@ -186,6 +201,7 @@ export default function NewCampaignPage() {
       department: ''
     })
     setShowNewStakeholderForm(false)
+    setError(null)
   }
 
   function removeStakeholder(index: number) {
@@ -195,7 +211,7 @@ export default function NewCampaignPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    if (!formData.campaignName || !formData.companyProfileId || !formData.facilitatorName || !formData.facilitatorEmail) {
+    if (!formData.campaignName || !formData.companyProfileId) {
       setError('Please fill in all required fields')
       return
     }
@@ -210,10 +226,10 @@ export default function NewCampaignPage() {
 
     try {
       const supabase = createClient()
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
-      if (sessionError || !session) {
-        setError('Authentication required. Please sign in again.')
+      if (!session) {
+        setError('Authentication required')
         return
       }
 
@@ -239,7 +255,6 @@ export default function NewCampaignPage() {
         throw new Error(data.error || 'Failed to create campaign')
       }
 
-      // Success! Navigate to campaign detail page
       router.push(`/dashboard/campaigns/${data.campaign.id}`)
     } catch (err) {
       console.error('Error creating campaign:', err)
@@ -247,11 +262,6 @@ export default function NewCampaignPage() {
     } finally {
       setSubmitting(false)
     }
-  }
-
-  const getRoleTypeLabel = (roleType: string) => {
-    const role = ROLE_TYPES.find(r => r.value === roleType)
-    return role?.label || roleType
   }
 
   if (loading) {
@@ -275,46 +285,39 @@ export default function NewCampaignPage() {
           </Link>
           <h1 className="text-3xl font-bold text-ctp-text">Create New Campaign</h1>
           <p className="mt-2 text-sm text-ctp-subtext0">
-            Set up a new assessment or workshop campaign
+            Create a campaign and assign stakeholders for interviews
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-ctp-red/10 border border-ctp-red rounded-lg text-ctp-red">
-            {error}
+          <div className="mb-6 bg-ctp-red/10 border border-ctp-red rounded-lg p-4">
+            <p className="text-ctp-red text-sm">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Campaign Details */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
-              <Building2 className="w-5 h-5" />
-              Campaign Details
-            </h2>
+          <div className="bg-ctp-surface0 rounded-lg p-6 border border-ctp-surface1">
+            <h2 className="text-lg font-semibold text-ctp-text mb-4">Campaign Details</h2>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ctp-text mb-2">
                   Company <span className="text-ctp-red">*</span>
                 </label>
-                {companies.length === 0 ? (
-                  <div className="text-sm text-ctp-subtext0">
-                    No companies found. <Link href="/dashboard/companies/new" className="text-ctp-peach hover:underline">Create a company first</Link>
-                  </div>
-                ) : (
-                  <select
-                    value={formData.companyProfileId}
-                    onChange={(e) => updateField('companyProfileId', e.target.value)}
-                    className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
-                    required
-                  >
-                    <option value="">Select a company...</option>
-                    {companies.map(company => (
-                      <option key={company.id} value={company.id}>{company.company_name}</option>
-                    ))}
-                  </select>
-                )}
+                <select
+                  value={formData.companyProfileId}
+                  onChange={(e) => updateField('companyProfileId', e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:outline-none focus:border-ctp-peach"
+                >
+                  <option value="">Select a company...</option>
+                  {companies.map(company => (
+                    <option key={company.id} value={company.id}>
+                      {company.company_name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -325,38 +328,36 @@ export default function NewCampaignPage() {
                   type="text"
                   value={formData.campaignName}
                   onChange={(e) => updateField('campaignName', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
-                  placeholder="Q1 2025 Industry 4.0 Assessment"
                   required
+                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                  placeholder="Q1 2025 Digital Transformation Assessment"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-ctp-text mb-2">
-                    Facilitator Name <span className="text-ctp-red">*</span>
+                    Facilitator Name
                   </label>
                   <input
                     type="text"
                     value={formData.facilitatorName}
                     onChange={(e) => updateField('facilitatorName', e.target.value)}
-                    className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                    className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
                     placeholder="Your name"
-                    required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-ctp-text mb-2">
-                    Facilitator Email <span className="text-ctp-red">*</span>
+                    Facilitator Email
                   </label>
                   <input
                     type="email"
                     value={formData.facilitatorEmail}
                     onChange={(e) => updateField('facilitatorEmail', e.target.value)}
-                    className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
-                    placeholder="your@email.com"
-                    required
+                    className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                    placeholder="your.email@example.com"
                   />
                 </div>
               </div>
@@ -369,25 +370,26 @@ export default function NewCampaignPage() {
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
                   placeholder="Brief description of this campaign..."
                 />
               </div>
             </div>
           </div>
 
-          {/* Stakeholders */}
+          {/* Stakeholder Selection */}
           {formData.companyProfileId && (
-            <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-              <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Stakeholders ({selectedStakeholders.length})
+            <div className="bg-ctp-surface0 rounded-lg p-6 border border-ctp-surface1">
+              <h2 className="text-lg font-semibold text-ctp-text mb-4">
+                Assign Stakeholders <span className="text-ctp-red">*</span>
               </h2>
 
-              {/* Available Stakeholders */}
+              {/* Existing Stakeholders */}
               {availableStakeholders.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-ctp-text mb-3">Select from existing stakeholders:</h3>
+                  <h3 className="text-sm font-medium text-ctp-text mb-3">
+                    Select from existing stakeholders:
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {availableStakeholders.map(stakeholder => {
                       const isSelected = selectedStakeholders.some(
@@ -398,15 +400,16 @@ export default function NewCampaignPage() {
                           key={stakeholder.id}
                           type="button"
                           onClick={() => toggleStakeholderSelection(stakeholder)}
-                          className={`p-3 rounded-lg border text-left transition-colors ${
+                          className={`p-4 rounded-lg border-2 text-left transition-colors ${
                             isSelected
                               ? 'border-ctp-peach bg-ctp-peach/10'
                               : 'border-ctp-surface1 bg-ctp-base hover:border-ctp-surface2'
                           }`}
                         >
                           <div className="font-medium text-ctp-text">{stakeholder.full_name}</div>
+                          <div className="text-sm text-ctp-subtext0 mt-1">{stakeholder.email}</div>
                           <div className="text-xs text-ctp-subtext0 mt-1">
-                            {stakeholder.title || getRoleTypeLabel(stakeholder.role_type)}
+                            {stakeholder.role_type.replace('_', ' ')}
                           </div>
                         </button>
                       )
@@ -416,109 +419,90 @@ export default function NewCampaignPage() {
               )}
 
               {/* Add New Stakeholder */}
-              {!showNewStakeholderForm && (
-                <button
-                  type="button"
-                  onClick={() => setShowNewStakeholderForm(true)}
-                  className="w-full p-3 border-2 border-dashed border-ctp-surface1 rounded-lg text-ctp-subtext0 hover:border-ctp-peach hover:text-ctp-peach transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add New Stakeholder
-                </button>
-              )}
-
-              {showNewStakeholderForm && (
-                <div className="p-4 bg-ctp-base rounded-lg border border-ctp-surface1">
-                  <h3 className="text-sm font-medium text-ctp-text mb-4">Create New Stakeholder</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs text-ctp-subtext0 mb-2">Full Name *</label>
+              <div className="mb-6">
+                {!showNewStakeholderForm ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowNewStakeholderForm(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text hover:bg-ctp-surface1 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add New Stakeholder
+                  </button>
+                ) : (
+                  <div className="p-4 bg-ctp-base border border-ctp-surface1 rounded-lg">
+                    <h3 className="text-sm font-medium text-ctp-text mb-3">New Stakeholder</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <input
                         type="text"
                         value={newStakeholder.fullName}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, fullName: e.target.value })}
-                        className="w-full px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text text-sm focus:border-ctp-peach focus:outline-none"
+                        placeholder="Full Name *"
+                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs text-ctp-subtext0 mb-2">Email *</label>
                       <input
                         type="email"
                         value={newStakeholder.email}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, email: e.target.value })}
-                        className="w-full px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text text-sm focus:border-ctp-peach focus:outline-none"
+                        placeholder="Email *"
+                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs text-ctp-subtext0 mb-2">Role Type *</label>
                       <select
                         value={newStakeholder.roleType}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, roleType: e.target.value })}
-                        className="w-full px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text text-sm focus:border-ctp-peach focus:outline-none"
+                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text focus:outline-none focus:border-ctp-peach"
                       >
                         {ROLE_TYPES.map(role => (
                           <option key={role.value} value={role.value}>{role.label}</option>
                         ))}
                       </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs text-ctp-subtext0 mb-2">Job Title</label>
                       <input
                         type="text"
                         value={newStakeholder.position}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, position: e.target.value })}
-                        className="w-full px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text text-sm focus:border-ctp-peach focus:outline-none"
+                        placeholder="Job Title"
+                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
                       />
                     </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-xs text-ctp-subtext0 mb-2">Department</label>
-                      <input
-                        type="text"
-                        value={newStakeholder.department}
-                        onChange={(e) => setNewStakeholder({ ...newStakeholder, department: e.target.value })}
-                        className="w-full px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text text-sm focus:border-ctp-peach focus:outline-none"
-                      />
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={addNewStakeholder}
+                        className="px-4 py-2 bg-ctp-peach text-white rounded hover:opacity-90 transition-opacity"
+                      >
+                        Add to Campaign
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowNewStakeholderForm(false)}
+                        className="px-4 py-2 bg-ctp-surface1 text-ctp-text rounded hover:bg-ctp-surface2 transition-colors"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  <div className="flex justify-end gap-3 mt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowNewStakeholderForm(false)}
-                      className="px-4 py-2 text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={addNewStakeholder}
-                      className="px-4 py-2 bg-ctp-peach rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                    >
-                      Add to Campaign
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Selected Stakeholders List */}
+              {/* Selected Stakeholders Summary */}
               {selectedStakeholders.length > 0 && (
-                <div className="mt-6 space-y-2">
-                  <h3 className="text-sm font-medium text-ctp-text">Selected stakeholders:</h3>
+                <div>
+                  <h3 className="text-sm font-medium text-ctp-text mb-3">
+                    Selected stakeholders ({selectedStakeholders.length}):
+                  </h3>
                   {selectedStakeholders.map((stakeholder, index) => {
                     if (stakeholder.isExisting) {
-                      const profile = availableStakeholders.find(s => s.id === stakeholder.stakeholderProfileId)
-                      return (
+                      const fullStakeholder = availableStakeholders.find(
+                        s => s.id === stakeholder.stakeholderProfileId
+                      )
+                      return fullStakeholder ? (
                         <div
-                          key={index}
-                          className="flex items-center justify-between p-3 bg-ctp-base rounded-lg border border-ctp-surface1"
+                          key={`existing-${stakeholder.stakeholderProfileId}`}
+                          className="flex items-center justify-between p-3 bg-ctp-base border border-ctp-surface1 rounded-lg mb-2"
                         >
                           <div>
-                            <div className="font-medium text-ctp-text">{profile?.full_name}</div>
-                            <div className="text-xs text-ctp-subtext0">{profile?.email}</div>
+                            <div className="font-medium text-ctp-text">{fullStakeholder.full_name}</div>
+                            <div className="text-xs text-ctp-subtext0">{fullStakeholder.email}</div>
                           </div>
                           <button
                             type="button"
@@ -528,12 +512,12 @@ export default function NewCampaignPage() {
                             <X className="w-4 h-4" />
                           </button>
                         </div>
-                      )
+                      ) : null
                     } else {
                       return (
                         <div
-                          key={index}
-                          className="flex items-center justify-between p-3 bg-ctp-peach/10 rounded-lg border border-ctp-peach"
+                          key={`new-${index}`}
+                          className="flex items-center justify-between p-3 bg-ctp-base border border-ctp-surface1 rounded-lg mb-2"
                         >
                           <div>
                             <div className="font-medium text-ctp-text">
@@ -576,5 +560,18 @@ export default function NewCampaignPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+// Default export with Suspense boundary
+export default function NewCampaignPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-ctp-base flex items-center justify-center">
+        <div className="text-ctp-text">Loading...</div>
+      </div>
+    }>
+      <CampaignFormWrapper />
+    </Suspense>
   )
 }
