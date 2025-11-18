@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
+import { Building2, BarChart3, Users, Plus } from 'lucide-react'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -24,6 +25,7 @@ interface UserProfile {
   full_name: string
   email: string
   role: string
+  user_type: 'consultant' | 'company' | null
 }
 
 export default function DashboardPage() {
@@ -56,12 +58,12 @@ export default function DashboardPage() {
     // Fetch user profile
     const { data: profile } = await client
       .from('user_profiles')
-      .select('full_name, email, role')
+      .select('full_name, email, role, user_type')
       .eq('id', user.id)
       .single()
 
     if (profile) {
-      setUserProfile(profile)
+      setUserProfile(profile as UserProfile)
     }
   }
 
@@ -120,23 +122,32 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-ctp-base">
       {/* Header */}
-      <header className="bg-mocha-mantle border-b border-mocha-surface0">
+      <header className="bg-ctp-mantle border-b border-ctp-surface0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
-                Flow Forge Dashboard
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-ctp-peach to-ctp-teal bg-clip-text text-transparent">
+                FlowForge Dashboard
               </h1>
-              <p className="text-mocha-subtext1 mt-1">
-                AI-Assisted Business Consulting Platform
+              <p className="text-ctp-subtext1 mt-1">
+                Multi-Disciplinary Consulting Platform
               </p>
             </div>
             <div className="flex items-center gap-4">
               <Link
+                href="/dashboard/companies"
+                className="px-4 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded-lg text-ctp-text hover:bg-ctp-surface1 transition-colors flex items-center gap-2"
+              >
+                <Building2 className="w-4 h-4" />
+                Companies
+              </Link>
+
+              <Link
                 href="/dashboard/campaigns/new"
-                className="bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                className="bg-gradient-to-r from-ctp-peach to-ctp-teal text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                <Plus className="w-4 h-4" />
                 Create Campaign
               </Link>
 
@@ -144,33 +155,33 @@ export default function DashboardPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 bg-mocha-surface0 hover:bg-mocha-surface1 px-4 py-2 rounded-lg transition-colors">
-                  <div className="w-8 h-8 bg-gradient-to-r from-brand-orange to-brand-teal rounded-full flex items-center justify-center text-white font-semibold">
+                  className="flex items-center gap-2 bg-ctp-surface0 hover:bg-ctp-surface1 px-4 py-2 rounded-lg transition-colors">
+                  <div className="w-8 h-8 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-full flex items-center justify-center text-white font-semibold">
                     {userProfile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-mocha-text">
+                    <div className="text-sm font-medium text-ctp-text">
                       {userProfile?.full_name || 'User'}
                     </div>
-                    <div className="text-xs text-mocha-subtext1">
-                      {userProfile?.role || 'member'}
+                    <div className="text-xs text-ctp-subtext1">
+                      {userProfile?.user_type || userProfile?.role || 'member'}
                     </div>
                   </div>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-mocha-surface0 border border-mocha-surface1 rounded-lg shadow-lg py-1 z-10">
-                    <div className="px-4 py-2 border-b border-mocha-surface1">
-                      <p className="text-sm font-medium text-mocha-text">
+                  <div className="absolute right-0 mt-2 w-48 bg-ctp-surface0 border border-ctp-surface1 rounded-lg shadow-lg py-1 z-10">
+                    <div className="px-4 py-2 border-b border-ctp-surface1">
+                      <p className="text-sm font-medium text-ctp-text">
                         {userProfile?.full_name}
                       </p>
-                      <p className="text-xs text-mocha-subtext1">
+                      <p className="text-xs text-ctp-subtext1">
                         {userProfile?.email}
                       </p>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-mocha-text hover:bg-mocha-surface1 transition-colors">
+                      className="w-full text-left px-4 py-2 text-sm text-ctp-text hover:bg-ctp-surface1 transition-colors">
                       Sign Out
                     </button>
                   </div>
@@ -183,60 +194,106 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Link
+            href="/dashboard/companies"
+            className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-peach transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-ctp-peach/10 rounded-lg flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-ctp-peach" />
+              </div>
+              <div>
+                <p className="text-sm text-ctp-subtext0">Manage</p>
+                <h3 className="text-xl font-semibold text-ctp-text">Companies</h3>
+              </div>
+            </div>
+          </Link>
+
+          <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-ctp-teal/10 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-ctp-teal" />
+              </div>
+              <div>
+                <p className="text-sm text-ctp-subtext0">Total</p>
+                <h3 className="text-xl font-semibold text-ctp-text">{campaigns.length} Campaigns</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-ctp-green/10 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-ctp-green" />
+              </div>
+              <div>
+                <p className="text-sm text-ctp-subtext0">Active</p>
+                <h3 className="text-xl font-semibold text-ctp-text">
+                  {campaigns.filter(c => c.status === 'active').length} Running
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Campaigns List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
-            <p className="text-mocha-subtext1 mt-4">Loading campaigns...</p>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-ctp-peach border-r-transparent"></div>
+            <p className="text-ctp-subtext1 mt-4">Loading campaigns...</p>
           </div>
         ) : error ? (
-          <div className="bg-mocha-surface0 border border-red-500/20 rounded-lg p-8 text-center">
-            <p className="text-red-400">{error}</p>
+          <div className="bg-ctp-surface0 border border-ctp-red/20 rounded-lg p-8 text-center">
+            <p className="text-ctp-red">{error}</p>
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="bg-mocha-surface0 rounded-lg p-12 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-mocha-overlay0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <h3 className="mt-4 text-lg font-semibold text-mocha-text">
+          <div className="bg-ctp-surface0 rounded-lg p-12 text-center">
+            <BarChart3 className="mx-auto h-12 w-12 text-ctp-overlay0" />
+            <h3 className="mt-4 text-lg font-semibold text-ctp-text">
               No campaigns yet
             </h3>
-            <p className="mt-2 text-mocha-subtext1">
+            <p className="mt-2 text-ctp-subtext1">
               Get started by creating your first assessment campaign.
             </p>
-            <Link
-              href="/dashboard/campaigns/new"
-              className="mt-6 inline-block bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-              Create Your First Campaign
-            </Link>
+            <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/dashboard/companies"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-ctp-surface0 border border-ctp-surface1 rounded-lg text-ctp-text hover:bg-ctp-surface1 transition-colors"
+              >
+                <Building2 className="w-4 h-4" />
+                Manage Companies
+              </Link>
+              <Link
+                href="/dashboard/campaigns/new"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-ctp-peach to-ctp-teal text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+                <Plus className="w-4 h-4" />
+                Create Your First Campaign
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-mocha-text mb-6">
-              Your Campaigns
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-ctp-text">
+                Your Campaigns
+              </h2>
+            </div>
             {campaigns.map((campaign) => (
               <Link
                 key={campaign.id}
                 href={`/dashboard/campaigns/${campaign.id}`}
-                className="block bg-mocha-surface0 hover:bg-mocha-surface1 border border-mocha-surface1 rounded-lg p-6 transition-colors">
+                className="block bg-ctp-surface0 hover:bg-ctp-surface1 border border-ctp-surface1 rounded-lg p-6 transition-colors">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold text-mocha-text">
+                    <h3 className="text-lg font-semibold text-ctp-text">
                       {campaign.name}
                     </h3>
-                    <p className="text-mocha-subtext1 mt-1">
+                    <p className="text-ctp-subtext1 mt-1">
                       {campaign.company_name}
                     </p>
-                    <div className="flex items-center gap-4 mt-3 text-sm text-mocha-subtext0">
+                    <div className="flex items-center gap-4 mt-3 text-sm text-ctp-subtext0">
                       <span>Facilitator: {campaign.facilitator_name}</span>
                       <span>•</span>
                       <span>
@@ -248,10 +305,10 @@ export default function DashboardPage() {
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                         campaign.status === 'active'
-                          ? 'bg-green-500/20 text-green-400'
+                          ? 'bg-ctp-green/20 text-ctp-green'
                           : campaign.status === 'completed'
-                          ? 'bg-blue-500/20 text-blue-400'
-                          : 'bg-mocha-overlay0/20 text-mocha-overlay0'
+                          ? 'bg-ctp-blue/20 text-ctp-blue'
+                          : 'bg-ctp-overlay0/20 text-ctp-overlay0'
                       }`}>
                       {campaign.status}
                     </span>
