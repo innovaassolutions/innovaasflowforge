@@ -5,18 +5,19 @@ import type { Database } from '@/types/database'
 import { randomBytes } from 'crypto'
 
 interface StakeholderInput {
-  fullName: string
-  email: string
-  position: string
-  department: string
-  dailyTaskDescription: string
-  roleType: 'managing_director' | 'it_operations' | 'production_manager' |
+  stakeholderProfileId?: string // Existing profile
+  fullName?: string // For new profiles
+  email?: string // For new profiles
+  position?: string
+  department?: string
+  dailyTaskDescription?: string
+  roleType?: 'managing_director' | 'it_operations' | 'production_manager' |
            'purchasing_manager' | 'planning_scheduler' | 'engineering_maintenance'
 }
 
 interface CreateCampaignRequest {
   name: string
-  companyName: string
+  companyProfileId: string // Required: which company is this campaign for
   facilitatorName: string
   facilitatorEmail: string
   description?: string
@@ -39,9 +40,9 @@ export async function POST(request: NextRequest) {
     const body: CreateCampaignRequest = await request.json()
 
     // Validate required fields
-    if (!body.name || !body.companyName || !body.facilitatorName || !body.facilitatorEmail) {
+    if (!body.name || !body.companyProfileId || !body.facilitatorName || !body.facilitatorEmail) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, companyName, facilitatorName, facilitatorEmail' },
+        { error: 'Missing required fields: name, companyProfileId, facilitatorName, facilitatorEmail' },
         { status: 400 }
       )
     }
@@ -101,46 +102,44 @@ export async function POST(request: NextRequest) {
       email: user.email
     })
 
-    // Get user's organization from user_profiles using authenticated client
-    const { data: userProfile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('organization_id, full_name')
-      .eq('id', user.id)
-      .single() as { data: { organization_id: string; full_name: string } | null; error: any }
+    // Verify user has access to this company profile
+    const { data: companyProfile, error: companyError } = await supabase
+      .from('company_profiles')
+      .select('*')
+      .eq('id', body.companyProfileId)
+      .single()
 
-    if (profileError || !userProfile) {
-      console.error('❌ User profile error:', {
-        error: profileError,
-        userId: user.id,
-        hasProfile: !!userProfile
+    if (companyError || !companyProfile) {
+      console.error('❌ Company profile error:', {
+        error: companyError,
+        companyProfileId: body.companyProfileId
       })
       return NextResponse.json(
         {
-          error: 'User profile not found. Please sign out and sign in again to complete your profile setup.',
-          details: profileError?.message
+          error: 'Company profile not found or you do not have access to it',
+          details: companyError?.message
         },
         { status: 404 }
       )
     }
 
-    console.log('✅ User profile found:', {
-      organizationId: userProfile.organization_id,
-      fullName: userProfile.full_name
+    console.log('✅ Company profile found:', {
+      companyId: companyProfile.id,
+      companyName: companyProfile.company_name
     })
 
-    // Create campaign with organization_id and created_by
-    // Use authenticated client so RLS policies can verify user's organization
+    // Create campaign linked to company profile
     const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
       .insert({
         name: body.name,
         campaign_type: 'industry_4_0_readiness',
-        company_name: body.companyName,
+        company_name: companyProfile.company_name, // Keep for backward compatibility
+        company_profile_id: body.companyProfileId,
         facilitator_name: body.facilitatorName,
         facilitator_email: body.facilitatorEmail,
         description: body.description,
         status: 'active',
-        organization_id: userProfile.organization_id,
         created_by: user.id
       } as any)
       .select()
@@ -154,20 +153,56 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create stakeholder sessions and send emails
+    // Process stakeholders: create profiles if needed, then create assignments
     const emailResults: { success: string[]; failed: string[] } = {
       success: [],
       failed: []
     }
 
     for (const stakeholder of body.stakeholders) {
+      let stakeholderProfileId = stakeholder.stakeholderProfileId
+
+      // If no profile ID provided, create a new stakeholder profile
+      if (!stakeholderProfileId) {
+        if (!stakeholder.fullName || !stakeholder.email) {
+          console.error('Missing stakeholder data for new profile')
+          emailResults.failed.push(stakeholder.email || 'unknown')
+          continue
+        }
+
+        const { data: newProfile, error: profileError } = await supabase
+          .from('stakeholder_profiles')
+          .insert({
+            company_profile_id: body.companyProfileId,
+            full_name: stakeholder.fullName,
+            email: stakeholder.email,
+            role_type: stakeholder.roleType,
+            title: stakeholder.position,
+            department: stakeholder.department,
+            created_by: user.id
+          } as any)
+          .select()
+          .single()
+
+        if (profileError) {
+          console.error(`Profile creation error for ${stakeholder.email}:`, profileError)
+          emailResults.failed.push(stakeholder.email)
+          continue
+        }
+
+        stakeholderProfileId = newProfile.id
+        console.log(`✅ Created stakeholder profile: ${newProfile.full_name}`)
+      }
+
+      // Create campaign assignment
       const accessToken = generateAccessToken()
 
-      // Create stakeholder session using authenticated client
-      const { error: sessionError } = await supabase
-        .from('stakeholder_sessions')
+      const { error: assignmentError } = await supabase
+        .from('campaign_assignments')
         .insert({
           campaign_id: campaign.id,
+          stakeholder_profile_id: stakeholderProfileId,
+          // Keep legacy fields for backward compatibility
           stakeholder_name: stakeholder.fullName,
           stakeholder_email: stakeholder.email,
           stakeholder_role: stakeholder.roleType,
@@ -178,9 +213,9 @@ export async function POST(request: NextRequest) {
         .select()
         .single()
 
-      if (sessionError) {
-        console.error(`Session creation error for ${stakeholder.email}:`, sessionError)
-        emailResults.failed.push(stakeholder.email)
+      if (assignmentError) {
+        console.error(`Assignment creation error for ${stakeholder.email}:`, assignmentError)
+        emailResults.failed.push(stakeholder.email || 'unknown')
         continue
       }
 
@@ -195,8 +230,8 @@ export async function POST(request: NextRequest) {
 
         const result = await resend.emails.send({
           from: 'Flow Forge <onboarding@resend.dev>',
-          to: stakeholder.email,
-          subject: `${body.facilitatorName} has invited you to participate in ${body.companyName}'s ${body.name}`,
+          to: stakeholder.email!,
+          subject: `${body.facilitatorName} has invited you to participate in ${companyProfile.company_name}'s ${body.name}`,
           html: `
             <!DOCTYPE html>
             <html>
@@ -220,7 +255,7 @@ export async function POST(request: NextRequest) {
                     </p>
 
                     <p style="color: #cdd6f4; font-size: 16px; line-height: 1.6; margin: 16px 0;">
-                      ${body.facilitatorName} has invited you to participate in <strong>${body.companyName}'s ${body.name}</strong>.
+                      ${body.facilitatorName} has invited you to participate in <strong>${companyProfile.company_name}'s ${body.name}</strong>.
                     </p>
 
                     <div style="background-color: #45475a; border-left: 4px solid #F25C05; border-radius: 8px; padding: 20px 24px; margin: 24px 0;">
@@ -247,15 +282,11 @@ export async function POST(request: NextRequest) {
                     </div>
 
                     <p style="color: #a6adc8; font-size: 14px; text-align: center; margin: 16px 0;">
-                      Or copy and paste this URL into your browser:<br>
-                      <a href="${accessLink}" style="color: #1D9BA3; text-decoration: underline; word-break: break-all;">${accessLink}</a>
+                      Or copy and paste this link: ${accessLink}
                     </p>
-                  </div>
 
-                  <!-- Footer -->
-                  <div style="border-top: 1px solid #45475a; margin-top: 32px; padding-top: 24px; text-align: center;">
-                    <p style="color: #6c7086; font-size: 12px; margin: 8px 0;">
-                      Powered by Innovaas Flow Forge
+                    <p style="color: #a6adc8; font-size: 14px; line-height: 1.6; margin: 16px 0;">
+                      Your honest feedback is valuable and will help shape the digital transformation roadmap for ${companyProfile.company_name}.
                     </p>
                   </div>
                 </div>
@@ -264,32 +295,22 @@ export async function POST(request: NextRequest) {
           `
         })
 
-        console.log(`✅ Email sent successfully to ${stakeholder.email}`)
-        console.log(`Full Resend response:`, JSON.stringify(result, null, 2))
-        emailResults.success.push(stakeholder.email)
-      } catch (emailError: any) {
-        console.error(`❌ Email send error for ${stakeholder.email}:`)
-        console.error(`Error type: ${emailError?.constructor?.name}`)
-        console.error(`Error message: ${emailError?.message}`)
-        console.error(`Error details:`, JSON.stringify(emailError, null, 2))
-        emailResults.failed.push(stakeholder.email)
+        console.log('✅ Email sent:', result)
+        emailResults.success.push(stakeholder.email!)
+      } catch (emailError) {
+        console.error(`Email send error for ${stakeholder.email}:`, emailError)
+        emailResults.failed.push(stakeholder.email!)
       }
     }
 
     return NextResponse.json({
       success: true,
-      campaign: {
-        id: campaign.id,
-        name: campaign.name,
-        companyName: campaign.company_name,
-        status: campaign.status
-      },
-      emailResults,
-      message: `Campaign created. Emails sent: ${emailResults.success.length}/${body.stakeholders.length}`
-    })
+      campaign,
+      emailResults
+    }, { status: 201 })
 
   } catch (error) {
-    console.error('Campaign creation error:', error)
+    console.error('Unexpected error:', error)
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -299,22 +320,20 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/campaigns
- * List all campaigns for the authenticated user's organization
+ * Get all campaigns for the authenticated user
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get the authenticated user from the Authorization header
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
 
     if (!token) {
       return NextResponse.json(
-        { error: 'Unauthorized - missing authentication token' },
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Create a Supabase client with the user's JWT token
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -335,72 +354,33 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      console.error('❌ Auth error:', {
-        error: authError,
-        hasUser: !!user,
-        tokenPrefix: token?.substring(0, 20)
-      })
       return NextResponse.json(
-        { error: 'Unauthorized - invalid or expired token', details: authError?.message },
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    console.log('✅ User authenticated:', {
-      userId: user.id,
-      email: user.email
-    })
-
-    // Get user's organization from user_profiles using authenticated client
-    const { data: userProfile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('organization_id')
-      .eq('id', user.id)
-      .single() as { data: { organization_id: string } | null; error: any }
-
-    if (profileError || !userProfile) {
-      console.error('❌ User profile error:', {
-        error: profileError,
-        userId: user.id,
-        hasProfile: !!userProfile
-      })
-      return NextResponse.json(
-        {
-          error: 'User profile not found. Please sign out and sign in again to complete your profile setup.',
-          details: profileError?.message
-        },
-        { status: 404 }
-      )
-    }
-
-    console.log('✅ User profile found:', {
-      organizationId: userProfile.organization_id
-    })
-
-    // Query campaigns using authenticated client (RLS will filter by organization)
+    // Get all campaigns created by this user (works for both consultant and company users)
+    // RLS policies will handle access control
     const { data: campaigns, error } = await supabase
       .from('campaigns')
       .select('*')
-      .eq('organization_id', userProfile.organization_id)
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Campaign fetch error:', error)
+      console.error('Error fetching campaigns:', error)
       return NextResponse.json(
         { error: 'Failed to fetch campaigns', details: error.message },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      campaigns
-    })
+    return NextResponse.json({ campaigns }, { status: 200 })
 
   } catch (error) {
-    console.error('Campaign fetch error:', error)
+    console.error('Unexpected error:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
