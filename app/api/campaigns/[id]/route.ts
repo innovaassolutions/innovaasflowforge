@@ -127,6 +127,9 @@ export async function DELETE(
   try {
     const { id: campaignId } = await params
 
+    console.log(`🗑️ Attempting to delete campaign: ${campaignId}`)
+    console.log(`🔑 Service role key configured:`, !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+
     // Delete campaign (cascades to campaign_assignments, agent_sessions, etc.)
     const { error } = await supabaseAdmin
       .from('campaigns')
@@ -134,12 +137,14 @@ export async function DELETE(
       .eq('id', campaignId)
 
     if (error) {
-      console.error('Campaign deletion error:', error)
+      console.error('❌ Campaign deletion error:', JSON.stringify(error, null, 2))
       return NextResponse.json(
         { error: 'Failed to delete campaign', details: error.message },
         { status: 500 }
       )
     }
+
+    console.log(`✅ Campaign deleted successfully: ${campaignId}`)
 
     return NextResponse.json({
       success: true,

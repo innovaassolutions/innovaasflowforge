@@ -44,9 +44,24 @@ let adminClient: ReturnType<typeof createSupabaseClient<Database>> | null = null
 
 export function getSupabaseAdmin() {
   if (!adminClient) {
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+
+    if (!serviceRoleKey) {
+      throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
+    }
+
+    if (!supabaseUrl) {
+      throw new Error('NEXT_PUBLIC_SUPABASE_URL is not configured')
+    }
+
+    console.log('🔧 Initializing Supabase Admin Client')
+    console.log('📍 URL:', supabaseUrl)
+    console.log('🔑 Service Role Key:', serviceRoleKey.substring(0, 20) + '...')
+
     adminClient = createSupabaseClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      supabaseUrl,
+      serviceRoleKey,
       {
         auth: {
           autoRefreshToken: false,
