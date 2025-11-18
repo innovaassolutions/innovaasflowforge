@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2 } from 'lucide-react'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -37,12 +37,16 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [deletingCampaignId, setDeletingCampaignId] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [companiesCount, setCompaniesCount] = useState(0)
 
   useEffect(() => {
     const client = createClient()
     setSupabase(client)
     checkUser(client)
     fetchCampaigns(client)
+    fetchCompaniesCount(client)
   }, [])
 
   async function checkUser(client: SupabaseClient<Database>) {
@@ -121,8 +125,104 @@ export default function DashboardPage() {
     }
   }
 
+  async function fetchCompaniesCount(client?: SupabaseClient<Database>) {
+    try {
+      const supabaseClient = client || supabase
+
+      if (!supabaseClient) return
+
+      const { data: { session } } = await supabaseClient.auth.getSession()
+
+      if (!session) return
+
+      const response = await fetch('/api/company-profiles', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setCompaniesCount(data.companies?.length || 0)
+      }
+    } catch (err) {
+      console.error('Error fetching companies count:', err)
+    }
+  }
+
+  async function handleDeleteCampaign(campaignId: string) {
+    if (!supabase) return
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        setError('Not authenticated')
+        return
+      }
+
+      const response = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        // Remove campaign from list
+        setCampaigns(campaigns.filter(c => c.id !== campaignId))
+        setShowDeleteConfirm(false)
+        setDeletingCampaignId(null)
+      } else {
+        setError(data.error || 'Failed to delete campaign')
+      }
+    } catch (err) {
+      setError('Error deleting campaign')
+      console.error(err)
+    }
+  }
+
+  function confirmDelete(campaignId: string) {
+    setDeletingCampaignId(campaignId)
+    setShowDeleteConfirm(true)
+  }
+
   return (
     <div className="min-h-screen bg-ctp-base">
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && deletingCampaignId && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-ctp-surface0 rounded-lg p-8 max-w-md w-full">
+            <h3 className="text-xl font-semibold text-ctp-text mb-4">
+              Delete Campaign?
+            </h3>
+            <p className="text-ctp-subtext1 mb-6">
+              Are you sure you want to delete this campaign? This action cannot be undone and will delete all associated stakeholder sessions and data.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false)
+                  setDeletingCampaignId(null)
+                }}
+                className="px-4 py-2 bg-ctp-surface1 hover:bg-ctp-surface2 text-ctp-text rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteCampaign(deletingCampaignId)}
+                className="px-4 py-2 bg-ctp-red hover:bg-ctp-red/80 text-white rounded-lg transition-colors"
+              >
+                Delete Campaign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-ctp-mantle border-b border-ctp-surface0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -205,8 +305,8 @@ export default function DashboardPage() {
                 <Building2 className="w-6 h-6 text-ctp-peach" />
               </div>
               <div>
-                <p className="text-sm text-ctp-subtext0">Manage</p>
-                <h3 className="text-xl font-semibold text-ctp-text">Companies</h3>
+                <p className="text-sm text-ctp-subtext0">Total</p>
+                <h3 className="text-xl font-semibold text-ctp-text">{companiesCount} Companies</h3>
               </div>
             </div>
           </Link>
@@ -281,27 +381,30 @@ export default function DashboardPage() {
               </h2>
             </div>
             {campaigns.map((campaign) => (
-              <Link
+              <div
                 key={campaign.id}
-                href={`/dashboard/campaigns/${campaign.id}`}
-                className="block bg-ctp-surface0 hover:bg-ctp-surface1 border border-ctp-surface1 rounded-lg p-6 transition-colors">
+                className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 transition-colors">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-ctp-text">
-                      {campaign.name}
-                    </h3>
-                    <p className="text-ctp-subtext1 mt-1">
-                      {campaign.company_name}
-                    </p>
-                    <div className="flex items-center gap-4 mt-3 text-sm text-ctp-subtext0">
-                      <span>Facilitator: {campaign.facilitator_name}</span>
-                      <span>•</span>
-                      <span>
-                        Created {new Date(campaign.created_at).toLocaleDateString()}
-                      </span>
+                  <Link
+                    href={`/dashboard/campaigns/${campaign.id}`}
+                    className="flex-1 hover:opacity-80 transition-opacity">
+                    <div>
+                      <h3 className="text-lg font-semibold text-ctp-text">
+                        {campaign.name}
+                      </h3>
+                      <p className="text-ctp-subtext1 mt-1">
+                        {campaign.company_name}
+                      </p>
+                      <div className="flex items-center gap-4 mt-3 text-sm text-ctp-subtext0">
+                        <span>Facilitator: {campaign.facilitator_name}</span>
+                        <span>•</span>
+                        <span>
+                          Created {new Date(campaign.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div>
+                  </Link>
+                  <div className="flex items-center gap-3">
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                         campaign.status === 'active'
@@ -312,9 +415,18 @@ export default function DashboardPage() {
                       }`}>
                       {campaign.status}
                     </span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        confirmDelete(campaign.id)
+                      }}
+                      className="p-2 text-ctp-subtext0 hover:text-ctp-red hover:bg-ctp-red/10 rounded-lg transition-colors"
+                      title="Delete campaign">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
