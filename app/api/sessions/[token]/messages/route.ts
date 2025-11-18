@@ -14,6 +14,8 @@ export async function POST(
     const { token: accessToken } = await params
     const { message, agentSessionId } = await request.json()
 
+    console.log('💬 Message API called:', { accessToken: accessToken.substring(0, 10) + '...', hasMessage: !!message, agentSessionId })
+
     if (!agentSessionId) {
       return NextResponse.json(
         { error: 'Missing required field: agentSessionId' },
@@ -22,6 +24,7 @@ export async function POST(
     }
 
     // Verify access token and get session details with full profile context
+    console.log('🔍 Fetching campaign assignment for token:', accessToken.substring(0, 10) + '...')
     const { data: stakeholderSession, error: sessionError } = await supabaseAdmin
       .from('campaign_assignments')
       .select(`
@@ -56,11 +59,14 @@ export async function POST(
       .single() as any
 
     if (sessionError || !stakeholderSession) {
+      console.error('❌ Session lookup failed:', JSON.stringify(sessionError, null, 2))
       return NextResponse.json(
-        { error: 'Invalid access token' },
+        { error: 'Invalid access token', details: sessionError?.message },
         { status: 401 }
       )
     }
+
+    console.log('✅ Found campaign assignment:', stakeholderSession.id)
 
     // Get agent session
     const { data: agentSession, error: agentError } = (await supabaseAdmin
