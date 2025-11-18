@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import type { Database } from '@/types/database'
 import { randomBytes } from 'crypto'
 
@@ -167,13 +168,13 @@ export async function POST(request: NextRequest) {
       let stakeholderRole = ''
       let stakeholderTitle = ''
 
-      // If profile ID provided, fetch the existing profile data
+      // If profile ID provided, fetch the existing profile data (use admin client)
       if (stakeholderProfileId) {
-        const { data: existingProfile, error: fetchError } = await supabase
+        const { data: existingProfile, error: fetchError } = (await supabaseAdmin
           .from('stakeholder_profiles')
           .select('full_name, email, role_type, title')
           .eq('id', stakeholderProfileId)
-          .single()
+          .single()) as any
 
         if (fetchError || !existingProfile) {
           console.error(`Error fetching stakeholder profile ${stakeholderProfileId}:`, fetchError)
@@ -185,13 +186,13 @@ export async function POST(request: NextRequest) {
         stakeholderRole = existingProfile.role_type
         stakeholderTitle = existingProfile.title || ''
       } else {
-        // Create a new stakeholder profile
+        // Create a new stakeholder profile (use admin client to bypass RLS)
         if (!stakeholder.fullName || !stakeholder.email) {
           console.error('Missing stakeholder data for new profile')
           continue
         }
 
-        const { data: newProfile, error: profileError } = await supabase
+        const { data: newProfile, error: profileError } = (await supabaseAdmin
           .from('stakeholder_profiles')
           .insert({
             company_profile_id: body.companyProfileId,
@@ -203,7 +204,7 @@ export async function POST(request: NextRequest) {
             created_by: user.id
           } as any)
           .select()
-          .single()
+          .single()) as any
 
         if (profileError) {
           console.error(`Profile creation error for ${stakeholder.email}:`, profileError)
@@ -218,10 +219,10 @@ export async function POST(request: NextRequest) {
         console.log(`✅ Created stakeholder profile: ${newProfile.full_name}`)
       }
 
-      // Create campaign assignment
+      // Create campaign assignment (use admin client to bypass RLS)
       const accessToken = generateAccessToken()
 
-      const { error: assignmentError } = await supabase
+      const { error: assignmentError } = await supabaseAdmin
         .from('campaign_assignments')
         .insert({
           campaign_id: campaign.id,
