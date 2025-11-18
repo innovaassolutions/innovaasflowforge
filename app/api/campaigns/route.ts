@@ -170,6 +170,7 @@ export async function POST(request: NextRequest) {
 
       // If profile ID provided, fetch the existing profile data (use admin client)
       if (stakeholderProfileId) {
+        console.log(`🔍 Fetching stakeholder profile: ${stakeholderProfileId}`)
         const { data: existingProfile, error: fetchError } = (await supabaseAdmin
           .from('stakeholder_profiles')
           .select('full_name, email, role_type, title, company_profile_id')
@@ -177,7 +178,10 @@ export async function POST(request: NextRequest) {
           .single()) as any
 
         if (fetchError || !existingProfile) {
-          console.error(`Error fetching stakeholder profile ${stakeholderProfileId}:`, fetchError)
+          console.error(`❌ Error fetching stakeholder profile ${stakeholderProfileId}:`, JSON.stringify(fetchError, null, 2))
+          console.error(`❌ Profile data:`, existingProfile)
+          console.error(`❌ Service role key set:`, !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+          console.error(`❌ Service role key length:`, process.env.SUPABASE_SERVICE_ROLE_KEY?.length)
           continue
         }
 
@@ -187,6 +191,7 @@ export async function POST(request: NextRequest) {
           continue
         }
 
+        console.log(`✅ Successfully fetched stakeholder: ${existingProfile.full_name}`)
         stakeholderName = existingProfile.full_name
         stakeholderEmail = existingProfile.email
         stakeholderRole = existingProfile.role_type
