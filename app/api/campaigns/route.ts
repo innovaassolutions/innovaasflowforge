@@ -172,12 +172,18 @@ export async function POST(request: NextRequest) {
       if (stakeholderProfileId) {
         const { data: existingProfile, error: fetchError } = (await supabaseAdmin
           .from('stakeholder_profiles')
-          .select('full_name, email, role_type, title')
+          .select('full_name, email, role_type, title, company_profile_id')
           .eq('id', stakeholderProfileId)
           .single()) as any
 
         if (fetchError || !existingProfile) {
           console.error(`Error fetching stakeholder profile ${stakeholderProfileId}:`, fetchError)
+          continue
+        }
+
+        // SECURITY CHECK: Verify stakeholder belongs to the same company
+        if (existingProfile.company_profile_id !== body.companyProfileId) {
+          console.error(`Security violation: Stakeholder ${stakeholderProfileId} belongs to different company`)
           continue
         }
 
