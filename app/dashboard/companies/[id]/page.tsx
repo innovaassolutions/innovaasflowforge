@@ -328,6 +328,12 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
                         <p className="text-sm text-ctp-subtext0">{stakeholder.title}</p>
                       )}
                     </div>
+                    <Link
+                      href={`/dashboard/companies/${company.id}/stakeholders/${stakeholder.id}/edit`}
+                      className="text-sm text-ctp-subtext0 hover:text-ctp-peach transition-colors"
+                    >
+                      Edit
+                    </Link>
                   </div>
 
                   <div className="space-y-2">
