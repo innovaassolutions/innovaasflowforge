@@ -138,14 +138,14 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setUserType('consultant')}
-                  className={`p-4 rounded-lg border-2 transition-colors ${
+                  className={`p-4 rounded-lg border-2 transition-all ${
                     formData.userType === 'consultant'
-                      ? 'border-ctp-peach bg-ctp-peach/10 text-ctp-text'
-                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2'
+                      ? 'border-brand-orange bg-brand-orange/20 text-ctp-text shadow-lg shadow-brand-orange/30 ring-2 ring-brand-orange/50'
+                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2 hover:bg-ctp-surface0'
                   }`}
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Users className="w-6 h-6" />
+                    <Users className={`w-6 h-6 ${formData.userType === 'consultant' ? 'text-brand-orange' : ''}`} />
                     <span className="font-medium text-sm">Consultant</span>
                     <span className="text-xs text-ctp-subtext0">
                       Manage multiple clients
@@ -156,14 +156,14 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setUserType('company')}
-                  className={`p-4 rounded-lg border-2 transition-colors ${
+                  className={`p-4 rounded-lg border-2 transition-all ${
                     formData.userType === 'company'
-                      ? 'border-ctp-peach bg-ctp-peach/10 text-ctp-text'
-                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2'
+                      ? 'border-brand-teal bg-brand-teal/20 text-ctp-text shadow-lg shadow-brand-teal/30 ring-2 ring-brand-teal/50'
+                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2 hover:bg-ctp-surface0'
                   }`}
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Building2 className="w-6 h-6" />
+                    <Building2 className={`w-6 h-6 ${formData.userType === 'company' ? 'text-brand-teal' : ''}`} />
                     <span className="font-medium text-sm">Company</span>
                     <span className="text-xs text-ctp-subtext0">
                       Manage my organization
