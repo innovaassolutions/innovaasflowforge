@@ -1,5 +1,6 @@
 import { anthropic } from '@/lib/anthropic'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { getModelForTier, type ReportTier } from '@/lib/model-config'
 
 // ============================================================================
 // Type Definitions
@@ -58,6 +59,7 @@ interface CampaignInfo {
   company_name: string
   facilitator_name: string
   description?: string
+  report_tier?: ReportTier
 }
 
 // ============================================================================
@@ -181,7 +183,7 @@ async function fetchCampaignTranscripts(campaignId: string): Promise<SessionTran
 async function fetchCampaignInfo(campaignId: string): Promise<CampaignInfo> {
   const { data: campaign, error } = await (supabaseAdmin
     .from('campaigns') as any)
-    .select('id, name, company_name, facilitator_name, description')
+    .select('id, name, company_name, facilitator_name, description, report_tier')
     .eq('id', campaignId)
     .single()
 
@@ -275,12 +277,13 @@ IMPORTANT: Return ONLY valid JSON, no additional text.`
  */
 async function analyzeDimension(
   dimension: { id: string; name: string; description: string },
-  transcripts: SessionTranscript[]
+  transcripts: SessionTranscript[],
+  modelId: string
 ): Promise<DimensionalScore> {
   const prompt = generateDimensionalAnalysisPrompt(dimension, transcripts)
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: modelId,
     max_tokens: 4000,
     temperature: 0.7,
     messages: [
@@ -317,7 +320,8 @@ async function analyzeDimension(
 async function generateExecutiveSummary(
   campaignInfo: CampaignInfo,
   transcripts: SessionTranscript[],
-  pillars: PillarScore[]
+  pillars: PillarScore[],
+  modelId: string
 ): Promise<string> {
   const pillarSummary = pillars.map(p =>
     `${p.pillar}: ${p.score.toFixed(1)}/5.0`
@@ -351,7 +355,7 @@ Use professional consulting language. Be specific and evidence-based. Do not men
 Return ONLY the executive summary text, no JSON or formatting.`
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: modelId,
     max_tokens: 1500,
     temperature: 0.7,
     messages: [
@@ -370,7 +374,8 @@ Return ONLY the executive summary text, no JSON or formatting.`
  */
 async function extractThemesAndContradictions(
   transcripts: SessionTranscript[],
-  pillars: PillarScore[]
+  pillars: PillarScore[],
+  modelId: string
 ): Promise<{ themes: string[]; contradictions: string[] }> {
   const allFindings = pillars.flatMap(p =>
     p.dimensions.flatMap(d => d.keyFindings)
@@ -400,7 +405,7 @@ OUTPUT FORMAT (JSON):
 Return ONLY valid JSON, no additional text.`
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: modelId,
     max_tokens: 2000,
     temperature: 0.7,
     messages: [
@@ -436,7 +441,7 @@ Return ONLY valid JSON, no additional text.`
 /**
  * Generate prioritized recommendations
  */
-async function generateRecommendations(pillars: PillarScore[]): Promise<string[]> {
+async function generateRecommendations(pillars: PillarScore[], modelId: string): Promise<string[]> {
   // Get critical and important priorities
   const criticalDimensions = pillars.flatMap(p =>
     p.dimensions.filter(d => d.priority === 'critical')
@@ -474,7 +479,7 @@ OUTPUT FORMAT (JSON):
 Return ONLY valid JSON, no additional text.`
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: modelId,
     max_tokens: 2000,
     temperature: 0.7,
     messages: [
@@ -556,6 +561,11 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
     fetchCampaignTranscripts(campaignId)
   ])
 
+  // Determine which AI model to use based on report tier
+  const reportTier = campaignInfo.report_tier || 'standard'
+  const modelId = getModelForTier(reportTier)
+  console.log(`Using AI model: ${modelId} (${reportTier} tier)`)
+
   console.log(`Analyzing ${transcripts.length} stakeholder transcripts`)
 
   if (transcripts.length === 0) {
@@ -572,7 +582,7 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
 
     for (const dimension of pillarData.dimensions) {
       console.log(`  - Analyzing dimension: ${dimension.name}`)
-      const score = await analyzeDimension(dimension, transcripts)
+      const score = await analyzeDimension(dimension, transcripts, modelId)
       dimensionScores.push(score)
     }
 
@@ -592,13 +602,13 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
   }, 0)
 
   console.log('Generating executive summary...')
-  const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars)
+  const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars, modelId)
 
   console.log('Extracting themes and contradictions...')
-  const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars)
+  const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars, modelId)
 
   console.log('Generating recommendations...')
-  const recommendations = await generateRecommendations(pillars)
+  const recommendations = await generateRecommendations(pillars, modelId)
 
   console.log('Extracting stakeholder perspectives...')
   const stakeholderPerspectives = extractStakeholderPerspectives(transcripts)

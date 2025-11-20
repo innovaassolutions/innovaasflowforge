@@ -319,8 +319,9 @@ export async function processMessage(
   ]
 
   // Call Claude API
+  // Note: Interview agent always uses Sonnet 4.5 (standard tier) - tiering applies to synthesis only
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5-20250929',
     max_tokens: 2048,
     system: systemPrompt,
     messages
@@ -362,7 +363,7 @@ This is the FIRST message in the interview. Write a warm, professional greeting 
 Keep it conversational and friendly. Maximum 3-4 sentences plus one opening question.`
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5-20250929',
     max_tokens: 512,
     system: systemPrompt,
     messages: [
