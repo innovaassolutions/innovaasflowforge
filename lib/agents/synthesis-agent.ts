@@ -181,11 +181,25 @@ async function fetchCampaignTranscripts(campaignId: string): Promise<SessionTran
  * Fetch campaign information
  */
 async function fetchCampaignInfo(campaignId: string): Promise<CampaignInfo> {
-  const { data: campaign, error } = await (supabaseAdmin
+  // Try to fetch with report_tier first (for after migration)
+  let { data: campaign, error } = await (supabaseAdmin
     .from('campaigns') as any)
     .select('id, name, company_name, facilitator_name, description, report_tier')
     .eq('id', campaignId)
     .single()
+
+  // If column doesn't exist yet (before migration), fetch without it
+  if (error && error.message?.includes('report_tier')) {
+    console.log('[fetchCampaignInfo] report_tier column not found, fetching without it')
+    const fallback = await (supabaseAdmin
+      .from('campaigns') as any)
+      .select('id, name, company_name, facilitator_name, description')
+      .eq('id', campaignId)
+      .single()
+
+    campaign = fallback.data
+    error = fallback.error
+  }
 
   if (error || !campaign) {
     throw new Error('Campaign not found')
