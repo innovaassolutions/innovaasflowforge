@@ -54,11 +54,18 @@ export async function POST(
       .single() as any;
 
     if (profileError || !userProfile) {
+      console.error('[Report Gen] User profile error:', profileError);
+      console.error('[Report Gen] User ID:', user.id);
       return NextResponse.json(
-        { error: 'User profile not found' },
+        { error: 'User profile not found', details: profileError?.message },
         { status: 404 }
       );
     }
+
+    console.log('[Report Gen] User profile:', {
+      user_id: user.id,
+      company_profile_id: userProfile.company_profile_id
+    });
 
     // Get campaign and verify user has access (same organization)
     const { data: campaign, error: campaignError } = await supabaseAdmin
@@ -68,11 +75,18 @@ export async function POST(
       .single() as any;
 
     if (campaignError || !campaign) {
+      console.error('[Report Gen] Campaign error:', campaignError);
+      console.error('[Report Gen] Campaign ID:', campaignId);
       return NextResponse.json(
-        { error: 'Campaign not found' },
+        { error: 'Campaign not found', details: campaignError?.message },
         { status: 404 }
       );
     }
+
+    console.log('[Report Gen] Campaign found:', {
+      campaign_id: campaign.id,
+      company_profile_id: campaign.company_profile_id
+    });
 
     // Verify user belongs to same organization as campaign
     if (campaign.company_profile_id !== userProfile.company_profile_id) {
@@ -89,6 +103,12 @@ export async function POST(
       .eq('campaign_id', campaignId)
       .maybeSingle() as any;
 
+    console.log('[Report Gen] Synthesis query result:', {
+      has_synthesis: !!synthesis,
+      has_data: !!synthesis?.synthesis_data,
+      error: synthesisError?.message
+    });
+
     // Validate campaign has synthesis data
     if (
       synthesisError ||
@@ -96,6 +116,11 @@ export async function POST(
       !synthesis.synthesis_data ||
       Object.keys(synthesis.synthesis_data).length === 0
     ) {
+      console.error('[Report Gen] No synthesis data:', {
+        synthesisError,
+        has_synthesis: !!synthesis,
+        has_data: !!synthesis?.synthesis_data
+      });
       return NextResponse.json(
         {
           error: 'Campaign synthesis not yet generated',
