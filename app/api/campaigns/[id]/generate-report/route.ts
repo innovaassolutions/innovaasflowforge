@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, supabaseAdmin } from '@/lib/supabase/server';
 import { generateAccessToken } from '@/lib/utils/token-generator';
+import { synthesizeCampaign } from '@/lib/agents/synthesis-agent';
 
 export async function POST(
   request: NextRequest,
@@ -114,8 +115,8 @@ export async function POST(
       );
     }
 
-    // Get campaign synthesis data from campaign_synthesis table
-    const { data: synthesis, error: synthesisError } = await supabaseAdmin
+    // Get or generate campaign synthesis data
+    let { data: synthesis, error: synthesisError } = await supabaseAdmin
       .from('campaign_synthesis')
       .select('synthesis_data')
       .eq('campaign_id', campaignId)
@@ -127,26 +128,63 @@ export async function POST(
       error: synthesisError?.message
     });
 
-    // Validate campaign has synthesis data
+    // If synthesis doesn't exist, generate it now
     if (
       synthesisError ||
       !synthesis ||
       !synthesis.synthesis_data ||
       Object.keys(synthesis.synthesis_data).length === 0
     ) {
-      console.error('[Report Gen] No synthesis data:', {
-        synthesisError,
-        has_synthesis: !!synthesis,
-        has_data: !!synthesis?.synthesis_data
-      });
-      return NextResponse.json(
-        {
-          error: 'Campaign synthesis not yet generated',
-          details:
-            'Please ensure the campaign has completed synthesis before generating a report',
-        },
-        { status: 400 }
-      );
+      console.log('[Report Gen] No synthesis found, generating now...');
+
+      // Check that at least one interview is completed
+      const { data: completedSessions } = await supabaseAdmin
+        .from('campaign_assignments')
+        .select('id')
+        .eq('campaign_id', campaignId)
+        .eq('status', 'completed');
+
+      if (!completedSessions || completedSessions.length === 0) {
+        return NextResponse.json(
+          {
+            error: 'No completed interviews',
+            details: 'At least one stakeholder interview must be completed before generating a report',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Run synthesis
+      console.log('[Report Gen] Running synthesis agent...');
+      const assessment = await synthesizeCampaign(campaignId);
+      console.log('[Report Gen] Synthesis complete. Overall score:', assessment.overallScore);
+
+      // Save synthesis to database
+      const { data: savedSynthesis, error: saveError } = await (supabaseAdmin
+        .from('campaign_synthesis') as any)
+        .upsert({
+          campaign_id: campaignId,
+          synthesis_data: assessment,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'campaign_id',
+        })
+        .select('synthesis_data')
+        .single();
+
+      if (saveError) {
+        console.error('[Report Gen] Failed to save synthesis:', saveError);
+        return NextResponse.json(
+          {
+            error: 'Failed to save synthesis',
+            details: saveError.message,
+          },
+          { status: 500 }
+        );
+      }
+
+      synthesis = savedSynthesis;
+      console.log('[Report Gen] Synthesis saved successfully');
     }
 
     // Generate unique access token
