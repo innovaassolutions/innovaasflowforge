@@ -88,6 +88,11 @@ export async function GET(
     }
 
     // Return report data
+    // Note: campaigns is an array because it's a foreign key relation
+    const campaignData = Array.isArray(report.campaigns)
+      ? report.campaigns[0]
+      : report.campaigns;
+
     return NextResponse.json(
       {
         success: true,
@@ -95,10 +100,10 @@ export async function GET(
           id: report.id,
           campaign: {
             id: report.campaign_id,
-            name: report.campaigns?.name,
-            description: report.campaigns?.description,
-            company_name: report.campaigns?.company_name,
-            company_industry: report.campaigns?.company_industry,
+            name: campaignData?.name,
+            description: campaignData?.description,
+            company_name: campaignData?.company_name,
+            company_industry: campaignData?.company_industry,
           },
           tier: report.report_tier,
           synthesis: report.synthesis_snapshot,
