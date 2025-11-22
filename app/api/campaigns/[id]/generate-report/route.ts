@@ -21,6 +21,11 @@ export async function POST(
   try {
     const { id: campaignId } = await params;
 
+    // Parse request body
+    const body = await request.json();
+    const reportTier = body.report_tier_override || 'basic';
+    const consultantObservations = body.consultant_observations || null;
+
     // Validate campaign ID format (UUID)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!campaignId || !uuidRegex.test(campaignId)) {
@@ -62,15 +67,28 @@ export async function POST(
       );
     }
 
+    // Check if user has a company_profile_id
+    if (!userProfile.company_profile_id) {
+      console.error('[Report Gen] User has no company_profile_id:', user.id);
+      return NextResponse.json(
+        {
+          error: 'User profile incomplete',
+          details: 'Your user profile is not associated with a company. Please contact support.'
+        },
+        { status: 400 }
+      );
+    }
+
     console.log('[Report Gen] User profile:', {
       user_id: user.id,
       company_profile_id: userProfile.company_profile_id
     });
 
     // Get campaign and verify user has access (same organization)
+    // Note: report_tier is in campaign_reports table, not campaigns table
     const { data: campaign, error: campaignError } = await supabaseAdmin
       .from('campaigns')
-      .select('id, name, report_tier, created_by, company_profile_id')
+      .select('id, name, created_by, company_profile_id')
       .eq('id', campaignId)
       .single() as any;
 
@@ -148,8 +166,9 @@ export async function POST(
       campaign_id: campaignId,
       access_token: accessToken,
       is_active: true,
-      report_tier: campaign.report_tier || 'basic',
+      report_tier: reportTier,
       synthesis_snapshot: synthesis.synthesis_data,
+      consultant_observations: consultantObservations,
       created_by: user.id,
       updated_at: new Date().toISOString(),
       ...(existingReport
