@@ -47,6 +47,7 @@ export async function GET(
         created_at,
         regenerated_at,
         regeneration_count,
+        access_count,
         campaigns (
           name,
           description,
