@@ -1,0 +1,295 @@
+<story-context id=".bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.1</storyId>
+    <title>Database & API Foundation</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-21</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/sprint-artifacts/1-1-database-api-foundation.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>system developer</asA>
+    <iWant>establish the database schema and core API endpoints for report generation</iWant>
+    <soThat>consultants can generate and access secure, tier-based reports from completed campaigns</soThat>
+    <tasks>
+      <taskGroup id="1" title="Create Database Migration">
+        <subtask id="1.1">Create migration file supabase/migrations/[timestamp]_create_campaign_reports.sql</subtask>
+        <subtask id="1.2">Define campaign_reports table schema with all columns</subtask>
+        <subtask id="1.3">Add UNIQUE constraints on access_token and campaign_id</subtask>
+        <subtask id="1.4">Add foreign key campaign_id references campaigns(id) ON DELETE CASCADE</subtask>
+        <subtask id="1.5">Create indexes on access_token, campaign_id, created_by</subtask>
+        <subtask id="1.6">Define RLS policies for organization-scoped access</subtask>
+        <subtask id="1.7">Create Supabase Storage bucket campaign-reports (private, non-public)</subtask>
+        <subtask id="1.8">Define Storage RLS policies for organization members</subtask>
+        <subtask id="1.9">Test migration on local Supabase instance</subtask>
+        <subtask id="1.10">Verify RLS policies with test queries (cross-org access blocked)</subtask>
+      </taskGroup>
+      <taskGroup id="2" title="Implement Token Generation Utility">
+        <subtask id="2.1">Create lib/utils/token-generator.ts</subtask>
+        <subtask id="2.2">Implement generateAccessToken() using crypto.randomBytes(32)</subtask>
+        <subtask id="2.3">Convert to base64url encoding (43 characters)</subtask>
+        <subtask id="2.4">Write unit tests for token format and uniqueness</subtask>
+        <subtask id="2.5">Test collision handling (generate 10k tokens, verify uniqueness)</subtask>
+      </taskGroup>
+      <taskGroup id="3" title="Build Report Generation API Endpoint">
+        <subtask id="3.1">Create app/api/campaigns/[id]/report/route.ts with POST handler</subtask>
+        <subtask id="3.2">Validate user authentication and campaign permissions</subtask>
+        <subtask id="3.3">Verify campaign status = 'completed' before generation</subtask>
+        <subtask id="3.4">Load campaign_synthesis data (READ ONLY - verify no modifications)</subtask>
+        <subtask id="3.5">Generate access token using token-generator utility</subtask>
+        <subtask id="3.6">Snapshot synthesis_snapshot JSONB from campaign_synthesis.synthesis_data</subtask>
+        <subtask id="3.7">Implement UPSERT logic using ON CONFLICT (campaign_id) DO UPDATE</subtask>
+        <subtask id="3.8">Handle regeneration with same token, increment regeneration_count</subtask>
+        <subtask id="3.9">Wrap database operations in transaction boundary</subtask>
+        <subtask id="3.10">Return report_id and access_token on success</subtask>
+        <subtask id="3.11">Handle errors with appropriate HTTP status codes</subtask>
+        <subtask id="3.12">Write API integration tests (valid request, permission denied, missing synthesis)</subtask>
+      </taskGroup>
+      <taskGroup id="4" title="Build Report Access API Endpoint">
+        <subtask id="4.1">Create app/api/reports/[token]/route.ts with GET handler</subtask>
+        <subtask id="4.2">Query campaign_reports by access_token (no auth required)</subtask>
+        <subtask id="4.3">Check is_active flag, return 404 if false</subtask>
+        <subtask id="4.4">Return 404 for invalid/missing tokens (no data leakage)</subtask>
+        <subtask id="4.5">Increment access_count and update last_accessed_at on success</subtask>
+        <subtask id="4.6">Return report data with 200 status</subtask>
+        <subtask id="4.7">Write API integration tests (valid token, invalid token, inactive report)</subtask>
+      </taskGroup>
+      <taskGroup id="5" title="Add TypeScript Type Definitions">
+        <subtask id="5.1">Extend lib/types/database.types.ts with CampaignReport interface</subtask>
+        <subtask id="5.2">Import ReadinessAssessment type from synthesis-agent.ts</subtask>
+        <subtask id="5.3">Define API request/response types</subtask>
+        <subtask id="5.4">Verify TypeScript compilation with tsc --noEmit</subtask>
+      </taskGroup>
+      <taskGroup id="6" title="Integration Testing and Validation">
+        <subtask id="6.1">Test report generation API with curl/Postman</subtask>
+        <subtask id="6.2">Verify token access API with multiple users</subtask>
+        <subtask id="6.3">Test permission checks (unauthorized user blocked)</subtask>
+        <subtask id="6.4">Test RLS policies with different organization contexts</subtask>
+        <subtask id="6.5">Verify regeneration maintains same token</subtask>
+        <subtask id="6.6">Test campaign workflows unchanged (create, add stakeholders)</subtask>
+        <subtask id="6.7">Verify interview sessions unaffected</subtask>
+        <subtask id="6.8">Measure P95 latency (target &lt; 5s)</subtask>
+      </taskGroup>
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC-1.1">System creates campaign_reports record with unique access token when authorized user requests report generation for completed campaign</criterion>
+    <criterion id="AC-1.2">Access token is cryptographically secure (256-bit, base64url encoded) with entropy sufficient to prevent brute force attacks</criterion>
+    <criterion id="AC-1.3">Report data is accessible via public token endpoint (GET /api/reports/[token]) without authentication requirements</criterion>
+    <criterion id="AC-1.4">RLS policies enforce organization isolation preventing cross-company data access</criterion>
+    <criterion id="AC-1.5">Invalid or inactive tokens return 404 response with appropriate error message</criterion>
+    <criterion id="AC-9.1">Report generation restricted to authenticated users with campaign report permissions (campaign-level flag OR admin-class profile)</criterion>
+    <criterion id="AC-9.2">Public report access requires only valid access token (no authentication)</criterion>
+    <criterion id="AC-9.3">Inactive reports (is_active = false) return 404 even with valid token</criterion>
+    <criterion id="AC-9.4">Users can only generate reports for campaigns they have permission to access (organization-scoped RLS policies)</criterion>
+    <criterion id="AC-9.5">RLS policies prevent direct database queries across organization boundaries</criterion>
+    <criterion id="AC-10.1">Report generation API responds within 5 seconds (95th percentile)</criterion>
+    <criterion id="AC-10.6">Failed report generation does not create partial database records (transaction boundary)</criterion>
+    <criterion id="AC-11.1">Report system does not disrupt existing campaign creation workflow</criterion>
+    <criterion id="AC-11.2">Report system does not interfere with stakeholder interview sessions</criterion>
+    <criterion id="AC-11.3">Report system does not modify campaign_synthesis data (read-only access)</criterion>
+    <criterion id="AC-11.4">TypeScript compilation succeeds with strict mode enabled (no type errors)</criterion>
+    <criterion id="AC-11.6">Database migrations run successfully on clean Supabase instance</criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/sprint-artifacts/tech-spec-epic-1.md</path>
+        <title>Epic 1 Technical Specification</title>
+        <section>Complete Specification</section>
+        <snippet>Comprehensive technical specification for Client Assessment Report Generation System including database design, API endpoints, security model, and acceptance criteria with full traceability mapping.</snippet>
+      </doc>
+      <doc>
+        <path>docs/tech-spec.md</path>
+        <title>innovaasflowforge Technical Specification</title>
+        <section>Implementation Details</section>
+        <snippet>Tech stack (Next.js 15, Supabase, TypeScript), database schema design for campaign_reports, token generation strategy using crypto.randomBytes(32), tier content logic, and file upload to Supabase Storage.</snippet>
+      </doc>
+      <doc>
+        <path>docs/ARCHITECTURE-multi-tenancy-redesign.md</path>
+        <title>Multi-Tenancy Architecture</title>
+        <section>RLS Patterns and Organization Isolation</section>
+        <snippet>Multi-tenant architecture using organization-scoped RLS policies, company_profiles with organization isolation, user types (consultant/company), and data access patterns.</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics.md</path>
+        <title>Epic Breakdown</title>
+        <section>Story 1.1: Database & API Foundation</section>
+        <snippet>Story overview, acceptance criteria summary, and technical notes including migration creation, token generation, API routes, and Supabase admin client usage.</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>lib/agents/synthesis-agent.ts</path>
+        <kind>service</kind>
+        <symbol>ReadinessAssessment</symbol>
+        <lines>625-642</lines>
+        <reason>Defines the interface structure for synthesis_snapshot JSONB column. Report system consumes this data structure without modification.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/supabase/server.ts</path>
+        <kind>service</kind>
+        <symbol>getSupabaseAdmin</symbol>
+        <lines>N/A</lines>
+        <reason>Provides admin Supabase client with service role key for privileged operations (bypasses RLS). Required for report generation API.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/supabase/server.ts</path>
+        <kind>service</kind>
+        <symbol>createClient</symbol>
+        <lines>N/A</lines>
+        <reason>Provides authenticated Supabase client for user-scoped operations. Used in public report access with RLS enforcement.</reason>
+      </artifact>
+      <artifact>
+        <path>lib/supabase/client.ts</path>
+        <kind>service</kind>
+        <symbol>createClient</symbol>
+        <lines>N/A</lines>
+        <reason>Browser-side Supabase client for client components. Reference pattern for consistent error handling.</reason>
+      </artifact>
+      <artifact>
+        <path>app/api/campaigns/[id]/route.ts</path>
+        <kind>controller</kind>
+        <symbol>API Route Pattern</symbol>
+        <lines>N/A</lines>
+        <reason>Existing campaign API route pattern to follow for consistent error handling, response format, and Supabase admin usage.</reason>
+      </artifact>
+      <artifact>
+        <path>app/session/[token]/page.tsx</path>
+        <kind>page</kind>
+        <symbol>Token Validation Pattern</symbol>
+        <lines>N/A</lines>
+        <reason>Reference implementation for token-based page access without authentication. Similar pattern needed for /report/[token] page.</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <node>
+        <package name="next" version="15.0.3"/>
+        <package name="react" version="^18.3.1"/>
+        <package name="typescript" version="^5"/>
+        <package name="@supabase/supabase-js" version="^2.39.0"/>
+        <package name="@supabase/ssr" version="^0.0.10"/>
+        <package name="@anthropic-ai/sdk" version="^0.27.0"/>
+        <package name="d3-scale" version="^4.0.2"/>
+        <package name="d3-shape" version="^3.2.0"/>
+        <package name="lucide-react" version="^0.553.0"/>
+        <package name="zustand" version="^4.4.7"/>
+        <package name="@react-pdf/renderer" version="^4.3.1"/>
+        <package name="tailwindcss" version="^3.4.1"/>
+        <package name="autoprefixer" version="^10.0.1"/>
+        <package name="postcss" version="^8"/>
+        <package name="dotenv" version="^17.2.3"/>
+      </node>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint>Use Next.js 15 App Router pattern with Server Components for data fetching</constraint>
+    <constraint>All API routes must use getSupabaseAdmin() for privileged operations to bypass RLS</constraint>
+    <constraint>Follow existing error handling pattern: Response.json({success, data?, error?})</constraint>
+    <constraint>Database tables use UUID primary keys with created_at/updated_at timestamps</constraint>
+    <constraint>RLS policies must enforce organization-level isolation via campaigns.company_profile_id</constraint>
+    <constraint>Public report access bypasses authentication (token IS the auth mechanism)</constraint>
+    <constraint>Token generation uses Node.js crypto.randomBytes(32) for 256-bit entropy</constraint>
+    <constraint>UPSERT strategy for report regeneration: ON CONFLICT (campaign_id) DO UPDATE</constraint>
+    <constraint>Read-only access to campaign_synthesis.synthesis_data (snapshot to campaign_reports)</constraint>
+    <constraint>TypeScript strict mode enabled - all code must compile without errors</constraint>
+    <constraint>Use @/* path aliases for internal imports</constraint>
+    <constraint>Catppuccin Mocha theme classes for consistent styling (bg-mocha-base, text-mocha-text)</constraint>
+    <constraint>Transaction boundaries required for multi-step database operations (AC-10.6)</constraint>
+    <constraint>Campaign-level permissions: check can_generate_reports flag OR admin-class profile</constraint>
+    <constraint>Report tier enum must be validated: 'basic' | 'informative' | 'premium'</constraint>
+    <constraint>Supabase Storage bucket 'campaign-reports' must be private (non-public)</constraint>
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>ReadinessAssessment</name>
+      <kind>TypeScript Interface</kind>
+      <signature>
+        interface ReadinessAssessment {
+          overallScore: number;
+          pillars: PillarScore[];
+          executiveSummary: string;
+          keyThemes: string[];
+          contradictions: string[];
+          recommendations: string[];
+          stakeholderPerspectives: StakeholderPerspective[];
+        }
+      </signature>
+      <path>lib/agents/synthesis-agent.ts:625-642</path>
+    </interface>
+    <interface>
+      <name>POST /api/campaigns/[id]/report</name>
+      <kind>REST Endpoint</kind>
+      <signature>
+        POST /api/campaigns/:campaignId/report
+        Request Body: { tier: 'basic' | 'informative' | 'premium' }
+        Response: { success: boolean; data?: { report_id: string; access_token: string }; error?: string }
+        Auth: Required (service role)
+        Permissions: campaign.can_generate_reports OR user admin class
+      </signature>
+      <path>To be created: app/api/campaigns/[id]/report/route.ts</path>
+    </interface>
+    <interface>
+      <name>GET /api/reports/[token]</name>
+      <kind>REST Endpoint</kind>
+      <signature>
+        GET /api/reports/:accessToken
+        Query Params: None
+        Response: { success: boolean; data?: CampaignReport; error?: string }
+        Auth: None (public access via token)
+        Returns 404 if token invalid or report inactive
+      </signature>
+      <path>To be created: app/api/reports/[token]/route.ts</path>
+    </interface>
+    <interface>
+      <name>campaign_reports Table</name>
+      <kind>Database Schema</kind>
+      <signature>
+        CREATE TABLE campaign_reports (
+          id UUID PRIMARY KEY,
+          campaign_id UUID UNIQUE NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+          access_token TEXT UNIQUE NOT NULL,
+          is_active BOOLEAN NOT NULL DEFAULT true,
+          report_tier TEXT NOT NULL CHECK (report_tier IN ('basic', 'informative', 'premium')),
+          synthesis_snapshot JSONB NOT NULL,
+          consultant_observations TEXT,
+          supporting_documents JSONB DEFAULT '[]'::jsonb,
+          created_by UUID NOT NULL REFERENCES auth.users(id),
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          regenerated_at TIMESTAMPTZ,
+          regeneration_count INTEGER NOT NULL DEFAULT 0,
+          access_count INTEGER NOT NULL DEFAULT 0,
+          last_accessed_at TIMESTAMPTZ,
+          UNIQUE(campaign_id)
+        );
+      </signature>
+      <path>To be created: supabase/migrations/[timestamp]_create_campaign_reports.sql</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>No test framework currently configured. Manual testing required for Story 1.1. Unit tests should use Jest + TypeScript (future). API integration tests with curl/Postman. Database tests verify RLS policies with multi-organization test data. Transaction rollback testing for AC-10.6. Performance testing: P95 latency must be &lt; 5s for report generation.</standards>
+    <locations>No test directories exist yet. Future test structure: lib/utils/token-generator.test.ts, app/api/campaigns/[id]/report/route.test.ts, app/api/reports/[token]/route.test.ts, supabase/tests/rls-policies.test.sql</locations>
+    <ideas>
+      <test ac="AC-1.1">API test: POST /api/campaigns/[valid-id]/report with tier='premium' returns success with 43-char access_token</test>
+      <test ac="AC-1.2">Unit test: generateAccessToken() produces base64url tokens, verify format matches /^[A-Za-z0-9_-]{43}$/, generate 10k tokens and verify no collisions</test>
+      <test ac="AC-1.3">Integration test: GET /api/reports/[valid-token] without auth headers returns 200 with report data</test>
+      <test ac="AC-1.4">Database test: User from Org A queries campaign_reports created by Org B, verify RLS returns 0 rows</test>
+      <test ac="AC-1.5">API test: GET /api/reports/[invalid-token] returns 404, GET /api/reports/[valid-but-inactive-token] returns 404</test>
+      <test ac="AC-9.1">Security test: User without campaign permissions attempts POST to generate report, verify 403 Forbidden</test>
+      <test ac="AC-9.4">Security test: User attempts to generate report for campaign_id from different organization, verify access denied</test>
+      <test ac="AC-10.1">Performance test: Generate 20 reports sequentially, measure response times, verify P95 &lt; 5s</test>
+      <test ac="AC-10.6">Error test: Force database error mid-generation (disconnect), verify no partial campaign_reports record exists</test>
+      <test ac="AC-11.3">Integration test: SELECT campaign_synthesis.synthesis_data before/after report generation, verify unchanged (read-only)</test>
+      <test ac="AC-11.4">Build test: Run tsc --noEmit, verify 0 errors</test>
+      <test ac="AC-11.6">Migration test: Fresh Supabase instance, run migration, verify table exists with correct schema and indexes</test>
+    </ideas>
+  </tests>
+</story-context>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Clock, Mail, Pause } from 'lucide-react'
+import { CheckCircle2, Clock, Mail, Pause, Share2 } from 'lucide-react'
+import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
 
 interface StakeholderSession {
   id: string
@@ -47,6 +48,7 @@ export default function CampaignDetailPage() {
   const [completingSession, setCompletingSession] = useState<string | null>(null)
   const [generatingReport, setGeneratingReport] = useState(false)
   const [generatingPDF, setGeneratingPDF] = useState(false)
+  const [showReportPanel, setShowReportPanel] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -383,17 +385,23 @@ export default function CampaignDetailPage() {
                 {campaign.progress.completed > 0 && (
                   <>
                     <button
+                      onClick={() => setShowReportPanel(true)}
+                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                      <Share2 className="w-4 h-4" />
+                      Generate Client Report
+                    </button>
+                    <button
                       onClick={handleGeneratePDF}
                       disabled={generatingPDF}
-                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50 flex items-center gap-2">
+                      className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
                       {generatingPDF ? (
                         <>
-                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
+                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
                           Generating PDF...
                         </>
                       ) : (
                         <>
-                          Download PDF Report
+                          Download PDF
                         </>
                       )}
                     </button>
@@ -502,19 +510,25 @@ export default function CampaignDetailPage() {
                     ? `All ${campaign.progress.total} stakeholder interviews are complete. Generate a comprehensive digital transformation readiness assessment with dimensional scoring, cross-stakeholder synthesis, and strategic recommendations.`
                     : `${campaign.progress.completed} of ${campaign.progress.total} interviews complete. You can generate a report now with available data, or wait for all stakeholders to complete their interviews for the most comprehensive analysis.`}
                 </p>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => setShowReportPanel(true)}
+                    className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                    <Share2 className="w-4 h-4" />
+                    Generate Client Report
+                  </button>
                   <button
                     onClick={handleGeneratePDF}
                     disabled={generatingPDF}
-                    className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity disabled:opacity-50 flex items-center gap-2">
+                    className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
                     {generatingPDF ? (
                       <>
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
-                        Generating PDF Report...
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
+                        Generating PDF...
                       </>
                     ) : (
                       <>
-                        Generate PDF Report
+                        Download PDF
                       </>
                     )}
                   </button>
@@ -529,7 +543,7 @@ export default function CampaignDetailPage() {
                       </>
                     ) : (
                       <>
-                        Generate Markdown
+                        Download Markdown
                       </>
                     )}
                   </button>
@@ -726,6 +740,18 @@ export default function CampaignDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Report Generation Panel */}
+      <ReportGenerationPanel
+        campaignId={campaign.id}
+        campaignName={campaign.name}
+        isOpen={showReportPanel}
+        onClose={() => setShowReportPanel(false)}
+        onSuccess={() => {
+          // Optionally refresh campaign data or show additional success feedback
+          fetchCampaign()
+        }}
+      />
     </div>
   )
 }
