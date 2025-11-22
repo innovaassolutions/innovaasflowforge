@@ -16,10 +16,10 @@ import { isValidTokenFormat } from '@/lib/utils/token-generator';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const accessToken = params.token;
+    const { token: accessToken } = await params;
 
     // Validate token format (43 base64url characters)
     if (!accessToken || !isValidTokenFormat(accessToken)) {
