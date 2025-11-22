@@ -46,12 +46,12 @@ export async function POST(
       );
     }
 
-    // Get user's company profile
-    const { data: userProfile, error: profileError } = await supabase
+    // Get user's company profile (use admin to bypass RLS)
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('company_profile_id')
       .eq('id', user.id)
-      .single();
+      .single() as any;
 
     if (profileError || !userProfile) {
       return NextResponse.json(
