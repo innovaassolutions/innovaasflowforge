@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, supabaseAdmin } from '@/lib/supabase/server';
 import { generateAccessToken } from '@/lib/utils/token-generator';
 
 export async function POST(
@@ -46,42 +46,48 @@ export async function POST(
       );
     }
 
-    // Verify user has access to this campaign (organization check)
-    // User must either:
-    // 1. Be the campaign creator, OR
-    // 2. Belong to the same organization as the campaign
-    const { data: campaign, error: campaignError } = await supabase
-      .from('campaigns')
-      .select(
-        `
-        id,
-        name,
-        report_tier,
-        created_by,
-        company_profile_id,
-        user_profiles!inner (
-          id,
-          company_profile_id
-        )
-      `
-      )
-      .eq('id', campaignId)
-      .eq('user_profiles.id', user.id)
+    // Get user's company profile
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('company_profile_id')
+      .eq('id', user.id)
       .single();
 
-    if (campaignError || !campaign) {
+    if (profileError || !userProfile) {
       return NextResponse.json(
-        { error: 'Campaign not found or access denied' },
+        { error: 'User profile not found' },
         { status: 404 }
       );
     }
 
+    // Get campaign and verify user has access (same organization)
+    const { data: campaign, error: campaignError } = await supabaseAdmin
+      .from('campaigns')
+      .select('id, name, report_tier, created_by, company_profile_id')
+      .eq('id', campaignId)
+      .single() as any;
+
+    if (campaignError || !campaign) {
+      return NextResponse.json(
+        { error: 'Campaign not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify user belongs to same organization as campaign
+    if (campaign.company_profile_id !== userProfile.company_profile_id) {
+      return NextResponse.json(
+        { error: 'Access denied - different organization' },
+        { status: 403 }
+      );
+    }
+
     // Get campaign synthesis data from campaign_synthesis table
-    const { data: synthesis, error: synthesisError } = await supabase
+    const { data: synthesis, error: synthesisError } = await supabaseAdmin
       .from('campaign_synthesis')
       .select('synthesis_data')
       .eq('campaign_id', campaignId)
-      .maybeSingle();
+      .maybeSingle() as any;
 
     // Validate campaign has synthesis data
     if (
@@ -104,11 +110,11 @@ export async function POST(
     const accessToken = generateAccessToken();
 
     // Get existing report if any
-    const { data: existingReport } = await supabase
+    const { data: existingReport } = await supabaseAdmin
       .from('campaign_reports')
       .select('id, regeneration_count')
       .eq('campaign_id', campaignId)
-      .maybeSingle();
+      .maybeSingle() as any;
 
     // UPSERT campaign_reports record
     // If report exists: increment regeneration_count, update regenerated_at
@@ -131,8 +137,8 @@ export async function POST(
           }),
     };
 
-    const { data: report, error: upsertError } = await supabase
-      .from('campaign_reports')
+    const { data: report, error: upsertError } = await (supabaseAdmin
+      .from('campaign_reports') as any)
       .upsert(reportData, {
         onConflict: 'campaign_id',
         ignoreDuplicates: false,
