@@ -8,3 +8,5 @@
 export { ExecutiveSummary } from './ExecutiveSummary'
 export { DimensionalAnalysis } from './DimensionalAnalysis'
 export { Recommendations } from './Recommendations'
+export { EnhancedRecommendations } from './EnhancedRecommendations'
+export { ExecutiveOnePager } from './ExecutiveOnePager'
