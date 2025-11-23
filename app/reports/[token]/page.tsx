@@ -1,8 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useParams } from 'next/navigation'
-import { CheckCircle2, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react'
+import { AlertCircle, Download, FileText } from 'lucide-react'
+import { generateReportFilename, downloadReport } from '@/lib/download-utils'
+import type { ReadinessAssessment } from '@/lib/agents/synthesis-agent'
+
+// Lazy load heavy chart components
+const ExecutiveSummary = lazy(() =>
+  import('@/components/reports/sections').then(mod => ({ default: mod.ExecutiveSummary }))
+)
+const DimensionalAnalysis = lazy(() =>
+  import('@/components/reports/sections').then(mod => ({ default: mod.DimensionalAnalysis }))
+)
+const Recommendations = lazy(() =>
+  import('@/components/reports/sections').then(mod => ({ default: mod.Recommendations }))
+)
 
 interface ReportData {
   id: string
@@ -14,33 +27,7 @@ interface ReportData {
     company_industry: string
   }
   tier: 'basic' | 'informative' | 'premium'
-  synthesis: {
-    overallScore: number
-    pillars: Array<{
-      pillar: string
-      score: number
-      dimensions: Array<{
-        dimension: string
-        score: number
-        confidence: string
-        keyFindings: string[]
-        supportingQuotes: string[]
-        gapToNext: string
-        priority: string
-      }>
-    }>
-    executiveSummary: string
-    keyThemes: string[]
-    contradictions: string[]
-    recommendations: string[]
-    stakeholderPerspectives: Array<{
-      name: string
-      role: string
-      title: string
-      keyConcerns: string[]
-      notableQuotes: string[]
-    }>
-  }
+  synthesis: ReadinessAssessment
   consultant_observations: string | null
   supporting_documents: any[]
   generated_at: string
@@ -55,6 +42,7 @@ export default function ReportViewerPage() {
   const [report, setReport] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [downloading, setDownloading] = useState<'pdf' | 'md' | null>(null)
 
   useEffect(() => {
     fetchReport()
@@ -81,27 +69,26 @@ export default function ReportViewerPage() {
     }
   }
 
-  const getScoreColor = (score: number) => {
-    if (score >= 4) return 'text-green-400'
-    if (score >= 3) return 'text-yellow-400'
-    if (score >= 2) return 'text-orange-400'
-    return 'text-red-400'
-  }
+  const handleDownload = async (format: 'pdf' | 'md') => {
+    if (!report) return
 
-  const getScoreBgColor = (score: number) => {
-    if (score >= 4) return 'bg-green-500/10 border-green-500/30'
-    if (score >= 3) return 'bg-yellow-500/10 border-yellow-500/30'
-    if (score >= 2) return 'bg-orange-500/10 border-orange-500/30'
-    return 'bg-red-500/10 border-red-500/30'
-  }
+    try {
+      setDownloading(format)
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical': return 'text-red-400 bg-red-500/10 border-red-500/30'
-      case 'important': return 'text-orange-400 bg-orange-500/10 border-orange-500/30'
-      case 'foundational': return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30'
-      case 'opportunistic': return 'text-brand-teal bg-brand-teal/10 border-brand-teal/30'
-      default: return 'text-mocha-subtext0 bg-mocha-surface0 border-mocha-surface1'
+      const filename = generateReportFilename(
+        report.campaign.company_name,
+        report.campaign.name,
+        token,
+        format
+      )
+
+      const downloadUrl = `/api/reports/${token}/download?format=${format}`
+      await downloadReport(downloadUrl, filename)
+    } catch (err) {
+      console.error('Download error:', err)
+      alert('Failed to download report. Please try again.')
+    } finally {
+      setDownloading(null)
     }
   }
 
@@ -139,201 +126,130 @@ export default function ReportViewerPage() {
     <div className="min-h-screen bg-mocha-base">
       {/* Header */}
       <div className="bg-gradient-to-r from-brand-orange/20 to-brand-teal/20 border-b border-mocha-surface1">
-        <div className="max-w-5xl mx-auto px-6 py-12">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-mocha-text mb-2">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-mocha-text mb-2">
                 Digital Transformation Readiness Assessment
               </h1>
-              <p className="text-xl text-mocha-subtext0">
-                {campaign.company_name}
-              </p>
+              <p className="text-xl text-mocha-subtext0">{campaign.company_name}</p>
               <p className="text-sm text-mocha-subtext1 mt-1">
                 {campaign.company_industry} • {campaign.name}
               </p>
             </div>
-            <div className={`text-center px-6 py-3 rounded-lg border ${getScoreBgColor(synthesis.overallScore)}`}>
-              <div className={`text-3xl font-bold ${getScoreColor(synthesis.overallScore)}`}>
-                {synthesis.overallScore.toFixed(1)}
-              </div>
-              <div className="text-xs text-mocha-subtext0 mt-1">Overall Score</div>
-            </div>
-          </div>
 
-          <div className="bg-mocha-surface0/50 border border-mocha-surface1 rounded-lg p-4">
-            <p className="text-mocha-text leading-relaxed">
-              {synthesis.executiveSummary}
-            </p>
+            {/* Download Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleDownload('pdf')}
+                disabled={downloading !== null}
+                className="flex items-center gap-2 px-4 py-2 bg-brand-orange hover:bg-brand-orange/90 disabled:bg-mocha-surface1 disabled:text-mocha-subtext1 text-white rounded-lg transition-colors text-sm font-medium"
+                aria-label="Download PDF report">
+                {downloading === 'pdf' ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
+                    <span>Downloading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download size={16} />
+                    <span>PDF</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => handleDownload('md')}
+                disabled={downloading !== null}
+                className="flex items-center gap-2 px-4 py-2 bg-mocha-surface0 hover:bg-mocha-surface1 disabled:bg-mocha-surface0 disabled:text-mocha-subtext1 text-mocha-text border border-mocha-surface1 hover:border-mocha-surface2 rounded-lg transition-colors text-sm font-medium"
+                aria-label="Download Markdown report">
+                {downloading === 'md' ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-mocha-text border-r-transparent"></div>
+                    <span>Downloading...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText size={16} />
+                    <span>Markdown</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Pillars */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-mocha-text mb-6 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-brand-orange" />
-            Readiness Pillars
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {synthesis.pillars.map((pillar) => (
-              <div
-                key={pillar.pillar}
-                className={`bg-mocha-surface0 border rounded-lg p-6 ${getScoreBgColor(pillar.score)}`}>
-                <h3 className="text-lg font-semibold text-mocha-text mb-2">{pillar.pillar}</h3>
-                <div className={`text-3xl font-bold ${getScoreColor(pillar.score)} mb-2`}>
-                  {pillar.score.toFixed(1)}
-                </div>
-                <div className="text-sm text-mocha-subtext0">
-                  {pillar.dimensions.length} dimensions assessed
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Dimensions per Pillar */}
-          {synthesis.pillars.map((pillar) => (
-            <div key={pillar.pillar} className="mb-8">
-              <h3 className="text-xl font-bold text-mocha-text mb-4 border-b border-mocha-surface1 pb-2">
-                {pillar.pillar} Dimensions
-              </h3>
-
-              <div className="space-y-4">
-                {pillar.dimensions.map((dim) => (
-                  <div
-                    key={dim.dimension}
-                    className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-mocha-text mb-1">
-                          {dim.dimension}
-                        </h4>
-                        <div className="flex items-center gap-3">
-                          <span className={`text-2xl font-bold ${getScoreColor(dim.score)}`}>
-                            {dim.score.toFixed(1)}
-                          </span>
-                          <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(dim.priority)}`}>
-                            {dim.priority}
-                          </span>
-                          <span className="text-xs text-mocha-subtext1 px-2 py-1 bg-mocha-surface1 rounded">
-                            {dim.confidence} confidence
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {tier !== 'basic' && (
-                      <>
-                        <div className="mb-4">
-                          <h5 className="text-sm font-semibold text-mocha-subtext0 mb-2">
-                            Key Findings
-                          </h5>
-                          <ul className="space-y-1">
-                            {dim.keyFindings.map((finding, idx) => (
-                              <li key={idx} className="text-sm text-mocha-text flex items-start gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                                <span>{finding}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {tier === 'informative' || tier === 'premium' ? (
-                          <>
-                            {dim.supportingQuotes.length > 0 && (
-                              <div className="mb-4">
-                                <h5 className="text-sm font-semibold text-mocha-subtext0 mb-2">
-                                  Stakeholder Insights
-                                </h5>
-                                <div className="space-y-2">
-                                  {dim.supportingQuotes.slice(0, 2).map((quote, idx) => (
-                                    <blockquote
-                                      key={idx}
-                                      className="text-sm text-mocha-subtext1 italic border-l-2 border-brand-orange pl-3 py-1">
-                                      "{quote}"
-                                    </blockquote>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : null}
-
-                        <div className="bg-mocha-surface1/50 rounded p-3">
-                          <h5 className="text-sm font-semibold text-brand-orange mb-1">
-                            Path to Next Level
-                          </h5>
-                          <p className="text-sm text-mocha-text">{dim.gapToNext}</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        {/* Executive Summary Section */}
+        <Suspense
+          fallback={
+            <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
+              <div className="h-8 bg-mocha-surface1 rounded w-1/3 mb-6"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-mocha-surface1 rounded"></div>
+                <div className="h-4 bg-mocha-surface1 rounded"></div>
+                <div className="h-4 bg-mocha-surface1 rounded w-2/3"></div>
               </div>
             </div>
-          ))}
-        </section>
+          }>
+          <ExecutiveSummary assessment={synthesis} />
+        </Suspense>
 
-        {/* Key Themes */}
-        {tier !== 'basic' && synthesis.keyThemes.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-mocha-text mb-6">Key Themes</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {synthesis.keyThemes.map((theme, idx) => (
-                <div
-                  key={idx}
-                  className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-4">
-                  <p className="text-mocha-text">{theme}</p>
-                </div>
-              ))}
+        {/* Dimensional Analysis Section */}
+        <Suspense
+          fallback={
+            <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
+              <div className="h-8 bg-mocha-surface1 rounded w-1/2 mb-6"></div>
+              <div className="h-64 bg-mocha-surface1 rounded"></div>
             </div>
-          </section>
-        )}
+          }>
+          <DimensionalAnalysis assessment={synthesis} />
+        </Suspense>
 
-        {/* Recommendations */}
-        {(tier === 'informative' || tier === 'premium') && synthesis.recommendations.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-mocha-text mb-6">Strategic Recommendations</h2>
-            <div className="space-y-4">
-              {synthesis.recommendations.map((rec, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gradient-to-r from-brand-orange/10 to-brand-teal/10 border border-brand-orange/30 rounded-lg p-6">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-brand-orange text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">
-                      {idx + 1}
-                    </div>
-                    <p className="text-mocha-text flex-1">{rec}</p>
+        {/* Recommendations Section */}
+        {(tier === 'informative' || tier === 'premium') &&
+          synthesis.recommendations.length > 0 && (
+            <Suspense
+              fallback={
+                <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
+                  <div className="h-8 bg-mocha-surface1 rounded w-1/3 mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="h-20 bg-mocha-surface1 rounded"></div>
+                    <div className="h-20 bg-mocha-surface1 rounded"></div>
+                    <div className="h-20 bg-mocha-surface1 rounded"></div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              }>
+              <Recommendations assessment={synthesis} />
+            </Suspense>
+          )}
 
         {/* Consultant Observations */}
         {consultant_observations && (
-          <section className="mb-12">
+          <section className="bg-mocha-base border border-mocha-surface0 rounded-lg p-8">
             <h2 className="text-2xl font-bold text-mocha-text mb-6">Consultant Observations</h2>
             <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-6">
-              <p className="text-mocha-text whitespace-pre-wrap">{consultant_observations}</p>
+              <p className="text-mocha-text whitespace-pre-wrap leading-relaxed">
+                {consultant_observations}
+              </p>
             </div>
           </section>
         )}
 
         {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-mocha-surface1 text-center">
+        <div className="pt-6 border-t border-mocha-surface1 text-center">
           <p className="text-sm text-mocha-subtext1">
-            Generated on {new Date(report.generated_at).toLocaleDateString('en-US', {
+            Generated on{' '}
+            {new Date(report.generated_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
             })}
             {report.regeneration_count > 0 && (
               <span className="ml-2">
-                (Updated {report.regeneration_count} time{report.regeneration_count > 1 ? 's' : ''})
+                (Updated {report.regeneration_count} time
+                {report.regeneration_count > 1 ? 's' : ''})
               </span>
             )}
           </p>

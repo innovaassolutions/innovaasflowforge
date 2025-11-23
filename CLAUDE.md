@@ -4,7 +4,9 @@
 
 ## Project Overview
 
-**Innovaas FlowForge** is a Digital Transformation Readiness Assessment platform that helps manufacturing companies evaluate their Industry 4.0 maturity through structured stakeholder interviews and AI-powered synthesis.
+**Innovaas FlowForge** is a management consulting platform that enables consultants to conduct structured assessments across any industry through AI-facilitated stakeholder interviews and intelligent synthesis.
+
+**First Use Case**: Digital Transformation Readiness Assessment - helping organizations across healthcare, manufacturing, retail, finance, education, logistics, and professional services evaluate their digital maturity and transformation readiness.
 
 ## Key Technologies
 
@@ -134,7 +136,8 @@ supabase/
 ## Documentation
 
 - **PDF Design**: [docs/pdf-design-guidelines.md](docs/pdf-design-guidelines.md)
-- **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Industry 4.0 reference materials
+- **Report Design**: [docs/report-design-guidelines.md](docs/report-design-guidelines.md)
+- **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Assessment framework reference materials
 - **Database Schema**: See Supabase migrations
 
 ## Development Workflow

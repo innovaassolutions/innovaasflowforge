@@ -89,7 +89,38 @@ This document outlines design principles for creating professional, high-impact 
 - Divergence indicators
 - Consensus areas highlighted
 
-**2. Infographics**
+**2. AI-Generated Images**
+
+**Google Gemini Integration**:
+- Generate contextual, industry-specific illustrations
+- Create visual metaphors for complex business concepts
+- Enhance executive summaries with relevant imagery
+- Generate custom infographic components dynamically
+
+**Use Cases**:
+- Industry context visuals (adaptable to healthcare, retail, finance, manufacturing, education, logistics)
+- Technology adoption illustrations
+- Process workflow diagrams
+- Organizational structure visuals
+- Future state visualizations
+- Transformation journey maps
+
+**Implementation**:
+- Environment variable: `GOOGLE_GEMINI_API_KEY` (configured in `.env.local`)
+- Model: Gemini Pro Vision for image generation
+- Prompts should be specific to client's industry context
+- Maintain consistent art style aligned with brand colors
+- Cache generated images to avoid redundant API calls
+- Include descriptive alt text for accessibility
+
+**Best Practices**:
+- Keep prompts detailed and context-specific
+- Request consistent visual style across report
+- Specify brand color palette (Orange #F25C05, Teal #1D9BA3)
+- Generate at appropriate resolution for web and PDF
+- Test generated images for clarity and relevance
+
+**3. Infographics**
 
 **Iconography**:
 - Use consistent icon set (Lucide React)
