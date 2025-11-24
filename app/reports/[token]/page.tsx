@@ -110,6 +110,13 @@ export default function ReportViewerPage() {
     }
   }
 
+  // Transform data for strategic frameworks (memoized for performance)
+  // These must be called before any conditional returns (Rules of Hooks)
+  const synthesis = report?.synthesis
+  const matrixData = useMemo(() => synthesis ? transformToMatrixData(synthesis) : [], [synthesis])
+  const heatMapData = useMemo(() => synthesis ? transformToHeatMapData(synthesis) : [], [synthesis])
+  const roadmapData = useMemo(() => synthesis ? transformToRoadmapData(synthesis) : [], [synthesis])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-mocha-base flex items-center justify-center">
@@ -138,12 +145,7 @@ export default function ReportViewerPage() {
     )
   }
 
-  const { synthesis, campaign, tier, consultant_observations } = report
-
-  // Transform data for strategic frameworks (memoized for performance)
-  const matrixData = useMemo(() => transformToMatrixData(synthesis), [synthesis])
-  const heatMapData = useMemo(() => transformToHeatMapData(synthesis), [synthesis])
-  const roadmapData = useMemo(() => transformToRoadmapData(synthesis), [synthesis])
+  const { campaign, tier, consultant_observations } = report
 
   // Determine if we should show consulting-grade components (premium tier)
   const showConsultingGrade = tier === 'premium'
@@ -208,7 +210,7 @@ export default function ReportViewerPage() {
       {/* Main Content */}
       <div className="space-y-0">
         {/* Executive One-Pager (Premium only) or Executive Summary */}
-        {showConsultingGrade ? (
+        {showConsultingGrade && synthesis ? (
           <Suspense
             fallback={
               <div className="bg-mocha-base py-25 animate-pulse">
@@ -220,7 +222,7 @@ export default function ReportViewerPage() {
             }>
             <ExecutiveOnePager assessment={synthesis} />
           </Suspense>
-        ) : (
+        ) : synthesis ? (
           <Suspense
             fallback={
               <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
@@ -234,18 +236,20 @@ export default function ReportViewerPage() {
             }>
             <ExecutiveSummary assessment={synthesis} />
           </Suspense>
-        )}
+        ) : null}
 
         {/* Dimensional Analysis Section (All tiers) */}
-        <Suspense
-          fallback={
-            <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
-              <div className="h-8 bg-mocha-surface1 rounded w-1/2 mb-6"></div>
-              <div className="h-64 bg-mocha-surface1 rounded"></div>
-            </div>
-          }>
-          <DimensionalAnalysis assessment={synthesis} />
-        </Suspense>
+        {synthesis && (
+          <Suspense
+            fallback={
+              <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
+                <div className="h-8 bg-mocha-surface1 rounded w-1/2 mb-6"></div>
+                <div className="h-64 bg-mocha-surface1 rounded"></div>
+              </div>
+            }>
+            <DimensionalAnalysis assessment={synthesis} />
+          </Suspense>
+        )}
 
         {/* Strategic Frameworks (Premium only) */}
         {showConsultingGrade && (
@@ -292,7 +296,7 @@ export default function ReportViewerPage() {
         )}
 
         {/* Recommendations Section */}
-        {synthesis.recommendations.length > 0 && (
+        {synthesis && synthesis.recommendations.length > 0 && (
           <>
             {showConsultingGrade ? (
               <Suspense
