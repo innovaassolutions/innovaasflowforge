@@ -52,10 +52,10 @@ export async function POST(
       );
     }
 
-    // Get user's company profile (use admin to bypass RLS)
+    // Get user's profile with user_type (use admin to bypass RLS)
     const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .select('company_profile_id')
+      .select('company_profile_id, user_type')
       .eq('id', user.id)
       .single() as any;
 
@@ -68,21 +68,13 @@ export async function POST(
       );
     }
 
-    // Check if user has a company_profile_id
-    if (!userProfile.company_profile_id) {
-      console.error('[Report Gen] User has no company_profile_id:', user.id);
-      return NextResponse.json(
-        {
-          error: 'User profile incomplete',
-          details: 'Your user profile is not associated with a company. Please contact support.'
-        },
-        { status: 400 }
-      );
-    }
+    const isConsultant = userProfile.user_type === 'consultant';
 
     console.log('[Report Gen] User profile:', {
       user_id: user.id,
-      company_profile_id: userProfile.company_profile_id
+      company_profile_id: userProfile.company_profile_id,
+      user_type: userProfile.user_type,
+      is_consultant: isConsultant
     });
 
     // Get campaign and verify user has access (same organization)
@@ -104,15 +96,29 @@ export async function POST(
 
     console.log('[Report Gen] Campaign found:', {
       campaign_id: campaign.id,
-      company_profile_id: campaign.company_profile_id
+      company_profile_id: campaign.company_profile_id,
+      created_by: campaign.created_by
     });
 
-    // Verify user belongs to same organization as campaign
-    if (campaign.company_profile_id !== userProfile.company_profile_id) {
-      return NextResponse.json(
-        { error: 'Access denied - different organization' },
-        { status: 403 }
-      );
+    // Verify user has access to this campaign
+    // Consultants can access any campaign they created
+    // Regular users must belong to the same organization
+    if (isConsultant) {
+      // Consultants can access campaigns they created
+      if (campaign.created_by !== user.id) {
+        return NextResponse.json(
+          { error: 'Access denied - you did not create this campaign' },
+          { status: 403 }
+        );
+      }
+    } else {
+      // Regular users must belong to same organization
+      if (campaign.company_profile_id !== userProfile.company_profile_id) {
+        return NextResponse.json(
+          { error: 'Access denied - different organization' },
+          { status: 403 }
+        );
+      }
     }
 
     // Get or generate campaign synthesis data
