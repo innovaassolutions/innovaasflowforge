@@ -326,12 +326,26 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get all campaigns created by this user (works for both consultant and company users)
-    // RLS policies will handle access control
-    const { data: campaigns, error } = await supabase
-      .from('campaigns')
-      .select('*')
-      .order('created_at', { ascending: false })
+    // Check if user is an admin
+    const { data: userProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .single() as any
+
+    const isAdmin = userProfile?.user_type === 'admin'
+
+    // Admins can see ALL campaigns (bypass RLS)
+    // Regular users see campaigns based on RLS policies
+    const { data: campaigns, error } = isAdmin
+      ? await supabaseAdmin
+          .from('campaigns')
+          .select('*')
+          .order('created_at', { ascending: false })
+      : await supabase
+          .from('campaigns')
+          .select('*')
+          .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Error fetching campaigns:', error)
@@ -340,6 +354,8 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    console.log(`[Campaigns GET] User ${user.email} (${isAdmin ? 'admin' : 'user'}) fetched ${campaigns?.length || 0} campaigns`)
 
     return NextResponse.json({ campaigns }, { status: 200 })
 

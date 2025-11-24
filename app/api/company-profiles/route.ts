@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import type { Database } from '@/types/database'
 
 interface CreateCompanyProfileRequest {
@@ -163,11 +164,26 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // RLS policies will automatically filter to show only companies the user can access
-    const { data: companies, error } = await supabase
-      .from('company_profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
+    // Check if user is an admin
+    const { data: userProfile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .single() as any
+
+    const isAdmin = userProfile?.user_type === 'admin'
+
+    // Admins can see ALL companies (bypass RLS)
+    // Regular users see companies based on RLS policies
+    const { data: companies, error } = isAdmin
+      ? await supabaseAdmin
+          .from('company_profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
+      : await supabase
+          .from('company_profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Error fetching companies:', error)
@@ -176,6 +192,8 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    console.log(`[Companies GET] User ${user.email} (${isAdmin ? 'admin' : 'user'}) fetched ${companies?.length || 0} companies`)
 
     return NextResponse.json({ companies }, { status: 200 })
 
