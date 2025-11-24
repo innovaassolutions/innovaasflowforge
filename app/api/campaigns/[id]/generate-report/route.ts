@@ -69,12 +69,14 @@ export async function POST(
     }
 
     const isConsultant = userProfile.user_type === 'consultant';
+    const isAdmin = userProfile.user_type === 'admin';
 
     console.log('[Report Gen] User profile:', {
       user_id: user.id,
       company_profile_id: userProfile.company_profile_id,
       user_type: userProfile.user_type,
-      is_consultant: isConsultant
+      is_consultant: isConsultant,
+      is_admin: isAdmin
     });
 
     // Get campaign and verify user has access (same organization)
@@ -101,9 +103,13 @@ export async function POST(
     });
 
     // Verify user has access to this campaign
+    // Admins have full access to all campaigns
     // Consultants can access any campaign they created
     // Regular users must belong to the same organization
-    if (isConsultant) {
+    if (isAdmin) {
+      // Admins have full access - skip authorization checks
+      console.log('[Report Gen] Admin access granted');
+    } else if (isConsultant) {
       // Consultants can access campaigns they created
       if (campaign.created_by !== user.id) {
         return NextResponse.json(
