@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	basePath: '/flowforge',
 	experimental: {
 		serverActions: {
 			bodySizeLimit: '10mb',
