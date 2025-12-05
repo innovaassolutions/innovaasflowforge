@@ -66,7 +66,7 @@ ${pillars.map(p => `- ${p.pillar}: ${p.score.toFixed(1)}/5.0 (${p.dimensions.len
 
   // Add tier-specific content
   if (tier === 'informative' || tier === 'premium') {
-    prompt += `\nKEY RECOMMENDATIONS:\n${recommendations.slice(0, 5).map((r, i) => `${i + 1}. ${r.title} (Priority: ${r.priority})`).join('\n')}\n`
+    prompt += `\nKEY RECOMMENDATIONS:\n${recommendations.slice(0, 5).map((r, i) => `${i + 1}. ${r}`).join('\n')}\n`
   }
 
   if (tier === 'premium') {
