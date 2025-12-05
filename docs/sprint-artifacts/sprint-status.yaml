@@ -42,8 +42,8 @@ story_location: docs/sprint-artifacts
 development_status:
   # Epic 1: Client Assessment Report Generation System
   epic-1: contexted
-  1-1-database-api-foundation: in-progress
-  1-2-report-generation-ui: backlog
-  1-3-report-landing-page-visualizations: backlog
+  1-1-database-api-foundation: done
+  1-2-report-generation-ui: done
+  1-3-report-landing-page-visualizations: in-progress
   1-4-document-upload-enhancements: backlog
   epic-1-retrospective: optional

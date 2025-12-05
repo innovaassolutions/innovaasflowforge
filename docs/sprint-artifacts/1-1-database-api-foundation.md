@@ -1,6 +1,6 @@
 # Story 1.1: Database & API Foundation
 
-**Status:** drafted
+**Status:** done
 
 ## Story
 

@@ -1,3 +1,14 @@
+/**
+ * Professional Consulting Report Viewer
+ *
+ * Visual-first, print-ready client assessment reports.
+ * Follows McKinsey/BCG/PWC design standards with light backgrounds,
+ * minimal text, and dominant data visualizations.
+ *
+ * Story: 1.3 - Report Landing Page & Visualizations
+ * Epic: 1 - Client Assessment Report Generation System
+ */
+
 'use client'
 
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
@@ -119,10 +130,10 @@ export default function ReportViewerPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-brand-orange border-r-transparent mb-4"></div>
-          <p className="text-mocha-text">Loading assessment report...</p>
+          <p className="text-gray-900">Loading assessment report...</p>
         </div>
       </div>
     )

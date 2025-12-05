@@ -11,7 +11,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Copy, Check, Loader2 } from 'lucide-react'
+import { X, Copy, Check, Loader2, Eye, EyeOff } from 'lucide-react'
 import type { ReportTier } from '@/lib/types'
 
 interface ReportGenerationPanelProps {
@@ -30,6 +30,7 @@ interface GeneratedReport {
   url: string
   is_regeneration: boolean
   regeneration_count: number
+  is_active?: boolean
 }
 
 export function ReportGenerationPanel({
@@ -45,6 +46,8 @@ export function ReportGenerationPanel({
   const [generatedReport, setGeneratedReport] = useState<GeneratedReport | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copiedUrl, setCopiedUrl] = useState(false)
+  const [isTogglingAccess, setIsTogglingAccess] = useState(false)
+  const [reportActive, setReportActive] = useState(true)
 
   if (!isOpen) return null
 
@@ -66,6 +69,7 @@ export function ReportGenerationPanel({
 
       if (data.success) {
         setGeneratedReport(data.report)
+        setReportActive(data.report.is_active !== false) // Default to true if not specified
         onSuccess?.()
       } else {
         setError(data.error || 'Failed to generate report')
@@ -90,12 +94,46 @@ export function ReportGenerationPanel({
     }
   }
 
+  const handleToggleAccess = async () => {
+    if (!generatedReport) return
+
+    setIsTogglingAccess(true)
+    setError(null)
+
+    try {
+      const newActiveState = !reportActive
+
+      const response = await fetch(
+        `/api/campaigns/${campaignId}/report/toggle-access`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ is_active: newActiveState }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (data.success) {
+        setReportActive(newActiveState)
+      } else {
+        setError(data.error || 'Failed to toggle report access')
+      }
+    } catch (err) {
+      console.error('Toggle access error:', err)
+      setError('Network error - please try again')
+    } finally {
+      setIsTogglingAccess(false)
+    }
+  }
+
   const handleClose = () => {
     setSelectedTier('basic')
     setObservations('')
     setGeneratedReport(null)
     setError(null)
     setCopiedUrl(false)
+    setReportActive(true)
     onClose()
   }
 
@@ -162,6 +200,46 @@ export function ReportGenerationPanel({
                           <Copy className="w-4 h-4" />
                           Copy
                         </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Report Access Toggle */}
+                <div className="mt-4 bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {reportActive ? (
+                        <Eye className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-mocha-subtext0" />
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-mocha-text">
+                          Report Access
+                        </div>
+                        <div className="text-xs text-mocha-subtext1">
+                          {reportActive
+                            ? 'Public access enabled - clients can view this report'
+                            : 'Access disabled - report is not accessible'}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleToggleAccess}
+                      disabled={isTogglingAccess}
+                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 ${
+                        reportActive
+                          ? 'bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 disabled:opacity-50'
+                          : 'bg-green-500/20 hover:bg-green-500/30 text-green-400 disabled:opacity-50'
+                      }`}>
+                      {isTogglingAccess ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          {reportActive ? 'Disabling...' : 'Enabling...'}
+                        </>
+                      ) : (
+                        <>{reportActive ? 'Disable Access' : 'Enable Access'}</>
                       )}
                     </button>
                   </div>
