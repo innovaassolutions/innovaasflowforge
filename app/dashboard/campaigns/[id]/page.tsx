@@ -561,7 +561,8 @@ export default function CampaignDetailPage() {
           </h2>
           <div className="space-y-4">
             {campaign.stakeholders.map((stakeholder) => {
-              const accessLink = `${window.location.origin}/session/${stakeholder.access_token}`
+              const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+              const accessLink = `${window.location.origin}${basePath}/session/${stakeholder.access_token}`
 
               return (
                 <div

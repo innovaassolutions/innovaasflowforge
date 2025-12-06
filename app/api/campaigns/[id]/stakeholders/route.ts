@@ -87,9 +87,10 @@ export async function POST(
 
       newStakeholderIds.push(newSession.id)
 
-      // Generate access link
+      // Generate access link (include basePath for FlowForge proxy)
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-      const accessLink = `${baseUrl}/session/${accessToken}`
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+      const accessLink = `${baseUrl}${basePath}/session/${accessToken}`
 
       // Send invitation email
       try {
