@@ -70,13 +70,25 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       const foundCompany = companyData.companies?.find((c: CompanyProfile) => c.id === companyId)
       if (!foundCompany) {
         setError('Company not found or you do not have access to it')
+        return
+      }
       setCompany(foundCompany)
+
       // Load stakeholders for this company
       const stakeholdersResponse = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       const stakeholdersData = await stakeholdersResponse.json()
       setStakeholders(stakeholdersData.stakeholders || [])
+
       // Load campaigns for this company
       const campaignsResponse = await fetch(apiUrl('api/campaigns'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       const campaignsData = await campaignsResponse.json()
       const companyCampaigns = campaignsData.campaigns?.filter(
         (c: Campaign & { company_profile_id: string }) => c.company_profile_id === companyId
@@ -87,6 +99,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       setError('Failed to load company information')
     } finally {
       setLoading(false)
+    }
   }
   const getMarketScopeLabel = (scope: string) => {
     const labels = {
@@ -94,27 +107,46 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       regional: 'Regional',
       national: 'National',
       international: 'International'
+    }
     return labels[scope as keyof typeof labels] || scope
+  }
+
   const getRoleTypeLabel = (roleType: string) => {
+    const labels = {
       managing_director: 'Managing Director',
       it_operations: 'IT Operations',
       production_manager: 'Production Manager',
       purchasing_manager: 'Purchasing Manager',
       planning_scheduler: 'Planning & Scheduler',
       engineering_maintenance: 'Engineering & Maintenance'
+    }
     return labels[roleType as keyof typeof labels] || roleType
+  }
+
   const getCampaignTypeLabel = (type: string) => {
+    const labels = {
       industry_4_0_readiness: 'Industry 4.0 Readiness',
       theory_of_constraints: 'Theory of Constraints',
       lean_six_sigma: 'Lean Six Sigma',
       bmad_strategic_planning: 'BMAD Strategic Planning'
+    }
     return labels[type as keyof typeof labels] || type
+  }
+
   async function handleDeleteCampaign(campaignId: string) {
+    try {
+      const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         setError('Not authenticated')
+        return
+      }
       const response = await fetch(apiUrl(`api/campaigns/${campaignId}`), {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
       const data = await response.json()
       if (response.ok && data.success) {
         // Remove campaign from list
@@ -123,18 +155,28 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         setDeletingCampaignId(null)
       } else {
         setError(data.error || 'Failed to delete campaign')
+      }
+    } catch (err) {
       setError('Error deleting campaign')
       console.error(err)
+    }
+  }
+
   function confirmDelete(campaignId: string) {
     setDeletingCampaignId(campaignId)
     setShowDeleteConfirm(true)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-ctp-base flex items-center justify-center">
         <div className="text-ctp-text">Loading company information...</div>
       </div>
     )
+  }
+
   if (error || !company) {
+    return (
       <div className="min-h-screen bg-ctp-base">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-ctp-red/10 border border-ctp-red rounded-lg p-6 text-ctp-red">
@@ -147,6 +189,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             ← Back to Companies
           </Link>
         </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-ctp-base">
       {/* Delete Confirmation Modal */}

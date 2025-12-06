@@ -115,21 +115,38 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
             facilitatorName: profile.full_name || '',
             facilitatorEmail: profile.email || ''
           }))
+        }
+      }
     } catch (err) {
       console.error('Error loading companies:', err)
       setError('Failed to load companies')
     } finally {
       setLoading(false)
+    }
   }
+
   async function loadStakeholders(companyId: string) {
+    try {
+      const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
       const response = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      const data = await response.json()
       setAvailableStakeholders(data.stakeholders || [])
       setSelectedStakeholders([]) // Reset selections when company changes
+    } catch (err) {
       console.error('Error loading stakeholders:', err)
+    }
+  }
+
   function updateField(field: string, value: string) {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
   function toggleStakeholderSelection(stakeholder: StakeholderProfile) {
     const isSelected = selectedStakeholders.some(
       s => s.stakeholderProfileId === stakeholder.id
