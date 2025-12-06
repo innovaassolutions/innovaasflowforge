@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -94,7 +93,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
           group bg-ctp-mantle border-r border-ctp-surface0 flex flex-col h-screen fixed left-0 top-0 z-50
           transition-all duration-200 ease-in-out
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:w-16 lg:hover:w-64
+          lg:translate-x-0 lg:w-16 lg:hover:w-52
         `}>
         {/* Close button (mobile only) */}
         <button
@@ -106,14 +105,13 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
 
         {/* Logo/Brand */}
         <div className="h-16 flex items-center px-4 border-b border-ctp-surface0">
-          {/* Small logo (collapsed) */}
-          <div className="w-8 h-8 rounded flex items-center justify-center bg-gradient-to-r from-ctp-peach to-ctp-teal text-white font-bold text-sm shrink-0">
+          {/* App icon logo */}
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-base shrink-0 shadow-sm">
             FF
           </div>
           {/* Full text (expanded on hover) */}
           <div className="ml-3 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
             <h1 className="text-sm font-bold text-ctp-text">FlowForge</h1>
-            <p className="text-xs text-ctp-subtext0">Assessment Platform</p>
           </div>
         </div>
 
@@ -184,20 +182,6 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
           )}
         </div>
       </div>
-
-        {/* Footer Branding (only show on desktop hover) */}
-        <div className="p-2 border-t border-ctp-surface0 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
-          <div className="flex items-center justify-center gap-2 px-2">
-            <p className="text-xs text-ctp-subtext0 whitespace-nowrap">Powered by</p>
-            <Image
-              src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
-              alt="Innovaas"
-              width={60}
-              height={14}
-              className="h-3.5 w-auto"
-            />
-          </div>
-        </div>
       </div>
     </>
   )
