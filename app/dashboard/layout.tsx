@@ -112,19 +112,17 @@ export default function DashboardLayout({
           {/* Footer */}
           <footer className="border-t border-mocha-surface0 py-6 mt-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
-                    alt="Innovaas"
-                    width={120}
-                    height={28}
-                    className="h-7 w-auto"
-                  />
-                </div>
-                <p className="text-sm text-mocha-subtext0 text-center">
-                  FlowForge version 1.0.0 · Innovaas Project
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-sm text-mocha-subtext0">
+                  FlowForge version 1.0.0 · by
                 </p>
+                <Image
+                  src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+                  alt="Innovaas"
+                  width={120}
+                  height={28}
+                  className="h-7 w-auto"
+                />
               </div>
             </div>
           </footer>
