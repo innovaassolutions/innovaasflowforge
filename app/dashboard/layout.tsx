@@ -70,28 +70,42 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base flex">
-      {/* Sidebar */}
-      <DashboardSidebar
-        userProfile={userProfile}
-        onLogout={handleLogout}
-        isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-      />
+    <div className="min-h-screen bg-ctp-base flex flex-col">
+      {/* Top Header Bar */}
+      <header className="h-16 bg-ctp-mantle border-b border-ctp-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
+        {/* Mobile hamburger menu */}
+        <button
+          onClick={() => setIsMobileSidebarOpen(true)}
+          className="lg:hidden p-2 text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors mr-3"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
 
-      {/* Main Content Area - offset by narrow sidebar width on desktop */}
-      <div className="flex-1 lg:ml-16">
-        {/* Mobile header with hamburger menu */}
-        <div className="lg:hidden bg-ctp-mantle border-b border-ctp-surface0 px-4 py-3 sticky top-0 z-30">
-          <button
-            onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-2 text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+        {/* App Logo and Title */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-base shrink-0 shadow-sm">
+            FF
+          </div>
+          <div className="hidden sm:block">
+            <h1 className="text-sm font-bold text-ctp-text">Innovaas FlowForge</h1>
+            <p className="text-xs text-ctp-subtext0">Assessment Platform</p>
+          </div>
         </div>
+      </header>
 
-        {children}
+      <div className="flex flex-1 pt-16">
+        {/* Sidebar */}
+        <DashboardSidebar
+          userProfile={userProfile}
+          onLogout={handleLogout}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
+
+        {/* Main Content Area - offset by narrow sidebar width on desktop */}
+        <div className="flex-1 lg:ml-16">
+          {children}
+        </div>
       </div>
     </div>
   )
