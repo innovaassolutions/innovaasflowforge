@@ -111,7 +111,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
             FF
           </div>
           {/* Full text (expanded on hover) */}
-          <div className="ml-3 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
+          <div className="ml-3 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
             <h1 className="text-sm font-bold text-ctp-text">FlowForge</h1>
             <p className="text-xs text-ctp-subtext0">Assessment Platform</p>
           </div>
@@ -135,7 +135,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                     : 'text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text'
                 }`}>
                 <Icon className="w-5 h-5 shrink-0" />
-                <span className="font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden">
+                <span className="font-medium whitespace-nowrap lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden">
                   {item.name}
                 </span>
               </Link>
@@ -153,7 +153,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
               <div className="w-8 h-8 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-full flex items-center justify-center text-white font-semibold text-sm shrink-0">
                 {userProfile?.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
-              <div className="flex-1 text-left min-w-0 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden whitespace-nowrap">
+              <div className="flex-1 text-left min-w-0 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden whitespace-nowrap">
                 <div className="text-sm font-medium text-ctp-text truncate">
                   {userProfile?.full_name || 'User'}
                 </div>
@@ -161,7 +161,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                   {userProfile?.email || ''}
                 </div>
               </div>
-              <ChevronDown className={`w-4 h-4 text-ctp-subtext0 transition-all duration-200 shrink-0 ${showUserMenu ? 'rotate-180' : ''} opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100`} />
+              <ChevronDown className={`w-4 h-4 text-ctp-subtext0 transition-all duration-200 shrink-0 ${showUserMenu ? 'rotate-180' : ''} lg:opacity-0 lg:group-hover:opacity-100`} />
             </button>
 
           {showUserMenu && (
@@ -185,8 +185,8 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
         </div>
       </div>
 
-        {/* Footer Branding (only show on hover) */}
-        <div className="p-2 border-t border-ctp-surface0 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
+        {/* Footer Branding (only show on desktop hover) */}
+        <div className="p-2 border-t border-ctp-surface0 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
           <div className="flex items-center justify-center gap-2 px-2">
             <p className="text-xs text-ctp-subtext0 whitespace-nowrap">Powered by</p>
             <Image
