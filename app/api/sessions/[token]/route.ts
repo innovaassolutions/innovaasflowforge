@@ -13,6 +13,13 @@ export async function GET(
   try {
     const { token: accessToken } = await params
 
+    console.log('🔍 Session lookup - Token received:', {
+      token: accessToken,
+      length: accessToken.length,
+      hasPrefix: accessToken.startsWith('p-'),
+      firstChars: accessToken.substring(0, 10)
+    })
+
     // Find campaign assignment by access token
     const { data: session, error: sessionError } = await supabaseAdmin
       .from('campaign_assignments')
