@@ -79,8 +79,8 @@ export default function DashboardLayout({
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* Main Content Area - offset by sidebar width on desktop */}
-      <div className="flex-1 lg:ml-64">
+      {/* Main Content Area - offset by narrow sidebar width on desktop */}
+      <div className="flex-1 lg:ml-16">
         {/* Mobile header with hamburger menu */}
         <div className="lg:hidden bg-ctp-mantle border-b border-ctp-surface0 px-4 py-3 sticky top-0 z-30">
           <button

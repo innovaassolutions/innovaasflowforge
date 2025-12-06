@@ -89,12 +89,13 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
       )}
 
       {/* Sidebar */}
-      <div className={`
-        w-64 bg-ctp-mantle border-r border-ctp-surface0 flex flex-col h-screen fixed left-0 top-0 z-50
-        transition-transform duration-300 ease-in-out
-        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0
-      `}>
+      <div
+        className={`
+          group bg-ctp-mantle border-r border-ctp-surface0 flex flex-col h-screen fixed left-0 top-0 z-50
+          transition-all duration-200 ease-in-out
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:w-16 lg:hover:w-64
+        `}>
         {/* Close button (mobile only) */}
         <button
           onClick={onCloseMobile}
@@ -104,15 +105,20 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
         </button>
 
         {/* Logo/Brand */}
-        <div className="p-6 border-b border-ctp-surface0">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-ctp-peach to-ctp-teal bg-clip-text text-transparent">
-            FlowForge
-          </h1>
-          <p className="text-xs text-ctp-subtext0 mt-1">Assessment Platform</p>
+        <div className="h-16 flex items-center px-4 border-b border-ctp-surface0">
+          {/* Small logo (collapsed) */}
+          <div className="w-8 h-8 rounded flex items-center justify-center bg-gradient-to-r from-ctp-peach to-ctp-teal text-white font-bold text-sm shrink-0">
+            FF
+          </div>
+          {/* Full text (expanded on hover) */}
+          <div className="ml-3 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
+            <h1 className="text-sm font-bold text-ctp-text">FlowForge</h1>
+            <p className="text-xs text-ctp-subtext0">Assessment Platform</p>
+          </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon
             const active = isActive(item.matchPaths)
@@ -122,37 +128,41 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                 key={item.name}
                 href={item.href}
                 onClick={onCloseMobile}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                title={item.name}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                   active
                     ? 'bg-ctp-surface0 text-ctp-text'
                     : 'text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text'
                 }`}>
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.name}</span>
+                <Icon className="w-5 h-5 shrink-0" />
+                <span className="font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden">
+                  {item.name}
+                </span>
               </Link>
             )
           })}
         </nav>
 
-      {/* User Menu */}
-      <div className="p-4 border-t border-ctp-surface0">
-        <div className="relative" ref={userMenuRef}>
-          <button
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ctp-surface0 transition-colors">
-            <div className="w-8 h-8 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-full flex items-center justify-center text-white font-semibold text-sm">
-              {userProfile?.full_name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <div className="flex-1 text-left min-w-0">
-              <div className="text-sm font-medium text-ctp-text truncate">
-                {userProfile?.full_name || 'User'}
+        {/* User Menu */}
+        <div className="p-2 border-t border-ctp-surface0">
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              title={userProfile?.full_name || 'User'}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-ctp-surface0 transition-all duration-200">
+              <div className="w-8 h-8 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-full flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                {userProfile?.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
-              <div className="text-xs text-ctp-subtext0 truncate">
-                {userProfile?.email || ''}
+              <div className="flex-1 text-left min-w-0 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden whitespace-nowrap">
+                <div className="text-sm font-medium text-ctp-text truncate">
+                  {userProfile?.full_name || 'User'}
+                </div>
+                <div className="text-xs text-ctp-subtext0 truncate">
+                  {userProfile?.email || ''}
+                </div>
               </div>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-ctp-subtext0 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
-          </button>
+              <ChevronDown className={`w-4 h-4 text-ctp-subtext0 transition-all duration-200 shrink-0 ${showUserMenu ? 'rotate-180' : ''} opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100`} />
+            </button>
 
           {showUserMenu && (
             <div className="absolute bottom-full left-0 right-0 mb-2 bg-ctp-surface0 border border-ctp-surface1 rounded-lg shadow-xl overflow-hidden">
@@ -175,16 +185,16 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
         </div>
       </div>
 
-        {/* Footer Branding */}
-        <div className="p-4 border-t border-ctp-surface0">
-          <div className="flex items-center justify-center gap-2">
-            <p className="text-xs text-ctp-subtext0">Powered by</p>
+        {/* Footer Branding (only show on hover) */}
+        <div className="p-2 border-t border-ctp-surface0 opacity-0 group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex items-center justify-center gap-2 px-2">
+            <p className="text-xs text-ctp-subtext0 whitespace-nowrap">Powered by</p>
             <Image
               src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
               alt="Innovaas"
-              width={80}
-              height={19}
-              className="h-5 w-auto"
+              width={60}
+              height={14}
+              className="h-3.5 w-auto"
             />
           </div>
         </div>
