@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  Home,
   LayoutDashboard,
   Building2,
   BarChart3,
@@ -48,6 +49,12 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
   }, [showUserMenu])
 
   const navItems = [
+    {
+      name: 'Home',
+      href: '/dashboard',
+      icon: Home,
+      matchPaths: ['/dashboard']
+    },
     {
       name: 'Dashboard',
       href: '/dashboard',
