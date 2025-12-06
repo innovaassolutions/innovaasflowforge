@@ -63,32 +63,32 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ctp-base flex items-center justify-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-ctp-peach border-r-transparent"></div>
+      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-mocha-peach border-r-transparent"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base">
+    <div className="min-h-screen bg-mocha-base">
       {/* Top Header Bar */}
-      <header className="h-16 bg-[#1e1e2e] border-b border-ctp-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
+      <header className="h-16 bg-[#1e1e2e] border-b border-mocha-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
         {/* Mobile hamburger menu */}
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
-          className="lg:hidden p-2 text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors mr-3"
+          className="lg:hidden p-2 text-mocha-text hover:bg-mocha-surface0 rounded-lg transition-colors mr-3"
         >
           <Menu className="w-6 h-6" />
         </button>
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-lg shrink-0 shadow-lg shadow-ctp-peach/40">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-mocha-peach via-mocha-peach to-mocha-teal text-white font-bold text-lg shrink-0 shadow-lg shadow-mocha-peach/40">
             FF
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-sm font-bold text-ctp-text">Innovaas FlowForge</h1>
-            <p className="text-xs text-ctp-subtext0">Assessment Platform</p>
+            <h1 className="text-sm font-bold text-mocha-text">Innovaas FlowForge</h1>
+            <p className="text-xs text-mocha-subtext0">Assessment Platform</p>
           </div>
         </div>
       </header>
