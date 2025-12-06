@@ -98,7 +98,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
       <div
         className={`
           group bg-ctp-mantle border-r border-ctp-surface0 flex flex-col fixed left-0 top-16 bottom-0 z-30
-          transition-all duration-200 ease-in-out
+          transition-all duration-200 ease-in-out opacity-100
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:w-16 lg:hover:w-52
         `}>
