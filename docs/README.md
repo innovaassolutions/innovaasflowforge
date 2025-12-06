@@ -180,6 +180,85 @@ The platform is designed to:
 
 ---
 
+## Deployment Architecture
+
+### FlowForge Proxy Setup
+
+FlowForge is deployed as a **separate application** that appears seamlessly integrated into the main Innovaas website through Next.js rewrites (proxy, not redirect).
+
+#### Two Separate Applications
+
+1. **Main Website** (`www.innovaas.co`)
+   - Repository: `innovaasWebsite`
+   - Vercel deployment of main company site
+   - Configured with rewrites to proxy `/flowforge` requests
+
+2. **FlowForge App** (`https://innovaasflowforge.vercel.app`)
+   - Repository: `innovaasflowforge` (this project)
+   - Separate Vercel deployment
+   - Independent Next.js application
+   - Configured with `basePath: '/flowforge'`
+
+#### How the Proxy Works
+
+**Main Website Configuration** (`next.config.js`):
+```javascript
+async rewrites() {
+  return [
+    {
+      source: '/flowforge',
+      destination: 'https://innovaasflowforge.vercel.app/flowforge',
+    },
+    {
+      source: '/flowforge/:path*',
+      destination: 'https://innovaasflowforge.vercel.app/flowforge/:path*',
+    },
+  ];
+}
+```
+
+**FlowForge App Configuration** (`next.config.js`):
+```javascript
+basePath: '/flowforge'
+```
+
+#### Request Flow
+
+1. User visits: `www.innovaas.co/flowforge`
+2. Main website's Next.js matches the rewrite rule
+3. Request is **proxied** (not redirected) to `https://innovaasflowforge.vercel.app/flowforge`
+4. FlowForge serves the page (basePath configured)
+5. Static assets load correctly via same proxy mechanism
+6. **User sees**: `www.innovaas.co/flowforge` in browser (seamless single-domain experience)
+
+#### Important Development Notes
+
+- **All API routes** in FlowForge require `/flowforge` prefix via the `apiUrl()` helper function
+- **Static assets** automatically handled by `basePath` configuration
+- **No redirects** = Better UX and single domain experience
+- **Testing locally**: Run FlowForge on its own without basePath, deploy to Vercel with basePath enabled
+
+#### The `apiUrl` Helper
+
+Located in `lib/api-url.ts`, this helper ensures all API calls work correctly under the `/flowforge` basePath:
+
+```typescript
+export function apiUrl(path: string): string {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+  const cleanPath = path.startsWith('/') ? path : `/${path}`
+  return `${basePath}${cleanPath}`
+}
+```
+
+Usage in components:
+```typescript
+const response = await fetch(apiUrl('api/campaigns'))
+// Resolves to: /flowforge/api/campaigns in production
+// Resolves to: /api/campaigns in local development
+```
+
+---
+
 ## Documentation Roadmap
 
 ### Planned Documentation
