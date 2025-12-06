@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from 'next/server'
 // DELETE - Remove an uploaded document
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { token: string; documentId: string } }
+  { params }: { params: Promise<{ token: string; documentId: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { token, documentId } = params
+    const { token, documentId } = await params
 
     // Find session by access token
     const { data: session, error: sessionError } = await supabase

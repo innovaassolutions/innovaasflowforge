@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from 'next/server'
 // GET - Fetch uploaded documents for a session
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { token } = params
+    const { token } = await params
 
     // Find session by access token
     const { data: session, error: sessionError } = await supabase
@@ -55,11 +55,11 @@ export async function GET(
 // POST - Upload a new document
 export async function POST(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { token } = params
+    const { token } = await params
 
     // Find session by access token
     const { data: session, error: sessionError } = await supabase
