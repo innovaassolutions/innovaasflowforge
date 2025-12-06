@@ -116,11 +116,9 @@ export default function DashboardLayout({
                 <p className="text-sm text-mocha-subtext0">
                   FlowForge version 1.0.0 · by
                 </p>
-                <Image
-                  src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+                <img
+                  src="/flowforge/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
                   alt="Innovaas"
-                  width={120}
-                  height={28}
                   className="h-7 w-auto"
                 />
               </div>
