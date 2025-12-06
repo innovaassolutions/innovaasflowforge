@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
         stakeholder_role: stakeholderRole
       })
 
-      const { data: assignmentData, error: assignmentError } = await supabaseAdmin
+      const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
         .from('campaign_assignments')
         .insert({
           campaign_id: campaign.id,
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
           status: 'invited'
         } as any)
         .select()
-        .single()
+        .single()) as any
 
       if (assignmentError) {
         console.error(`❌ Assignment creation FAILED for ${stakeholderEmail}:`, {
