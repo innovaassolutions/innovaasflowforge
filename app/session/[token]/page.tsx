@@ -28,6 +28,9 @@ interface ConversationState {
   phase: string
   questions_asked: number
   topics_covered: string[]
+  is_complete?: boolean
+}
+
 export default function StakeholderInterviewPage() {
   const params = useParams()
   const router = useRouter()
@@ -43,9 +46,12 @@ export default function StakeholderInterviewPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     loadSession()
   }, [params.token])
+
+  useEffect(() => {
     scrollToBottom()
   }, [messages])
   async function loadSession() {
@@ -73,6 +79,7 @@ export default function StakeholderInterviewPage() {
         } else {
           // Initialize new conversation with greeting
           await sendMessage(null, data.session.agentSessionId)
+        }
       } else {
         setError(data.error || 'Invalid or expired access link')
       }
@@ -82,18 +89,25 @@ export default function StakeholderInterviewPage() {
     } finally {
       setLoading(false)
     }
+  }
   async function sendMessage(message: string | null, agentSessionId?: string) {
     if (!session && !agentSessionId) return
     const sessionId = agentSessionId || session?.agentSessionId
+
+    try {
       setSending(true)
+
       // Add user message to UI if provided
       if (message) {
         const userMessage: Message = {
           role: 'user',
           content: message,
           timestamp: new Date().toISOString()
+        }
         setMessages(prev => [...prev, userMessage])
         setInputMessage('')
+      }
+
       const response = await fetch(apiUrl(`api/sessions/${params.token}/messages`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,34 +116,72 @@ export default function StakeholderInterviewPage() {
           agentSessionId: sessionId
         })
       })
+
+      const data = await response.json()
+
+      if (data.success) {
         // Add assistant response
         const assistantMessage: Message = {
           role: 'assistant',
           content: data.message,
+          timestamp: new Date().toISOString()
+        }
         setMessages(prev => [...prev, assistantMessage])
         setConversationState(data.conversationState)
+
         // Check if interview is complete
         if (data.isComplete) {
           setIsComplete(true)
+        }
+      } else {
         setError(data.error || 'Failed to send message')
+      }
+    } catch (err) {
       setError('Error sending message')
+      console.error(err)
+    } finally {
       setSending(false)
+    }
+  }
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!inputMessage.trim() || sending) return
     sendMessage(inputMessage)
+  }
+
   function scrollToBottom() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   async function handleSubmitInterview() {
     if (!session) return
+
+    try {
       setSubmitting(true)
       setShowSubmitConfirm(false)
+
       const response = await fetch(apiUrl(`api/sessions/${params.token}/complete`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           agentSessionId: session.agentSessionId
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
         setIsComplete(true)
+      } else {
         setError(data.error || 'Failed to submit interview')
+      }
+    } catch (err) {
       setError('Error submitting interview')
+      console.error(err)
+    } finally {
       setSubmitting(false)
+    }
+  }
   if (loading) {
     return (
       <div className="min-h-screen bg-mocha-base flex items-center justify-center">
@@ -139,7 +191,10 @@ export default function StakeholderInterviewPage() {
         </div>
       </div>
     )
+  }
+
   if (error) {
+    return (
       <div className="min-h-screen bg-mocha-base flex items-center justify-center p-4">
         <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 max-w-md text-center">
           <svg
@@ -155,6 +210,11 @@ export default function StakeholderInterviewPage() {
             />
           </svg>
           <h2 className="mt-4 text-xl font-semibold text-mocha-text">{error}</h2>
+        </div>
+      </div>
+    )
+  }
+
   if (!session) return null
   return (
     <div className="min-h-screen bg-mocha-base flex flex-col">
@@ -179,7 +239,9 @@ export default function StakeholderInterviewPage() {
               </div>
             )}
           </div>
+        </div>
       </header>
+
       {/* Welcome or Resume Message */}
       {messages.length === 0 && !isResuming && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -192,7 +254,10 @@ export default function StakeholderInterviewPage() {
             </p>
             <div className="mt-6 inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
             <p className="text-mocha-subtext0 mt-3">Loading your interview...</p>
+          </div>
+        </div>
       )}
+
       {/* Resume Message */}
       {isResuming && messages.length > 0 && !isComplete && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -203,6 +268,11 @@ export default function StakeholderInterviewPage() {
               </svg>
               <p className="text-mocha-text font-medium">
                 Welcome back! Your conversation has been restored. You can continue from where you left off.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Messages */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -229,7 +299,11 @@ export default function StakeholderInterviewPage() {
                 </div>
                 <p className={`text-xs mt-2 ${
                   message.role === 'user' ? 'text-white/70' : 'text-mocha-subtext0'
+                }`}>
                   {new Date(message.timestamp).toLocaleTimeString()}
+                </p>
+              </div>
+            </div>
           ))}
           {sending && (
             <div className="flex justify-start">
@@ -237,8 +311,13 @@ export default function StakeholderInterviewPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div>
                   <span className="text-mocha-subtext1">Thinking...</span>
+                </div>
+              </div>
+            </div>
           )}
           <div ref={messagesEndRef} />
+        </div>
+      </div>
       {/* Input or Completion Message */}
       <div className="flex-shrink-0 bg-mocha-mantle border-t border-mocha-surface0">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -249,10 +328,14 @@ export default function StakeholderInterviewPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <h3 className="text-2xl font-bold text-green-400">Interview Complete!</h3>
+              </div>
               <p className="text-mocha-text">
                 Thank you for your valuable insights, {session.stakeholder_name}. Your responses have been saved and will be analyzed alongside other stakeholder perspectives.
+              </p>
               <p className="text-mocha-subtext1 mt-4">
                 You may now close this window. Results will be shared by {session.campaigns.facilitator_name}.
+              </p>
+            </div>
           ) : (
             <>
               {/* Submit Confirmation Dialog */}
@@ -273,11 +356,16 @@ export default function StakeholderInterviewPage() {
                       >
                         Continue Interview
                       </button>
+                      <button
                         onClick={handleSubmitInterview}
                         disabled={submitting}
                         className="flex-1 bg-brand-orange hover:bg-brand-orange-dark disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                      >
                         {submitting ? 'Submitting...' : 'Submit Now'}
+                      </button>
                     </div>
+                  </div>
+                </div>
               )}
               <form onSubmit={handleSubmit} className="flex gap-3">
                 <input
@@ -305,11 +393,20 @@ export default function StakeholderInterviewPage() {
                   >
                     Submit interview early
                   </button>
+                </div>
+              )}
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-mocha-subtext0">
                   Your responses are confidential and will be used solely for this assessment.
+                </p>
                 <p className="text-xs text-mocha-subtext1">
                   You can close this window anytime and resume later using the same link.
+                </p>
+              </div>
             </>
+          )}
+        </div>
+      </div>
     </div>
   )
+}
