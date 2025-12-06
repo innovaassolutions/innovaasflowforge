@@ -286,7 +286,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => updateField('fullName', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="John Doe"
                   required
                 />
@@ -301,7 +301,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateField('email', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="john.doe@company.com"
                   required
                 />
@@ -324,7 +324,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                 <select
                   value={formData.roleType}
                   onChange={(e) => updateField('roleType', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   required
                 >
                   {ROLE_TYPES.map(role => (
@@ -341,7 +341,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   type="text"
                   value={formData.title}
                   onChange={(e) => updateField('title', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="Senior Manager"
                 />
               </div>
@@ -355,7 +355,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
                   type="text"
                   value={formData.department}
                   onChange={(e) => updateField('department', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="Operations"
                 />
               </div>

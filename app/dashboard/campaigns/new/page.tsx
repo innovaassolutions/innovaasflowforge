@@ -325,7 +325,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                   value={formData.companyProfileId}
                   onChange={(e) => updateField('companyProfileId', e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:outline-none focus:border-ctp-peach"
+                  className="w-full px-4 py-3 bg-white border border-ctp-surface1 rounded-lg text-gray-900 focus:outline-none focus:border-ctp-peach"
                 >
                   <option value="">Select a company...</option>
                   {companies.map(company => (
@@ -345,7 +345,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                   value={formData.campaignName}
                   onChange={(e) => updateField('campaignName', e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                  className="w-full px-4 py-3 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                   placeholder="Q1 2025 Digital Transformation Assessment"
                 />
               </div>
@@ -359,7 +359,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                     type="text"
                     value={formData.facilitatorName}
                     onChange={(e) => updateField('facilitatorName', e.target.value)}
-                    className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                    className="w-full px-4 py-3 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                     placeholder="Your name"
                   />
                 </div>
@@ -372,7 +372,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                     type="email"
                     value={formData.facilitatorEmail}
                     onChange={(e) => updateField('facilitatorEmail', e.target.value)}
-                    className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                    className="w-full px-4 py-3 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -386,7 +386,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                  className="w-full px-4 py-3 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                   placeholder="Brief description of this campaign..."
                 />
               </div>
@@ -454,19 +454,19 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                         value={newStakeholder.fullName}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, fullName: e.target.value })}
                         placeholder="Full Name *"
-                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                        className="px-3 py-2 bg-white border border-ctp-surface1 rounded text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                       />
                       <input
                         type="email"
                         value={newStakeholder.email}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, email: e.target.value })}
                         placeholder="Email *"
-                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                        className="px-3 py-2 bg-white border border-ctp-surface1 rounded text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                       />
                       <select
                         value={newStakeholder.roleType}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, roleType: e.target.value })}
-                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text focus:outline-none focus:border-ctp-peach"
+                        className="px-3 py-2 bg-white border border-ctp-surface1 rounded text-gray-900 focus:outline-none focus:border-ctp-peach"
                       >
                         {ROLE_TYPES.map(role => (
                           <option key={role.value} value={role.value}>{role.label}</option>
@@ -477,7 +477,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
                         value={newStakeholder.position}
                         onChange={(e) => setNewStakeholder({ ...newStakeholder, position: e.target.value })}
                         placeholder="Job Title"
-                        className="px-3 py-2 bg-ctp-surface0 border border-ctp-surface1 rounded text-ctp-text placeholder-ctp-subtext0 focus:outline-none focus:border-ctp-peach"
+                        className="px-3 py-2 bg-white border border-ctp-surface1 rounded text-gray-900 placeholder-gray-600 focus:outline-none focus:border-ctp-peach"
                       />
                     </div>
                     <div className="flex gap-2 mt-3">

@@ -153,7 +153,7 @@ export default function NewCompanyPage() {
                   type="text"
                   value={formData.companyName}
                   onChange={(e) => updateField('companyName', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="Acme Manufacturing"
                   required
                 />
@@ -166,7 +166,7 @@ export default function NewCompanyPage() {
                 <select
                   value={formData.industry}
                   onChange={(e) => updateField('industry', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   required
                 >
                   {INDUSTRIES.map(industry => (
@@ -183,7 +183,7 @@ export default function NewCompanyPage() {
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="Brief description of what the company does..."
                 />
               </div>
@@ -230,7 +230,7 @@ export default function NewCompanyPage() {
                   type="url"
                   value={formData.website}
                   onChange={(e) => updateField('website', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="https://example.com"
                 />
               </div>
@@ -244,7 +244,7 @@ export default function NewCompanyPage() {
                   type="text"
                   value={formData.headquartersLocation}
                   onChange={(e) => updateField('headquartersLocation', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                   placeholder="Detroit, MI"
                 />
               </div>
@@ -266,7 +266,7 @@ export default function NewCompanyPage() {
                 <select
                   value={formData.employeeCountRange}
                   onChange={(e) => updateField('employeeCountRange', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                 >
                   <option value="">Select range...</option>
                   {EMPLOYEE_RANGES.map(range => (
@@ -282,7 +282,7 @@ export default function NewCompanyPage() {
                 <select
                   value={formData.annualRevenueRange}
                   onChange={(e) => updateField('annualRevenueRange', e.target.value)}
-                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
                 >
                   <option value="">Select range...</option>
                   {REVENUE_RANGES.map(range => (
