@@ -233,7 +233,14 @@ export async function POST(request: NextRequest) {
       // Create campaign assignment (use admin client to bypass RLS)
       const accessToken = generateAccessToken()
 
-      const { error: assignmentError } = await supabaseAdmin
+      console.log(`🔨 Creating assignment for ${stakeholderName}:`, {
+        campaign_id: campaign.id,
+        stakeholder_profile_id: stakeholderProfileId,
+        stakeholder_email: stakeholderEmail,
+        stakeholder_role: stakeholderRole
+      })
+
+      const { data: assignmentData, error: assignmentError } = await supabaseAdmin
         .from('campaign_assignments')
         .insert({
           campaign_id: campaign.id,
@@ -250,9 +257,22 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (assignmentError) {
-        console.error(`Assignment creation error for ${stakeholderEmail}:`, assignmentError)
+        console.error(`❌ Assignment creation FAILED for ${stakeholderEmail}:`, {
+          error: assignmentError,
+          code: assignmentError.code,
+          message: assignmentError.message,
+          details: assignmentError.details,
+          hint: assignmentError.hint
+        })
         continue
       }
+
+      if (!assignmentData) {
+        console.error(`❌ Assignment created but no data returned for ${stakeholderEmail}`)
+        continue
+      }
+
+      console.log(`✅ Assignment created successfully:`, assignmentData.id)
 
       // Generate access link (include basePath for FlowForge proxy)
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
