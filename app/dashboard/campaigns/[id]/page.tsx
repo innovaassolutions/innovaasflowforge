@@ -1,13 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { apiUrl } from '@/lib/api-url'
 import { useParams, useRouter } from 'next/navigation'
-import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
-import { apiUrl } from '@/lib/api-url'
 import { CheckCircle2, Clock, Mail, Pause, Share2 } from 'lucide-react'
-import { apiUrl } from '@/lib/api-url'
 import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
 import { apiUrl } from '@/lib/api-url'
 

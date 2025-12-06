@@ -12,15 +12,10 @@
 'use client'
 
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
-import { apiUrl } from '@/lib/api-url'
 import { useParams } from 'next/navigation'
-import { apiUrl } from '@/lib/api-url'
 import { AlertCircle, Download, FileText } from 'lucide-react'
-import { apiUrl } from '@/lib/api-url'
 import { generateReportFilename, downloadReport } from '@/lib/download-utils'
-import { apiUrl } from '@/lib/api-url'
 import type { ReadinessAssessment } from '@/lib/agents/synthesis-agent'
-import { apiUrl } from '@/lib/api-url'
 import { transformToMatrixData, transformToHeatMapData, transformToRoadmapData } from '@/lib/consulting-data-transformers'
 import { apiUrl } from '@/lib/api-url'
 
