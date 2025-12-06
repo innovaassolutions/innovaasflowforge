@@ -22,6 +22,8 @@ interface Session {
     facilitator_name: string
   }
   agentSessionId: string
+}
+
 interface ConversationState {
   phase: string
   questions_asked: number

@@ -16,6 +16,8 @@ interface StakeholderProfile {
   role_type: string
   title: string | null
   department: string | null
+}
+
 interface StakeholderSelection {
   stakeholderProfileId?: string
   fullName?: string

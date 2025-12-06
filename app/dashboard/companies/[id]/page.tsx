@@ -24,6 +24,8 @@ interface StakeholderProfile {
   role_type: string
   title: string | null
   department: string | null
+}
+
 interface Campaign {
   name: string
   campaign_type: string
