@@ -208,7 +208,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/campaigns/new"
-            className="bg-gradient-to-r from-mocha-peach to-mocha-teal text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+            className="bg-mocha-peach text-mocha-base font-semibold py-2 px-6 rounded-lg hover:bg-mocha-peach/90 transition-colors flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Create Campaign
           </Link>
@@ -282,7 +282,7 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-mocha-peach to-mocha-teal text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+                className="inline-flex items-center gap-2 bg-mocha-peach text-mocha-base font-semibold py-3 px-6 rounded-lg hover:bg-mocha-peach/90 transition-colors">
                 <Plus className="w-4 h-4" />
                 Create Your First Campaign
               </Link>

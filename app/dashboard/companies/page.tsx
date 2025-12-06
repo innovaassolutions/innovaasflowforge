@@ -93,7 +93,7 @@ export default function CompaniesPage() {
           </div>
           <Link
             href="/dashboard/companies/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-mocha-peach to-mocha-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-mocha-peach text-mocha-base rounded-lg font-medium hover:bg-mocha-peach/90 transition-colors"
           >
             <Plus className="w-5 h-5" />
             New Company
@@ -116,7 +116,7 @@ export default function CompaniesPage() {
             </p>
             <Link
               href="/dashboard/companies/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-mocha-peach to-mocha-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-mocha-peach text-mocha-base rounded-lg font-medium hover:bg-mocha-peach/90 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Create Company Profile
@@ -132,7 +132,7 @@ export default function CompaniesPage() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-mocha-peach to-mocha-teal rounded-lg flex items-center justify-center text-white text-xl">
+                    <div className="w-12 h-12 bg-mocha-blue rounded-lg flex items-center justify-center text-mocha-base text-xl font-bold">
                       {company.company_name.charAt(0).toUpperCase()}
                     </div>
                     <div>

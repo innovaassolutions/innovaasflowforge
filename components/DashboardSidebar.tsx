@@ -148,7 +148,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
               onClick={() => setShowUserMenu(!showUserMenu)}
               title={userProfile?.full_name || 'User'}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-mocha-surface0 transition-all duration-200">
-              <div className="w-8 h-8 bg-gradient-to-r from-mocha-peach to-mocha-teal rounded-full flex items-center justify-center text-white font-semibold text-sm shrink-0">
+              <div className="w-8 h-8 bg-mocha-mauve rounded-full flex items-center justify-center text-mocha-base font-semibold text-sm shrink-0">
                 {userProfile?.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 text-left min-w-0 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden whitespace-nowrap">

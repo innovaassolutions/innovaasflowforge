@@ -83,7 +83,7 @@ export default function DashboardLayout({
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-mocha-peach via-mocha-peach to-mocha-teal text-white font-bold text-lg shrink-0 shadow-lg shadow-mocha-peach/40">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-mocha-peach text-mocha-base font-bold text-lg shrink-0">
             FF
           </div>
           <div className="hidden sm:block">
