@@ -180,22 +180,14 @@ export default function ReportViewerPage() {
 
             {/* Download Buttons */}
             <div className="flex gap-3">
+              {/* PDF download temporarily disabled */}
               <button
-                onClick={() => handleDownload('pdf')}
-                disabled={downloading !== null}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-orange hover:bg-brand-orange/90 disabled:bg-mocha-surface1 disabled:text-mocha-subtext1 text-white rounded-lg transition-colors text-sm font-medium"
-                aria-label="Download PDF report">
-                {downloading === 'pdf' ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent"></div>
-                    <span>Downloading...</span>
-                  </>
-                ) : (
-                  <>
-                    <Download size={16} />
-                    <span>PDF</span>
-                  </>
-                )}
+                disabled={true}
+                className="flex items-center gap-2 px-4 py-2 bg-mocha-surface1 text-mocha-subtext1 rounded-lg transition-colors text-sm font-medium cursor-not-allowed opacity-60"
+                aria-label="PDF download temporarily unavailable"
+                title="PDF download is temporarily unavailable. Please use Markdown format.">
+                <Download size={16} />
+                <span>PDF (Unavailable)</span>
               </button>
               <button
                 onClick={() => handleDownload('md')}
