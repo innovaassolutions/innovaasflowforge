@@ -70,7 +70,7 @@ export default function CampaignDetailPage() {
   async function fetchCampaign() {
     try {
       setLoading(true)
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}`)
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}`))
       const data = await response.json()
 
       if (data.success) {

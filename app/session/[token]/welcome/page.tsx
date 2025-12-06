@@ -1,11 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { apiUrl } from '@/lib/api-url'
 import { useParams, useRouter } from 'next/navigation'
-import { apiUrl } from '@/lib/api-url'
 import Image from 'next/image'
-import { apiUrl } from '@/lib/api-url'
 import { Upload, FileText, X, Check } from 'lucide-react'
 import { apiUrl } from '@/lib/api-url'
 
@@ -49,7 +46,7 @@ export default function StakeholderWelcomePage() {
   async function loadSession() {
     try {
       setLoading(true)
-      const response = await fetch(apiUrl(`api/sessions/${params.token}`)
+      const response = await fetch(apiUrl(`api/sessions/${params.token}`))
       const data = await response.json()
 
       if (data.success) {
@@ -70,7 +67,7 @@ export default function StakeholderWelcomePage() {
 
   async function loadUploadedDocuments() {
     try {
-      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`)
+      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`))
       const data = await response.json()
 
       if (data.success && data.documents) {
