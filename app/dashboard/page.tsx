@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2 } from 'lucide-react'
-import DashboardSidebar from '@/components/DashboardSidebar'
+import { Building2, BarChart3, Users, Plus, Trash2, LogOut, ChevronDown } from 'lucide-react'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -123,7 +123,7 @@ export default function DashboardPage() {
       }
 
       // Fetch campaigns with authentication
-      const response = await fetch('api/campaigns', {
+      const response = await fetch('/api/campaigns', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -163,7 +163,7 @@ export default function DashboardPage() {
 
       if (!session) return
 
-      const response = await fetch('api/company-profiles', {
+      const response = await fetch('/api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -190,7 +190,7 @@ export default function DashboardPage() {
         return
       }
 
-      const response = await fetch(`api/campaigns/${campaignId}`, {
+      const response = await fetch(`/api/campaigns/${campaignId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

@@ -98,7 +98,7 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         return
       }
 
-      const response = await fetch('api/company-profiles', {
+      const response = await fetch('/api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -156,7 +156,7 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         return
       }
 
-      const response = await fetch(`api/company-profiles/${companyId}`, {
+      const response = await fetch(`/api/company-profiles/${companyId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

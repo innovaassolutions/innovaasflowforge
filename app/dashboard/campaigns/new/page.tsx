@@ -108,7 +108,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
-      const response = await fetch('api/company-profiles', {
+      const response = await fetch('/api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -148,7 +148,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
 
       if (!session) return
 
-      const response = await fetch(`api/company-profiles/${companyId}/stakeholders`, {
+      const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -245,7 +245,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
-      const response = await fetch('api/campaigns', {
+      const response = await fetch('/api/campaigns', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

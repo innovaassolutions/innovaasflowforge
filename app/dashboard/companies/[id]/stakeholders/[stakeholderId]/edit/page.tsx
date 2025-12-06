@@ -72,7 +72,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       }
 
       // Load company
-      const companyResponse = await fetch('api/company-profiles', {
+      const companyResponse = await fetch('/api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

@@ -40,7 +40,7 @@ export default function CompaniesPage() {
         return
       }
 
-      const response = await fetch('api/company-profiles', {
+      const response = await fetch('/api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
