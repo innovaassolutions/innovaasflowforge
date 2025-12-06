@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Plus, X } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 interface CompanyProfile {
   id: string
@@ -108,7 +113,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -148,7 +153,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
 
       if (!session) return
 
-      const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
+      const response = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -245,7 +250,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
-      const response = await fetch('/api/campaigns', {
+      const response = await fetch(apiUrl('api/campaigns'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

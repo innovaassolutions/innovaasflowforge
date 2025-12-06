@@ -1,8 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useRouter, useParams } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 
 interface Stakeholder {
   id?: string
@@ -40,7 +43,7 @@ export default function EditCampaignPage() {
 
   const fetchCampaign = async () => {
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}`)
+      const response = await fetch(apiUrl(`api/campaigns/${campaignId}`)
       const data = await response.json()
 
       if (data.success) {
@@ -89,7 +92,7 @@ export default function EditCampaignPage() {
     setSubmitting(true)
 
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/stakeholders`, {
+      const response = await fetch(apiUrl(`api/campaigns/${campaignId}/stakeholders`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stakeholders: newStakeholders })

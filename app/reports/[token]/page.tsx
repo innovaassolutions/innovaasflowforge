@@ -12,11 +12,17 @@
 'use client'
 
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useParams } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import { AlertCircle, Download, FileText } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 import { generateReportFilename, downloadReport } from '@/lib/download-utils'
+import { apiUrl } from '@/lib/api-url'
 import type { ReadinessAssessment } from '@/lib/agents/synthesis-agent'
+import { apiUrl } from '@/lib/api-url'
 import { transformToMatrixData, transformToHeatMapData, transformToRoadmapData } from '@/lib/consulting-data-transformers'
+import { apiUrl } from '@/lib/api-url'
 
 // Lazy load heavy chart components
 const ExecutiveOnePager = lazy(() =>
@@ -82,7 +88,7 @@ export default function ReportViewerPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/reports/${token}`)
+      const response = await fetch(apiUrl(`api/reports/${token}`)
       const data = await response.json()
 
       if (!response.ok || !data.success) {

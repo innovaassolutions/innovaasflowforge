@@ -9,6 +9,7 @@ import type { User } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { Building2, BarChart3, Users, Plus, Trash2, LogOut, ChevronDown } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -123,7 +124,7 @@ export default function DashboardPage() {
       }
 
       // Fetch campaigns with authentication
-      const response = await fetch('/api/campaigns', {
+      const response = await fetch(apiUrl('api/campaigns'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -163,7 +164,7 @@ export default function DashboardPage() {
 
       if (!session) return
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -190,7 +191,7 @@ export default function DashboardPage() {
         return
       }
 
-      const response = await fetch(`/api/campaigns/${campaignId}`, {
+      const response = await fetch(apiUrl(`api/campaigns/${campaignId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

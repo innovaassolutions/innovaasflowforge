@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Building2, Globe, MapPin, Users, DollarSign, Mail, Briefcase, Plus, BarChart3, Trash2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 interface CompanyProfile {
   id: string
@@ -71,7 +76,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       }
 
       // Load company profile
-      const companyResponse = await fetch('/api/company-profiles', {
+      const companyResponse = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -88,7 +93,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       setCompany(foundCompany)
 
       // Load stakeholders for this company
-      const stakeholdersResponse = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
+      const stakeholdersResponse = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -98,7 +103,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       setStakeholders(stakeholdersData.stakeholders || [])
 
       // Load campaigns for this company
-      const campaignsResponse = await fetch('/api/campaigns', {
+      const campaignsResponse = await fetch(apiUrl('api/campaigns'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -160,7 +165,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         return
       }
 
-      const response = await fetch(`/api/campaigns/${campaignId}`, {
+      const response = await fetch(apiUrl(`api/campaigns/${campaignId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

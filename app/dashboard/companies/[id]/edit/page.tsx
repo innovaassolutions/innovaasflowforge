@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Building2, Globe, MapPin, Users, DollarSign } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 const INDUSTRIES = [
   'Manufacturing',
@@ -98,7 +103,7 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -156,7 +161,7 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         return
       }
 
-      const response = await fetch(`/api/company-profiles/${companyId}`, {
+      const response = await fetch(apiUrl(`api/company-profiles/${companyId}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

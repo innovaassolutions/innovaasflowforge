@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useParams, useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -58,7 +60,7 @@ export default function StakeholderInterviewPage() {
   async function loadSession() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/sessions/${params.token}`)
+      const response = await fetch(apiUrl(`api/sessions/${params.token}`)
       const data = await response.json()
 
       if (data.success) {
@@ -115,7 +117,7 @@ export default function StakeholderInterviewPage() {
         setInputMessage('')
       }
 
-      const response = await fetch(`/api/sessions/${params.token}/messages`, {
+      const response = await fetch(apiUrl(`api/sessions/${params.token}/messages`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -168,7 +170,7 @@ export default function StakeholderInterviewPage() {
       setSubmitting(true)
       setShowSubmitConfirm(false)
 
-      const response = await fetch(`/api/sessions/${params.token}/complete`, {
+      const response = await fetch(apiUrl(`api/sessions/${params.token}/complete`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

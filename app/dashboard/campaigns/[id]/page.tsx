@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useParams, useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 import { CheckCircle2, Clock, Mail, Pause, Share2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
+import { apiUrl } from '@/lib/api-url'
 
 interface StakeholderSession {
   id: string
@@ -65,7 +70,7 @@ export default function CampaignDetailPage() {
   async function fetchCampaign() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/campaigns/${params.id}`)
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}`)
       const data = await response.json()
 
       if (data.success) {
@@ -94,7 +99,7 @@ export default function CampaignDetailPage() {
 
     try {
       setDeleting(true)
-      const response = await fetch(`/api/campaigns/${params.id}`, {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}`), {
         method: 'DELETE'
       })
       const data = await response.json()
@@ -115,7 +120,7 @@ export default function CampaignDetailPage() {
 
   async function handleSaveEdit() {
     try {
-      const response = await fetch(`/api/campaigns/${params.id}`, {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
@@ -202,7 +207,7 @@ export default function CampaignDetailPage() {
 
     try {
       setCompletingSession(sessionId)
-      const response = await fetch(`/api/campaigns/${params.id}/sessions/${sessionId}/complete`, {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}/sessions/${sessionId}/complete`), {
         method: 'POST'
       })
       const data = await response.json()
@@ -236,7 +241,7 @@ export default function CampaignDetailPage() {
     try {
       setGeneratingReport(true)
 
-      const response = await fetch(`/api/campaigns/${params.id}/synthesize`, {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}/synthesize`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ format: 'markdown' })
@@ -290,7 +295,7 @@ export default function CampaignDetailPage() {
     try {
       setGeneratingPDF(true)
 
-      const response = await fetch(`/api/campaigns/${params.id}/generate-pdf`, {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}/generate-pdf`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })

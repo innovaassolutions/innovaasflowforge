@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Users, Mail, Briefcase, Building2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 const ROLE_TYPES = [
   { value: 'managing_director', label: 'Managing Director' },
@@ -57,7 +62,7 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -104,7 +109,7 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
         return
       }
 
-      const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
+      const response = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

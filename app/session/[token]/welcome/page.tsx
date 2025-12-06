@@ -1,9 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { apiUrl } from '@/lib/api-url'
 import { useParams, useRouter } from 'next/navigation'
+import { apiUrl } from '@/lib/api-url'
 import Image from 'next/image'
+import { apiUrl } from '@/lib/api-url'
 import { Upload, FileText, X, Check } from 'lucide-react'
+import { apiUrl } from '@/lib/api-url'
 
 interface Session {
   id: string
@@ -45,7 +49,7 @@ export default function StakeholderWelcomePage() {
   async function loadSession() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/sessions/${params.token}`)
+      const response = await fetch(apiUrl(`api/sessions/${params.token}`)
       const data = await response.json()
 
       if (data.success) {
@@ -66,7 +70,7 @@ export default function StakeholderWelcomePage() {
 
   async function loadUploadedDocuments() {
     try {
-      const response = await fetch(`/api/sessions/${params.token}/documents`)
+      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`)
       const data = await response.json()
 
       if (data.success && data.documents) {
@@ -90,7 +94,7 @@ export default function StakeholderWelcomePage() {
 
         setUploadProgress(prev => ({ ...prev, [file.name]: 0 }))
 
-        const response = await fetch(`/api/sessions/${params.token}/documents`, {
+        const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`), {
           method: 'POST',
           body: formData
         })
@@ -123,7 +127,7 @@ export default function StakeholderWelcomePage() {
 
   async function handleRemoveDocument(documentId: string) {
     try {
-      const response = await fetch(`/api/sessions/${params.token}/documents/${documentId}`, {
+      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents/${documentId}`), {
         method: 'DELETE'
       })
 
