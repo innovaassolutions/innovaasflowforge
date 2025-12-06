@@ -72,7 +72,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-ctp-base">
       {/* Top Header Bar */}
-      <header className="h-16 bg-ctp-mantle border-b border-ctp-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
+      <header className="h-16 bg-[#1e1e2e] border-b border-ctp-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
         {/* Mobile hamburger menu */}
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
@@ -83,7 +83,7 @@ export default function DashboardLayout({
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-base shrink-0 shadow-sm">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-lg shrink-0 shadow-lg shadow-ctp-peach/40">
             FF
           </div>
           <div className="hidden sm:block">

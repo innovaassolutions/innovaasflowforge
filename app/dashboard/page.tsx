@@ -221,39 +221,42 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/dashboard/companies"
-            className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-peach hover:shadow-lg hover:shadow-ctp-peach/10 transition-all group"
+            className="relative bg-ctp-surface0 border-2 border-ctp-surface1 rounded-xl p-6 hover:border-ctp-peach hover:shadow-2xl hover:shadow-ctp-peach/20 transition-all duration-300 group overflow-hidden"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-ctp-peach/20 to-ctp-peach/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Building2 className="w-6 h-6 text-ctp-peach" />
+            <div className="absolute inset-0 bg-gradient-to-br from-ctp-peach/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-ctp-peach to-ctp-peach/70 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-ctp-peach/30">
+                <Building2 className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm text-ctp-subtext0">Total</p>
-                <h3 className="text-xl font-semibold text-ctp-text">{companiesCount} Companies</h3>
+                <p className="text-sm text-ctp-subtext0 font-medium">Total</p>
+                <h3 className="text-2xl font-bold text-ctp-text group-hover:text-ctp-peach transition-colors">{companiesCount} Companies</h3>
               </div>
             </div>
           </Link>
 
-          <div className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-teal hover:shadow-lg hover:shadow-ctp-teal/10 transition-all group">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-ctp-teal/20 to-ctp-teal/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-6 h-6 text-ctp-teal" />
+          <div className="relative bg-ctp-surface0 border-2 border-ctp-surface1 rounded-xl p-6 hover:border-ctp-teal hover:shadow-2xl hover:shadow-ctp-teal/20 transition-all duration-300 group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-ctp-teal/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-ctp-teal to-ctp-teal/70 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-ctp-teal/30">
+                <BarChart3 className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm text-ctp-subtext0">Total</p>
-                <h3 className="text-xl font-semibold text-ctp-text">{campaigns.length} Campaigns</h3>
+                <p className="text-sm text-ctp-subtext0 font-medium">Total</p>
+                <h3 className="text-2xl font-bold text-ctp-text group-hover:text-ctp-teal transition-colors">{campaigns.length} Campaigns</h3>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-green hover:shadow-lg hover:shadow-ctp-green/10 transition-all group">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-ctp-green/20 to-ctp-green/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6 text-ctp-green" />
+          <div className="relative bg-ctp-surface0 border-2 border-ctp-surface1 rounded-xl p-6 hover:border-ctp-green hover:shadow-2xl hover:shadow-ctp-green/20 transition-all duration-300 group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-ctp-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-ctp-green to-ctp-green/70 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-ctp-green/30">
+                <Users className="w-7 h-7 text-white" />
               </div>
               <div>
-                <p className="text-sm text-ctp-subtext0">Active</p>
-                <h3 className="text-xl font-semibold text-ctp-text">
+                <p className="text-sm text-ctp-subtext0 font-medium">Active</p>
+                <h3 className="text-2xl font-bold text-ctp-text group-hover:text-ctp-green transition-colors">
                   {campaigns.filter(c => c.status === 'active').length} Running
                 </h3>
               </div>
