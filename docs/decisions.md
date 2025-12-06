@@ -116,6 +116,57 @@ ALTER TABLE stakeholder_sessions ADD COLUMN framework_role_id UUID REFERENCES fr
 - Configuration-driven question/analysis logic
 - Template system for reports
 
+**Framework Definition Files (Markdown-based):**
+
+Frameworks will be defined as Markdown files in the codebase for easy editing, version control, and AI agent access:
+
+```
+docs/frameworks/
+├── industry-4.0/
+│   ├── framework.md              # Overview, dimensions, scoring methodology
+│   ├── stakeholder-roles.md      # Role definitions and focus areas
+│   ├── interview-questions.md    # Question bank organized by role/dimension
+│   ├── synthesis-guidelines.md   # Analysis methodology and scoring logic
+│   └── report-template.md        # Report structure and terminology
+├── lean-six-sigma/
+│   ├── framework.md
+│   ├── stakeholder-roles.md
+│   ├── interview-questions.md
+│   ├── synthesis-guidelines.md
+│   └── report-template.md
+└── theory-of-constraints/
+    ├── framework.md
+    ├── stakeholder-roles.md
+    ├── interview-questions.md
+    ├── synthesis-guidelines.md
+    └── report-template.md
+```
+
+**Benefits of Markdown-based frameworks:**
+1. **Easy editing:** Non-technical users can modify frameworks without code changes
+2. **AI agent access:** Agents can read framework definitions directly via file system
+3. **Version control:** Framework changes tracked in Git with full history
+4. **Human-readable:** Consultants can review and improve framework definitions
+5. **Modular addition:** New frameworks added by creating new folder with required files
+6. **No database dependency:** Frameworks defined at application level, not runtime data
+
+**Framework Loading Pattern:**
+```typescript
+// Load framework definition at runtime
+const framework = await loadFramework('industry-4.0')
+
+// AI agents read directly from markdown
+const interviewQuestions = await readMarkdown('docs/frameworks/industry-4.0/interview-questions.md')
+const synthesisGuidelines = await readMarkdown('docs/frameworks/industry-4.0/synthesis-guidelines.md')
+
+// Pass to AI agents
+const interviewPrompt = `
+Framework: ${framework.name}
+${interviewQuestions}
+...
+`
+```
+
 #### Alternatives Considered
 
 **Alternative 1: Immediate Implementation**
