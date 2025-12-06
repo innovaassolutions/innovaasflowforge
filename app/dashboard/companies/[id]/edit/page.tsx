@@ -185,15 +185,22 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
+          <Link
             href={`/dashboard/companies/${companyId}`}
             className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
+          >
             ← Back to Company
+          </Link>
           <h1 className="text-3xl font-bold text-ctp-text">Edit Company Profile</h1>
           <p className="mt-2 text-sm text-ctp-subtext0">
             Update company information and settings
           </p>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 bg-ctp-red/10 border border-ctp-red rounded-lg text-ctp-red">
+            {error}
+          </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
@@ -216,26 +223,49 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
                   required
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2">
                   Industry <span className="text-ctp-red">*</span>
+                </label>
                 <select
                   value={formData.industry}
                   onChange={(e) => updateField('industry', e.target.value)}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                  required
                 >
                   {INDUSTRIES.map(industry => (
                     <option key={industry} value={industry}>{industry}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2">
                   Description
+                </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
                   placeholder="Brief description of what the company does..."
+                />
+              </div>
             </div>
+          </div>
+
           {/* Market & Location */}
+          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
+            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
               <Globe className="w-5 h-5" />
               Market & Location
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2">
                   Market Scope <span className="text-ctp-red">*</span>
+                </label>
                 <div className="grid grid-cols-2 gap-3">
                   {MARKET_SCOPES.map(scope => (
                     <button
@@ -251,33 +281,81 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
                       <div className="font-medium">{scope.label}</div>
                       <div className="text-xs mt-1">{scope.description}</div>
                     </button>
+                  ))}
                 </div>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-ctp-text mb-2 flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   Website
+                </label>
+                <input
                   type="url"
                   value={formData.website}
                   onChange={(e) => updateField('website', e.target.value)}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
                   placeholder="https://example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2 flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Headquarters Location
+                </label>
+                <input
+                  type="text"
                   value={formData.headquartersLocation}
                   onChange={(e) => updateField('headquartersLocation', e.target.value)}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
                   placeholder="Detroit, MI"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Company Size */}
+          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
+            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
               Company Size
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2">
                   Employee Count
+                </label>
+                <select
                   value={formData.employeeCountRange}
                   onChange={(e) => updateField('employeeCountRange', e.target.value)}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                >
                   <option value="">Select range...</option>
                   {EMPLOYEE_RANGES.map(range => (
                     <option key={range} value={range}>{range}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-ctp-text mb-2">
                   Annual Revenue
+                </label>
+                <select
                   value={formData.annualRevenueRange}
                   onChange={(e) => updateField('annualRevenueRange', e.target.value)}
+                  className="w-full px-4 py-2 bg-ctp-base border border-ctp-surface1 rounded-lg text-ctp-text focus:border-ctp-peach focus:outline-none"
+                >
+                  <option value="">Select range...</option>
                   {REVENUE_RANGES.map(range => (
+                    <option key={range} value={range}>{range}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex items-center justify-end gap-4">
             <Link
@@ -290,8 +368,12 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
               type="submit"
               disabled={submitting}
               className="px-6 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {submitting ? 'Saving...' : 'Save Changes'}
             </button>
+          </div>
         </form>
+      </div>
     </div>
   )
+}
