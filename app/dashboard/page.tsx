@@ -221,44 +221,33 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/dashboard/companies"
-            className="relative bg-mocha-surface0 border-2 border-mocha-surface1 rounded-xl p-6 hover:border-brand-orange hover:shadow-2xl hover:shadow-brand-orange/40 transition-all duration-300 group overflow-hidden"
+            className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6 hover:border-brand-orange/50 transition-colors"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-brand-orange to-brand-orange-dark rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl shadow-brand-orange/50">
-                <Building2 className="w-8 h-8 text-white" />
-              </div>
+            <div className="flex items-center gap-4">
+              <Building2 className="w-10 h-10 text-brand-orange" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium">Total</p>
-                <h3 className="text-2xl font-bold text-mocha-text group-hover:text-brand-orange transition-colors">{companiesCount} Companies</h3>
+                <p className="text-sm text-mocha-subtext0 font-medium mb-1">Total Stakeholders</p>
+                <h3 className="text-4xl font-bold text-mocha-text">{companiesCount}</h3>
               </div>
             </div>
           </Link>
 
-          <div className="relative bg-mocha-surface0 border-2 border-mocha-surface1 rounded-xl p-6 hover:border-brand-teal hover:shadow-2xl hover:shadow-brand-teal/40 transition-all duration-300 group overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-teal/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-brand-teal to-brand-teal-dark rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl shadow-brand-teal/50">
-                <BarChart3 className="w-8 h-8 text-white" />
-              </div>
+          <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6">
+            <div className="flex items-center gap-4">
+              <BarChart3 className="w-10 h-10 text-mocha-green" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium">Total</p>
-                <h3 className="text-2xl font-bold text-mocha-text group-hover:text-brand-teal transition-colors">{campaigns.length} Campaigns</h3>
+                <p className="text-sm text-mocha-subtext0 font-medium mb-1">Completed</p>
+                <h3 className="text-4xl font-bold text-mocha-green">0</h3>
               </div>
             </div>
           </div>
 
-          <div className="relative bg-mocha-surface0 border-2 border-mocha-surface1 rounded-xl p-6 hover:border-mocha-green hover:shadow-2xl hover:shadow-mocha-green/40 transition-all duration-300 group overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-mocha-green/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-mocha-green to-mocha-green/80 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-xl shadow-mocha-green/50">
-                <Users className="w-8 h-8 text-white" />
-              </div>
+          <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6">
+            <div className="flex items-center gap-4">
+              <Users className="w-10 h-10 text-mocha-blue" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium">Active</p>
-                <h3 className="text-2xl font-bold text-mocha-text group-hover:text-mocha-green transition-colors">
-                  {campaigns.filter(c => c.status === 'active').length} Running
-                </h3>
+                <p className="text-sm text-mocha-subtext0 font-medium mb-1">In Progress</p>
+                <h3 className="text-4xl font-bold text-mocha-blue">{campaigns.filter(c => c.status === 'active').length}</h3>
               </div>
             </div>
           </div>
