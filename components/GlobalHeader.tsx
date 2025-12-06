@@ -2,8 +2,16 @@
 
 import Link from 'next/link'
 import { Home } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 export default function GlobalHeader() {
+  const pathname = usePathname()
+
+  // Hide header on dashboard pages (dashboard has its own header)
+  if (pathname?.startsWith('/dashboard')) {
+    return null
+  }
+
   return (
     <header className="bg-mocha-surface0 border-b border-mocha-surface1 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -221,10 +221,10 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/dashboard/companies"
-            className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-peach transition-colors"
+            className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-peach hover:shadow-lg hover:shadow-ctp-peach/10 transition-all group"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-ctp-peach/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-ctp-peach/20 to-ctp-peach/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Building2 className="w-6 h-6 text-ctp-peach" />
               </div>
               <div>
@@ -234,9 +234,9 @@ export default function DashboardPage() {
             </div>
           </Link>
 
-          <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-teal hover:shadow-lg hover:shadow-ctp-teal/10 transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-ctp-teal/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-ctp-teal/20 to-ctp-teal/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                 <BarChart3 className="w-6 h-6 text-ctp-teal" />
               </div>
               <div>
@@ -246,9 +246,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-6">
+          <div className="bg-gradient-to-br from-ctp-surface0 to-ctp-surface0 border border-ctp-surface1 rounded-lg p-6 hover:border-ctp-green hover:shadow-lg hover:shadow-ctp-green/10 transition-all group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-ctp-green/10 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-ctp-green/20 to-ctp-green/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Users className="w-6 h-6 text-ctp-green" />
               </div>
               <div>
