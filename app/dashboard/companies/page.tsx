@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Plus, Building2, Globe, MapPin, Users } from 'lucide-react'
 
 interface CompanyProfile {
@@ -40,7 +41,7 @@ export default function CompaniesPage() {
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

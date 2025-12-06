@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Users, Mail, Briefcase, Building2 } from 'lucide-react'
 
 const ROLE_TYPES = [
@@ -72,7 +73,7 @@ export default function EditStakeholderPage({ params }: { params: Promise<{ id: 
       }
 
       // Load company
-      const companyResponse = await fetch('/api/company-profiles', {
+      const companyResponse = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }

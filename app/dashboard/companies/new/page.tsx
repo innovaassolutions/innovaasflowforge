@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { apiUrl } from '@/lib/api-url'
 import { Building2, Globe, MapPin, Users, DollarSign } from 'lucide-react'
 
 const INDUSTRIES = [
@@ -87,7 +88,7 @@ export default function NewCompanyPage() {
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch(apiUrl('api/company-profiles'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
