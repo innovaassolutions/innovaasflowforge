@@ -30,6 +30,8 @@ interface Campaign {
   name: string
   campaign_type: string
   status: string
+}
+
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [company, setCompany] = useState<CompanyProfile | null>(null)

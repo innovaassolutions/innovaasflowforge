@@ -26,9 +26,13 @@ interface StakeholderSelection {
   position?: string
   department?: string
   isExisting: boolean
+}
+
 interface UserProfile {
   full_name: string | null
   email: string | null
+}
+
 const ROLE_TYPES = [
   { value: 'managing_director', label: 'Managing Director' },
   { value: 'it_operations', label: 'IT Operations' },

@@ -36,6 +36,8 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
   useEffect(() => {
     params.then(p => setCompanyId(p.id))
   }, [params])
+
+  useEffect(() => {
     if (companyId) {
       loadCompany()
     }

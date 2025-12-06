@@ -24,6 +24,8 @@ const MARKET_SCOPES = [
   { value: 'regional', label: 'Regional', description: 'State or multi-state region' },
   { value: 'national', label: 'National', description: 'Entire country' },
   { value: 'international', label: 'International', description: 'Multiple countries' }
+]
+
 const EMPLOYEE_RANGES = [
   '1-10',
   '11-50',
@@ -32,6 +34,8 @@ const EMPLOYEE_RANGES = [
   '501-1000',
   '1001-5000',
   '5000+'
+]
+
 const REVENUE_RANGES = [
   'Under $1M',
   '$1M-$10M',
@@ -40,6 +44,8 @@ const REVENUE_RANGES = [
   '$100M-$500M',
   '$500M-$1B',
   'Over $1B'
+]
+
 interface CompanyProfile {
   id: string
   company_name: string
@@ -71,6 +77,8 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     params.then(p => setCompanyId(p.id))
   }, [params])
+
+  useEffect(() => {
     if (companyId) {
       loadCompany()
     }
@@ -92,6 +100,8 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
       const company = data.companies?.find((c: CompanyProfile) => c.id === companyId)
       if (!company) {
         setError('Company not found or you do not have access to it')
+        return
+      }
       // Populate form with existing data
       setFormData({
         companyName: company.company_name,
@@ -102,40 +112,59 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
         employeeCountRange: company.employee_count_range || '',
         annualRevenueRange: company.annual_revenue_range || '',
         headquartersLocation: company.headquarters_location || ''
+      })
     } catch (err) {
       console.error('Error loading company:', err)
       setError('Failed to load company information')
     } finally {
       setLoading(false)
+    }
   }
+
   function updateField(field: string, value: string) {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!formData.companyName || !formData.industry) {
       setError('Please fill in all required fields')
       return
-    setSubmitting(true)
-    setError(null)
+    }
+
+    try {
+      setSubmitting(true)
+      setError(null)
       const response = await fetch(apiUrl(`api/company-profiles/${companyId}`), {
         method: 'PATCH',
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
+      })
+      const data = await response.json()
       if (!response.ok) {
         throw new Error(data.error || 'Failed to update company profile')
+      }
       // Success! Navigate back to company detail page
       router.push(`/dashboard/companies/${companyId}`)
+    } catch (err) {
       console.error('Error updating company:', err)
       setError(err instanceof Error ? err.message : 'Failed to update company profile')
+    } finally {
       setSubmitting(false)
+    }
+  }
   if (loading) {
     return (
       <div className="min-h-screen bg-ctp-base flex items-center justify-center">
         <div className="text-ctp-text">Loading company information...</div>
       </div>
     )
+  }
+
   if (error && !formData.companyName) {
+    return (
       <div className="min-h-screen bg-ctp-base">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-ctp-red/10 border border-ctp-red rounded-lg p-6 text-ctp-red">
@@ -148,6 +177,9 @@ export default function EditCompanyPage({ params }: { params: Promise<{ id: stri
             ← Back to Companies
           </Link>
         </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-ctp-base">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
