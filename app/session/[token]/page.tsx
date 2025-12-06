@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -33,6 +33,7 @@ interface ConversationState {
 
 export default function StakeholderInterviewPage() {
   const params = useParams()
+  const router = useRouter()
   const [session, setSession] = useState<Session | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')

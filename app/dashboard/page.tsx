@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2, LogOut, ChevronDown } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2 } from 'lucide-react'
+import DashboardSidebar from '@/components/DashboardSidebar'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
