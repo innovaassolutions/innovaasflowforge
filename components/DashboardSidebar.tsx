@@ -128,7 +128,11 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                     ? 'bg-mocha-surface0 text-mocha-text'
                     : 'text-mocha-subtext1 hover:bg-mocha-surface0/50 hover:text-mocha-text'
                 }`}>
-                <Icon className="w-5 h-5 shrink-0" />
+                <Icon className={`w-5 h-5 shrink-0 transition-colors ${
+                  active
+                    ? 'text-brand-orange'
+                    : 'text-mocha-subtext1 group-hover:text-brand-teal'
+                }`} />
                 <span className="font-medium whitespace-nowrap lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden">
                   {item.name}
                 </span>

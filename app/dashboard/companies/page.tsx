@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { apiUrl } from '@/lib/api-url'
-import { Plus, Building2, Globe, MapPin, Users } from 'lucide-react'
+import { Plus, Building2, Globe, MapPin, Users, Flag, Landmark } from 'lucide-react'
 
 interface CompanyProfile {
   id: string
@@ -62,37 +62,38 @@ export default function CompaniesPage() {
   }
 
   function getMarketScopeIcon(scope: string) {
+    const iconProps = { className: "w-7 h-7 text-brand-teal" }
     switch (scope) {
-      case 'international': return '🌍'
-      case 'national': return '🏛️'
-      case 'regional': return '🏙️'
-      case 'local': return '📍'
-      default: return '🏢'
+      case 'international': return <Globe {...iconProps} />
+      case 'national': return <Flag {...iconProps} />
+      case 'regional': return <Landmark {...iconProps} />
+      case 'local': return <MapPin {...iconProps} />
+      default: return <Building2 {...iconProps} />
     }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-ctp-base">
-        <div className="text-ctp-text">Loading companies...</div>
+      <div className="flex items-center justify-center min-h-screen bg-mocha-base">
+        <div className="text-mocha-text">Loading companies...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base">
+    <div className="min-h-screen bg-mocha-base">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-ctp-text">Company Profiles</h1>
-            <p className="mt-2 text-sm text-ctp-subtext0">
+            <h1 className="text-3xl font-bold text-mocha-text">Company Profiles</h1>
+            <p className="mt-2 text-sm text-mocha-subtext0">
               Manage your client companies and their information
             </p>
           </div>
           <Link
             href="/dashboard/companies/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-mocha-peach to-mocha-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
           >
             <Plus className="w-5 h-5" />
             New Company
@@ -100,22 +101,22 @@ export default function CompaniesPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-ctp-red/10 border border-ctp-red rounded-lg text-ctp-red">
+          <div className="mb-6 p-4 bg-mocha-red/10 border border-mocha-red rounded-lg text-mocha-red">
             {error}
           </div>
         )}
 
         {/* Companies Grid */}
         {companies.length === 0 ? (
-          <div className="text-center py-12 bg-ctp-surface0 rounded-lg border border-ctp-surface1">
-            <Building2 className="w-16 h-16 text-ctp-subtext0 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-ctp-text mb-2">No companies yet</h3>
-            <p className="text-sm text-ctp-subtext0 mb-6">
+          <div className="text-center py-12 bg-mocha-surface0 rounded-lg border border-mocha-surface1">
+            <Building2 className="w-16 h-16 text-mocha-subtext0 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-mocha-text mb-2">No companies yet</h3>
+            <p className="text-sm text-mocha-subtext0 mb-6">
               Create your first company profile to get started
             </p>
             <Link
               href="/dashboard/companies/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-mocha-peach to-mocha-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
             >
               <Plus className="w-5 h-5" />
               Create Company Profile
@@ -127,52 +128,52 @@ export default function CompaniesPage() {
               <Link
                 key={company.id}
                 href={`/dashboard/companies/${company.id}`}
-                className="block bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6 hover:border-ctp-peach transition-colors"
+                className="block bg-mocha-surface0 rounded-lg border border-mocha-surface1 p-6 hover:border-mocha-peach transition-colors"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-ctp-peach to-ctp-teal rounded-lg flex items-center justify-center text-white text-xl">
+                    <div className="w-12 h-12 bg-gradient-to-br from-mocha-peach to-mocha-teal rounded-lg flex items-center justify-center text-white text-xl">
                       {company.company_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-ctp-text">
+                      <h3 className="font-semibold text-mocha-text">
                         {company.company_name}
                       </h3>
-                      <p className="text-sm text-ctp-subtext0">{company.industry}</p>
+                      <p className="text-sm text-mocha-subtext0">{company.industry}</p>
                     </div>
                   </div>
                   <span className="text-2xl">{getMarketScopeIcon(company.market_scope)}</span>
                 </div>
 
                 {company.description && (
-                  <p className="text-sm text-ctp-subtext1 mb-4 line-clamp-2">
+                  <p className="text-sm text-mocha-subtext1 mb-4 line-clamp-2">
                     {company.description}
                   </p>
                 )}
 
                 <div className="space-y-2">
                   {company.website && (
-                    <div className="flex items-center gap-2 text-sm text-ctp-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
                       <Globe className="w-4 h-4" />
                       <span className="truncate">{company.website}</span>
                     </div>
                   )}
                   {company.headquarters_location && (
-                    <div className="flex items-center gap-2 text-sm text-ctp-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
                       <MapPin className="w-4 h-4" />
                       <span>{company.headquarters_location}</span>
                     </div>
                   )}
                   {company.employee_count_range && (
-                    <div className="flex items-center gap-2 text-sm text-ctp-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
                       <Users className="w-4 h-4" />
                       <span>{company.employee_count_range} employees</span>
                     </div>
                   )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-ctp-surface1">
-                  <span className="text-xs text-ctp-subtext0">
+                <div className="mt-4 pt-4 border-t border-mocha-surface1">
+                  <span className="text-xs text-mocha-subtext0">
                     Created {new Date(company.created_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -185,7 +186,7 @@ export default function CompaniesPage() {
         <div className="mt-8">
           <Link
             href="/dashboard"
-            className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors"
+            className="text-sm text-mocha-subtext0 hover:text-mocha-text transition-colors"
           >
             ← Back to Dashboard
           </Link>
