@@ -7,6 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import { Menu } from 'lucide-react'
+import Image from 'next/image'
 
 interface UserProfile {
   full_name: string
@@ -103,8 +104,30 @@ export default function DashboardLayout({
         />
 
         {/* Main Content Area - offset by narrow sidebar width on desktop */}
-        <div className="flex-1 lg:ml-16">
-          {children}
+        <div className="flex-1 lg:ml-16 flex flex-col min-h-[calc(100vh-4rem)]">
+          <div className="flex-1">
+            {children}
+          </div>
+
+          {/* Footer */}
+          <footer className="border-t border-mocha-surface0 py-6 mt-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+                    alt="Innovaas"
+                    width={120}
+                    height={28}
+                    className="h-7 w-auto"
+                  />
+                </div>
+                <p className="text-sm text-mocha-subtext0 text-center">
+                  FlowForge version 1.0.0 · Innovaas Project
+                </p>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
     </div>
