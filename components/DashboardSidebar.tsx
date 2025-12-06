@@ -97,21 +97,22 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
       {/* Sidebar */}
       <div
         className={`
-          group bg-ctp-mantle border-r border-ctp-surface0 flex flex-col fixed left-0 top-16 bottom-0 z-30
-          transition-all duration-200 ease-in-out opacity-100
+          group flex flex-col fixed left-0 top-16 bottom-0 z-30
+          transition-all duration-200 ease-in-out
+          bg-[#1e1e2e] border-r border-ctp-surface0
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:w-16 lg:hover:w-52
         `}>
         {/* Close button (mobile only) */}
         <button
           onClick={onCloseMobile}
-          className="lg:hidden absolute top-4 right-4 p-2 text-ctp-subtext0 hover:text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors"
+          className="lg:hidden absolute top-4 right-4 p-2 text-ctp-subtext0 hover:text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Navigation */}
-        <nav className="flex-1 p-2 pt-4 space-y-1 overflow-y-auto bg-ctp-mantle">
+        <nav className="flex-1 p-2 pt-4 space-y-1 overflow-y-auto bg-[#1e1e2e]">
           {navItems.map((item) => {
             const Icon = item.icon
             const active = isActive(item.matchPaths)
@@ -137,7 +138,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
         </nav>
 
         {/* User Menu */}
-        <div className="p-2 border-t border-ctp-surface0 bg-ctp-mantle">
+        <div className="p-2 border-t border-ctp-surface0 bg-[#1e1e2e]">
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
