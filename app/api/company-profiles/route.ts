@@ -165,13 +165,29 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is an admin
-    const { data: userProfile } = await supabaseAdmin
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('user_type')
       .eq('id', user.id)
       .single() as any
 
-    const isAdmin = userProfile?.user_type === 'admin'
+    if (profileError) {
+      console.error('❌ Error fetching user profile:', profileError)
+      return NextResponse.json(
+        { error: 'Failed to fetch user profile', details: profileError.message },
+        { status: 500 }
+      )
+    }
+
+    if (!userProfile) {
+      console.error('❌ User profile not found for user:', user.id)
+      return NextResponse.json(
+        { error: 'User profile not found - please contact support' },
+        { status: 404 }
+      )
+    }
+
+    const isAdmin = userProfile.user_type === 'admin'
 
     // Admins can see ALL companies (bypass RLS)
     // Regular users see companies based on RLS policies
