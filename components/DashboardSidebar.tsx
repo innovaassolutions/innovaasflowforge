@@ -10,7 +10,8 @@ import {
   Users,
   Settings,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  X
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -24,9 +25,11 @@ interface UserProfile {
 interface DashboardSidebarProps {
   userProfile: UserProfile | null
   onLogout: () => void
+  isMobileOpen: boolean
+  onCloseMobile: () => void
 }
 
-export default function DashboardSidebar({ userProfile, onLogout }: DashboardSidebarProps) {
+export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, onCloseMobile }: DashboardSidebarProps) {
   const pathname = usePathname()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -76,36 +79,60 @@ export default function DashboardSidebar({ userProfile, onLogout }: DashboardSid
   }
 
   return (
-    <div className="w-64 bg-ctp-mantle border-r border-ctp-surface0 flex flex-col h-screen fixed left-0 top-0">
-      {/* Logo/Brand */}
-      <div className="p-6 border-b border-ctp-surface0">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-ctp-peach to-ctp-teal bg-clip-text text-transparent">
-          FlowForge
-        </h1>
-        <p className="text-xs text-ctp-subtext0 mt-1">Assessment Platform</p>
-      </div>
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const active = isActive(item.matchPaths)
+      {/* Sidebar */}
+      <div className={`
+        w-64 bg-ctp-mantle border-r border-ctp-surface0 flex flex-col h-screen fixed left-0 top-0 z-50
+        transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0
+      `}>
+        {/* Close button (mobile only) */}
+        <button
+          onClick={onCloseMobile}
+          className="lg:hidden absolute top-4 right-4 p-2 text-ctp-subtext0 hover:text-ctp-text hover:bg-ctp-surface0 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                active
-                  ? 'bg-ctp-surface0 text-ctp-text'
-                  : 'text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text'
-              }`}>
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          )
-        })}
-      </nav>
+        {/* Logo/Brand */}
+        <div className="p-6 border-b border-ctp-surface0">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-ctp-peach to-ctp-teal bg-clip-text text-transparent">
+            FlowForge
+          </h1>
+          <p className="text-xs text-ctp-subtext0 mt-1">Assessment Platform</p>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.matchPaths)
+
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={onCloseMobile}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                  active
+                    ? 'bg-ctp-surface0 text-ctp-text'
+                    : 'text-ctp-subtext1 hover:bg-ctp-surface0/50 hover:text-ctp-text'
+                }`}>
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
       {/* User Menu */}
       <div className="p-4 border-t border-ctp-surface0">
@@ -148,19 +175,20 @@ export default function DashboardSidebar({ userProfile, onLogout }: DashboardSid
         </div>
       </div>
 
-      {/* Footer Branding */}
-      <div className="p-4 border-t border-ctp-surface0">
-        <div className="flex items-center justify-center gap-2">
-          <p className="text-xs text-ctp-subtext0">Powered by</p>
-          <Image
-            src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
-            alt="Innovaas"
-            width={80}
-            height={19}
-            className="h-5 w-auto"
-          />
+        {/* Footer Branding */}
+        <div className="p-4 border-t border-ctp-surface0">
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-xs text-ctp-subtext0">Powered by</p>
+            <Image
+              src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+              alt="Innovaas"
+              width={80}
+              height={19}
+              className="h-5 w-auto"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
