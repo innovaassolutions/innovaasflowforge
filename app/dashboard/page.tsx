@@ -99,7 +99,7 @@ export default function DashboardPage() {
       }
 
       // Fetch campaigns with authentication
-      const response = await fetch('/api/campaigns', {
+      const response = await fetch('api/campaigns', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -139,7 +139,7 @@ export default function DashboardPage() {
 
       if (!session) return
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch('api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -166,7 +166,7 @@ export default function DashboardPage() {
         return
       }
 
-      const response = await fetch(`/api/campaigns/${campaignId}`, {
+      const response = await fetch(`api/campaigns/${campaignId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`

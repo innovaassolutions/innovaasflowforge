@@ -57,7 +57,7 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
         return
       }
 
-      const response = await fetch('/api/company-profiles', {
+      const response = await fetch('api/company-profiles', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -104,7 +104,7 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
         return
       }
 
-      const response = await fetch(`/api/company-profiles/${companyId}/stakeholders`, {
+      const response = await fetch(`api/company-profiles/${companyId}/stakeholders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

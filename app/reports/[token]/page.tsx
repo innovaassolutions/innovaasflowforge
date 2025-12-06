@@ -82,7 +82,7 @@ export default function ReportViewerPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/reports/${token}`)
+      const response = await fetch(`api/reports/${token}`)
       const data = await response.json()
 
       if (!response.ok || !data.success) {
