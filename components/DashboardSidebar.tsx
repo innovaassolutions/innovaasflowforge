@@ -110,7 +110,14 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
           <X className="w-5 h-5" />
         </button>
 
-        {/* Navigation - starts immediately, no logo section */}
+        {/* Logo Section */}
+        <div className="p-4 border-b border-ctp-surface0 bg-ctp-mantle">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br from-ctp-peach via-ctp-peach to-ctp-teal text-white font-bold text-base shrink-0 shadow-sm">
+            FF
+          </div>
+        </div>
+
+        {/* Navigation */}
         <nav className="flex-1 p-2 pt-4 space-y-1 overflow-y-auto bg-ctp-mantle">
           {navItems.map((item) => {
             const Icon = item.icon
