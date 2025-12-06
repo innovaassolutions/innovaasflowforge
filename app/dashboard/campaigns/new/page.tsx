@@ -76,9 +76,13 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
     roleType: 'managing_director',
     position: '',
     department: ''
+  })
+
   useEffect(() => {
     loadCompanies()
   }, [])
+
+  useEffect(() => {
     if (formData.companyProfileId) {
       loadStakeholders(formData.companyProfileId)
     }

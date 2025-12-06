@@ -46,6 +46,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     params.then(p => setCompanyId(p.id))
   }, [params])
+
+  useEffect(() => {
     if (companyId) {
       loadCompanyData()
     }
