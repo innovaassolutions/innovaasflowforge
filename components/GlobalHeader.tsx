@@ -1,11 +1,22 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Home } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
 export default function GlobalHeader() {
   const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent hydration mismatch - don't render until client-side
+  if (!mounted) {
+    return null
+  }
 
   // Hide header on dashboard pages (dashboard has its own header)
   if (pathname?.startsWith('/dashboard')) {
