@@ -50,6 +50,7 @@ export default function CampaignDetailPage() {
   const [generatingReport, setGeneratingReport] = useState(false)
   const [generatingPDF, setGeneratingPDF] = useState(false)
   const [showReportPanel, setShowReportPanel] = useState(false)
+  const [existingReport, setExistingReport] = useState<{ id: string; url: string; access_token: string } | null>(null)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -58,6 +59,7 @@ export default function CampaignDetailPage() {
 
   useEffect(() => {
     fetchCampaign()
+    checkForExistingReport()
     // Poll for updates every 10 seconds
     const interval = setInterval(fetchCampaign, 10000)
     return () => clearInterval(interval)
@@ -85,6 +87,22 @@ export default function CampaignDetailPage() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function checkForExistingReport() {
+    try {
+      const response = await fetch(apiUrl(`api/campaigns/${params.id}/report`))
+      const data = await response.json()
+
+      if (data.success && data.report) {
+        setExistingReport(data.report)
+      } else {
+        setExistingReport(null)
+      }
+    } catch (err) {
+      console.error('Error checking for existing report:', err)
+      setExistingReport(null)
     }
   }
 
@@ -385,12 +403,21 @@ export default function CampaignDetailPage() {
                 </span>
                 {campaign.progress.completed > 0 && (
                   <>
-                    <button
-                      onClick={() => setShowReportPanel(true)}
-                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
-                      <Share2 className="w-4 h-4" />
-                      Generate Client Report
-                    </button>
+                    {existingReport ? (
+                      <button
+                        onClick={() => window.open(existingReport.url, '_blank')}
+                        className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                        <Share2 className="w-4 h-4" />
+                        View Report
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowReportPanel(true)}
+                        className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                        <Share2 className="w-4 h-4" />
+                        Generate Client Report
+                      </button>
+                    )}
                     <button
                       onClick={handleGeneratePDF}
                       disabled={generatingPDF}
@@ -512,12 +539,21 @@ export default function CampaignDetailPage() {
                     : `${campaign.progress.completed} of ${campaign.progress.total} interviews complete. You can generate a report now with available data, or wait for all stakeholders to complete their interviews for the most comprehensive analysis.`}
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setShowReportPanel(true)}
-                    className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
-                    <Share2 className="w-4 h-4" />
-                    Generate Client Report
-                  </button>
+                  {existingReport ? (
+                    <button
+                      onClick={() => window.open(existingReport.url, '_blank')}
+                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                      <Share2 className="w-4 h-4" />
+                      View Report
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowReportPanel(true)}
+                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                      <Share2 className="w-4 h-4" />
+                      Generate Client Report
+                    </button>
+                  )}
                   <button
                     onClick={handleGeneratePDF}
                     disabled={generatingPDF}
@@ -750,8 +786,9 @@ export default function CampaignDetailPage() {
         isOpen={showReportPanel}
         onClose={() => setShowReportPanel(false)}
         onSuccess={() => {
-          // Optionally refresh campaign data or show additional success feedback
+          // Refresh campaign data and check for existing report
           fetchCampaign()
+          checkForExistingReport()
         }}
       />
     </div>
