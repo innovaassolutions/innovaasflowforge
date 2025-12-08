@@ -313,7 +313,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-4 mt-3 text-sm text-mocha-subtext0">
                         <span>Facilitator: {campaign.facilitator_name}</span>
                         <span>•</span>
-                        <span>
+                        <span suppressHydrationWarning>
                           Created {new Date(campaign.created_at).toLocaleDateString()}
                         </span>
                       </div>

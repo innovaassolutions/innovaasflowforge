@@ -173,7 +173,7 @@ export default function CompaniesPage() {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-mocha-surface1">
-                  <span className="text-xs text-mocha-subtext0">
+                  <span className="text-xs text-mocha-subtext0" suppressHydrationWarning>
                     Created {new Date(company.created_at).toLocaleDateString()}
                   </span>
                 </div>

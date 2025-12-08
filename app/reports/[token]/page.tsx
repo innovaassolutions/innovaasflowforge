@@ -350,7 +350,7 @@ export default function ReportViewerPage() {
 
         {/* Footer */}
         <div className="pt-6 border-t border-mocha-surface1 text-center">
-          <p className="text-sm text-mocha-subtext1">
+          <p className="text-sm text-mocha-subtext1" suppressHydrationWarning>
             Generated on{' '}
             {new Date(report.generated_at).toLocaleDateString('en-US', {
               year: 'numeric',
