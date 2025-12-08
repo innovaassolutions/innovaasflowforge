@@ -112,7 +112,7 @@ export default function ReportViewerPage() {
         format
       )
 
-      const downloadUrl = `/api/reports/${token}/download?format=${format}`
+      const downloadUrl = apiUrl(`api/reports/${token}/download?format=${format}`)
       await downloadReport(downloadUrl, filename)
     } catch (err) {
       console.error('Download error:', err)
