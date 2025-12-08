@@ -171,8 +171,8 @@ export function ReportGenerationPanel({
                 </h3>
                 <p className="text-sm text-mocha-subtext1 mb-4">
                   {generatedReport.is_regeneration
-                    ? `This is regeneration #${generatedReport.regeneration_count}. The shareable URL remains the same.`
-                    : 'Share this URL with your client to provide access to their assessment report.'}
+                    ? `Report updated successfully! This is update #${generatedReport.regeneration_count}. The shareable URL below remains unchanged and will continue to work.`
+                    : 'Share this URL with your client to provide access to their assessment report. This URL will remain permanent and can be regenerated to update the report content while keeping the same link.'}
                 </p>
 
                 {/* Shareable URL */}

@@ -199,15 +199,15 @@ export async function POST(
       console.log('[Report Gen] Synthesis saved successfully');
     }
 
-    // Generate unique access token
-    const accessToken = generateAccessToken();
-
     // Get existing report if any
     const { data: existingReport } = await supabaseAdmin
       .from('campaign_reports')
-      .select('id, regeneration_count')
+      .select('id, regeneration_count, access_token')
       .eq('campaign_id', campaignId)
       .maybeSingle() as any;
+
+    // Reuse existing access token if report exists, otherwise generate new one
+    const accessToken = existingReport?.access_token || generateAccessToken();
 
     // UPSERT campaign_reports record
     // If report exists: increment regeneration_count, update regenerated_at
