@@ -11,40 +11,49 @@
 
 'use client'
 
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { AlertCircle, Download, FileText } from 'lucide-react'
 import { generateReportFilename, downloadReport } from '@/lib/download-utils'
 import type { ReadinessAssessment } from '@/lib/agents/synthesis-agent'
 import { transformToMatrixData, transformToHeatMapData, transformToRoadmapData } from '@/lib/consulting-data-transformers'
 import { apiUrl } from '@/lib/api-url'
 
-// Lazy load heavy chart components
-const ExecutiveOnePager = lazy(() =>
-  import('@/components/reports/sections').then(mod => ({ default: mod.ExecutiveOnePager }))
+// Dynamically load heavy chart components with NO SSR
+const ExecutiveOnePager = dynamic(() =>
+  import('@/components/reports/sections').then(mod => mod.ExecutiveOnePager),
+  { ssr: false }
 )
-const ExecutiveSummary = lazy(() =>
-  import('@/components/reports/sections').then(mod => ({ default: mod.ExecutiveSummary }))
+const ExecutiveSummary = dynamic(() =>
+  import('@/components/reports/sections').then(mod => mod.ExecutiveSummary),
+  { ssr: false }
 )
-const DimensionalAnalysis = lazy(() =>
-  import('@/components/reports/sections').then(mod => ({ default: mod.DimensionalAnalysis }))
+const DimensionalAnalysis = dynamic(() =>
+  import('@/components/reports/sections').then(mod => mod.DimensionalAnalysis),
+  { ssr: false }
 )
-const EnhancedRecommendations = lazy(() =>
-  import('@/components/reports/sections').then(mod => ({ default: mod.EnhancedRecommendations }))
+const EnhancedRecommendations = dynamic(() =>
+  import('@/components/reports/sections').then(mod => mod.EnhancedRecommendations),
+  { ssr: false }
 )
-const Recommendations = lazy(() =>
-  import('@/components/reports/sections').then(mod => ({ default: mod.Recommendations }))
+const Recommendations = dynamic(() =>
+  import('@/components/reports/sections').then(mod => mod.Recommendations),
+  { ssr: false }
 )
 
-// Lazy load strategic framework components
-const PriorityMatrix = lazy(() =>
-  import('@/components/reports/frameworks').then(mod => ({ default: mod.PriorityMatrix }))
+// Dynamically load strategic framework components with NO SSR
+const PriorityMatrix = dynamic(() =>
+  import('@/components/reports/frameworks').then(mod => mod.PriorityMatrix),
+  { ssr: false }
 )
-const CapabilityHeatMap = lazy(() =>
-  import('@/components/reports/frameworks').then(mod => ({ default: mod.CapabilityHeatMap }))
+const CapabilityHeatMap = dynamic(() =>
+  import('@/components/reports/frameworks').then(mod => mod.CapabilityHeatMap),
+  { ssr: false }
 )
-const TransformationRoadmap = lazy(() =>
-  import('@/components/reports/frameworks').then(mod => ({ default: mod.TransformationRoadmap }))
+const TransformationRoadmap = dynamic(() =>
+  import('@/components/reports/frameworks').then(mod => mod.TransformationRoadmap),
+  { ssr: false }
 )
 
 interface ReportData {
@@ -222,87 +231,27 @@ export default function ReportViewerPage() {
       <div className="space-y-0">
         {/* Executive One-Pager (Premium only) or Executive Summary */}
         {showConsultingGrade && synthesis ? (
-          <Suspense
-            fallback={
-              <div className="bg-mocha-base py-25 animate-pulse">
-                <div className="max-w-[1600px] mx-auto px-[100px]">
-                  <div className="h-12 bg-mocha-surface1 rounded w-1/2 mb-8"></div>
-                  <div className="h-96 bg-mocha-surface1 rounded"></div>
-                </div>
-              </div>
-            }>
-            <ExecutiveOnePager assessment={synthesis} />
-          </Suspense>
+          <ExecutiveOnePager assessment={synthesis} />
         ) : synthesis ? (
-          <Suspense
-            fallback={
-              <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
-                <div className="h-8 bg-mocha-surface1 rounded w-1/3 mb-6"></div>
-                <div className="space-y-3">
-                  <div className="h-4 bg-mocha-surface1 rounded"></div>
-                  <div className="h-4 bg-mocha-surface1 rounded"></div>
-                  <div className="h-4 bg-mocha-surface1 rounded w-2/3"></div>
-                </div>
-              </div>
-            }>
-            <ExecutiveSummary assessment={synthesis} />
-          </Suspense>
+          <ExecutiveSummary assessment={synthesis} />
         ) : null}
 
         {/* Dimensional Analysis Section (All tiers) */}
         {synthesis && (
-          <Suspense
-            fallback={
-              <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
-                <div className="h-8 bg-mocha-surface1 rounded w-1/2 mb-6"></div>
-                <div className="h-64 bg-mocha-surface1 rounded"></div>
-              </div>
-            }>
-            <DimensionalAnalysis assessment={synthesis} />
-          </Suspense>
+          <DimensionalAnalysis assessment={synthesis} />
         )}
 
         {/* Strategic Frameworks (Premium only) */}
         {showConsultingGrade && (
           <>
             {/* Priority Matrix */}
-            <Suspense
-              fallback={
-                <div className="bg-mocha-base py-25 animate-pulse">
-                  <div className="max-w-[1600px] mx-auto px-[100px]">
-                    <div className="h-12 bg-mocha-surface1 rounded w-1/3 mb-8"></div>
-                    <div className="h-[600px] bg-mocha-surface1 rounded"></div>
-                  </div>
-                </div>
-              }>
-              <PriorityMatrix data={matrixData} />
-            </Suspense>
+            <PriorityMatrix data={matrixData} />
 
             {/* Capability Heat Map */}
-            <Suspense
-              fallback={
-                <div className="bg-mocha-base py-25 animate-pulse">
-                  <div className="max-w-[1600px] mx-auto px-[100px]">
-                    <div className="h-12 bg-mocha-surface1 rounded w-1/3 mb-8"></div>
-                    <div className="h-96 bg-mocha-surface1 rounded"></div>
-                  </div>
-                </div>
-              }>
-              <CapabilityHeatMap data={heatMapData} />
-            </Suspense>
+            <CapabilityHeatMap data={heatMapData} />
 
             {/* Transformation Roadmap */}
-            <Suspense
-              fallback={
-                <div className="bg-mocha-base py-25 animate-pulse">
-                  <div className="max-w-[1600px] mx-auto px-[100px]">
-                    <div className="h-12 bg-mocha-surface1 rounded w-1/3 mb-8"></div>
-                    <div className="h-[800px] bg-mocha-surface1 rounded"></div>
-                  </div>
-                </div>
-              }>
-              <TransformationRoadmap data={roadmapData} />
-            </Suspense>
+            <TransformationRoadmap data={roadmapData} />
           </>
         )}
 
@@ -310,35 +259,9 @@ export default function ReportViewerPage() {
         {synthesis && synthesis.recommendations.length > 0 && (
           <>
             {showConsultingGrade ? (
-              <Suspense
-                fallback={
-                  <div className="bg-mocha-base py-25 animate-pulse">
-                    <div className="max-w-[1600px] mx-auto px-[100px]">
-                      <div className="h-12 bg-mocha-surface1 rounded w-1/3 mb-8"></div>
-                      <div className="space-y-6">
-                        <div className="h-40 bg-mocha-surface1 rounded"></div>
-                        <div className="h-40 bg-mocha-surface1 rounded"></div>
-                        <div className="h-40 bg-mocha-surface1 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                }>
-                <EnhancedRecommendations assessment={synthesis} />
-              </Suspense>
+              <EnhancedRecommendations assessment={synthesis} />
             ) : tier === 'informative' ? (
-              <Suspense
-                fallback={
-                  <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 animate-pulse">
-                    <div className="h-8 bg-mocha-surface1 rounded w-1/3 mb-6"></div>
-                    <div className="space-y-4">
-                      <div className="h-20 bg-mocha-surface1 rounded"></div>
-                      <div className="h-20 bg-mocha-surface1 rounded"></div>
-                      <div className="h-20 bg-mocha-surface1 rounded"></div>
-                    </div>
-                  </div>
-                }>
-                <Recommendations assessment={synthesis} />
-              </Suspense>
+              <Recommendations assessment={synthesis} />
             ) : null}
           </>
         )}
