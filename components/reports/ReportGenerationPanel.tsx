@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { X, Copy, Check, Loader2, Eye, EyeOff } from 'lucide-react'
 import type { ReportTier } from '@/lib/types'
+import { apiUrl } from '@/lib/api-url'
 
 interface ReportGenerationPanelProps {
   campaignId: string
@@ -56,7 +57,7 @@ export function ReportGenerationPanel({
     setError(null)
 
     try {
-      const response = await fetch(`/api/campaigns/${campaignId}/generate-report`, {
+      const response = await fetch(apiUrl(`api/campaigns/${campaignId}/generate-report`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -104,7 +105,7 @@ export function ReportGenerationPanel({
       const newActiveState = !reportActive
 
       const response = await fetch(
-        `/api/campaigns/${campaignId}/report/toggle-access`,
+        apiUrl(`api/campaigns/${campaignId}/report/toggle-access`),
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

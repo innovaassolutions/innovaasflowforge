@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react'
 import type { IllustrationOptions } from '@/lib/ai'
+import { apiUrl } from '@/lib/api-url'
 
 interface AIIllustrationProps {
   prompt: string
@@ -42,7 +43,7 @@ export function AIIllustration({
 
       try {
         // Call API route to generate illustration
-        const response = await fetch('/api/illustrations/generate', {
+        const response = await fetch(apiUrl('api/illustrations/generate'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
