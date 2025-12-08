@@ -73,8 +73,10 @@ export default function ReportViewerPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [downloading, setDownloading] = useState<'pdf' | 'md' | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     fetchReport()
   }, [token])
 
@@ -128,6 +130,11 @@ export default function ReportViewerPage() {
   const matrixData = useMemo(() => synthesis ? transformToMatrixData(synthesis) : [], [synthesis])
   const heatMapData = useMemo(() => synthesis ? transformToHeatMapData(synthesis) : [], [synthesis])
   const roadmapData = useMemo(() => synthesis ? transformToRoadmapData(synthesis) : [], [synthesis])
+
+  // Prevent hydration mismatch by only rendering on client
+  if (!mounted) {
+    return null
+  }
 
   if (loading) {
     return (
@@ -350,7 +357,7 @@ export default function ReportViewerPage() {
 
         {/* Footer */}
         <div className="pt-6 border-t border-mocha-surface1 text-center">
-          <p className="text-sm text-mocha-subtext1" suppressHydrationWarning>
+          <p className="text-sm text-mocha-subtext1">
             Generated on{' '}
             {new Date(report.generated_at).toLocaleDateString('en-US', {
               year: 'numeric',
