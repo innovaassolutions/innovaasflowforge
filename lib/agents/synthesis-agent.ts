@@ -1,6 +1,13 @@
 import { anthropic } from '@/lib/anthropic'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { getModelForTier, type ReportTier } from '@/lib/model-config'
+import {
+  classifyAnthropicError,
+  retryWithBackoff,
+  InvalidResponseError,
+  NoInterviewsError,
+  DatabaseError
+} from '@/lib/errors/synthesis-errors'
 
 // ============================================================================
 // Type Definitions
@@ -294,38 +301,53 @@ async function analyzeDimension(
   transcripts: SessionTranscript[],
   modelId: string
 ): Promise<DimensionalScore> {
-  const prompt = generateDimensionalAnalysisPrompt(dimension, transcripts)
+  // Wrap API call with retry logic
+  return retryWithBackoff(async () => {
+    try {
+      const prompt = generateDimensionalAnalysisPrompt(dimension, transcripts)
 
-  const response = await anthropic.messages.create({
-    model: modelId,
-    max_tokens: 4000,
-    temperature: 0.7,
-    messages: [
-      {
-        role: 'user',
-        content: prompt
+      const response = await anthropic.messages.create({
+        model: modelId,
+        max_tokens: 4000,
+        temperature: 0.7,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+
+      const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}'
+
+      // Parse JSON response
+      try {
+        // Strip markdown code blocks if present
+        let jsonText = responseText.trim()
+        if (jsonText.includes('```json')) {
+          jsonText = jsonText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+        } else if (jsonText.includes('```')) {
+          jsonText = jsonText.replace(/```\s*/g, '').trim()
+        }
+
+        const result = JSON.parse(jsonText)
+        return result as DimensionalScore
+      } catch (parseError) {
+        console.error('Failed to parse dimensional analysis:', parseError)
+        console.error('Response:', responseText)
+        throw new InvalidResponseError(dimension.name, {
+          parseError: parseError instanceof Error ? parseError.message : 'Unknown parse error',
+          responseText: responseText.substring(0, 500) // Truncate for logging
+        })
       }
-    ]
-  })
-
-  const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}'
-
-  try {
-    // Strip markdown code blocks if present
-    let jsonText = responseText.trim()
-    if (jsonText.includes('```json')) {
-      jsonText = jsonText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
-    } else if (jsonText.includes('```')) {
-      jsonText = jsonText.replace(/```\s*/g, '').trim()
+    } catch (error) {
+      // Classify Anthropic API errors
+      if (error instanceof InvalidResponseError) {
+        throw error // Already classified
+      }
+      throw classifyAnthropicError(error)
     }
-
-    const result = JSON.parse(jsonText)
-    return result as DimensionalScore
-  } catch (error) {
-    console.error('Failed to parse dimensional analysis:', error)
-    console.error('Response:', responseText)
-    throw new Error(`Failed to parse analysis for ${dimension.name}`)
-  }
+  }, 3, 2000) // 3 retries with 2s base delay
 }
 
 /**
@@ -337,11 +359,13 @@ async function generateExecutiveSummary(
   pillars: PillarScore[],
   modelId: string
 ): Promise<string> {
-  const pillarSummary = pillars.map(p =>
-    `${p.pillar}: ${p.score.toFixed(1)}/5.0`
-  ).join(', ')
+  return retryWithBackoff(async () => {
+    try {
+      const pillarSummary = pillars.map(p =>
+        `${p.pillar}: ${p.score.toFixed(1)}/5.0`
+      ).join(', ')
 
-  const prompt = `You are summarizing the findings from a comprehensive digital transformation readiness assessment.
+      const prompt = `You are summarizing the findings from a comprehensive digital transformation readiness assessment.
 
 ORGANIZATION: ${campaignInfo.company_name}
 CAMPAIGN: ${campaignInfo.name}
@@ -368,19 +392,23 @@ Use professional consulting language. Be specific and evidence-based. Do not men
 
 Return ONLY the executive summary text, no JSON or formatting.`
 
-  const response = await anthropic.messages.create({
-    model: modelId,
-    max_tokens: 1500,
-    temperature: 0.7,
-    messages: [
-      {
-        role: 'user',
-        content: prompt
-      }
-    ]
-  })
+      const response = await anthropic.messages.create({
+        model: modelId,
+        max_tokens: 1500,
+        temperature: 0.7,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
 
-  return response.content[0].type === 'text' ? response.content[0].text : ''
+      return response.content[0].type === 'text' ? response.content[0].text : ''
+    } catch (error) {
+      throw classifyAnthropicError(error)
+    }
+  }, 3, 2000)
 }
 
 /**
@@ -567,75 +595,102 @@ function extractStakeholderPerspectives(transcripts: SessionTranscript[]): Stake
  * Synthesize all campaign data into a comprehensive readiness assessment
  */
 export async function synthesizeCampaign(campaignId: string): Promise<ReadinessAssessment> {
-  console.log(`Starting synthesis for campaign ${campaignId}`)
+  console.log(`[Synthesis] Starting synthesis for campaign ${campaignId}`)
 
-  // Fetch campaign data
-  const [campaignInfo, transcripts] = await Promise.all([
-    fetchCampaignInfo(campaignId),
-    fetchCampaignTranscripts(campaignId)
-  ])
+  try {
+    // Fetch campaign data with error handling
+    let campaignInfo: CampaignInfo
+    let transcripts: SessionTranscript[]
 
-  // Determine which AI model to use based on report tier
-  const reportTier = campaignInfo.report_tier || 'standard'
-  const modelId = getModelForTier(reportTier)
-  console.log(`Using AI model: ${modelId} (${reportTier} tier)`)
-
-  console.log(`Analyzing ${transcripts.length} stakeholder transcripts`)
-
-  if (transcripts.length === 0) {
-    throw new Error('No completed interviews found for this campaign')
-  }
-
-  // Analyze all dimensions across all three pillars
-  const pillars: PillarScore[] = []
-
-  for (const [pillarKey, pillarData] of Object.entries(FRAMEWORK.pillars)) {
-    console.log(`Analyzing ${pillarData.name} pillar...`)
-
-    const dimensionScores: DimensionalScore[] = []
-
-    for (const dimension of pillarData.dimensions) {
-      console.log(`  - Analyzing dimension: ${dimension.name}`)
-      const score = await analyzeDimension(dimension, transcripts, modelId)
-      dimensionScores.push(score)
+    try {
+      [campaignInfo, transcripts] = await Promise.all([
+        fetchCampaignInfo(campaignId),
+        fetchCampaignTranscripts(campaignId)
+      ])
+    } catch (error) {
+      console.error('[Synthesis] Database fetch error:', error)
+      throw new DatabaseError('fetch campaign data', {
+        campaignId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
     }
 
-    // Calculate pillar score as average of dimensions
-    const pillarScore = dimensionScores.reduce((sum, d) => sum + d.score, 0) / dimensionScores.length
+    // Determine which AI model to use based on report tier
+    const reportTier = campaignInfo.report_tier || 'standard'
+    const modelId = getModelForTier(reportTier)
+    console.log(`[Synthesis] Using AI model: ${modelId} (${reportTier} tier)`)
 
-    pillars.push({
-      pillar: pillarData.name,
-      score: pillarScore,
-      dimensions: dimensionScores
-    })
-  }
+    console.log(`[Synthesis] Analyzing ${transcripts.length} stakeholder transcripts`)
 
-  // Calculate overall readiness score (weighted average)
-  const overallScore = Object.entries(FRAMEWORK.pillars).reduce((sum, [key, pillarData], idx) => {
-    return sum + (pillars[idx].score * pillarData.weight)
-  }, 0)
+    // Validate we have interviews
+    if (transcripts.length === 0) {
+      throw new NoInterviewsError(campaignId)
+    }
 
-  console.log('Generating executive summary...')
-  const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars, modelId)
+    // Analyze all dimensions across all three pillars
+    const pillars: PillarScore[] = []
 
-  console.log('Extracting themes and contradictions...')
-  const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars, modelId)
+    for (const [, pillarData] of Object.entries(FRAMEWORK.pillars)) {
+      console.log(`[Synthesis] Analyzing ${pillarData.name} pillar...`)
 
-  console.log('Generating recommendations...')
-  const recommendations = await generateRecommendations(pillars, modelId)
+      const dimensionScores: DimensionalScore[] = []
 
-  console.log('Extracting stakeholder perspectives...')
-  const stakeholderPerspectives = extractStakeholderPerspectives(transcripts)
+      for (const dimension of pillarData.dimensions) {
+        console.log(`[Synthesis]   - Analyzing dimension: ${dimension.name}`)
+        const score = await analyzeDimension(dimension, transcripts, modelId)
+        dimensionScores.push(score)
+      }
 
-  console.log('Synthesis complete!')
+      // Calculate pillar score as average of dimensions
+      const pillarScore = dimensionScores.reduce((sum, d) => sum + d.score, 0) / dimensionScores.length
 
-  return {
-    overallScore,
-    pillars,
-    executiveSummary,
-    keyThemes: themes,
-    contradictions,
-    recommendations,
-    stakeholderPerspectives
+      pillars.push({
+        pillar: pillarData.name,
+        score: pillarScore,
+        dimensions: dimensionScores
+      })
+    }
+
+    // Calculate overall readiness score (weighted average)
+    const overallScore = Object.entries(FRAMEWORK.pillars).reduce((sum, [, pillarData], idx) => {
+      return sum + (pillars[idx].score * pillarData.weight)
+    }, 0)
+
+    console.log('[Synthesis] Generating executive summary...')
+    const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars, modelId)
+
+    console.log('[Synthesis] Extracting themes and contradictions...')
+    const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars, modelId)
+
+    console.log('[Synthesis] Generating recommendations...')
+    const recommendations = await generateRecommendations(pillars, modelId)
+
+    console.log('[Synthesis] Extracting stakeholder perspectives...')
+    const stakeholderPerspectives = extractStakeholderPerspectives(transcripts)
+
+    console.log('[Synthesis] Synthesis complete!')
+
+    return {
+      overallScore,
+      pillars,
+      executiveSummary,
+      keyThemes: themes,
+      contradictions,
+      recommendations,
+      stakeholderPerspectives
+    }
+  } catch (error) {
+    // Log the error for debugging
+    console.error('[Synthesis] Synthesis failed:', error)
+
+    // Re-throw if already a classified error
+    if (error instanceof NoInterviewsError ||
+        error instanceof DatabaseError ||
+        error instanceof InvalidResponseError) {
+      throw error
+    }
+
+    // Classify and throw
+    throw classifyAnthropicError(error)
   }
 }

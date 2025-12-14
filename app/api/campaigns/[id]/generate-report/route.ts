@@ -14,6 +14,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, supabaseAdmin } from '@/lib/supabase/server';
 import { generateAccessToken } from '@/lib/utils/token-generator';
 import { synthesizeCampaign } from '@/lib/agents/synthesis-agent';
+import {
+  SynthesisError,
+  APIQuotaError,
+  APIRateLimitError,
+  APIAuthError,
+  NetworkError,
+  InvalidResponseError,
+  NoInterviewsError,
+  DatabaseError
+} from '@/lib/errors/synthesis-errors';
 
 export async function POST(
   request: NextRequest,
@@ -166,10 +176,127 @@ export async function POST(
         );
       }
 
-      // Run synthesis
+      // Run synthesis with error handling
       console.log('[Report Gen] Running synthesis agent...');
-      const assessment = await synthesizeCampaign(campaignId);
-      console.log('[Report Gen] Synthesis complete. Overall score:', assessment.overallScore);
+      let assessment;
+
+      try {
+        assessment = await synthesizeCampaign(campaignId);
+        console.log('[Report Gen] Synthesis complete. Overall score:', assessment.overallScore);
+      } catch (synthError) {
+        console.error('[Report Gen] Synthesis error:', synthError);
+
+        // Handle specific error types with user-friendly messages
+        if (synthError instanceof APIQuotaError) {
+          return NextResponse.json(
+            {
+              error: 'API Credits Required',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: false
+            },
+            { status: 402 } // Payment Required
+          );
+        }
+
+        if (synthError instanceof APIRateLimitError) {
+          return NextResponse.json(
+            {
+              error: 'Rate Limit Exceeded',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: true,
+              retryAfter: synthError.details?.retryAfter
+            },
+            { status: 429 } // Too Many Requests
+          );
+        }
+
+        if (synthError instanceof APIAuthError) {
+          return NextResponse.json(
+            {
+              error: 'API Authentication Error',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: false
+            },
+            { status: 500 }
+          );
+        }
+
+        if (synthError instanceof NetworkError) {
+          return NextResponse.json(
+            {
+              error: 'Network Error',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: true
+            },
+            { status: 503 } // Service Unavailable
+          );
+        }
+
+        if (synthError instanceof InvalidResponseError) {
+          return NextResponse.json(
+            {
+              error: 'Invalid AI Response',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: true,
+              details: synthError.details?.dimension
+            },
+            { status: 500 }
+          );
+        }
+
+        if (synthError instanceof NoInterviewsError) {
+          return NextResponse.json(
+            {
+              error: 'No Completed Interviews',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: false
+            },
+            { status: 400 }
+          );
+        }
+
+        if (synthError instanceof DatabaseError) {
+          return NextResponse.json(
+            {
+              error: 'Database Error',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: true
+            },
+            { status: 500 }
+          );
+        }
+
+        if (synthError instanceof SynthesisError) {
+          return NextResponse.json(
+            {
+              error: 'Synthesis Error',
+              userMessage: synthError.userMessage,
+              code: synthError.code,
+              retryable: synthError.retryable
+            },
+            { status: 500 }
+          );
+        }
+
+        // Unknown error
+        return NextResponse.json(
+          {
+            error: 'Synthesis Failed',
+            userMessage: 'An unexpected error occurred during report generation. Please try again or contact support if the issue persists.',
+            code: 'UNKNOWN_ERROR',
+            retryable: true,
+            details: synthError instanceof Error ? synthError.message : 'Unknown error'
+          },
+          { status: 500 }
+        );
+      }
 
       // Save synthesis to database
       const { data: savedSynthesis, error: saveError } = await (supabaseAdmin

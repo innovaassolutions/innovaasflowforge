@@ -46,6 +46,11 @@ export function ReportGenerationPanel({
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedReport, setGeneratedReport] = useState<GeneratedReport | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [errorDetails, setErrorDetails] = useState<{
+    userMessage?: string
+    code?: string
+    retryable?: boolean
+  } | null>(null)
   const [copiedUrl, setCopiedUrl] = useState(false)
   const [isTogglingAccess, setIsTogglingAccess] = useState(false)
   const [reportActive, setReportActive] = useState(true)
@@ -55,6 +60,7 @@ export function ReportGenerationPanel({
   const handleGenerate = async () => {
     setIsGenerating(true)
     setError(null)
+    setErrorDetails(null)
 
     try {
       const response = await fetch(apiUrl(`api/campaigns/${campaignId}/generate-report`), {
@@ -73,11 +79,21 @@ export function ReportGenerationPanel({
         setReportActive(data.report.is_active !== false) // Default to true if not specified
         onSuccess?.()
       } else {
+        // Capture detailed error information
         setError(data.error || 'Failed to generate report')
+        setErrorDetails({
+          userMessage: data.userMessage,
+          code: data.code,
+          retryable: data.retryable
+        })
       }
     } catch (err) {
       console.error('Report generation error:', err)
       setError('Network error - please try again')
+      setErrorDetails({
+        userMessage: 'Unable to connect to the server. Please check your internet connection and try again.',
+        retryable: true
+      })
     } finally {
       setIsGenerating(false)
     }
@@ -133,6 +149,7 @@ export function ReportGenerationPanel({
     setObservations('')
     setGeneratedReport(null)
     setError(null)
+    setErrorDetails(null)
     setCopiedUrl(false)
     setReportActive(true)
     onClose()
@@ -269,7 +286,25 @@ export function ReportGenerationPanel({
         {/* Error State */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-            <p className="text-sm text-red-400">{error}</p>
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-400 mb-1">{error}</p>
+                {errorDetails?.userMessage && (
+                  <p className="text-sm text-mocha-subtext1 mb-2">{errorDetails.userMessage}</p>
+                )}
+                {errorDetails?.code && (
+                  <p className="text-xs text-mocha-subtext0 font-mono">Error Code: {errorDetails.code}</p>
+                )}
+                {errorDetails?.retryable && (
+                  <p className="text-xs text-mocha-subtext1 mt-2">
+                    This error is temporary. Please try again.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
