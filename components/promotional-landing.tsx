@@ -126,10 +126,12 @@ export default function PromotionalLanding() {
             {/* Right: Industry Illustration + Mockup */}
             <div className="relative">
               {/* Character Illustration - positioned right side, hand pointing at mockup */}
-              <div className="absolute -right-40 bottom-4 w-52 h-52 z-10
-                              hidden md:block
-                              lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64
-                              xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72">
+              {/* Teacher illustration needs to be ~50% larger than others */}
+              <div className={`absolute z-10 hidden md:block
+                              ${industry === 'education'
+                                ? '-right-56 bottom-4 w-80 h-80 lg:-right-72 lg:bottom-6 lg:w-96 lg:h-96 xl:-right-80 xl:bottom-8 xl:w-[28rem] xl:h-[28rem]'
+                                : '-right-40 bottom-4 w-52 h-52 lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64 xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72'
+                              }`}>
                 <Image
                   src={content.illustration}
                   alt={`${content.name} professional`}
