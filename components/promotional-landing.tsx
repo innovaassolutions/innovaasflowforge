@@ -125,15 +125,17 @@ export default function PromotionalLanding() {
 
             {/* Right: Industry Illustration + Mockup */}
             <div className="relative">
-              {/* Character Illustration */}
-              <div className="absolute -left-16 -top-8 w-40 h-40 z-10
-                              hidden lg:block">
+              {/* Character Illustration - positioned right side, large and prominent */}
+              <div className="absolute -right-8 -bottom-8 w-48 h-48 z-10
+                              hidden md:block
+                              lg:-right-12 lg:-bottom-12 lg:w-64 lg:h-64
+                              xl:-right-16 xl:-bottom-16 xl:w-80 xl:h-80">
                 <Image
                   src={content.illustration}
                   alt={`${content.name} professional`}
-                  width={160}
-                  height={160}
-                  className="object-contain drop-shadow-lg"
+                  width={320}
+                  height={320}
+                  className="object-contain drop-shadow-2xl"
                   unoptimized
                 />
               </div>
