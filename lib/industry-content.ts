@@ -207,15 +207,15 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     accentColorLight: 'hsl(220, 70%, 93%)',
     heroHeadline: 'Transform Learning Outcomes Through Strategic Insight',
     heroHighlight: 'Learning Outcomes',
-    heroDescription: 'AI-powered assessment platform that interviews faculty, administrators, and staff to identify institutional strengths, gaps, and pathways to educational excellence.',
+    heroDescription: 'AI-powered assessment platform that interviews faculty, administrators, parents, and staff to identify institutional strengths, gaps, and pathways to educational excellence.',
     valueProps: [
       {
-        title: 'Stakeholder Voice',
-        description: 'Hear from every faculty member, not just the vocal few'
+        title: 'Complete Stakeholder Voice',
+        description: 'Hear from faculty, staff, and parents - not just the vocal few'
       },
       {
-        title: 'Data-Driven Planning',
-        description: 'Replace opinion with evidence in strategic decisions'
+        title: 'Parent Satisfaction Insights',
+        description: 'Understand what drives family engagement and institutional loyalty'
       },
       {
         title: 'Accreditation Ready',
@@ -233,12 +233,12 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
         ]
       },
       {
-        title: 'IT Directors',
-        description: 'Evaluate EdTech adoption and infrastructure readiness across campuses.',
+        title: 'Parent & Family Engagement',
+        description: 'Capture parent perspectives on educational quality, communication, and institutional value.',
         benefits: [
-          'LMS effectiveness assessment',
-          'Technology integration gaps',
-          'Digital equity evaluation'
+          'Parent satisfaction drivers',
+          'Communication effectiveness',
+          'Enrollment decision factors'
         ]
       },
       {
@@ -253,8 +253,8 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     ],
     painPoints: [
       {
-        title: 'Faculty Engagement',
-        description: 'Getting meaningful input from busy faculty is hard. AI interviews fit their schedule, not yours.'
+        title: 'Parent Voice Gap',
+        description: 'Parents influence enrollment and retention but rarely get heard. AI interviews capture what surveys miss.'
       },
       {
         title: 'Accreditation Pressure',
@@ -268,9 +268,9 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     ctaPrimary: 'Start Institutional Assessment',
     ctaSecondary: 'See Education Demo',
     stats: [
-      { value: '500+', label: 'Faculty voices captured' },
-      { value: '85%', label: 'Higher response rates than surveys' },
-      { value: '2 Weeks', label: 'Complete institutional assessment' }
+      { value: '500+', label: 'Faculty & parent voices' },
+      { value: '85%', label: 'Higher response than surveys' },
+      { value: '2 Weeks', label: 'Complete assessment' }
     ],
     heroMockup: 'education'
   },

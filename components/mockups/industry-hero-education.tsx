@@ -39,49 +39,49 @@ export default function IndustryHeroEducation() {
 
       {/* Institution info */}
       <text x="140" y="125" fontSize="16" fontWeight="600" fill="#171614">State University</text>
-      <text x="140" y="145" fontSize="12" fill="#78716C">Digital Learning Readiness • 85 Faculty</text>
+      <text x="140" y="145" fontSize="12" fill="#78716C">Complete Assessment • Faculty + Parents</text>
 
       {/* Response stats */}
       <rect x="60" y="175" width="340" height="70" rx="12" fill="#3B82F6" fillOpacity="0.05" />
-      <g transform="translate(80, 195)">
-        <text x="0" y="0" fontSize="28" fontWeight="700" fill="#3B82F6">85%</text>
-        <text x="0" y="20" fontSize="10" fill="#78716C">Response Rate</text>
+      <g transform="translate(75, 195)">
+        <text x="0" y="0" fontSize="24" fontWeight="700" fill="#3B82F6">72</text>
+        <text x="0" y="18" fontSize="9" fill="#78716C">Faculty</text>
       </g>
-      <g transform="translate(180, 195)">
-        <text x="0" y="0" fontSize="28" fontWeight="700" fill="#6366F1">72</text>
-        <text x="0" y="20" fontSize="10" fill="#78716C">Interviews</text>
+      <g transform="translate(145, 195)">
+        <text x="0" y="0" fontSize="24" fontWeight="700" fill="#22C55E">248</text>
+        <text x="0" y="18" fontSize="9" fill="#78716C">Parents</text>
       </g>
-      <g transform="translate(280, 195)">
-        <text x="0" y="0" fontSize="28" fontWeight="700" fill="#8B5CF6">6</text>
-        <text x="0" y="20" fontSize="10" fill="#78716C">Departments</text>
+      <g transform="translate(225, 195)">
+        <text x="0" y="0" fontSize="24" fontWeight="700" fill="#6366F1">85%</text>
+        <text x="0" y="18" fontSize="9" fill="#78716C">Response</text>
       </g>
-
-      {/* Sentiment analysis */}
-      <text x="60" y="275" fontSize="11" fontWeight="600" fill="#78716C">FACULTY SENTIMENT</text>
-
-      <g transform="translate(60, 290)">
-        {/* Positive */}
-        <rect x="0" y="0" width="110" height="50" rx="8" fill="#22C55E" fillOpacity="0.1" />
-        <text x="55" y="20" fontSize="20" fontWeight="700" fill="#22C55E" textAnchor="middle">62%</text>
-        <text x="55" y="38" fontSize="9" fill="#78716C" textAnchor="middle">Supportive</text>
-
-        {/* Neutral */}
-        <rect x="120" y="0" width="110" height="50" rx="8" fill="#F59E0B" fillOpacity="0.1" />
-        <text x="175" y="20" fontSize="20" fontWeight="700" fill="#F59E0B" textAnchor="middle">28%</text>
-        <text x="175" y="38" fontSize="9" fill="#78716C" textAnchor="middle">Cautious</text>
-
-        {/* Resistant */}
-        <rect x="240" y="0" width="100" height="50" rx="8" fill="#EF4444" fillOpacity="0.1" />
-        <text x="290" y="20" fontSize="20" fontWeight="700" fill="#EF4444" textAnchor="middle">10%</text>
-        <text x="290" y="38" fontSize="9" fill="#78716C" textAnchor="middle">Resistant</text>
+      <g transform="translate(305, 195)">
+        <text x="0" y="0" fontSize="24" fontWeight="700" fill="#8B5CF6">6</text>
+        <text x="0" y="18" fontSize="9" fill="#78716C">Depts</text>
       </g>
 
-      {/* Key theme */}
-      <rect x="60" y="360" width="340" height="60" rx="8" fill="#FFFEFB" stroke="#3B82F6" strokeWidth="1" />
-      <circle cx="85" cy="390" r="12" fill="#3B82F6" />
-      <text x="83" y="394" fontSize="12" fill="white" textAnchor="middle">#1</text>
-      <text x="105" y="382" fontSize="12" fontWeight="600" fill="#171614">Top Faculty Concern</text>
-      <text x="105" y="400" fontSize="11" fill="#78716C">"Need more training before adopting new EdTech"</text>
+      {/* Parent Satisfaction Score */}
+      <text x="60" y="270" fontSize="11" fontWeight="600" fill="#78716C">PARENT SATISFACTION</text>
+
+      <g transform="translate(60, 283)">
+        <rect x="0" y="0" width="340" height="50" rx="8" fill="#22C55E" fillOpacity="0.05" />
+        <circle cx="30" cy="25" r="20" stroke="#22C55E" strokeWidth="4" fill="none" />
+        <circle cx="30" cy="25" r="20" stroke="#E7E5E4" strokeWidth="4" fill="none" strokeDasharray="126" strokeDashoffset="126" />
+        <circle cx="30" cy="25" r="20" stroke="#22C55E" strokeWidth="4" fill="none" strokeDasharray="126" strokeDashoffset="23" strokeLinecap="round" transform="rotate(-90 30 25)">
+          <animate attributeName="stroke-dashoffset" from="126" to="23" dur="1s" fill="freeze" />
+        </circle>
+        <text x="30" y="29" fontSize="11" fontWeight="700" fill="#22C55E" textAnchor="middle">82%</text>
+
+        <text x="65" y="18" fontSize="11" fontWeight="600" fill="#171614">Parents recommend institution</text>
+        <text x="65" y="34" fontSize="10" fill="#78716C">+8% vs last year • Top driver: Communication</text>
+      </g>
+
+      {/* Key insight */}
+      <rect x="60" y="350" width="340" height="55" rx="8" fill="#FFFEFB" stroke="#3B82F6" strokeWidth="1" />
+      <circle cx="85" cy="377" r="12" fill="#F59E0B" />
+      <text x="83" y="381" fontSize="12" fill="white" textAnchor="middle">!</text>
+      <text x="105" y="370" fontSize="11" fontWeight="600" fill="#171614">Gap Identified</text>
+      <text x="105" y="386" fontSize="10" fill="#78716C">Parents want more progress updates - faculty unaware</text>
 
       {/* Accreditation tag */}
       <rect x="60" y="430" width="340" height="35" rx="6" fill="#F5F5F4" />
@@ -152,19 +152,19 @@ export default function IndustryHeroEducation() {
       </g>
 
       <g transform="translate(510, 350)">
-        <rect x="0" y="0" width="320" height="40" rx="6" fill="#6366F1" fillOpacity="0.1" />
-        <circle cx="20" cy="20" r="12" fill="#6366F1" />
+        <rect x="0" y="0" width="320" height="40" rx="6" fill="#22C55E" fillOpacity="0.1" />
+        <circle cx="20" cy="20" r="12" fill="#22C55E" />
         <text x="20" y="24" fontSize="10" fill="white" textAnchor="middle">2</text>
-        <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Pilot hybrid learning in Health Sciences</text>
-        <text x="42" y="30" fontSize="9" fill="#78716C">Lowest readiness dept - targeted intervention</text>
+        <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Implement parent progress portal</text>
+        <text x="42" y="30" fontSize="9" fill="#78716C">Address #1 parent request - boost satisfaction 12%</text>
       </g>
 
       <g transform="translate(510, 400)">
         <rect x="0" y="0" width="320" height="40" rx="6" fill="#8B5CF6" fillOpacity="0.1" />
         <circle cx="20" cy="20" r="12" fill="#8B5CF6" />
         <text x="20" y="24" fontSize="10" fill="white" textAnchor="middle">3</text>
-        <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Leverage Business School champions</text>
-        <text x="42" y="30" fontSize="9" fill="#78716C">Peer mentoring from highest-readiness dept</text>
+        <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Pilot hybrid learning in Health Sciences</text>
+        <text x="42" y="30" fontSize="9" fill="#78716C">Lowest digital readiness - targeted support</text>
       </g>
     </svg>
   )

@@ -37,14 +37,18 @@ export default function PromotionalLanding() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Industry Selector Bar */}
-      <div className="bg-muted border-b border-border py-3 px-4
-                      sm:py-4">
-        <div className="max-w-7xl mx-auto flex flex-col items-center gap-2
-                        sm:flex-row sm:justify-between">
-          <span className="text-sm text-muted-foreground">
-            Select your industry:
-          </span>
+      {/* Industry Selector Bar - Prominent */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-brand-teal/10 border-b-2 border-primary/20 py-4 px-4
+                      sm:py-5">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-3
+                        sm:flex-row sm:justify-center sm:gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            <span className="text-base font-semibold text-foreground
+                             sm:text-lg">
+              Choose Your Industry
+            </span>
+          </div>
           <IndustrySelector
             selected={industry}
             onSelect={setIndustry}
