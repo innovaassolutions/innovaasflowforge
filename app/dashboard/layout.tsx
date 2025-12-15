@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
@@ -83,9 +84,11 @@ export default function DashboardLayout({
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <img
+          <Image
             src="/icon-orb.svg"
             alt="Innovaas FlowForge"
+            width={40}
+            height={40}
             className="w-10 h-10 shrink-0"
           />
           <div className="hidden sm:block">
@@ -117,9 +120,11 @@ export default function DashboardLayout({
                 <p className="text-sm text-muted-foreground">
                   FlowForge version 1.0.0 · by
                 </p>
-                <img
-                  src="/flowforge/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+                <Image
+                  src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
                   alt="Innovaas"
+                  width={120}
+                  height={28}
                   className="h-7 w-auto"
                 />
               </div>

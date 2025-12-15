@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Home } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
@@ -31,9 +32,11 @@ export default function GlobalHeader() {
           <Link
             href="/"
             className="flex items-center gap-3 text-foreground hover:text-primary transition-colors group">
-            <img
+            <Image
               src="/icon-orb.svg"
               alt="Innovaas FlowForge"
+              width={40}
+              height={40}
               className="w-10 h-10"
             />
             <div className="hidden sm:block">
