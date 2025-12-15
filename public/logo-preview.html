@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge Logo Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --teal: #1D9BA3;
+      --border: #E6E2D6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .concept-box {
+      background: linear-gradient(135deg, rgba(242, 92, 5, 0.08), rgba(29, 155, 163, 0.08));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .concept-box h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .concept-box p {
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .preview-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .preview-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(242, 92, 5, 0.1);
+    }
+
+    .preview-card.dark {
+      background: var(--text);
+    }
+
+    .preview-card h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .preview-card.dark h3 {
+      color: #9ca3af;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+    }
+
+    .logo-container svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .icon-sizes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .icon-size {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-size span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .preview-card.dark .icon-size span {
+      color: #9ca3af;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch-color {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .swatch-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .design-notes {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 40px;
+    }
+
+    .design-notes h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .design-notes ul {
+      color: var(--text-muted);
+      line-height: 1.8;
+      padding-left: 20px;
+    }
+
+    .design-notes li {
+      margin-bottom: 8px;
+    }
+
+    .design-notes strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FlowForge Logo System</h1>
+    <p class="subtitle">Pearl Vibrant Theme - "Unlocking Flow" Concept</p>
+
+    <div class="concept-box">
+      <h2>Brand Concept: Unlocking Flow</h2>
+      <p>
+        FlowForge helps organizations unlock their hidden potential. By working through an organization's
+        current state and identifying opportunities for improvement, we unlock <strong>Flow</strong> -
+        new value, new revenue opportunities, cultural alignment, and enhanced organizational value for everyone.
+        The logo represents this moment of breakthrough and release - two shapes opening to reveal flowing energy.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Full Logo</h2>
+      <div class="preview-grid">
+        <div class="preview-card">
+          <h3>Light Background</h3>
+          <div class="logo-container">
+            <svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="flowGradientLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F25C05"/>
+                  <stop offset="100%" stop-color="#1D9BA3"/>
+                </linearGradient>
+              </defs>
+              <!-- Left opening shape -->
+              <path d="M6 15 C6 10 10 5 18 5 L22 5 L22 35 C22 40 18 45 14 45 L14 75 C14 75 6 70 6 60 L6 15 Z" fill="#F25C05"/>
+              <!-- Right opening shape -->
+              <path d="M54 15 C54 10 50 5 42 5 L38 5 L38 35 C38 40 42 45 46 45 L46 75 C46 75 54 70 54 60 L54 15 Z" fill="#1D9BA3"/>
+              <!-- Central flow element -->
+              <path d="M26 20 C26 15 28 10 30 10 C32 10 34 15 34 20 L34 30 C34 35 36 40 40 40 L40 50 C36 50 34 55 34 60 L34 70 C34 75 32 80 30 80 C28 80 26 75 26 70 L26 60 C26 55 24 50 20 50 L20 40 C24 40 26 35 26 30 L26 20 Z" fill="url(#flowGradientLogo)"/>
+              <!-- Wordmark -->
+              <text x="75" y="52" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="36" font-weight="600" fill="#171614">FlowForge</text>
+            </svg>
+          </div>
+        </div>
+        <div class="preview-card dark">
+          <h3>Dark Background</h3>
+          <div class="logo-container">
+            <svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="flowGradientLogoDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F25C05"/>
+                  <stop offset="100%" stop-color="#1D9BA3"/>
+                </linearGradient>
+              </defs>
+              <!-- Left opening shape -->
+              <path d="M6 15 C6 10 10 5 18 5 L22 5 L22 35 C22 40 18 45 14 45 L14 75 C14 75 6 70 6 60 L6 15 Z" fill="#F25C05"/>
+              <!-- Right opening shape -->
+              <path d="M54 15 C54 10 50 5 42 5 L38 5 L38 35 C38 40 42 45 46 45 L46 75 C46 75 54 70 54 60 L54 15 Z" fill="#1D9BA3"/>
+              <!-- Central flow element -->
+              <path d="M26 20 C26 15 28 10 30 10 C32 10 34 15 34 20 L34 30 C34 35 36 40 40 40 L40 50 C36 50 34 55 34 60 L34 70 C34 75 32 80 30 80 C28 80 26 75 26 70 L26 60 C26 55 24 50 20 50 L20 40 C24 40 26 35 26 30 L26 20 Z" fill="url(#flowGradientLogoDark)"/>
+              <!-- Wordmark (white for dark background) -->
+              <text x="75" y="52" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="36" font-weight="600" fill="#FFFEFB">FlowForge</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Icon Mark</h2>
+      <div class="preview-grid">
+        <div class="preview-card">
+          <h3>Light Background</h3>
+          <div class="icon-sizes">
+            <div class="icon-size">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient64" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient64)"/>
+              </svg>
+              <span>64px</span>
+            </div>
+            <div class="icon-size">
+              <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient32" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient32)"/>
+              </svg>
+              <span>32px</span>
+            </div>
+            <div class="icon-size">
+              <svg width="16" height="16" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient16" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient16)"/>
+              </svg>
+              <span>16px</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-card dark">
+          <h3>Dark Background</h3>
+          <div class="icon-sizes">
+            <div class="icon-size">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient64d" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient64d)"/>
+              </svg>
+              <span>64px</span>
+            </div>
+            <div class="icon-size">
+              <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient32d" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient32d)"/>
+              </svg>
+              <span>32px</span>
+            </div>
+            <div class="icon-size">
+              <svg width="16" height="16" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="flowGradient16d" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#F25C05"/>
+                    <stop offset="100%" stop-color="#1D9BA3"/>
+                  </linearGradient>
+                </defs>
+                <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+                <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+                <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient16d)"/>
+              </svg>
+              <span>16px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Brand Colors</h2>
+      <div class="color-swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #F25C05"></div>
+          <span class="swatch-label">Primary (Orange)</span>
+          <span class="swatch-hex">#F25C05</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #1D9BA3"></div>
+          <span class="swatch-label">Secondary (Teal)</span>
+          <span class="swatch-hex">#1D9BA3</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #171614"></div>
+          <span class="swatch-label">Text</span>
+          <span class="swatch-hex">#171614</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #FFFEFB; border: 1px solid #71706B"></div>
+          <span class="swatch-label">Background</span>
+          <span class="swatch-hex">#FFFEFB</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="design-notes">
+      <h2>Design Notes</h2>
+      <ul>
+        <li><strong>Left Shape (Orange):</strong> Represents the organization's current state, the constraint that's being opened</li>
+        <li><strong>Right Shape (Teal):</strong> Represents the desired future state, the potential waiting to be unlocked</li>
+        <li><strong>Central Flow (Gradient):</strong> The flowing energy released when constraints are removed - the value, revenue, and alignment that emerges</li>
+        <li><strong>Visual Metaphor:</strong> Two barriers opening outward, revealing dynamic flow between them - the moment of breakthrough</li>
+        <li><strong>Scalability:</strong> Clean geometry ensures the icon remains recognizable at 16px while being visually striking at larger sizes</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

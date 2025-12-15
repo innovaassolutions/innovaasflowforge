@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F25C05"/>
+      <stop offset="100%" stop-color="#1D9BA3"/>
+    </linearGradient>
+  </defs>
+  <!-- Two shapes diverging/opening to reveal flow -->
+  <!-- Left shape - opening outward -->
+  <path d="M8 12 C8 8 12 4 20 4 L24 4 L24 28 C24 32 20 36 16 36 L16 60 C16 60 8 56 8 48 L8 12 Z" fill="#F25C05"/>
+  <!-- Right shape - opening outward -->
+  <path d="M56 12 C56 8 52 4 44 4 L40 4 L40 28 C40 32 44 36 48 36 L48 60 C48 60 56 56 56 48 L56 12 Z" fill="#1D9BA3"/>
+  <!-- Central flowing element - the "unlocked" flow -->
+  <path d="M28 16 C28 12 30 8 32 8 C34 8 36 12 36 16 L36 24 C36 28 38 32 42 32 L42 40 C38 40 36 44 36 48 L36 56 C36 60 34 64 32 64 C30 64 28 60 28 56 L28 48 C28 44 26 40 22 40 L22 32 C26 32 28 28 28 24 L28 16 Z" fill="url(#flowGradient)"/>
+</svg>
