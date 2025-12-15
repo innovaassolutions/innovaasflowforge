@@ -352,6 +352,7 @@ export default function StakeholderWelcomePage() {
               width={120}
               height={28}
               className="h-7 w-auto"
+              unoptimized
             />
           </div>
         </div>

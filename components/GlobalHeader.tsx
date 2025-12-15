@@ -38,6 +38,7 @@ export default function GlobalHeader() {
               width={40}
               height={40}
               className="w-10 h-10"
+              unoptimized
             />
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold">Innovaas FlowForge</h1>

@@ -134,6 +134,7 @@ export default function PromotionalLanding() {
                   width={160}
                   height={160}
                   className="object-contain drop-shadow-lg"
+                  unoptimized
                 />
               </div>
               <div className="rounded-lg overflow-hidden shadow-2xl">

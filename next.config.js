@@ -8,6 +8,10 @@ const nextConfig = {
 	},
 	images: {
 		domains: ['tlynzgbxrnujphaatagu.supabase.co'],
+		// Enable SVG support with security settings
+		dangerouslyAllowSVG: true,
+		contentDispositionType: 'attachment',
+		contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
 	},
 }
 

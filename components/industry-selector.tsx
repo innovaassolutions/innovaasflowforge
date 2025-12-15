@@ -89,6 +89,7 @@ export default function IndustrySelector({
                   fill
                   className={`object-contain transition-all
                               ${isSelected ? 'opacity-100' : 'opacity-70 grayscale-[30%]'}`}
+                  unoptimized
                 />
               </div>
               <span className={`text-sm font-semibold text-center

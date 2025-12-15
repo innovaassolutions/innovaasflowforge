@@ -90,6 +90,7 @@ export default function DashboardLayout({
             width={40}
             height={40}
             className="w-10 h-10 shrink-0"
+            unoptimized
           />
           <div className="hidden sm:block">
             <h1 className="text-sm font-bold text-foreground">Innovaas FlowForge</h1>
@@ -126,6 +127,7 @@ export default function DashboardLayout({
                   width={120}
                   height={28}
                   className="h-7 w-auto"
+                  unoptimized
                 />
               </div>
             </div>
