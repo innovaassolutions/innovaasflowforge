@@ -2,135 +2,245 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Catppuccin Mocha + Innovaas Blend */
-  --background: #1e1e2e;
-  --foreground: #cdd6f4;
+/* ============================================
+   Pearl Vibrant Theme - Warm Light Design System
+   Based on UX Design Specification v1.0
+   ============================================ */
 
-  /* Brand colors */
+:root {
+  /* --------------------------------------------------
+     Core Background Colors (Warm Cream Base)
+     -------------------------------------------------- */
+  --background: 60 33% 99%;           /* #FFFEFB - Main page backgrounds */
+  --background-subtle: 43 33% 97%;    /* #FAF8F3 - Cards, inputs, sidebars */
+  --background-muted: 43 20% 93%;     /* #F2EFE7 - Hover states, dividers */
+
+  /* --------------------------------------------------
+     Foreground / Text Colors
+     -------------------------------------------------- */
+  --foreground: 40 7% 9%;             /* #171614 - Primary text */
+  --muted-foreground: 40 3% 44%;      /* #71706B - Secondary/muted text */
+
+  /* --------------------------------------------------
+     Brand Accent Colors (Vibrant Orange)
+     -------------------------------------------------- */
+  --accent: 22 97% 48%;               /* #F25C05 - CTAs, links, highlights */
+  --accent-hover: 22 95% 44%;         /* #DC5204 - Button hover states */
+  --accent-subtle: 22 88% 97%;        /* #FEF5EE - Badge backgrounds */
+  --accent-foreground: 0 0% 100%;     /* White text on accent */
+
+  /* --------------------------------------------------
+     Structural Colors
+     -------------------------------------------------- */
+  --border: 43 18% 87%;               /* #E6E2D6 - Borders, separators */
+  --input: 43 33% 97%;                /* Same as background-subtle */
+  --ring: 22 97% 48%;                 /* Same as accent for focus rings */
+
+  /* --------------------------------------------------
+     Semantic Component Colors (shadcn mapping)
+     -------------------------------------------------- */
+  --card: 43 33% 97%;                 /* Cards use subtle background */
+  --card-foreground: 40 7% 9%;        /* Same as foreground */
+
+  --popover: 60 33% 99%;              /* Popovers use main background */
+  --popover-foreground: 40 7% 9%;     /* Same as foreground */
+
+  --primary: 22 97% 48%;              /* Primary = Accent (Orange) */
+  --primary-foreground: 0 0% 100%;    /* White text on primary */
+
+  --secondary: 43 20% 93%;            /* Secondary = Muted background */
+  --secondary-foreground: 40 7% 9%;   /* Dark text on secondary */
+
+  --muted: 43 20% 93%;                /* Muted backgrounds */
+
+  /* --------------------------------------------------
+     Status/Semantic Colors
+     -------------------------------------------------- */
+  --success: 142 76% 36%;             /* #16A34A - Completed states */
+  --success-subtle: 142 76% 93%;      /* #DCFCE7 - Success backgrounds */
+  --success-foreground: 0 0% 100%;    /* White text on success */
+
+  --warning: 45 93% 40%;              /* #CA8A04 - Pending states */
+  --warning-subtle: 48 96% 89%;       /* #FEF9C3 - Warning backgrounds */
+  --warning-foreground: 40 7% 9%;     /* Dark text on warning */
+
+  --destructive: 0 84% 50%;           /* #DC2626 - Error states */
+  --destructive-subtle: 0 93% 94%;    /* #FEE2E2 - Error backgrounds */
+  --destructive-foreground: 0 0% 100%; /* White text on destructive */
+
+  /* --------------------------------------------------
+     Chart Colors (Data Visualization)
+     -------------------------------------------------- */
+  --chart-1: 22 97% 48%;              /* Orange (Primary) */
+  --chart-2: 180 70% 38%;             /* Teal (Secondary) */
+  --chart-3: 142 76% 36%;             /* Green (Success) */
+  --chart-4: 45 93% 40%;              /* Amber (Warning) */
+  --chart-5: 262 83% 58%;             /* Purple (Accent) */
+
+  /* --------------------------------------------------
+     Design Tokens
+     -------------------------------------------------- */
+  --radius: 0.5rem;                   /* 8px - Base border radius */
+
+  /* Legacy brand colors (for backward compatibility) */
   --brand-orange: #F25C05;
-  --brand-orange-dark: #D94C04;
+  --brand-orange-dark: #DC5204;
   --brand-teal: #1D9BA3;
   --brand-teal-dark: #14737A;
-
-  /* Mocha base colors */
-  --mocha-base: #1e1e2e;
-  --mocha-mantle: #181825;
-  --mocha-crust: #11111b;
-
-  /* Mocha surface colors */
-  --mocha-surface0: #313244;
-  --mocha-surface1: #45475a;
-  --mocha-surface2: #585b70;
-
-  /* Mocha overlay colors */
-  --mocha-overlay0: #6c7086;
-  --mocha-overlay1: #7f849c;
-  --mocha-overlay2: #9399b2;
-
-  /* Mocha text colors */
-  --mocha-text: #cdd6f4;
-  --mocha-subtext1: #bac2de;
-  --mocha-subtext0: #a6adc8;
 }
+
+/* ============================================
+   Base Layer - Global Styles
+   ============================================ */
 
 @layer base {
   * {
-    @apply border-mocha-overlay0;
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
   }
 
   body {
-    @apply bg-mocha-base text-mocha-text;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Custom scrollbar for Mocha theme */
+  /* Typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+
+  h4 {
+    @apply text-lg md:text-xl;
+  }
+
+  /* Custom scrollbar for warm theme */
   ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-2 h-2;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-mocha-mantle;
+    background: hsl(var(--background-subtle));
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-mocha-overlay0 rounded-full;
+    background: hsl(var(--border));
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-mocha-overlay1;
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Selection highlight */
+  ::selection {
+    background: hsl(var(--accent) / 0.2);
+    color: hsl(var(--foreground));
   }
 }
 
+/* ============================================
+   Component Layer - Custom Components
+   ============================================ */
+
 @layer components {
-  /* Primary button - Innovaas orange */
+  /* --------------------------------------------------
+     Legacy Button Classes (for migration period)
+     Will be replaced by shadcn Button component
+     -------------------------------------------------- */
   .btn-primary {
-    @apply bg-brand-orange text-white px-4 py-2 rounded-lg font-medium;
-    @apply hover:bg-brand-orange-dark transition-colors;
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 focus:ring-offset-mocha-base;
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-[hsl(var(--accent-hover))] transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Secondary button - Innovaas teal */
   .btn-secondary {
-    @apply bg-brand-teal text-white px-4 py-2 rounded-lg font-medium;
-    @apply hover:bg-brand-teal-dark transition-colors;
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2 focus:ring-offset-mocha-base;
+    @apply bg-secondary text-secondary-foreground px-4 py-2 rounded-lg font-medium;
+    @apply border border-border;
+    @apply hover:bg-muted transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Ghost button */
   .btn-ghost {
-    @apply bg-mocha-surface0 text-mocha-text px-4 py-2 rounded-lg font-medium;
-    @apply hover:bg-mocha-surface1 transition-colors;
-    @apply focus:outline-none focus:ring-2 focus:ring-mocha-overlay1 focus:ring-offset-2 focus:ring-offset-mocha-base;
+    @apply bg-transparent text-foreground px-4 py-2 rounded-lg font-medium;
+    @apply hover:bg-muted transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
-  /* Card component */
+  /* --------------------------------------------------
+     Legacy Card Classes (for migration period)
+     Will be replaced by shadcn Card component
+     -------------------------------------------------- */
   .card {
-    @apply bg-mocha-surface0 rounded-xl p-6 border border-mocha-overlay0;
-    @apply shadow-lg shadow-mocha-crust/50;
+    @apply bg-card rounded-xl p-6 border border-border;
+    @apply shadow-sm;
   }
 
-  /* Elevated card */
   .card-elevated {
-    @apply bg-mocha-surface1 rounded-xl p-6 border border-mocha-overlay1;
-    @apply shadow-xl shadow-mocha-crust/70;
+    @apply bg-card rounded-xl p-6 border border-border;
+    @apply shadow-md;
   }
 
-  /* Input field */
+  /* --------------------------------------------------
+     Legacy Input Classes (for migration period)
+     Will be replaced by shadcn Input component
+     -------------------------------------------------- */
   .input {
-    @apply bg-mocha-surface0 text-mocha-text px-4 py-2 rounded-lg;
-    @apply border border-mocha-overlay0;
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent;
-    @apply placeholder:text-mocha-subtext0;
+    @apply bg-input text-foreground px-4 py-2 rounded-lg;
+    @apply border border-border;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+    @apply placeholder:text-muted-foreground;
   }
 
-  /* Link styling */
+  /* --------------------------------------------------
+     Link Styling
+     -------------------------------------------------- */
   .link {
-    @apply text-brand-teal hover:text-brand-teal-dark transition-colors;
+    @apply text-primary hover:text-[hsl(var(--accent-hover))] transition-colors;
     @apply underline-offset-4 hover:underline;
   }
 
-  /* Badge component */
+  /* --------------------------------------------------
+     Badge Components
+     -------------------------------------------------- */
   .badge {
     @apply px-3 py-1 rounded-full text-sm font-medium;
   }
 
   .badge-success {
-    @apply bg-mocha-green/20 text-mocha-green border border-mocha-green/30;
+    @apply bg-[hsl(var(--success-subtle))] text-[hsl(var(--success))] border border-[hsl(var(--success)/0.3)];
   }
 
   .badge-warning {
-    @apply bg-mocha-yellow/20 text-mocha-yellow border border-mocha-yellow/30;
+    @apply bg-[hsl(var(--warning-subtle))] text-[hsl(var(--warning))] border border-[hsl(var(--warning)/0.3)];
   }
 
   .badge-error {
-    @apply bg-mocha-red/20 text-mocha-red border border-mocha-red/30;
+    @apply bg-[hsl(var(--destructive-subtle))] text-destructive border border-destructive/30;
   }
 
   .badge-info {
-    @apply bg-mocha-sky/20 text-mocha-sky border border-mocha-sky/30;
+    @apply bg-[hsl(var(--accent-subtle))] text-primary border border-primary/30;
   }
 }
+
+/* ============================================
+   Utility Layer - Custom Utilities
+   ============================================ */
 
 @layer utilities {
   .text-balance {
@@ -139,15 +249,78 @@
 
   /* Gradient backgrounds */
   .bg-gradient-brand {
-    @apply bg-gradient-to-r from-brand-orange to-brand-teal;
+    @apply bg-gradient-to-r from-[#F25C05] to-[#1D9BA3];
   }
 
-  .bg-gradient-mocha {
-    @apply bg-gradient-to-br from-mocha-surface0 to-mocha-surface2;
+  .bg-gradient-warm {
+    @apply bg-gradient-to-br from-[hsl(var(--background))] to-[hsl(var(--background-subtle))];
   }
 
-  /* Glass morphism effect */
+  /* Soft shadow utilities */
+  .shadow-soft {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .shadow-soft-lg {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Glass morphism effect (light mode) */
   .glass {
-    @apply bg-mocha-surface0/80 backdrop-blur-lg border border-mocha-overlay0/50;
+    @apply bg-white/80 backdrop-blur-lg border border-border/50;
   }
+
+  /* Container max-width utilities */
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4;
+  }
+
+  .container-wide {
+    @apply max-w-6xl mx-auto px-4;
+  }
+}
+
+/* ============================================
+   Animation Utilities (via tailwindcss-animate)
+   ============================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }

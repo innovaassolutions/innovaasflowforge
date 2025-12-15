@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge - Color Theme Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Theme A: Warm Cream with Burnt Orange */
+      --a-bg: #FAF7F2;
+      --a-bg-subtle: #F5F0E8;
+      --a-bg-muted: #EDE6DA;
+      --a-border: #E5DDD0;
+      --a-text: #1A1A1A;
+      --a-text-muted: #6B6B6B;
+      --a-accent: #E85A1B;
+      --a-accent-hover: #D14E14;
+      --a-accent-subtle: #FDF2EE;
+
+      /* Theme B: Off-White with Terracotta */
+      --b-bg: #FDFCFA;
+      --b-bg-subtle: #F8F6F1;
+      --b-bg-muted: #F0EDE5;
+      --b-border: #E8E3D9;
+      --b-text: #2D2A26;
+      --b-text-muted: #7A756D;
+      --b-accent: #C4562A;
+      --b-accent-hover: #A84620;
+      --b-accent-subtle: #FCF4F0;
+
+      /* Theme C: Pearl with Vibrant Orange */
+      --c-bg: #FFFEFB;
+      --c-bg-subtle: #FAF8F3;
+      --c-bg-muted: #F2EFE7;
+      --c-border: #E6E2D6;
+      --c-text: #171614;
+      --c-text-muted: #71706B;
+      --c-accent: #F25C05;
+      --c-accent-hover: #DC5204;
+      --c-accent-subtle: #FEF5EE;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F5F5F5;
+      color: #1A1A1A;
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+      color: white;
+      padding: 60px 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1A1A1A;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    /* Theme Cards Grid */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 80px;
+    }
+
+    @media (max-width: 1100px) {
+      .themes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .theme-card {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .theme-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+
+    .theme-header {
+      padding: 24px;
+      border-bottom: 1px solid;
+    }
+
+    .theme-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .theme-description {
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+
+    .theme-preview {
+      padding: 32px 24px;
+    }
+
+    /* Color Palette Display */
+    .palette {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .color-swatch {
+      flex: 1;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+
+    .color-swatch::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      white-space: nowrap;
+      opacity: 0.6;
+    }
+
+    /* Component Examples */
+    .component-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .example-button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .example-button.primary {
+      color: white;
+    }
+
+    .example-button.secondary {
+      background: transparent;
+      border: 1.5px solid;
+    }
+
+    .example-input {
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1.5px solid;
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .example-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid;
+    }
+
+    .example-card-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .example-card-text {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .example-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Theme A Specific */
+    .theme-a .theme-header {
+      background: var(--a-bg);
+      border-color: var(--a-border);
+      color: var(--a-text);
+    }
+
+    .theme-a .theme-description {
+      color: var(--a-text-muted);
+    }
+
+    .theme-a .theme-preview {
+      background: var(--a-bg);
+    }
+
+    .theme-a .example-button.primary {
+      background: var(--a-accent);
+    }
+
+    .theme-a .example-button.primary:hover {
+      background: var(--a-accent-hover);
+    }
+
+    .theme-a .example-button.secondary {
+      color: var(--a-accent);
+      border-color: var(--a-accent);
+    }
+
+    .theme-a .example-button.secondary:hover {
+      background: var(--a-accent-subtle);
+    }
+
+    .theme-a .example-input {
+      background: var(--a-bg-subtle);
+      border-color: var(--a-border);
+      color: var(--a-text);
+    }
+
+    .theme-a .example-input:focus {
+      border-color: var(--a-accent);
+    }
+
+    .theme-a .example-input::placeholder {
+      color: var(--a-text-muted);
+    }
+
+    .theme-a .example-card {
+      background: var(--a-bg-subtle);
+      border-color: var(--a-border);
+    }
+
+    .theme-a .example-card-title {
+      color: var(--a-text);
+    }
+
+    .theme-a .example-card-text {
+      color: var(--a-text-muted);
+    }
+
+    .theme-a .example-badge {
+      background: var(--a-accent-subtle);
+      color: var(--a-accent);
+    }
+
+    /* Theme B Specific */
+    .theme-b .theme-header {
+      background: var(--b-bg);
+      border-color: var(--b-border);
+      color: var(--b-text);
+    }
+
+    .theme-b .theme-description {
+      color: var(--b-text-muted);
+    }
+
+    .theme-b .theme-preview {
+      background: var(--b-bg);
+    }
+
+    .theme-b .example-button.primary {
+      background: var(--b-accent);
+    }
+
+    .theme-b .example-button.primary:hover {
+      background: var(--b-accent-hover);
+    }
+
+    .theme-b .example-button.secondary {
+      color: var(--b-accent);
+      border-color: var(--b-accent);
+    }
+
+    .theme-b .example-button.secondary:hover {
+      background: var(--b-accent-subtle);
+    }
+
+    .theme-b .example-input {
+      background: var(--b-bg-subtle);
+      border-color: var(--b-border);
+      color: var(--b-text);
+    }
+
+    .theme-b .example-input:focus {
+      border-color: var(--b-accent);
+    }
+
+    .theme-b .example-input::placeholder {
+      color: var(--b-text-muted);
+    }
+
+    .theme-b .example-card {
+      background: var(--b-bg-subtle);
+      border-color: var(--b-border);
+    }
+
+    .theme-b .example-card-title {
+      color: var(--b-text);
+    }
+
+    .theme-b .example-card-text {
+      color: var(--b-text-muted);
+    }
+
+    .theme-b .example-badge {
+      background: var(--b-accent-subtle);
+      color: var(--b-accent);
+    }
+
+    /* Theme C Specific */
+    .theme-c .theme-header {
+      background: var(--c-bg);
+      border-color: var(--c-border);
+      color: var(--c-text);
+    }
+
+    .theme-c .theme-description {
+      color: var(--c-text-muted);
+    }
+
+    .theme-c .theme-preview {
+      background: var(--c-bg);
+    }
+
+    .theme-c .example-button.primary {
+      background: var(--c-accent);
+    }
+
+    .theme-c .example-button.primary:hover {
+      background: var(--c-accent-hover);
+    }
+
+    .theme-c .example-button.secondary {
+      color: var(--c-accent);
+      border-color: var(--c-accent);
+    }
+
+    .theme-c .example-button.secondary:hover {
+      background: var(--c-accent-subtle);
+    }
+
+    .theme-c .example-input {
+      background: var(--c-bg-subtle);
+      border-color: var(--c-border);
+      color: var(--c-text);
+    }
+
+    .theme-c .example-input:focus {
+      border-color: var(--c-accent);
+    }
+
+    .theme-c .example-input::placeholder {
+      color: var(--c-text-muted);
+    }
+
+    .theme-c .example-card {
+      background: var(--c-bg-subtle);
+      border-color: var(--c-border);
+    }
+
+    .theme-c .example-card-title {
+      color: var(--c-text);
+    }
+
+    .theme-c .example-card-text {
+      color: var(--c-text-muted);
+    }
+
+    .theme-c .example-badge {
+      background: var(--c-accent-subtle);
+      color: var(--c-accent);
+    }
+
+    /* Detailed Color Sections */
+    .color-detail-section {
+      margin-bottom: 80px;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .color-block {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .color-sample {
+      height: 100px;
+    }
+
+    .color-info {
+      padding: 16px;
+      background: white;
+    }
+
+    .color-name {
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+    }
+
+    .color-value {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .color-usage {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    /* Comparison Section */
+    .comparison-section {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 80px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .comparison-item {
+      padding: 24px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .comparison-item:hover {
+      border-color: #E5E5E5;
+    }
+
+    .comparison-item.selected {
+      border-color: #F25C05;
+      background: #FEF5EE;
+    }
+
+    .comparison-label {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .comparison-traits {
+      list-style: none;
+    }
+
+    .comparison-traits li {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .comparison-traits li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.4;
+    }
+
+    /* Dashboard Preview */
+    .dashboard-preview {
+      margin-bottom: 80px;
+    }
+
+    .dashboard-frame {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .dashboard-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #F5F5F5;
+    }
+
+    .toolbar-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .toolbar-dot.red { background: #FF5F57; }
+    .toolbar-dot.yellow { background: #FFBD2E; }
+    .toolbar-dot.green { background: #28CA41; }
+
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 500px;
+    }
+
+    .dashboard-sidebar {
+      padding: 24px;
+      border-right: 1px solid;
+    }
+
+    .sidebar-logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 32px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .sidebar-nav li {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar-nav li.active {
+      font-weight: 600;
+    }
+
+    .dashboard-main {
+      padding: 32px;
+    }
+
+    .dashboard-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-subtitle {
+      font-size: 0.875rem;
+      margin-bottom: 32px;
+      opacity: 0.6;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 65%;
+    }
+
+    /* Theme C Dashboard Styles */
+    .dashboard-theme-c .dashboard-sidebar {
+      background: var(--c-bg-subtle);
+      border-color: var(--c-border);
+      color: var(--c-text);
+    }
+
+    .dashboard-theme-c .sidebar-nav li:hover {
+      background: var(--c-bg-muted);
+    }
+
+    .dashboard-theme-c .sidebar-nav li.active {
+      background: var(--c-accent-subtle);
+      color: var(--c-accent);
+    }
+
+    .dashboard-theme-c .dashboard-main {
+      background: var(--c-bg);
+      color: var(--c-text);
+    }
+
+    .dashboard-theme-c .stat-card {
+      background: var(--c-bg-subtle);
+      border-color: var(--c-border);
+    }
+
+    .dashboard-theme-c .stat-value {
+      color: var(--c-accent);
+    }
+
+    .dashboard-theme-c .progress-bar {
+      background: var(--c-bg-muted);
+    }
+
+    .dashboard-theme-c .progress-fill {
+      background: var(--c-accent);
+    }
+
+    /* Personality Section */
+    .personality-section {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .personality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .personality-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .personality-card {
+      padding: 32px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .personality-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-size: 1.5rem;
+    }
+
+    .personality-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .personality-text {
+      font-size: 0.875rem;
+      opacity: 0.7;
+      line-height: 1.6;
+    }
+
+    .personality-a {
+      background: var(--a-bg);
+      color: var(--a-text);
+    }
+
+    .personality-a .personality-icon {
+      background: var(--a-accent-subtle);
+      color: var(--a-accent);
+    }
+
+    .personality-b {
+      background: var(--b-bg);
+      color: var(--b-text);
+    }
+
+    .personality-b .personality-icon {
+      background: var(--b-accent-subtle);
+      color: var(--b-accent);
+    }
+
+    .personality-c {
+      background: var(--c-bg);
+      color: var(--c-text);
+    }
+
+    .personality-c .personality-icon {
+      background: var(--c-accent-subtle);
+      color: var(--c-accent);
+    }
+
+    /* Recommendation Banner */
+    .recommendation {
+      background: linear-gradient(135deg, var(--c-accent) 0%, var(--c-accent-hover) 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    .recommendation h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .recommendation p {
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>FlowForge Color Theme Explorer</h1>
+    <p>Three warm light theme variations designed for premium business intelligence. Each emphasizes restraint, whitespace, and a single refined orange accent.</p>
+  </div>
+
+  <div class="container">
+    <!-- Theme Cards -->
+    <h2 class="section-title">Theme Variations</h2>
+    <p class="section-subtitle">Hover over components to see interaction states</p>
+
+    <div class="themes-grid">
+      <!-- Theme A -->
+      <div class="theme-card theme-a">
+        <div class="theme-header">
+          <div class="theme-name">A. Warm Cream</div>
+          <div class="theme-description">Cozy, inviting, artisanal feel</div>
+        </div>
+        <div class="theme-preview">
+          <div class="palette">
+            <div class="color-swatch" style="background: var(--a-bg)" data-label="Base"></div>
+            <div class="color-swatch" style="background: var(--a-bg-subtle)" data-label="Subtle"></div>
+            <div class="color-swatch" style="background: var(--a-border)" data-label="Border"></div>
+            <div class="color-swatch" style="background: var(--a-accent)" data-label="Accent"></div>
+          </div>
+          <div class="component-examples">
+            <button class="example-button primary">Generate Report</button>
+            <button class="example-button secondary">View Details</button>
+            <input type="text" class="example-input" placeholder="Search campaigns...">
+            <div class="example-card">
+              <div class="example-card-title">Campaign Progress</div>
+              <div class="example-card-text">4 of 6 stakeholders complete</div>
+              <span class="example-badge">In Progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme B -->
+      <div class="theme-card theme-b">
+        <div class="theme-header">
+          <div class="theme-name">B. Off-White Terracotta</div>
+          <div class="theme-description">Earthy, sophisticated, grounded</div>
+        </div>
+        <div class="theme-preview">
+          <div class="palette">
+            <div class="color-swatch" style="background: var(--b-bg)" data-label="Base"></div>
+            <div class="color-swatch" style="background: var(--b-bg-subtle)" data-label="Subtle"></div>
+            <div class="color-swatch" style="background: var(--b-border)" data-label="Border"></div>
+            <div class="color-swatch" style="background: var(--b-accent)" data-label="Accent"></div>
+          </div>
+          <div class="component-examples">
+            <button class="example-button primary">Generate Report</button>
+            <button class="example-button secondary">View Details</button>
+            <input type="text" class="example-input" placeholder="Search campaigns...">
+            <div class="example-card">
+              <div class="example-card-title">Campaign Progress</div>
+              <div class="example-card-text">4 of 6 stakeholders complete</div>
+              <span class="example-badge">In Progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme C -->
+      <div class="theme-card theme-c">
+        <div class="theme-header">
+          <div class="theme-name">C. Pearl Vibrant</div>
+          <div class="theme-description">Clean, energetic, modern</div>
+        </div>
+        <div class="theme-preview">
+          <div class="palette">
+            <div class="color-swatch" style="background: var(--c-bg)" data-label="Base"></div>
+            <div class="color-swatch" style="background: var(--c-bg-subtle)" data-label="Subtle"></div>
+            <div class="color-swatch" style="background: var(--c-border)" data-label="Border"></div>
+            <div class="color-swatch" style="background: var(--c-accent)" data-label="Accent"></div>
+          </div>
+          <div class="component-examples">
+            <button class="example-button primary">Generate Report</button>
+            <button class="example-button secondary">View Details</button>
+            <input type="text" class="example-input" placeholder="Search campaigns...">
+            <div class="example-card">
+              <div class="example-card-title">Campaign Progress</div>
+              <div class="example-card-text">4 of 6 stakeholders complete</div>
+              <span class="example-badge">In Progress</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Color Palette -->
+    <div class="color-detail-section">
+      <h2 class="section-title">Complete Color Palette (Theme C - Recommended)</h2>
+      <p class="section-subtitle">Full specification for the Pearl Vibrant theme</p>
+
+      <div class="color-grid">
+        <div class="color-block">
+          <div class="color-sample" style="background: #FFFEFB"></div>
+          <div class="color-info">
+            <div class="color-name">Background</div>
+            <div class="color-value">#FFFEFB</div>
+            <div class="color-usage">Main page backgrounds</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #FAF8F3"></div>
+          <div class="color-info">
+            <div class="color-name">Background Subtle</div>
+            <div class="color-value">#FAF8F3</div>
+            <div class="color-usage">Cards, inputs, sidebars</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #F2EFE7"></div>
+          <div class="color-info">
+            <div class="color-name">Background Muted</div>
+            <div class="color-value">#F2EFE7</div>
+            <div class="color-usage">Hover states, dividers</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #E6E2D6"></div>
+          <div class="color-info">
+            <div class="color-name">Border</div>
+            <div class="color-value">#E6E2D6</div>
+            <div class="color-usage">Borders, separators</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #171614"></div>
+          <div class="color-info">
+            <div class="color-name">Text Primary</div>
+            <div class="color-value">#171614</div>
+            <div class="color-usage">Headings, body text</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #71706B"></div>
+          <div class="color-info">
+            <div class="color-name">Text Muted</div>
+            <div class="color-value">#71706B</div>
+            <div class="color-usage">Secondary text, labels</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #F25C05"></div>
+          <div class="color-info">
+            <div class="color-name">Accent Primary</div>
+            <div class="color-value">#F25C05</div>
+            <div class="color-usage">CTAs, links, highlights</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #DC5204"></div>
+          <div class="color-info">
+            <div class="color-name">Accent Hover</div>
+            <div class="color-value">#DC5204</div>
+            <div class="color-usage">Button hover states</div>
+          </div>
+        </div>
+        <div class="color-block">
+          <div class="color-sample" style="background: #FEF5EE"></div>
+          <div class="color-info">
+            <div class="color-name">Accent Subtle</div>
+            <div class="color-value">#FEF5EE</div>
+            <div class="color-usage">Badge backgrounds, highlights</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Preview -->
+    <div class="dashboard-preview">
+      <h2 class="section-title">Dashboard Preview</h2>
+      <p class="section-subtitle">How the theme looks in a real application context</p>
+
+      <div class="dashboard-frame">
+        <div class="dashboard-toolbar">
+          <div class="toolbar-dot red"></div>
+          <div class="toolbar-dot yellow"></div>
+          <div class="toolbar-dot green"></div>
+        </div>
+        <div class="dashboard-content dashboard-theme-c">
+          <div class="dashboard-sidebar">
+            <div class="sidebar-logo">FlowForge</div>
+            <ul class="sidebar-nav">
+              <li class="active">Dashboard</li>
+              <li>Campaigns</li>
+              <li>Reports</li>
+              <li>Stakeholders</li>
+              <li>Settings</li>
+            </ul>
+          </div>
+          <div class="dashboard-main">
+            <div class="dashboard-title">Active Campaigns</div>
+            <div class="dashboard-subtitle">3 campaigns in progress across 2 organizations</div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Total Stakeholders</div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Interviews Complete</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 66%"></div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Reports Ready</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 40%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Section -->
+    <div class="comparison-section">
+      <h2 class="section-title">Theme Comparison</h2>
+      <p class="section-subtitle">Key characteristics of each variation</p>
+
+      <div class="comparison-grid">
+        <div class="comparison-item">
+          <div class="comparison-label">A. Warm Cream</div>
+          <ul class="comparison-traits">
+            <li>Warmest base tone (#FAF7F2)</li>
+            <li>Burnt orange accent (#E85A1B)</li>
+            <li>Most inviting, artisanal feel</li>
+            <li>Best for: Boutique consulting firms</li>
+            <li>Potential concern: May feel too casual</li>
+          </ul>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">B. Off-White Terracotta</div>
+          <ul class="comparison-traits">
+            <li>Neutral cream base (#FDFCFA)</li>
+            <li>Terracotta accent (#C4562A)</li>
+            <li>Most grounded, mature feel</li>
+            <li>Best for: Traditional enterprises</li>
+            <li>Potential concern: Accent may feel muted</li>
+          </ul>
+        </div>
+        <div class="comparison-item selected">
+          <div class="comparison-label">C. Pearl Vibrant (Recommended)</div>
+          <ul class="comparison-traits">
+            <li>Cleanest near-white base (#FFFEFB)</li>
+            <li>Vibrant orange accent (#F25C05)</li>
+            <li>Best balance of premium and energy</li>
+            <li>Best for: Modern transformation consulting</li>
+            <li>Aligns with FlowForge brand positioning</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme Personalities -->
+    <div class="personality-section">
+      <h2 class="section-title">Theme Personalities</h2>
+      <p class="section-subtitle">The emotional character each theme conveys</p>
+
+      <div class="personality-grid">
+        <div class="personality-card personality-a">
+          <div class="personality-icon">A</div>
+          <div class="personality-title">The Artisan</div>
+          <div class="personality-text">
+            Handcrafted quality and personal attention. Like visiting a specialty boutique where every detail is considered. Warm and approachable, yet refined.
+          </div>
+        </div>
+        <div class="personality-card personality-b">
+          <div class="personality-icon">B</div>
+          <div class="personality-title">The Sage</div>
+          <div class="personality-text">
+            Wisdom and experience. Like sitting in a well-appointed study with leather-bound books. Grounded, trustworthy, and timeless in its appeal.
+          </div>
+        </div>
+        <div class="personality-card personality-c">
+          <div class="personality-icon">C</div>
+          <div class="personality-title">The Innovator</div>
+          <div class="personality-text">
+            Forward-thinking clarity. Like the clean lines of a modern gallery where ideas shine. Professional yet energetic, premium yet accessible.
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendation">
+        <h3>Recommendation: Theme C - Pearl Vibrant</h3>
+        <p>This theme best captures FlowForge's positioning as a modern AI-powered consulting platform. The clean base allows content to breathe while the vibrant orange accent provides energy and draws attention to key actions. It feels premium without being stuffy, innovative without being cold.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>FlowForge UX Design Exploration - Created with BMad Method</p>
+  </div>
+
+  <script>
+    // Add subtle interaction effects
+    document.querySelectorAll('.comparison-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.comparison-item').forEach(i => i.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>
