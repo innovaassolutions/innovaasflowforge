@@ -129,7 +129,7 @@ export default function PromotionalLanding() {
               {/* Teacher illustration needs to be ~50% larger than others */}
               <div className={`absolute z-10 hidden md:block
                               ${industry === 'education'
-                                ? '-right-56 bottom-4 w-80 h-80 lg:-right-72 lg:bottom-6 lg:w-96 lg:h-96 xl:-right-80 xl:bottom-8 xl:w-[28rem] xl:h-[28rem]'
+                                ? '-right-56 -bottom-1 w-80 h-80 lg:-right-72 lg:bottom-1 lg:w-96 lg:h-96 xl:-right-80 xl:bottom-3 xl:w-[28rem] xl:h-[28rem]'
                                 : '-right-40 bottom-4 w-52 h-52 lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64 xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72'
                               }`}>
                 <Image
