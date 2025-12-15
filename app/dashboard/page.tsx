@@ -8,6 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import { Building2, BarChart3, Users, Plus, Trash2 } from 'lucide-react'
 import { apiUrl } from '@/lib/api-url'
+import { Button } from '@/components/ui/button'
 
 // Disable static generation (page requires auth)
 export const dynamic = 'force-dynamic'
@@ -165,53 +166,53 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-background">
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && deletingCampaignId && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-mocha-surface0 rounded-lg p-8 max-w-md w-full">
-            <h3 className="text-xl font-semibold text-mocha-text mb-4">
+          <div className="bg-card rounded-lg p-8 max-w-md w-full border border-border">
+            <h3 className="text-xl font-semibold text-foreground mb-4">
               Delete Campaign?
             </h3>
-            <p className="text-mocha-subtext1 mb-6">
+            <p className="text-muted-foreground mb-6">
               Are you sure you want to delete this campaign? This action cannot be undone and will delete all associated stakeholder sessions and data.
             </p>
             <div className="flex gap-3 justify-end">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => {
                   setShowDeleteConfirm(false)
                   setDeletingCampaignId(null)
                 }}
-                className="px-4 py-2 bg-mocha-surface1 hover:bg-mocha-surface2 text-mocha-text rounded-lg transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="destructive"
                 onClick={() => handleDeleteCampaign(deletingCampaignId)}
-                className="px-4 py-2 bg-mocha-red hover:bg-mocha-red/80 text-white rounded-lg transition-colors"
               >
                 Delete Campaign
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
 
       {/* Page Header */}
-      <div className="bg-mocha-mantle border-b border-mocha-surface0 px-8 py-6">
+      <div className="bg-card border-b border-border px-8 py-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-mocha-text">Dashboard</h1>
-            <p className="text-mocha-subtext1 mt-1 text-sm">
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
               Manage your campaigns and companies
             </p>
           </div>
-          <Link
-            href="/dashboard/campaigns/new"
-            className="bg-brand-orange text-white font-semibold py-2 px-6 rounded-lg hover:bg-brand-orange-dark transition-colors flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create Campaign
-          </Link>
+          <Button asChild>
+            <Link href="/dashboard/campaigns/new">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Campaign
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -221,33 +222,33 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/dashboard/companies"
-            className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6 hover:border-brand-orange/50 transition-colors"
+            className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors"
           >
             <div className="flex items-center gap-4">
-              <Building2 className="w-10 h-10 text-brand-orange" />
+              <Building2 className="w-10 h-10 text-primary" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium mb-1">Total Stakeholders</p>
-                <h3 className="text-4xl font-bold text-mocha-text">{companiesCount}</h3>
+                <p className="text-sm text-muted-foreground font-medium mb-1">Total Stakeholders</p>
+                <h3 className="text-4xl font-bold text-foreground">{companiesCount}</h3>
               </div>
             </div>
           </Link>
 
-          <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex items-center gap-4">
-              <BarChart3 className="w-10 h-10 text-mocha-green" />
+              <BarChart3 className="w-10 h-10 text-success" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium mb-1">Completed</p>
-                <h3 className="text-4xl font-bold text-mocha-green">0</h3>
+                <p className="text-sm text-muted-foreground font-medium mb-1">Completed</p>
+                <h3 className="text-4xl font-bold text-success">0</h3>
               </div>
             </div>
           </div>
 
-          <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex items-center gap-4">
-              <Users className="w-10 h-10 text-mocha-blue" />
+              <Users className="w-10 h-10 text-brand-teal" />
               <div>
-                <p className="text-sm text-mocha-subtext0 font-medium mb-1">In Progress</p>
-                <h3 className="text-4xl font-bold text-mocha-blue">{campaigns.filter(c => c.status === 'active').length}</h3>
+                <p className="text-sm text-muted-foreground font-medium mb-1">In Progress</p>
+                <h3 className="text-4xl font-bold text-brand-teal">{campaigns.filter(c => c.status === 'active').length}</h3>
               </div>
             </div>
           </div>
@@ -256,61 +257,60 @@ export default function DashboardPage() {
         {/* Campaigns List */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
-            <p className="text-mocha-subtext1 mt-4">Loading campaigns...</p>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+            <p className="text-muted-foreground mt-4">Loading campaigns...</p>
           </div>
         ) : error ? (
-          <div className="bg-mocha-surface0 border border-mocha-red/20 rounded-lg p-8 text-center">
-            <p className="text-mocha-red">{error}</p>
+          <div className="bg-card border border-destructive/20 rounded-lg p-8 text-center">
+            <p className="text-destructive">{error}</p>
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="bg-mocha-surface0 rounded-lg p-12 text-center">
-            <BarChart3 className="mx-auto h-12 w-12 text-mocha-overlay0" />
-            <h3 className="mt-4 text-lg font-semibold text-mocha-text">
+          <div className="bg-card border border-border rounded-lg p-12 text-center">
+            <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-4 text-lg font-semibold text-foreground">
               No campaigns yet
             </h3>
-            <p className="mt-2 text-mocha-subtext1">
+            <p className="mt-2 text-muted-foreground">
               Get started by creating your first assessment campaign.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/dashboard/companies"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-mocha-surface0 border border-mocha-surface1 rounded-lg text-mocha-text hover:bg-mocha-surface1 transition-colors"
-              >
-                <Building2 className="w-4 h-4" />
-                Manage Companies
-              </Link>
-              <Link
-                href="/dashboard/campaigns/new"
-                className="inline-flex items-center gap-2 bg-brand-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-brand-orange-dark transition-colors">
-                <Plus className="w-4 h-4" />
-                Create Your First Campaign
-              </Link>
+              <Button variant="secondary" asChild>
+                <Link href="/dashboard/companies">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Manage Companies
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/dashboard/campaigns/new">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Campaign
+                </Link>
+              </Button>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-mocha-text">
+              <h2 className="text-xl font-semibold text-foreground">
                 Your Campaigns
               </h2>
             </div>
             {campaigns.map((campaign) => (
               <div
                 key={campaign.id}
-                className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-6 transition-colors">
+                className="bg-card border border-border rounded-lg p-6 transition-colors">
                 <div className="flex justify-between items-start">
                   <Link
                     href={`/dashboard/campaigns/${campaign.id}`}
                     className="flex-1 hover:opacity-80 transition-opacity">
                     <div>
-                      <h3 className="text-lg font-semibold text-mocha-text">
+                      <h3 className="text-lg font-semibold text-foreground">
                         {campaign.name}
                       </h3>
-                      <p className="text-mocha-subtext1 mt-1">
+                      <p className="text-muted-foreground mt-1">
                         {campaign.company_name}
                       </p>
-                      <div className="flex items-center gap-4 mt-3 text-sm text-mocha-subtext0">
+                      <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                         <span>Facilitator: {campaign.facilitator_name}</span>
                         <span>•</span>
                         <span suppressHydrationWarning>
@@ -323,10 +323,10 @@ export default function DashboardPage() {
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                         campaign.status === 'active'
-                          ? 'bg-mocha-green/20 text-mocha-green'
+                          ? 'bg-success/20 text-success'
                           : campaign.status === 'completed'
-                          ? 'bg-mocha-blue/20 text-mocha-blue'
-                          : 'bg-mocha-overlay0/20 text-mocha-overlay0'
+                          ? 'bg-brand-teal/20 text-brand-teal'
+                          : 'bg-muted text-muted-foreground'
                       }`}>
                       {campaign.status}
                     </span>
@@ -335,7 +335,7 @@ export default function DashboardPage() {
                         e.preventDefault()
                         confirmDelete(campaign.id)
                       }}
-                      className="p-2 text-mocha-subtext0 hover:text-mocha-red hover:bg-mocha-red/10 rounded-lg transition-colors"
+                      className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                       title="Delete campaign">
                       <Trash2 className="w-4 h-4" />
                     </button>

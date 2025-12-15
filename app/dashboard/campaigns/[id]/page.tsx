@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Clock, Mail, Pause, Share2 } from 'lucide-react'
+import { CheckCircle2, Clock, Mail, Pause, Share2, Plus, Pencil, Trash2 } from 'lucide-react'
 import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
+import { Button } from '@/components/ui/button'
 import { apiUrl } from '@/lib/api-url'
 
 interface StakeholderSession {
@@ -157,41 +158,41 @@ export default function CampaignDetailPage() {
   function getStatusColor(status: string) {
     switch (status) {
       case 'completed':
-        return 'bg-green-500/20 text-green-400'
+        return 'bg-success/20 text-success'
       case 'in_progress':
-        return 'bg-blue-500/20 text-blue-400'
+        return 'bg-brand-teal/20 text-brand-teal'
       case 'paused':
-        return 'bg-yellow-500/20 text-yellow-400'
+        return 'bg-warning/20 text-warning'
       case 'invited':
-        return 'bg-mocha-overlay0/20 text-mocha-overlay0'
+        return 'bg-muted text-muted-foreground'
       default:
-        return 'bg-mocha-overlay0/20 text-mocha-overlay0'
+        return 'bg-muted text-muted-foreground'
     }
   }
 
   function getStatusIcon(status: string, startedAt: string | null) {
     // Completed
     if (status === 'completed') {
-      return <CheckCircle2 className="w-5 h-5 text-green-400" />
+      return <CheckCircle2 className="w-5 h-5 text-success" />
     }
 
     // Paused (in progress but no recent activity - placeholder for future implementation)
     if (status === 'paused') {
-      return <Pause className="w-5 h-5 text-yellow-400" />
+      return <Pause className="w-5 h-5 text-warning" />
     }
 
     // In progress
     if (status === 'in_progress') {
-      return <Clock className="w-5 h-5 text-blue-400 animate-pulse" />
+      return <Clock className="w-5 h-5 text-brand-teal animate-pulse" />
     }
 
     // Accessed but not started (started_at exists but status is still invited)
     if (startedAt && status === 'invited') {
-      return <Mail className="w-5 h-5 text-purple-400" />
+      return <Mail className="w-5 h-5 text-purple-500" />
     }
 
     // Not accessed yet (invited)
-    return <Mail className="w-5 h-5 text-mocha-overlay0" />
+    return <Mail className="w-5 h-5 text-muted-foreground" />
   }
 
   function getStatusLabel(status: string, startedAt: string | null) {
@@ -348,10 +349,10 @@ export default function CampaignDetailPage() {
 
   if (loading && !campaign) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
-          <p className="text-mocha-subtext1 mt-4">Loading campaign...</p>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p className="text-muted-foreground mt-4">Loading campaign...</p>
         </div>
       </div>
     )
@@ -359,9 +360,9 @@ export default function CampaignDetailPage() {
 
   if (error && !campaign) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
-        <div className="bg-mocha-surface0 border border-red-500/20 rounded-lg p-8">
-          <p className="text-red-400">{error}</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-card border border-destructive/20 rounded-lg p-8">
+          <p className="text-destructive">{error}</p>
           <Link
             href="/dashboard"
             className="mt-4 inline-block text-brand-teal hover:underline">
@@ -375,13 +376,13 @@ export default function CampaignDetailPage() {
   if (!campaign) return null
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-mocha-mantle border-b border-mocha-surface0">
+      <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link
             href="/dashboard"
-            className="text-mocha-subtext1 hover:text-mocha-text transition-colors">
+            className="text-muted-foreground hover:text-foreground transition-colors">
             ← Back to Dashboard
           </Link>
           <div className="mt-4">
@@ -390,7 +391,7 @@ export default function CampaignDetailPage() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
                   {campaign.name}
                 </h1>
-                <p className="text-mocha-subtext1 mt-2">
+                <p className="text-muted-foreground mt-2">
                   {campaign.company_name}
                 </p>
               </div>
@@ -418,54 +419,53 @@ export default function CampaignDetailPage() {
                         Generate Client Report
                       </button>
                     )}
-                    <button
+                    <Button
+                      variant="secondary"
                       onClick={handleGeneratePDF}
-                      disabled={generatingPDF}
-                      className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                      disabled={generatingPDF}>
                       {generatingPDF ? (
                         <>
-                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
+                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent mr-2"></div>
                           Generating PDF...
                         </>
                       ) : (
-                        <>
-                          Download PDF
-                        </>
+                        'Download PDF'
                       )}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={handleGenerateReport}
-                      disabled={generatingReport}
-                      className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                      disabled={generatingReport}>
                       {generatingReport ? (
                         <>
-                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
+                          <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent mr-2"></div>
                           Generating...
                         </>
                       ) : (
-                        <>
-                          Download Markdown
-                        </>
+                        'Download Markdown'
                       )}
-                    </button>
+                    </Button>
                   </>
                 )}
-                <Link
-                  href={`/dashboard/campaigns/${campaign.id}/edit`}
-                  className="btn-primary">
-                  + Add Stakeholders
-                </Link>
-                <button
-                  onClick={() => setEditing(true)}
-                  className="btn-secondary">
+                <Button asChild>
+                  <Link href={`/dashboard/campaigns/${campaign.id}/edit`}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Stakeholders
+                  </Link>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditing(true)}>
+                  <Pencil className="w-4 h-4 mr-2" />
                   Edit Details
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={handleDelete}
-                  disabled={deleting}
-                  className="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg transition-colors disabled:opacity-50">
+                  disabled={deleting}>
+                  <Trash2 className="w-4 h-4 mr-2" />
                   {deleting ? 'Deleting...' : 'Delete'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -476,41 +476,41 @@ export default function CampaignDetailPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-mocha-surface0 rounded-lg p-6">
-            <h3 className="text-sm font-medium text-mocha-subtext1">Total Stakeholders</h3>
-            <p className="text-3xl font-bold text-mocha-text mt-2">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-sm font-medium text-muted-foreground">Total Stakeholders</h3>
+            <p className="text-3xl font-bold text-foreground mt-2">
               {campaign.progress.total}
             </p>
           </div>
-          <div className="bg-mocha-surface0 rounded-lg p-6">
-            <h3 className="text-sm font-medium text-mocha-subtext1">Completed</h3>
-            <p className="text-3xl font-bold text-green-400 mt-2">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-sm font-medium text-muted-foreground">Completed</h3>
+            <p className="text-3xl font-bold text-success mt-2">
               {campaign.progress.completed}
             </p>
           </div>
-          <div className="bg-mocha-surface0 rounded-lg p-6">
-            <h3 className="text-sm font-medium text-mocha-subtext1">In Progress</h3>
-            <p className="text-3xl font-bold text-blue-400 mt-2">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-sm font-medium text-muted-foreground">In Progress</h3>
+            <p className="text-3xl font-bold text-brand-teal mt-2">
               {campaign.progress.inProgress}
             </p>
           </div>
-          <div className="bg-mocha-surface0 rounded-lg p-6">
-            <h3 className="text-sm font-medium text-mocha-subtext1">Pending</h3>
-            <p className="text-3xl font-bold text-mocha-overlay0 mt-2">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-sm font-medium text-muted-foreground">Pending</h3>
+            <p className="text-3xl font-bold text-muted-foreground mt-2">
               {campaign.progress.pending}
             </p>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-mocha-surface0 rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium text-mocha-subtext1">Overall Progress</h3>
-            <span className="text-2xl font-bold text-mocha-text">
+            <h3 className="text-sm font-medium text-muted-foreground">Overall Progress</h3>
+            <span className="text-2xl font-bold text-foreground">
               {campaign.progress.percentComplete}%
             </span>
           </div>
-          <div className="w-full bg-mocha-base rounded-full h-4 overflow-hidden">
+          <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
             <div
               className="bg-gradient-to-r from-brand-orange to-brand-teal h-full transition-all duration-500 rounded-full"
               style={{ width: `${campaign.progress.percentComplete}%` }}
@@ -520,20 +520,20 @@ export default function CampaignDetailPage() {
 
         {/* Synthesis Readiness */}
         {campaign.progress.completed > 0 && (
-          <div className="bg-gradient-to-r from-brand-orange/10 to-brand-teal/10 border border-brand-orange/30 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-primary/10 to-brand-teal/10 border border-primary/30 rounded-lg p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <svg className="w-12 h-12 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-mocha-text mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {campaign.progress.completed === campaign.progress.total
                     ? 'Ready for Comprehensive Analysis'
                     : 'Partial Analysis Available'}
                 </h3>
-                <p className="text-sm text-mocha-subtext1 mb-3">
+                <p className="text-sm text-muted-foreground mb-3">
                   {campaign.progress.completed === campaign.progress.total
                     ? `All ${campaign.progress.total} stakeholder interviews are complete. Generate a comprehensive digital transformation readiness assessment with dimensional scoring, cross-stakeholder synthesis, and strategic recommendations.`
                     : `${campaign.progress.completed} of ${campaign.progress.total} interviews complete. You can generate a report now with available data, or wait for all stakeholders to complete their interviews for the most comprehensive analysis.`}
@@ -554,36 +554,34 @@ export default function CampaignDetailPage() {
                       Generate Client Report
                     </button>
                   )}
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="lg"
                     onClick={handleGeneratePDF}
-                    disabled={generatingPDF}
-                    className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                    disabled={generatingPDF}>
                     {generatingPDF ? (
                       <>
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent mr-2"></div>
                         Generating PDF...
                       </>
                     ) : (
-                      <>
-                        Download PDF
-                      </>
+                      'Download PDF'
                     )}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
                     onClick={handleGenerateReport}
-                    disabled={generatingReport}
-                    className="bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
+                    disabled={generatingReport}>
                     {generatingReport ? (
                       <>
-                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-orange border-r-transparent"></div>
+                        <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent mr-2"></div>
                         Generating Markdown...
                       </>
                     ) : (
-                      <>
-                        Download Markdown
-                      </>
+                      'Download Markdown'
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -591,8 +589,8 @@ export default function CampaignDetailPage() {
         )}
 
         {/* Stakeholder List */}
-        <div className="bg-mocha-surface0 rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-mocha-text mb-6">
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-foreground mb-6">
             Stakeholder Sessions
           </h2>
           <div className="space-y-4">
@@ -603,15 +601,15 @@ export default function CampaignDetailPage() {
               return (
                 <div
                   key={stakeholder.id}
-                  className="bg-mocha-base border border-mocha-surface1 rounded-lg p-5">
+                  className="bg-background border border-border rounded-lg p-5">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
                         {getStatusIcon(stakeholder.status, stakeholder.started_at)}
-                        <h3 className="text-lg font-semibold text-mocha-text">
+                        <h3 className="text-lg font-semibold text-foreground">
                           {stakeholder.stakeholder_name}
                         </h3>
-                        <span className="text-xs bg-brand-orange/20 text-brand-orange px-2 py-1 rounded">
+                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
                           {getRoleTypeLabel(stakeholder.stakeholder_role)}
                         </span>
                         <span
@@ -621,15 +619,15 @@ export default function CampaignDetailPage() {
                           {getStatusLabel(stakeholder.status, stakeholder.started_at)}
                         </span>
                       </div>
-                      <p className="text-sm text-mocha-subtext1 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {stakeholder.stakeholder_title}
                       </p>
-                      <p className="text-sm text-mocha-subtext0 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         {stakeholder.stakeholder_email}
                       </p>
 
                       {/* Timeline */}
-                      <div className="flex gap-6 mt-3 text-xs text-mocha-subtext0">
+                      <div className="flex gap-6 mt-3 text-xs text-muted-foreground">
                         {stakeholder.started_at && (
                           <span>
                             Started: {new Date(stakeholder.started_at).toLocaleString()}
@@ -643,13 +641,13 @@ export default function CampaignDetailPage() {
                       </div>
 
                       {/* Access Link */}
-                      <div className="mt-4 bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-3">
+                      <div className="mt-4 bg-muted border border-border rounded-lg p-3">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex-1">
-                            <p className="text-xs font-medium text-mocha-subtext1 mb-1">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">
                               Interview Access Link
                             </p>
-                            <code className="text-xs text-mocha-text bg-mocha-base px-2 py-1 rounded break-all block">
+                            <code className="text-xs text-foreground bg-background px-2 py-1 rounded break-all block">
                               {accessLink}
                             </code>
                           </div>
@@ -666,7 +664,7 @@ export default function CampaignDetailPage() {
                               <button
                                 onClick={() => handleCompleteSession(stakeholder.id, stakeholder.stakeholder_name)}
                                 disabled={completingSession === stakeholder.id}
-                                className="flex-shrink-0 bg-green-500/20 hover:bg-green-500/30 text-green-400 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+                                className="flex-shrink-0 bg-success/20 hover:bg-success/30 text-success px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
                                 {completingSession === stakeholder.id ? 'Completing...' : 'Mark as Complete'}
                               </button>
                             )}
@@ -682,27 +680,27 @@ export default function CampaignDetailPage() {
         </div>
 
         {/* Campaign Info */}
-        <div className="bg-mocha-surface0 rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-mocha-text mb-4">
+        <div className="bg-card border border-border rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             Campaign Information
           </h2>
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="text-sm font-medium text-mocha-subtext1">Facilitator</dt>
-              <dd className="text-mocha-text mt-1">
+              <dt className="text-sm font-medium text-muted-foreground">Facilitator</dt>
+              <dd className="text-foreground mt-1">
                 {campaign.facilitator_name} ({campaign.facilitator_email})
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-mocha-subtext1">Created</dt>
-              <dd className="text-mocha-text mt-1">
+              <dt className="text-sm font-medium text-muted-foreground">Created</dt>
+              <dd className="text-foreground mt-1">
                 {new Date(campaign.created_at).toLocaleString()}
               </dd>
             </div>
             {campaign.description && (
               <div className="md:col-span-2">
-                <dt className="text-sm font-medium text-mocha-subtext1">Description</dt>
-                <dd className="text-mocha-text mt-1">{campaign.description}</dd>
+                <dt className="text-sm font-medium text-muted-foreground">Description</dt>
+                <dd className="text-foreground mt-1">{campaign.description}</dd>
               </div>
             )}
           </dl>
@@ -712,42 +710,42 @@ export default function CampaignDetailPage() {
       {/* Edit Modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-mocha-surface0 rounded-lg p-6 max-w-2xl w-full">
-            <h2 className="text-2xl font-bold text-mocha-text mb-6">Edit Campaign</h2>
+          <div className="bg-card border border-border rounded-lg p-6 max-w-2xl w-full">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Edit Campaign</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-mocha-subtext1 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Campaign Name
                 </label>
                 <input
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-mocha-base border border-mocha-surface1 rounded-lg px-4 py-2 text-mocha-text"
+                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-mocha-subtext1 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Description
                 </label>
                 <textarea
                   value={editForm.description}
                   onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                   rows={3}
-                  className="w-full bg-mocha-base border border-mocha-surface1 rounded-lg px-4 py-2 text-mocha-text"
+                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-mocha-subtext1 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Status
                 </label>
                 <select
                   value={editForm.status}
                   onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                  className="w-full bg-mocha-base border border-mocha-surface1 rounded-lg px-4 py-2 text-mocha-text">
+                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground">
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
                   <option value="completed">Completed</option>
@@ -757,7 +755,8 @@ export default function CampaignDetailPage() {
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
-              <button
+              <Button
+                variant="secondary"
                 onClick={() => {
                   setEditing(false)
                   setEditForm({
@@ -765,15 +764,12 @@ export default function CampaignDetailPage() {
                     description: campaign.description || '',
                     status: campaign.status
                   })
-                }}
-                className="btn-secondary">
+                }}>
                 Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                className="btn-primary">
+              </Button>
+              <Button onClick={handleSaveEdit}>
                 Save Changes
-              </button>
+              </Button>
             </div>
           </div>
         </div>

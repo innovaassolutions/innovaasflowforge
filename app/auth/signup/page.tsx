@@ -95,21 +95,21 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-ctp-surface0 rounded-lg p-8 shadow-lg">
+        <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-ctp-text mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Create Account
             </h1>
-            <p className="text-ctp-subtext1">
+            <p className="text-muted-foreground">
               Join FlowForge - Multi-Disciplinary Consulting Platform
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 bg-ctp-red/10 border border-ctp-red rounded-lg p-4">
-              <p className="text-ctp-red text-sm">{error}</p>
+            <div className="mb-6 bg-destructive/10 border border-destructive rounded-lg p-4">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           )}
 
@@ -117,10 +117,10 @@ export default function SignupPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-ctp-overlay0"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-ctp-surface0 text-ctp-subtext1">
+              <span className="px-4 bg-card text-muted-foreground">
                 Or sign up with email
               </span>
             </div>
@@ -129,7 +129,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-6">
             {/* User Type Selection */}
             <div>
-              <label className="block text-sm font-medium text-ctp-text mb-3">
+              <label className="block text-sm font-medium text-foreground mb-3">
                 I am a...
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -138,14 +138,14 @@ export default function SignupPage() {
                   onClick={() => setUserType('consultant')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     formData.userType === 'consultant'
-                      ? 'border-brand-orange bg-brand-orange/20 text-ctp-text shadow-lg shadow-brand-orange/30 ring-2 ring-brand-orange/50'
-                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2 hover:bg-ctp-surface0'
+                      ? 'border-primary bg-primary/10 text-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/50'
+                      : 'border-border bg-background text-muted-foreground hover:border-muted hover:bg-muted'
                   }`}
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Users className={`w-6 h-6 ${formData.userType === 'consultant' ? 'text-brand-orange' : ''}`} />
+                    <Users className={`w-6 h-6 ${formData.userType === 'consultant' ? 'text-primary' : ''}`} />
                     <span className="font-medium text-sm">Consultant</span>
-                    <span className="text-xs text-ctp-subtext0">
+                    <span className="text-xs text-muted-foreground">
                       Manage multiple clients
                     </span>
                   </div>
@@ -156,14 +156,14 @@ export default function SignupPage() {
                   onClick={() => setUserType('company')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     formData.userType === 'company'
-                      ? 'border-brand-teal bg-brand-teal/20 text-ctp-text shadow-lg shadow-brand-teal/30 ring-2 ring-brand-teal/50'
-                      : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2 hover:bg-ctp-surface0'
+                      ? 'border-brand-teal bg-brand-teal/10 text-foreground shadow-lg shadow-brand-teal/30 ring-2 ring-brand-teal/50'
+                      : 'border-border bg-background text-muted-foreground hover:border-muted hover:bg-muted'
                   }`}
                 >
                   <div className="flex flex-col items-center gap-2">
                     <Building2 className={`w-6 h-6 ${formData.userType === 'company' ? 'text-brand-teal' : ''}`} />
                     <span className="font-medium text-sm">Company</span>
-                    <span className="text-xs text-ctp-subtext0">
+                    <span className="text-xs text-muted-foreground">
                       Manage my organization
                     </span>
                   </div>
@@ -174,7 +174,7 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="fullName"
-                className="block text-sm font-medium text-ctp-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Full Name
               </label>
               <input
@@ -184,7 +184,7 @@ export default function SignupPage() {
                 value={formData.fullName}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-white placeholder-ctp-overlay0 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 placeholder="John Doe"
               />
             </div>
@@ -192,7 +192,7 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-ctp-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Email Address
               </label>
               <input
@@ -202,7 +202,7 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-white placeholder-ctp-overlay0 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 placeholder="you@example.com"
               />
             </div>
@@ -210,7 +210,7 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-ctp-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Password
               </label>
               <input
@@ -220,10 +220,10 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-white placeholder-ctp-overlay0 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 placeholder="••••••••"
               />
-              <p className="text-xs text-ctp-subtext0 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Minimum 8 characters
               </p>
             </div>
@@ -231,7 +231,7 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-ctp-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Confirm Password
               </label>
               <input
@@ -241,7 +241,7 @@ export default function SignupPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-ctp-base border border-ctp-surface1 rounded-lg text-white placeholder-ctp-overlay0 focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 placeholder="••••••••"
               />
             </div>
@@ -249,17 +249,17 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-ctp-peach to-ctp-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity disabled:opacity-50">
+              className="w-full bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity disabled:opacity-50">
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-ctp-subtext1 text-sm">
+            <p className="text-muted-foreground text-sm">
               Already have an account?{' '}
               <Link
                 href="/auth/login"
-                className="text-ctp-peach hover:text-ctp-teal transition-colors font-medium">
+                className="text-primary hover:text-brand-teal transition-colors font-medium">
                 Sign in
               </Link>
             </p>
@@ -270,7 +270,7 @@ export default function SignupPage() {
       {/* Success Modal */}
       {success && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-ctp-surface0 rounded-lg p-8 max-w-md w-full border border-ctp-surface1 shadow-2xl">
+          <div className="bg-card rounded-lg p-8 max-w-md w-full border border-border shadow-2xl">
             <div className="flex flex-col items-center text-center">
               {/* Success Icon */}
               <div className="w-16 h-16 bg-gradient-to-br from-brand-orange to-brand-teal rounded-full flex items-center justify-center mb-4">
@@ -280,10 +280,10 @@ export default function SignupPage() {
               </div>
 
               {/* Success Message */}
-              <h3 className="text-2xl font-bold text-ctp-text mb-2">
+              <h3 className="text-2xl font-bold text-foreground mb-2">
                 Account Created Successfully!
               </h3>
-              <p className="text-ctp-subtext1 mb-6">
+              <p className="text-muted-foreground mb-6">
                 Please check your email to verify your account before signing in.
               </p>
 

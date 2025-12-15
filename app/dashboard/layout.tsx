@@ -64,20 +64,20 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-mocha-peach border-r-transparent"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-background">
       {/* Top Header Bar */}
-      <header className="h-16 bg-[#1e1e2e] border-b border-mocha-surface0 flex items-center px-4 fixed top-0 left-0 right-0 z-40">
+      <header className="h-16 bg-card border-b border-border flex items-center px-4 fixed top-0 left-0 right-0 z-40">
         {/* Mobile hamburger menu */}
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
-          className="lg:hidden p-2 text-mocha-text hover:bg-mocha-surface0 rounded-lg transition-colors mr-3"
+          className="lg:hidden p-2 text-foreground hover:bg-muted rounded-lg transition-colors mr-3"
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -88,8 +88,8 @@ export default function DashboardLayout({
             FF
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-sm font-bold text-mocha-text">Innovaas FlowForge</h1>
-            <p className="text-xs text-mocha-subtext0">Assessment Platform</p>
+            <h1 className="text-sm font-bold text-foreground">Innovaas FlowForge</h1>
+            <p className="text-xs text-muted-foreground">Assessment Platform</p>
           </div>
         </div>
       </header>
@@ -110,10 +110,10 @@ export default function DashboardLayout({
           </div>
 
           {/* Footer */}
-          <footer className="border-t border-mocha-surface0 py-6 mt-8">
+          <footer className="border-t border-border py-6 mt-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-center gap-3">
-                <p className="text-sm text-mocha-subtext0">
+                <p className="text-sm text-muted-foreground">
                   FlowForge version 1.0.0 · by
                 </p>
                 <img

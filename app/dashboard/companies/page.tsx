@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { apiUrl } from '@/lib/api-url'
 import { Plus, Building2, Globe, MapPin, Users, Flag, Landmark } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface CompanyProfile {
   id: string
@@ -74,53 +75,51 @@ export default function CompaniesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-mocha-base">
-        <div className="text-mocha-text">Loading companies...</div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-foreground">Loading companies...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-mocha-text">Company Profiles</h1>
-            <p className="mt-2 text-sm text-mocha-subtext0">
+            <h1 className="text-3xl font-bold text-foreground">Company Profiles</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
               Manage your client companies and their information
             </p>
           </div>
-          <Link
-            href="/dashboard/companies/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange text-white rounded-lg font-medium hover:bg-brand-orange/90 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            New Company
-          </Link>
+          <Button asChild>
+            <Link href="/dashboard/companies/new">
+              <Plus className="w-5 h-5 mr-2" />
+              New Company
+            </Link>
+          </Button>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-mocha-red/10 border border-mocha-red rounded-lg text-mocha-red">
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg text-destructive">
             {error}
           </div>
         )}
 
         {/* Companies Grid */}
         {companies.length === 0 ? (
-          <div className="text-center py-12 bg-mocha-surface0 rounded-lg border border-mocha-surface1">
-            <Building2 className="w-16 h-16 text-mocha-subtext0 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-mocha-text mb-2">No companies yet</h3>
-            <p className="text-sm text-mocha-subtext0 mb-6">
+          <div className="text-center py-12 bg-card rounded-lg border border-border">
+            <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No companies yet</h3>
+            <p className="text-sm text-muted-foreground mb-6">
               Create your first company profile to get started
             </p>
-            <Link
-              href="/dashboard/companies/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-orange text-white rounded-lg font-medium hover:bg-brand-orange/90 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Create Company Profile
-            </Link>
+            <Button asChild>
+              <Link href="/dashboard/companies/new">
+                <Plus className="w-5 h-5 mr-2" />
+                Create Company Profile
+              </Link>
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,52 +127,52 @@ export default function CompaniesPage() {
               <Link
                 key={company.id}
                 href={`/dashboard/companies/${company.id}`}
-                className="block bg-mocha-surface0 rounded-lg border border-mocha-surface1 p-6 hover:border-mocha-peach transition-colors"
+                className="block bg-card rounded-lg border border-border p-6 hover:border-primary/50 transition-colors"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-mocha-blue rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                    <div className="w-12 h-12 bg-brand-teal rounded-lg flex items-center justify-center text-white text-xl font-bold">
                       {company.company_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-mocha-text">
+                      <h3 className="font-semibold text-foreground">
                         {company.company_name}
                       </h3>
-                      <p className="text-sm text-mocha-subtext0">{company.industry}</p>
+                      <p className="text-sm text-muted-foreground">{company.industry}</p>
                     </div>
                   </div>
                   <span className="text-2xl">{getMarketScopeIcon(company.market_scope)}</span>
                 </div>
 
                 {company.description && (
-                  <p className="text-sm text-mocha-subtext1 mb-4 line-clamp-2">
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                     {company.description}
                   </p>
                 )}
 
                 <div className="space-y-2">
                   {company.website && (
-                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Globe className="w-4 h-4" />
                       <span className="truncate">{company.website}</span>
                     </div>
                   )}
                   {company.headquarters_location && (
-                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
                       <span>{company.headquarters_location}</span>
                     </div>
                   )}
                   {company.employee_count_range && (
-                    <div className="flex items-center gap-2 text-sm text-mocha-subtext0">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Users className="w-4 h-4" />
                       <span>{company.employee_count_range} employees</span>
                     </div>
                   )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-mocha-surface1">
-                  <span className="text-xs text-mocha-subtext0" suppressHydrationWarning>
+                <div className="mt-4 pt-4 border-t border-border">
+                  <span className="text-xs text-muted-foreground" suppressHydrationWarning>
                     Created {new Date(company.created_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -186,7 +185,7 @@ export default function CompaniesPage() {
         <div className="mt-8">
           <Link
             href="/dashboard"
-            className="text-sm text-mocha-subtext0 hover:text-mocha-text transition-colors"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Back to Dashboard
           </Link>

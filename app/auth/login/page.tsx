@@ -54,21 +54,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mocha-base flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-mocha-surface0 rounded-lg p-8 shadow-lg">
+        <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-mocha-text mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Sign In
             </h1>
-            <p className="text-mocha-subtext1">
+            <p className="text-muted-foreground">
               Welcome back to Innovaas FlowForge
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-500/10 border border-red-500/50 rounded-lg p-4">
-              <p className="text-red-500 text-sm">{error}</p>
+            <div className="mb-6 bg-destructive/10 border border-destructive/50 rounded-lg p-4">
+              <p className="text-destructive text-sm">{error}</p>
             </div>
           )}
 
@@ -76,10 +76,10 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-mocha-overlay0"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-mocha-surface0 text-mocha-subtext1">
+              <span className="px-4 bg-card text-muted-foreground">
                 Or continue with email
               </span>
             </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-mocha-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Email Address
               </label>
               <input
@@ -98,7 +98,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-mocha-surface1 border border-mocha-surface2 rounded-lg text-mocha-text placeholder-mocha-subtext0 focus:outline-none focus:ring-2 focus:ring-brand-orange"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="you@example.com"
               />
             </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-mocha-text mb-2">
+                className="block text-sm font-medium text-foreground mb-2">
                 Password
               </label>
               <input
@@ -115,7 +115,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-mocha-surface1 border border-mocha-surface2 rounded-lg text-mocha-text placeholder-mocha-subtext0 focus:outline-none focus:ring-2 focus:ring-brand-orange"
+                className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="••••••••"
               />
             </div>
@@ -129,11 +129,11 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-mocha-subtext1 text-sm">
+            <p className="text-muted-foreground text-sm">
               Don't have an account?{' '}
               <Link
                 href="/auth/signup"
-                className="text-brand-orange hover:text-brand-teal transition-colors font-medium">
+                className="text-primary hover:text-brand-teal transition-colors font-medium">
                 Sign up
               </Link>
             </p>

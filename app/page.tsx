@@ -30,8 +30,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
       </div>
     )
   }

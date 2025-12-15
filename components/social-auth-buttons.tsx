@@ -35,11 +35,11 @@ export default function SocialAuthButtons() {
       <button
         onClick={() => handleSocialLogin('google')}
         disabled={loading !== null}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-mocha-surface0 text-mocha-text border border-mocha-overlay0 rounded-lg
-                   hover:bg-mocha-surface1 hover:border-mocha-overlay1 transition-colors
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-card text-foreground border border-border rounded-lg
+                   hover:bg-muted hover:border-muted-foreground/30 transition-colors
                    disabled:opacity-50 disabled:cursor-not-allowed">
         {loading === 'google' ? (
-          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand-orange border-r-transparent" />
+          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-primary border-r-transparent" />
         ) : (
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -66,11 +66,11 @@ export default function SocialAuthButtons() {
       <button
         onClick={() => handleSocialLogin('azure')}
         disabled={loading !== null}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-mocha-surface0 text-mocha-text border border-mocha-overlay0 rounded-lg
-                   hover:bg-mocha-surface1 hover:border-mocha-overlay1 transition-colors
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-card text-foreground border border-border rounded-lg
+                   hover:bg-muted hover:border-muted-foreground/30 transition-colors
                    disabled:opacity-50 disabled:cursor-not-allowed">
         {loading === 'azure' ? (
-          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand-orange border-r-transparent" />
+          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-primary border-r-transparent" />
         ) : (
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -85,11 +85,11 @@ export default function SocialAuthButtons() {
       <button
         onClick={() => handleSocialLogin('github')}
         disabled={loading !== null}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-mocha-surface0 text-mocha-text border border-mocha-overlay0 rounded-lg
-                   hover:bg-mocha-surface1 hover:border-mocha-overlay1 transition-colors
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-card text-foreground border border-border rounded-lg
+                   hover:bg-muted hover:border-muted-foreground/30 transition-colors
                    disabled:opacity-50 disabled:cursor-not-allowed">
         {loading === 'github' ? (
-          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand-orange border-r-transparent" />
+          <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-primary border-r-transparent" />
         ) : (
           <Github className="w-5 h-5" />
         )}
