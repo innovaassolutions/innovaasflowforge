@@ -10,19 +10,19 @@ export default function ReportMockup() {
       <rect width="800" height="600" rx="12" fill="#FFFEFB" />
 
       {/* Browser Chrome */}
-      <rect width="800" height="40" rx="12" fill="#F5F5F4" />
+      <rect width="800" height="40" rx="12" fill="#FAF8F3" />
       <circle cx="20" cy="20" r="6" fill="#ef4444" />
       <circle cx="40" cy="20" r="6" fill="#F25C05" />
       <circle cx="60" cy="20" r="6" fill="#22c55e" />
 
       {/* URL Bar */}
       <rect x="90" y="10" width="600" height="20" rx="4" fill="#FFFFFF" />
-      <text x="100" y="25" fontSize="12" fill="#78716C" fontFamily="monospace">
+      <text x="100" y="25" fontSize="12" fill="#71706B" fontFamily="monospace">
         flowforge.ai/reports/transformation-readiness
       </text>
 
       {/* Header */}
-      <rect y="40" width="800" height="80" fill="#F5F5F4" />
+      <rect y="40" width="800" height="80" fill="#FAF8F3" />
       <text x="30" y="75" fontSize="22" fontWeight="bold" fill="#171614">
         Digital Transformation Readiness Report
       </text>
@@ -45,10 +45,10 @@ export default function ReportMockup() {
       <text x="180" y="195" fontSize="14" fill="#171614" fontWeight="500">
         Medium-High Readiness
       </text>
-      <text x="180" y="215" fontSize="12" fill="#78716C">
+      <text x="180" y="215" fontSize="12" fill="#71706B">
         Strong foundation with opportunities
       </text>
-      <text x="180" y="230" fontSize="12" fill="#78716C">
+      <text x="180" y="230" fontSize="12" fill="#71706B">
         for strategic improvement
       </text>
 
@@ -154,7 +154,7 @@ export default function ReportMockup() {
       <text x="455" y="325" fontSize="12" fill="#171614">
         Strong leadership alignment on
       </text>
-      <text x="455" y="340" fontSize="12" fill="#78716C">
+      <text x="455" y="340" fontSize="12" fill="#71706B">
         digital strategy vision
       </text>
 
@@ -162,7 +162,7 @@ export default function ReportMockup() {
       <text x="455" y="370" fontSize="12" fill="#171614">
         Cultural readiness gaps identified
       </text>
-      <text x="455" y="385" fontSize="12" fill="#78716C">
+      <text x="455" y="385" fontSize="12" fill="#71706B">
         in production teams
       </text>
 
@@ -170,7 +170,7 @@ export default function ReportMockup() {
       <text x="455" y="415" fontSize="12" fill="#171614">
         Existing technology stack provides
       </text>
-      <text x="455" y="430" fontSize="12" fill="#78716C">
+      <text x="455" y="430" fontSize="12" fill="#71706B">
         solid foundation for growth
       </text>
 
@@ -178,12 +178,12 @@ export default function ReportMockup() {
       <text x="455" y="460" fontSize="12" fill="#171614">
         Process standardization needed
       </text>
-      <text x="455" y="475" fontSize="12" fill="#78716C">
+      <text x="455" y="475" fontSize="12" fill="#71706B">
         before advanced automation
       </text>
 
-      <rect x="430" y="510" width="320" height="50" rx="6" fill="#F5F5F4" />
-      <text x="445" y="530" fontSize="11" fill="#78716C">
+      <rect x="430" y="510" width="320" height="50" rx="6" fill="#FAF8F3" />
+      <text x="445" y="530" fontSize="11" fill="#71706B">
         Recommended Next Steps
       </text>
       <text x="445" y="548" fontSize="11" fontWeight="bold" fill="#F25C05">

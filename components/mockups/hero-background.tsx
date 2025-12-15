@@ -26,9 +26,9 @@ export default function HeroBackground() {
       {/* Person silhouette at desk - using warm gray tones */}
       <g transform="translate(750, 300)">
         {/* Desk */}
-        <rect x="0" y="200" width="400" height="20" rx="4" fill="#78716C" opacity="0.4" />
-        <rect x="20" y="220" width="8" height="100" fill="#78716C" opacity="0.4" />
-        <rect x="372" y="220" width="8" height="100" fill="#78716C" opacity="0.4" />
+        <rect x="0" y="200" width="400" height="20" rx="4" fill="#71706B" opacity="0.4" />
+        <rect x="20" y="220" width="8" height="100" fill="#71706B" opacity="0.4" />
+        <rect x="372" y="220" width="8" height="100" fill="#71706B" opacity="0.4" />
 
         {/* Monitor */}
         <rect x="120" y="80" width="200" height="130" rx="4" fill="#E7E5E4" opacity="0.8" />
@@ -36,14 +36,14 @@ export default function HeroBackground() {
 
         {/* Monitor screen content - chat interface */}
         <rect x="140" y="100" width="160" height="30" rx="4" fill="#F25C05" opacity="0.3" />
-        <rect x="145" y="105" width="80" height="4" fill="#78716C" opacity="0.6" />
-        <rect x="145" y="112" width="120" height="4" fill="#78716C" opacity="0.4" />
-        <rect x="145" y="119" width="100" height="4" fill="#78716C" opacity="0.4" />
+        <rect x="145" y="105" width="80" height="4" fill="#71706B" opacity="0.6" />
+        <rect x="145" y="112" width="120" height="4" fill="#71706B" opacity="0.4" />
+        <rect x="145" y="119" width="100" height="4" fill="#71706B" opacity="0.4" />
 
         <rect x="140" y="140" width="160" height="30" rx="4" fill="#1D9BA3" opacity="0.2" />
-        <rect x="145" y="145" width="70" height="4" fill="#78716C" opacity="0.6" />
-        <rect x="145" y="152" width="110" height="4" fill="#78716C" opacity="0.4" />
-        <rect x="145" y="159" width="90" height="4" fill="#78716C" opacity="0.4" />
+        <rect x="145" y="145" width="70" height="4" fill="#71706B" opacity="0.6" />
+        <rect x="145" y="152" width="110" height="4" fill="#71706B" opacity="0.4" />
+        <rect x="145" y="159" width="90" height="4" fill="#71706B" opacity="0.4" />
 
         {/* Monitor stand */}
         <rect x="200" y="210" width="40" height="8" rx="2" fill="#E7E5E4" opacity="0.8" />
@@ -51,35 +51,35 @@ export default function HeroBackground() {
 
         {/* Person silhouette */}
         {/* Head */}
-        <circle cx="220" cy="150" r="30" fill="#78716C" opacity="0.3" />
+        <circle cx="220" cy="150" r="30" fill="#71706B" opacity="0.3" />
 
         {/* Shoulders/torso */}
-        <ellipse cx="220" cy="220" rx="50" ry="60" fill="#78716C" opacity="0.3" />
+        <ellipse cx="220" cy="220" rx="50" ry="60" fill="#71706B" opacity="0.3" />
 
         {/* Left arm - typing position */}
-        <rect x="150" y="200" width="50" height="15" rx="8" fill="#78716C" opacity="0.3"
+        <rect x="150" y="200" width="50" height="15" rx="8" fill="#71706B" opacity="0.3"
               transform="rotate(-20 150 207)" />
 
         {/* Right arm - typing position */}
-        <rect x="240" y="200" width="50" height="15" rx="8" fill="#78716C" opacity="0.3"
+        <rect x="240" y="200" width="50" height="15" rx="8" fill="#71706B" opacity="0.3"
               transform="rotate(20 290 207)" />
 
         {/* Keyboard */}
         <rect x="140" y="220" width="160" height="40" rx="4" fill="#E7E5E4" opacity="0.5" />
         <g opacity="0.3">
           {/* Key rows */}
-          <rect x="150" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="162" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="174" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="186" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="198" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="210" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="222" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="234" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="246" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="258" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="270" y="228" width="8" height="6" rx="1" fill="#78716C" />
-          <rect x="282" y="228" width="8" height="6" rx="1" fill="#78716C" />
+          <rect x="150" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="162" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="174" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="186" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="198" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="210" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="222" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="234" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="246" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="258" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="270" y="228" width="8" height="6" rx="1" fill="#71706B" />
+          <rect x="282" y="228" width="8" height="6" rx="1" fill="#71706B" />
         </g>
 
         {/* Mouse */}
@@ -94,7 +94,7 @@ export default function HeroBackground() {
         <rect x="140" y="560" width="15" height="45" fill="#1D9BA3" />
         <rect x="165" y="540" width="15" height="65" fill="#22c55e" />
         <rect x="190" y="550" width="15" height="55" fill="#f97316" />
-        <line x1="110" y1="605" x2="225" y2="605" stroke="#78716C" strokeWidth="1" opacity="0.3" />
+        <line x1="110" y1="605" x2="225" y2="605" stroke="#71706B" strokeWidth="1" opacity="0.3" />
 
         {/* Chart 2 - Pie chart */}
         <circle cx="1050" cy="150" r="60" fill="#E7E5E4" opacity="0.4" />
@@ -104,10 +104,10 @@ export default function HeroBackground() {
 
         {/* Document/Report icon */}
         <rect x="150" y="100" width="100" height="140" rx="8" fill="#E7E5E4" opacity="0.3" />
-        <line x1="170" y1="130" x2="220" y2="130" stroke="#78716C" strokeWidth="2" opacity="0.3" />
-        <line x1="170" y1="150" x2="230" y2="150" stroke="#78716C" strokeWidth="2" opacity="0.3" />
-        <line x1="170" y1="170" x2="225" y2="170" stroke="#78716C" strokeWidth="2" opacity="0.3" />
-        <line x1="170" y1="190" x2="215" y2="190" stroke="#78716C" strokeWidth="2" opacity="0.3" />
+        <line x1="170" y1="130" x2="220" y2="130" stroke="#71706B" strokeWidth="2" opacity="0.3" />
+        <line x1="170" y1="150" x2="230" y2="150" stroke="#71706B" strokeWidth="2" opacity="0.3" />
+        <line x1="170" y1="170" x2="225" y2="170" stroke="#71706B" strokeWidth="2" opacity="0.3" />
+        <line x1="170" y1="190" x2="215" y2="190" stroke="#71706B" strokeWidth="2" opacity="0.3" />
       </g>
 
       {/* Network nodes */}
@@ -115,9 +115,9 @@ export default function HeroBackground() {
         <circle cx="400" cy="600" r="8" fill="#F25C05" />
         <circle cx="500" cy="650" r="8" fill="#1D9BA3" />
         <circle cx="450" cy="700" r="8" fill="#F25C05" />
-        <line x1="400" y1="600" x2="500" y2="650" stroke="#78716C" strokeWidth="1" />
-        <line x1="500" y1="650" x2="450" y2="700" stroke="#78716C" strokeWidth="1" />
-        <line x1="450" y1="700" x2="400" y2="600" stroke="#78716C" strokeWidth="1" />
+        <line x1="400" y1="600" x2="500" y2="650" stroke="#71706B" strokeWidth="1" />
+        <line x1="500" y1="650" x2="450" y2="700" stroke="#71706B" strokeWidth="1" />
+        <line x1="450" y1="700" x2="400" y2="600" stroke="#71706B" strokeWidth="1" />
       </g>
     </svg>
   )

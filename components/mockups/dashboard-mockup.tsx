@@ -10,19 +10,19 @@ export default function DashboardMockup() {
       <rect width="800" height="600" rx="12" fill="#FFFEFB" />
 
       {/* Browser Chrome */}
-      <rect width="800" height="40" rx="12" fill="#F5F5F4" />
+      <rect width="800" height="40" rx="12" fill="#FAF8F3" />
       <circle cx="20" cy="20" r="6" fill="#ef4444" />
       <circle cx="40" cy="20" r="6" fill="#F25C05" />
       <circle cx="60" cy="20" r="6" fill="#22c55e" />
 
       {/* URL Bar */}
       <rect x="90" y="10" width="600" height="20" rx="4" fill="#FFFFFF" />
-      <text x="100" y="25" fontSize="12" fill="#78716C" fontFamily="monospace">
+      <text x="100" y="25" fontSize="12" fill="#71706B" fontFamily="monospace">
         flowforge.ai/dashboard/campaigns
       </text>
 
       {/* Sidebar */}
-      <rect y="40" width="200" height="560" fill="#F5F5F4" />
+      <rect y="40" width="200" height="560" fill="#FAF8F3" />
       <text x="30" y="80" fontSize="16" fontWeight="bold" fill="#F25C05">
         FlowForge
       </text>
@@ -35,12 +35,12 @@ export default function DashboardMockup() {
       </text>
 
       <rect x="20" y="155" width="160" height="35" rx="6" fill="transparent" />
-      <text x="35" y="178" fontSize="13" fill="#78716C">
+      <text x="35" y="178" fontSize="13" fill="#71706B">
         Reports
       </text>
 
       <rect x="20" y="200" width="160" height="35" rx="6" fill="transparent" />
-      <text x="35" y="223" fontSize="13" fill="#78716C">
+      <text x="35" y="223" fontSize="13" fill="#71706B">
         Analytics
       </text>
 
@@ -66,12 +66,12 @@ export default function DashboardMockup() {
       <text x="250" y="185" fontSize="13" fill="#1D9BA3" fontWeight="500">
         Active
       </text>
-      <text x="300" y="185" fontSize="13" fill="#78716C">
+      <text x="300" y="185" fontSize="13" fill="#71706B">
         12 stakeholders
       </text>
       <rect x="250" y="200" width="400" height="8" rx="4" fill="#E7E5E4" />
       <rect x="250" y="200" width="280" height="8" rx="4" fill="#22c55e" />
-      <text x="250" y="230" fontSize="12" fill="#78716C">
+      <text x="250" y="230" fontSize="12" fill="#71706B">
         8 of 12 interviews completed
       </text>
       <rect x="670" y="155" width="60" height="25" rx="4" fill="#F25C05" opacity="0.1" />
@@ -89,12 +89,12 @@ export default function DashboardMockup() {
       <text x="250" y="325" fontSize="13" fill="#F25C05" fontWeight="500">
         Planning
       </text>
-      <text x="310" y="325" fontSize="13" fill="#78716C">
+      <text x="310" y="325" fontSize="13" fill="#71706B">
         8 stakeholders
       </text>
       <rect x="250" y="340" width="400" height="8" rx="4" fill="#E7E5E4" />
       <rect x="250" y="340" width="100" height="8" rx="4" fill="#F25C05" />
-      <text x="250" y="370" fontSize="12" fill="#78716C">
+      <text x="250" y="370" fontSize="12" fill="#71706B">
         2 of 8 interviews completed
       </text>
       <rect x="670" y="295" width="60" height="25" rx="4" fill="#F25C05" opacity="0.1" />
@@ -112,11 +112,11 @@ export default function DashboardMockup() {
       <text x="250" y="465" fontSize="13" fill="#22c55e" fontWeight="500">
         Completed
       </text>
-      <text x="325" y="465" fontSize="13" fill="#78716C">
+      <text x="325" y="465" fontSize="13" fill="#71706B">
         15 stakeholders
       </text>
       <rect x="250" y="480" width="400" height="8" rx="4" fill="#22c55e" />
-      <text x="250" y="510" fontSize="12" fill="#78716C">
+      <text x="250" y="510" fontSize="12" fill="#71706B">
         15 of 15 interviews completed
       </text>
       <rect x="650" y="435" width="80" height="25" rx="4" fill="#22c55e" opacity="0.1" />

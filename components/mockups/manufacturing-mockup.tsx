@@ -10,19 +10,19 @@ export default function ManufacturingMockup() {
       <rect width="800" height="600" rx="12" fill="#FFFEFB" />
 
       {/* Browser Chrome */}
-      <rect width="800" height="40" rx="12" fill="#F5F5F4" />
+      <rect width="800" height="40" rx="12" fill="#FAF8F3" />
       <circle cx="20" cy="20" r="6" fill="#ef4444" />
       <circle cx="40" cy="20" r="6" fill="#F25C05" />
       <circle cx="60" cy="20" r="6" fill="#22c55e" />
 
       {/* URL Bar */}
       <rect x="90" y="10" width="600" height="20" rx="4" fill="#FFFFFF" />
-      <text x="100" y="25" fontSize="12" fill="#78716C" fontFamily="monospace">
+      <text x="100" y="25" fontSize="12" fill="#71706B" fontFamily="monospace">
         flowforge.ai/session/manufacturing-assessment
       </text>
 
       {/* Header */}
-      <rect y="40" width="800" height="60" fill="#F5F5F4" />
+      <rect y="40" width="800" height="60" fill="#FAF8F3" />
       <text x="30" y="75" fontSize="20" fontWeight="bold" fill="#171614">
         Manufacturing Digital Transformation Assessment
       </text>
@@ -70,22 +70,22 @@ export default function ManufacturingMockup() {
       </text>
 
       {/* Typing Indicator */}
-      <rect x="30" y="420" width="100" height="40" rx="8" fill="#F5F5F4" />
-      <circle cx="60" cy="440" r="4" fill="#78716C">
+      <rect x="30" y="420" width="100" height="40" rx="8" fill="#FAF8F3" />
+      <circle cx="60" cy="440" r="4" fill="#71706B">
         <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite" />
       </circle>
-      <circle cx="80" cy="440" r="4" fill="#78716C">
+      <circle cx="80" cy="440" r="4" fill="#71706B">
         <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.2s" repeatCount="indefinite" />
       </circle>
-      <circle cx="100" cy="440" r="4" fill="#78716C">
+      <circle cx="100" cy="440" r="4" fill="#71706B">
         <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" begin="0.4s" repeatCount="indefinite" />
       </circle>
 
       {/* Input Area */}
-      <rect y="540" width="800" height="60" fill="#F5F5F4" />
+      <rect y="540" width="800" height="60" fill="#FAF8F3" />
       <rect x="30" y="555" width="680" height="30" rx="15" fill="#FFFFFF" />
       <rect x="30" y="555" width="680" height="30" rx="15" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="50" y="575" fontSize="13" fill="#78716C">
+      <text x="50" y="575" fontSize="13" fill="#71706B">
         Type your response...
       </text>
 

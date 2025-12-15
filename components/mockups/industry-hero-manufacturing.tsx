@@ -32,7 +32,7 @@ export default function IndustryHeroManufacturing() {
       <rect x="480" y="30" width="380" height="440" rx="16" fill="#FFFEFB" filter="drop-shadow(0 4px 20px rgba(0,0,0,0.08))" />
 
       {/* LEFT PANEL - Assessment Dashboard */}
-      <rect x="40" y="30" width="380" height="50" rx="16" fill="#F5F5F4" />
+      <rect x="40" y="30" width="380" height="50" rx="16" fill="#FAF8F3" />
       <rect x="40" y="64" width="380" height="1" fill="#E7E5E4" />
       <circle cx="65" cy="55" r="8" fill="#F25C05" />
       <text x="82" y="60" fontSize="14" fontWeight="600" fill="#171614">Digital Maturity Assessment</text>
@@ -43,7 +43,7 @@ export default function IndustryHeroManufacturing() {
 
       {/* Assessment title */}
       <text x="140" y="125" fontSize="16" fontWeight="600" fill="#171614">Acme Manufacturing</text>
-      <text x="140" y="145" fontSize="12" fill="#78716C">Industry 4.0 Readiness • 12 Stakeholders</text>
+      <text x="140" y="145" fontSize="12" fill="#71706B">Industry 4.0 Readiness • 12 Stakeholders</text>
 
       {/* Progress ring */}
       <circle cx="90" cy="220" r="45" stroke="#E7E5E4" strokeWidth="8" fill="none" />
@@ -51,26 +51,26 @@ export default function IndustryHeroManufacturing() {
         <animate attributeName="stroke-dashoffset" from="212" to="53" dur="1.5s" fill="freeze" />
       </circle>
       <text x="90" y="215" fontSize="24" fontWeight="700" fill="#171614" textAnchor="middle">75%</text>
-      <text x="90" y="235" fontSize="10" fill="#78716C" textAnchor="middle">Overall Score</text>
+      <text x="90" y="235" fontSize="10" fill="#71706B" textAnchor="middle">Overall Score</text>
 
       {/* Dimension scores */}
       <g transform="translate(160, 180)">
-        <text x="0" y="0" fontSize="11" fontWeight="600" fill="#78716C">DIMENSIONS</text>
+        <text x="0" y="0" fontSize="11" fontWeight="600" fill="#71706B">DIMENSIONS</text>
 
         {/* Technology */}
-        <rect x="0" y="15" width="220" height="24" rx="4" fill="#F5F5F4" />
+        <rect x="0" y="15" width="220" height="24" rx="4" fill="#FAF8F3" />
         <rect x="0" y="15" width="176" height="24" rx="4" fill="#F25C05" fillOpacity="0.15" />
         <text x="8" y="31" fontSize="11" fill="#171614">Technology</text>
         <text x="200" y="31" fontSize="11" fontWeight="600" fill="#F25C05">80%</text>
 
         {/* Process */}
-        <rect x="0" y="45" width="220" height="24" rx="4" fill="#F5F5F4" />
+        <rect x="0" y="45" width="220" height="24" rx="4" fill="#FAF8F3" />
         <rect x="0" y="45" width="154" height="24" rx="4" fill="#1D9BA3" fillOpacity="0.15" />
         <text x="8" y="61" fontSize="11" fill="#171614">Process</text>
         <text x="200" y="61" fontSize="11" fontWeight="600" fill="#1D9BA3">70%</text>
 
         {/* People */}
-        <rect x="0" y="75" width="220" height="24" rx="4" fill="#F5F5F4" />
+        <rect x="0" y="75" width="220" height="24" rx="4" fill="#FAF8F3" />
         <rect x="0" y="75" width="165" height="24" rx="4" fill="#8B5CF6" fillOpacity="0.15" />
         <text x="8" y="91" fontSize="11" fill="#171614">People</text>
         <text x="200" y="91" fontSize="11" fontWeight="600" fill="#8B5CF6">75%</text>
@@ -81,14 +81,14 @@ export default function IndustryHeroManufacturing() {
       <circle cx="85" cy="355" r="12" fill="#F25C05" />
       <path d="M80 355 L85 360 L92 350" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <text x="105" y="345" fontSize="12" fontWeight="600" fill="#171614">Key Insight Detected</text>
-      <text x="105" y="365" fontSize="11" fill="#78716C">Quality control automation is your highest-impact</text>
-      <text x="105" y="380" fontSize="11" fill="#78716C">opportunity with 3.2x ROI potential</text>
+      <text x="105" y="365" fontSize="11" fill="#71706B">Quality control automation is your highest-impact</text>
+      <text x="105" y="380" fontSize="11" fill="#71706B">opportunity with 3.2x ROI potential</text>
 
       {/* Timeline indicator */}
-      <rect x="60" y="410" width="340" height="40" rx="8" fill="#F5F5F4" />
-      <text x="80" y="435" fontSize="11" fill="#78716C">Assessment completed in</text>
+      <rect x="60" y="410" width="340" height="40" rx="8" fill="#FAF8F3" />
+      <text x="80" y="435" fontSize="11" fill="#71706B">Assessment completed in</text>
       <text x="220" y="435" fontSize="14" fontWeight="700" fill="#F25C05">3 days</text>
-      <text x="262" y="435" fontSize="11" fill="#78716C">vs 3 weeks traditional</text>
+      <text x="262" y="435" fontSize="11" fill="#71706B">vs 3 weeks traditional</text>
 
       {/* RIGHT PANEL - Interview Synthesis */}
       <rect x="480" y="30" width="380" height="50" rx="16" fill="#171614" />
@@ -130,7 +130,7 @@ export default function IndustryHeroManufacturing() {
       <path d="M800 130 L810 140 L820 130 M800 150 L810 140 L820 150" stroke="white" strokeWidth="2" strokeLinecap="round" />
 
       {/* Cross-reference analysis */}
-      <rect x="510" y="190" width="320" height="100" rx="8" fill="#F5F5F4" />
+      <rect x="510" y="190" width="320" height="100" rx="8" fill="#FAF8F3" />
       <text x="530" y="215" fontSize="11" fontWeight="600" fill="#171614">Cross-Stakeholder Analysis</text>
 
       {/* Contradiction highlight */}
@@ -138,7 +138,7 @@ export default function IndustryHeroManufacturing() {
       <circle cx="545" cy="252" r="10" fill="#F25C05" fillOpacity="0.1" />
       <text x="545" y="256" fontSize="12" fill="#F25C05" textAnchor="middle">!</text>
       <text x="565" y="248" fontSize="10" fontWeight="500" fill="#171614">Contradiction Detected</text>
-      <text x="565" y="262" fontSize="9" fill="#78716C">OPS reports 30% automation vs IT reports 45%</text>
+      <text x="565" y="262" fontSize="9" fill="#71706B">OPS reports 30% automation vs IT reports 45%</text>
 
       {/* Generated insights */}
       <text x="510" y="320" fontSize="11" fontWeight="600" fill="#171614">Strategic Recommendations</text>

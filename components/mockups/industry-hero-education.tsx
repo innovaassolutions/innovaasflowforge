@@ -27,7 +27,7 @@ export default function IndustryHeroEducation() {
       <rect x="480" y="30" width="380" height="440" rx="16" fill="#FFFEFB" filter="drop-shadow(0 4px 20px rgba(0,0,0,0.08))" />
 
       {/* LEFT PANEL - Faculty Insights */}
-      <rect x="40" y="30" width="380" height="50" rx="16" fill="#F5F5F4" />
+      <rect x="40" y="30" width="380" height="50" rx="16" fill="#FAF8F3" />
       <rect x="40" y="64" width="380" height="1" fill="#E7E5E4" />
       <circle cx="65" cy="55" r="8" fill="#3B82F6" />
       <text x="82" y="60" fontSize="14" fontWeight="600" fill="#171614">Institutional Assessment</text>
@@ -39,29 +39,29 @@ export default function IndustryHeroEducation() {
 
       {/* Institution info */}
       <text x="140" y="125" fontSize="16" fontWeight="600" fill="#171614">State University</text>
-      <text x="140" y="145" fontSize="12" fill="#78716C">Complete Assessment • Faculty + Parents</text>
+      <text x="140" y="145" fontSize="12" fill="#71706B">Complete Assessment • Faculty + Parents</text>
 
       {/* Response stats */}
       <rect x="60" y="175" width="340" height="70" rx="12" fill="#3B82F6" fillOpacity="0.05" />
       <g transform="translate(75, 195)">
         <text x="0" y="0" fontSize="24" fontWeight="700" fill="#3B82F6">72</text>
-        <text x="0" y="18" fontSize="9" fill="#78716C">Faculty</text>
+        <text x="0" y="18" fontSize="9" fill="#71706B">Faculty</text>
       </g>
       <g transform="translate(145, 195)">
         <text x="0" y="0" fontSize="24" fontWeight="700" fill="#22C55E">248</text>
-        <text x="0" y="18" fontSize="9" fill="#78716C">Parents</text>
+        <text x="0" y="18" fontSize="9" fill="#71706B">Parents</text>
       </g>
       <g transform="translate(225, 195)">
         <text x="0" y="0" fontSize="24" fontWeight="700" fill="#6366F1">85%</text>
-        <text x="0" y="18" fontSize="9" fill="#78716C">Response</text>
+        <text x="0" y="18" fontSize="9" fill="#71706B">Response</text>
       </g>
       <g transform="translate(305, 195)">
         <text x="0" y="0" fontSize="24" fontWeight="700" fill="#8B5CF6">6</text>
-        <text x="0" y="18" fontSize="9" fill="#78716C">Depts</text>
+        <text x="0" y="18" fontSize="9" fill="#71706B">Depts</text>
       </g>
 
       {/* Parent Satisfaction Score */}
-      <text x="60" y="270" fontSize="11" fontWeight="600" fill="#78716C">PARENT SATISFACTION</text>
+      <text x="60" y="270" fontSize="11" fontWeight="600" fill="#71706B">PARENT SATISFACTION</text>
 
       <g transform="translate(60, 283)">
         <rect x="0" y="0" width="340" height="50" rx="8" fill="#22C55E" fillOpacity="0.05" />
@@ -73,7 +73,7 @@ export default function IndustryHeroEducation() {
         <text x="30" y="29" fontSize="11" fontWeight="700" fill="#22C55E" textAnchor="middle">82%</text>
 
         <text x="65" y="18" fontSize="11" fontWeight="600" fill="#171614">Parents recommend institution</text>
-        <text x="65" y="34" fontSize="10" fill="#78716C">+8% vs last year • Top driver: Communication</text>
+        <text x="65" y="34" fontSize="10" fill="#71706B">+8% vs last year • Top driver: Communication</text>
       </g>
 
       {/* Key insight */}
@@ -81,11 +81,11 @@ export default function IndustryHeroEducation() {
       <circle cx="85" cy="377" r="12" fill="#F59E0B" />
       <text x="83" y="381" fontSize="12" fill="white" textAnchor="middle">!</text>
       <text x="105" y="370" fontSize="11" fontWeight="600" fill="#171614">Gap Identified</text>
-      <text x="105" y="386" fontSize="10" fill="#78716C">Parents want more progress updates - faculty unaware</text>
+      <text x="105" y="386" fontSize="10" fill="#71706B">Parents want more progress updates - faculty unaware</text>
 
       {/* Accreditation tag */}
-      <rect x="60" y="430" width="340" height="35" rx="6" fill="#F5F5F4" />
-      <text x="80" y="452" fontSize="11" fill="#78716C">Accreditation evidence •</text>
+      <rect x="60" y="430" width="340" height="35" rx="6" fill="#FAF8F3" />
+      <text x="80" y="452" fontSize="11" fill="#71706B">Accreditation evidence •</text>
       <text x="200" y="452" fontSize="11" fontWeight="600" fill="#3B82F6">SACSCOC aligned documentation</text>
 
       {/* RIGHT PANEL - Department Analysis */}
@@ -97,7 +97,7 @@ export default function IndustryHeroEducation() {
 
       {/* Department bars */}
       <g transform="translate(510, 100)">
-        <text x="0" y="0" fontSize="11" fontWeight="600" fill="#78716C">DIGITAL READINESS BY DEPARTMENT</text>
+        <text x="0" y="0" fontSize="11" fontWeight="600" fill="#71706B">DIGITAL READINESS BY DEPARTMENT</text>
 
         {/* Business */}
         <text x="0" y="30" fontSize="11" fill="#171614">Business</text>
@@ -148,7 +148,7 @@ export default function IndustryHeroEducation() {
         <circle cx="20" cy="20" r="12" fill="#3B82F6" />
         <text x="20" y="24" fontSize="10" fill="white" textAnchor="middle">1</text>
         <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Launch faculty development program</text>
-        <text x="42" y="30" fontSize="9" fill="#78716C">Address training gap cited by 68% of faculty</text>
+        <text x="42" y="30" fontSize="9" fill="#71706B">Address training gap cited by 68% of faculty</text>
       </g>
 
       <g transform="translate(510, 350)">
@@ -156,7 +156,7 @@ export default function IndustryHeroEducation() {
         <circle cx="20" cy="20" r="12" fill="#22C55E" />
         <text x="20" y="24" fontSize="10" fill="white" textAnchor="middle">2</text>
         <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Implement parent progress portal</text>
-        <text x="42" y="30" fontSize="9" fill="#78716C">Address #1 parent request - boost satisfaction 12%</text>
+        <text x="42" y="30" fontSize="9" fill="#71706B">Address #1 parent request - boost satisfaction 12%</text>
       </g>
 
       <g transform="translate(510, 400)">
@@ -164,7 +164,7 @@ export default function IndustryHeroEducation() {
         <circle cx="20" cy="20" r="12" fill="#8B5CF6" />
         <text x="20" y="24" fontSize="10" fill="white" textAnchor="middle">3</text>
         <text x="42" y="17" fontSize="10" fontWeight="500" fill="#171614">Pilot hybrid learning in Health Sciences</text>
-        <text x="42" y="30" fontSize="9" fill="#78716C">Lowest digital readiness - targeted support</text>
+        <text x="42" y="30" fontSize="9" fill="#71706B">Lowest digital readiness - targeted support</text>
       </g>
     </svg>
   )
