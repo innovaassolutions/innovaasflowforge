@@ -158,14 +158,14 @@ export default function ReportViewerPage() {
 
   if (error || !report) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center p-6">
-        <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 max-w-md w-full text-center">
-          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-mocha-text mb-2">Report Not Found</h1>
-          <p className="text-mocha-subtext0 mb-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="bg-card border border-border rounded-lg p-8 max-w-md w-full text-center">
+          <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Report Not Found</h1>
+          <p className="text-muted-foreground mb-4">
             {error || 'This report may have been deactivated or the access link is invalid.'}
           </p>
-          <p className="text-sm text-mocha-subtext1">
+          <p className="text-sm text-muted-foreground">
             Please contact the assessment facilitator for a new access link.
           </p>
         </div>
@@ -179,17 +179,17 @@ export default function ReportViewerPage() {
   const showConsultingGrade = tier === 'premium'
 
   return (
-    <div className="min-h-screen bg-mocha-base">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-orange/20 to-brand-teal/20 border-b border-mocha-surface1">
+      <div className="bg-gradient-to-r from-brand-orange/20 to-brand-teal/20 border-b border-border">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-mocha-text mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
                 Digital Transformation Readiness Assessment
               </h1>
-              <p className="text-xl text-mocha-subtext0">{campaign.company_name}</p>
-              <p className="text-sm text-mocha-subtext1 mt-1">
+              <p className="text-xl text-muted-foreground">{campaign.company_name}</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 {campaign.company_industry} • {campaign.name}
               </p>
             </div>
@@ -199,7 +199,7 @@ export default function ReportViewerPage() {
               {/* PDF download temporarily disabled */}
               <button
                 disabled={true}
-                className="flex items-center gap-2 px-4 py-2 bg-mocha-surface1 text-mocha-subtext1 rounded-lg transition-colors text-sm font-medium cursor-not-allowed opacity-60"
+                className="flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-lg transition-colors text-sm font-medium cursor-not-allowed opacity-60"
                 aria-label="PDF download temporarily unavailable"
                 title="PDF download is temporarily unavailable. Please use Markdown format.">
                 <Download size={16} />
@@ -208,11 +208,11 @@ export default function ReportViewerPage() {
               <button
                 onClick={() => handleDownload('md')}
                 disabled={downloading !== null}
-                className="flex items-center gap-2 px-4 py-2 bg-mocha-surface0 hover:bg-mocha-surface1 disabled:bg-mocha-surface0 disabled:text-mocha-subtext1 text-mocha-text border border-mocha-surface1 hover:border-mocha-surface2 rounded-lg transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-muted disabled:bg-card disabled:text-muted-foreground text-foreground border border-border hover:border-border/80 rounded-lg transition-colors text-sm font-medium"
                 aria-label="Download Markdown report">
                 {downloading === 'md' ? (
                   <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-mocha-text border-r-transparent"></div>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-r-transparent"></div>
                     <span>Downloading...</span>
                   </>
                 ) : (
@@ -268,10 +268,10 @@ export default function ReportViewerPage() {
 
         {/* Consultant Observations */}
         {consultant_observations && (
-          <section className="bg-mocha-base border border-mocha-surface0 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-mocha-text mb-6">Consultant Observations</h2>
-            <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-6">
-              <p className="text-mocha-text whitespace-pre-wrap leading-relaxed">
+          <section className="bg-background border border-border rounded-lg p-8">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Consultant Observations</h2>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <p className="text-foreground whitespace-pre-wrap leading-relaxed">
                 {consultant_observations}
               </p>
             </div>
@@ -279,8 +279,8 @@ export default function ReportViewerPage() {
         )}
 
         {/* Footer */}
-        <div className="pt-6 border-t border-mocha-surface1 text-center">
-          <p className="text-sm text-mocha-subtext1">
+        <div className="pt-6 border-t border-border text-center">
+          <p className="text-sm text-muted-foreground">
             Generated on{' '}
             {new Date(report.generated_at).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -294,7 +294,7 @@ export default function ReportViewerPage() {
               </span>
             )}
           </p>
-          <p className="text-xs text-mocha-subtext1 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             Report Tier: {tier.charAt(0).toUpperCase() + tier.slice(1)}
           </p>
         </div>

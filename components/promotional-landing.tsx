@@ -21,18 +21,18 @@ export default function PromotionalLanding() {
   const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
 
   return (
-    <div className="min-h-screen bg-mocha-base text-mocha-text">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20
                           md:py-28
                           lg:py-36">
-        <div className="absolute inset-0 bg-gradient-to-br from-mocha-peach/10 via-transparent to-mocha-teal/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-brand-teal/10" />
         <HeroBackground />
 
         <div className="relative max-w-7xl mx-auto px-6
                         lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold text-mocha-text mb-6
+            <h1 className="text-4xl font-bold text-foreground mb-6
                            sm:text-5xl
                            md:text-6xl
                            lg:text-7xl">
@@ -42,7 +42,7 @@ export default function PromotionalLanding() {
               </span>
             </h1>
 
-            <p className="text-lg text-mocha-subtext0 mb-8 max-w-2xl mx-auto
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto
                           md:text-xl
                           lg:text-2xl">
               AI-powered assessment platform that conducts intelligent stakeholder interviews
@@ -54,7 +54,7 @@ export default function PromotionalLanding() {
                             md:gap-6">
               <Link
                 href="/auth/signup"
-                className="w-full px-8 py-4 bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base font-semibold rounded-lg
+                className="w-full px-8 py-4 bg-gradient-to-r from-brand-orange to-brand-teal text-white font-semibold rounded-lg
                            hover:opacity-90 transition-opacity
                            sm:w-auto
                            md:px-10 md:py-5 md:text-lg">
@@ -63,7 +63,7 @@ export default function PromotionalLanding() {
 
               <Link
                 href="#how-it-works"
-                className="w-full px-8 py-4 border-2 border-mocha-overlay0 text-mocha-text font-semibold rounded-lg
+                className="w-full px-8 py-4 border-2 border-border text-foreground font-semibold rounded-lg
                            hover:border-brand-teal hover:text-brand-teal transition-colors
                            sm:w-auto
                            md:px-10 md:py-5 md:text-lg">
@@ -75,12 +75,12 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Target Audience Section */}
-      <section className="py-16 bg-mocha-mantle
+      <section className="py-16 bg-muted
                           md:py-20
                           lg:py-24">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-mocha-text mb-12
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12
                          md:text-4xl
                          lg:text-5xl lg:mb-16">
             Built For Transformation Leaders
@@ -90,23 +90,23 @@ export default function PromotionalLanding() {
                           md:grid-cols-2 md:gap-8
                           lg:grid-cols-3 lg:gap-10">
             {/* Persona 1 */}
-            <div className="bg-mocha-surface0 p-6 rounded-lg border border-mocha-overlay0
+            <div className="bg-card p-6 rounded-lg border border-border
                             hover:border-brand-teal transition-colors
                             md:p-8">
               <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Factory className="w-6 h-6 text-mocha-base
+                <Factory className="w-6 h-6 text-white
                                    md:w-7 md:h-7" />
               </div>
-              <h3 className="text-xl font-bold text-mocha-text mb-3
+              <h3 className="text-xl font-bold text-foreground mb-3
                              md:text-2xl">
                 Manufacturing Leaders
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 Assess Industry 4.0 readiness across production facilities and stakeholder teams.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
@@ -124,23 +124,23 @@ export default function PromotionalLanding() {
             </div>
 
             {/* Persona 2 */}
-            <div className="bg-mocha-surface0 p-6 rounded-lg border border-mocha-overlay0
+            <div className="bg-card p-6 rounded-lg border border-border
                             hover:border-brand-teal transition-colors
                             md:p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-mocha-mauve to-mocha-blue rounded-lg flex items-center justify-center mb-4
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Briefcase className="w-6 h-6 text-mocha-base
+                <Briefcase className="w-6 h-6 text-white
                                      md:w-7 md:h-7" />
               </div>
-              <h3 className="text-xl font-bold text-mocha-text mb-3
+              <h3 className="text-xl font-bold text-foreground mb-3
                              md:text-2xl">
                 Management Consultants
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 Facilitate structured workshops and synthesize insights across diverse methodologies.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
@@ -158,24 +158,24 @@ export default function PromotionalLanding() {
             </div>
 
             {/* Persona 3 */}
-            <div className="bg-mocha-surface0 p-6 rounded-lg border border-mocha-overlay0
+            <div className="bg-card p-6 rounded-lg border border-border
                             hover:border-brand-teal transition-colors
                             md:p-8 md:col-span-2
                             lg:col-span-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-mocha-green to-mocha-sapphire rounded-lg flex items-center justify-center mb-4
+              <div className="w-12 h-12 bg-gradient-to-br from-success to-brand-teal rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Target className="w-6 h-6 text-mocha-base
+                <Target className="w-6 h-6 text-white
                                   md:w-7 md:h-7" />
               </div>
-              <h3 className="text-xl font-bold text-mocha-text mb-3
+              <h3 className="text-xl font-bold text-foreground mb-3
                              md:text-2xl">
                 Strategic Planners
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 Gather cross-functional insights and build data-driven strategic roadmaps.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
@@ -196,12 +196,12 @@ export default function PromotionalLanding() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-mocha-base
+      <section id="how-it-works" className="py-16 bg-background
                                              md:py-20
                                              lg:py-24">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-mocha-text mb-12
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12
                          md:text-4xl
                          lg:text-5xl lg:mb-16">
             Three Steps to Strategic Clarity
@@ -212,22 +212,22 @@ export default function PromotionalLanding() {
             {/* Step 1 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-full flex items-center justify-center text-base font-bold
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-full flex items-center justify-center text-base font-bold text-white
                                 md:w-14 md:h-14 md:text-xl">
                   1
                 </div>
                 <div className="flex-1 h-1 bg-gradient-to-r from-brand-orange to-transparent ml-4
                                 lg:hidden" />
               </div>
-              <h3 className="text-2xl font-bold text-mocha-text mb-4
+              <h3 className="text-2xl font-bold text-foreground mb-4
                              md:text-3xl">
                 Create Campaign
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 Define your assessment scope and invite stakeholders via secure, personalized links.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Multi-stakeholder coordination</li>
                 <li>• Flexible methodology selection</li>
@@ -238,22 +238,22 @@ export default function PromotionalLanding() {
             {/* Step 2 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-brand-teal to-mocha-sapphire rounded-full flex items-center justify-center text-base font-bold
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-teal to-primary rounded-full flex items-center justify-center text-base font-bold text-white
                                 md:w-14 md:h-14 md:text-xl">
                   2
                 </div>
                 <div className="flex-1 h-1 bg-gradient-to-r from-brand-teal to-transparent ml-4
                                 lg:hidden" />
               </div>
-              <h3 className="text-2xl font-bold text-mocha-text mb-4
+              <h3 className="text-2xl font-bold text-foreground mb-4
                              md:text-3xl">
                 AI-Facilitated Interviews
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 Stakeholders engage in intelligent conversations that adapt based on their responses.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Context-aware questioning</li>
                 <li>• Natural conversation flow</li>
@@ -264,20 +264,20 @@ export default function PromotionalLanding() {
             {/* Step 3 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-mocha-sapphire to-mocha-mauve rounded-full flex items-center justify-center text-mocha-base font-bold
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold
                                 md:w-14 md:h-14 md:text-xl">
                   3
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-mocha-text mb-4
+              <h3 className="text-2xl font-bold text-foreground mb-4
                              md:text-3xl">
                 Strategic Synthesis
               </h3>
-              <p className="text-mocha-subtext0 mb-4
+              <p className="text-muted-foreground mb-4
                             md:text-lg">
                 AI analyzes all interviews and generates comprehensive readiness assessments.
               </p>
-              <ul className="space-y-2 text-sm text-mocha-subtext1
+              <ul className="space-y-2 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Multi-dimensional analysis</li>
                 <li>• Visual data representations</li>
@@ -289,12 +289,12 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Feature Showcase with Mockups */}
-      <section className="py-16 bg-mocha-mantle
+      <section className="py-16 bg-muted
                           md:py-20
                           lg:py-24">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-mocha-text mb-12
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12
                          md:text-4xl
                          lg:text-5xl lg:mb-16">
             See FlowForge In Action
@@ -309,8 +309,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'dashboard'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
-                            : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
+                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
                           }`}>
               Campaign Dashboard
             </button>
@@ -319,8 +319,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'interview'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
-                            : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
+                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
                           }`}>
               AI Interview
             </button>
@@ -329,8 +329,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'report'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base'
-                            : 'bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-overlay0'
+                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
+                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
                           }`}>
               Assessment Report
             </button>
@@ -348,11 +348,11 @@ export default function PromotionalLanding() {
                           md:mt-12">
             {selectedMockup === 'dashboard' && (
               <div>
-                <h3 className="text-2xl font-bold text-mocha-text mb-4
+                <h3 className="text-2xl font-bold text-foreground mb-4
                                md:text-3xl">
                   Centralized Campaign Management
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   Track multiple assessment campaigns, monitor stakeholder participation,
                   and manage interview progress from a unified dashboard.
@@ -361,11 +361,11 @@ export default function PromotionalLanding() {
             )}
             {selectedMockup === 'interview' && (
               <div>
-                <h3 className="text-2xl font-bold text-mocha-text mb-4
+                <h3 className="text-2xl font-bold text-foreground mb-4
                                md:text-3xl">
                   Intelligent Interview Agent
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   AI-powered conversations that adapt to stakeholder responses, probe deeper
                   when needed, and capture rich qualitative insights.
@@ -374,11 +374,11 @@ export default function PromotionalLanding() {
             )}
             {selectedMockup === 'report' && (
               <div>
-                <h3 className="text-2xl font-bold text-mocha-text mb-4
+                <h3 className="text-2xl font-bold text-foreground mb-4
                                md:text-3xl">
                   Comprehensive Assessment Reports
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   Multi-dimensional analysis with visual data representations, scoring across
                   readiness dimensions, and actionable strategic recommendations.
@@ -390,12 +390,12 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-mocha-base
+      <section className="py-16 bg-background
                           md:py-20
                           lg:py-24">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-mocha-text mb-12
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12
                          md:text-4xl
                          lg:text-5xl lg:mb-16">
             Why FlowForge?
@@ -407,15 +407,15 @@ export default function PromotionalLanding() {
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Clock className="w-5 h-5 text-mocha-base
+                <Clock className="w-5 h-5 text-white
                                  md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-mocha-text mb-2
+                <h3 className="text-xl font-bold text-foreground mb-2
                                md:text-2xl">
                   Save 80% of Assessment Time
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   Automate stakeholder interviews while maintaining depth and quality.
                   What used to take weeks now takes days.
@@ -424,17 +424,17 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-teal to-mocha-sapphire rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-teal to-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Shield className="w-5 h-5 text-mocha-base
+                <Shield className="w-5 h-5 text-white
                                   md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-mocha-text mb-2
+                <h3 className="text-xl font-bold text-foreground mb-2
                                md:text-2xl">
                   Eliminate Interview Bias
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   Consistent, structured questioning ensures every stakeholder receives
                   the same rigorous assessment experience.
@@ -443,17 +443,17 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-sapphire to-mocha-mauve rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <TrendingUp className="w-5 h-5 text-mocha-base
+                <TrendingUp className="w-5 h-5 text-white
                                       md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-mocha-text mb-2
+                <h3 className="text-xl font-bold text-foreground mb-2
                                md:text-2xl">
                   Scale Without Limits
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   Conduct assessments with 10 or 1,000 stakeholders simultaneously.
                   Your capacity is no longer bottlenecked by interviewer availability.
@@ -462,17 +462,17 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-mocha-mauve to-mocha-pink rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-accent to-brand-orange rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Brain className="w-5 h-5 text-mocha-base
+                <Brain className="w-5 h-5 text-white
                                  md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-mocha-text mb-2
+                <h3 className="text-xl font-bold text-foreground mb-2
                                md:text-2xl">
                   Data-Driven Insights
                 </h3>
-                <p className="text-mocha-subtext0
+                <p className="text-muted-foreground
                               md:text-lg">
                   AI synthesis identifies patterns, themes, and strategic opportunities
                   across hundreds of interview transcripts instantly.
@@ -484,18 +484,18 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-mocha-surface0 via-mocha-mantle to-mocha-surface0
+      <section className="py-16 bg-gradient-to-br from-card via-muted to-card
                           md:py-20
                           lg:py-28">
         <div className="max-w-4xl mx-auto px-6 text-center
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-mocha-text mb-6
+          <h2 className="text-3xl font-bold text-foreground mb-6
                          md:text-4xl
                          lg:text-5xl lg:mb-8">
             Ready to Transform Your Assessment Process?
           </h2>
 
-          <p className="text-lg text-mocha-subtext0 mb-8
+          <p className="text-lg text-muted-foreground mb-8
                         md:text-xl
                         lg:text-2xl lg:mb-12">
             Join transformation leaders who are leveraging AI to accelerate strategic insights.
@@ -506,7 +506,7 @@ export default function PromotionalLanding() {
                           md:gap-6">
             <Link
               href="/auth/signup"
-              className="w-full px-10 py-5 bg-gradient-to-r from-brand-orange to-brand-teal text-mocha-base font-bold rounded-lg text-lg
+              className="w-full px-10 py-5 bg-gradient-to-r from-brand-orange to-brand-teal text-white font-bold rounded-lg text-lg
                          hover:opacity-90 transition-opacity
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
@@ -515,7 +515,7 @@ export default function PromotionalLanding() {
 
             <Link
               href="/auth/login"
-              className="w-full px-10 py-5 border-2 border-mocha-overlay0 text-mocha-text font-bold rounded-lg text-lg
+              className="w-full px-10 py-5 border-2 border-border text-foreground font-bold rounded-lg text-lg
                          hover:border-brand-teal hover:text-brand-teal transition-colors
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
@@ -523,7 +523,7 @@ export default function PromotionalLanding() {
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-mocha-subtext1
+          <p className="mt-6 text-sm text-muted-foreground
                         md:text-base">
             No credit card required • Set up in minutes • Enterprise-ready security
           </p>

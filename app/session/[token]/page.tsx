@@ -184,10 +184,10 @@ export default function StakeholderInterviewPage() {
   }
   if (loading) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
-          <p className="text-mocha-subtext1 mt-4">Loading your interview...</p>
+          <p className="text-muted-foreground mt-4">Loading your interview...</p>
         </div>
       </div>
     )
@@ -195,8 +195,8 @@ export default function StakeholderInterviewPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-mocha-base flex items-center justify-center p-4">
-        <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-8 max-w-md text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-lg p-8 max-w-md text-center">
           <svg
             className="mx-auto h-12 w-12 text-brand-orange"
             fill="none"
@@ -209,7 +209,7 @@ export default function StakeholderInterviewPage() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h2 className="mt-4 text-xl font-semibold text-mocha-text">{error}</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">{error}</h2>
         </div>
       </div>
     )
@@ -217,22 +217,22 @@ export default function StakeholderInterviewPage() {
 
   if (!session) return null
   return (
-    <div className="min-h-screen bg-mocha-base flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-mocha-mantle border-b border-mocha-surface0 flex-shrink-0">
+      <header className="bg-muted border-b border-border flex-shrink-0">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
                 {session.campaigns.name}
               </h1>
-              <p className="text-mocha-subtext1 mt-1">
+              <p className="text-muted-foreground mt-1">
                 {session.campaigns.company_name}
               </p>
             </div>
             {conversationState && (
               <div className="text-right">
-                <p className="text-sm text-mocha-subtext1">Progress</p>
+                <p className="text-sm text-muted-foreground">Progress</p>
                 <p className="text-lg font-semibold text-brand-orange">
                   {conversationState.questions_asked}/15
                 </p>
@@ -245,15 +245,15 @@ export default function StakeholderInterviewPage() {
       {/* Welcome or Resume Message */}
       {messages.length === 0 && !isResuming && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-mocha-surface0 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold text-mocha-text">
+          <div className="bg-card rounded-lg p-8 text-center">
+            <h2 className="text-2xl font-bold text-foreground">
               Welcome, {session.stakeholder_name}!
             </h2>
-            <p className="text-mocha-subtext1 mt-4">
+            <p className="text-muted-foreground mt-4">
               Your AI-guided interview is ready to begin. This will take approximately 20-30 minutes.
             </p>
             <div className="mt-6 inline-block h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-r-transparent"></div>
-            <p className="text-mocha-subtext0 mt-3">Loading your interview...</p>
+            <p className="text-muted-foreground mt-3">Loading your interview...</p>
           </div>
         </div>
       )}
@@ -266,7 +266,7 @@ export default function StakeholderInterviewPage() {
               <svg className="w-5 h-5 text-brand-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              <p className="text-mocha-text font-medium">
+              <p className="text-foreground font-medium">
                 Welcome back! Your conversation has been restored. You can continue from where you left off.
               </p>
             </div>
@@ -284,21 +284,21 @@ export default function StakeholderInterviewPage() {
                 className={`max-w-3xl rounded-lg px-6 py-4 ${
                   message.role === 'user'
                     ? 'bg-brand-orange text-white'
-                    : 'bg-mocha-surface0 text-mocha-text'
+                    : 'bg-card text-foreground'
                 }`}>
                 {message.role === 'assistant' && (
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full bg-brand-teal"></div>
-                    <span className="text-xs font-medium text-mocha-subtext1">
+                    <span className="text-xs font-medium text-muted-foreground">
                       Industry 4.0 Consultant
                     </span>
                   </div>
                 )}
-                <div className="prose prose-invert max-w-none whitespace-pre-wrap">
+                <div className="prose max-w-none whitespace-pre-wrap">
                   {message.content}
                 </div>
                 <p className={`text-xs mt-2 ${
-                  message.role === 'user' ? 'text-white/70' : 'text-mocha-subtext0'
+                  message.role === 'user' ? 'text-white/70' : 'text-muted-foreground'
                 }`}>
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </p>
@@ -307,10 +307,10 @@ export default function StakeholderInterviewPage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="bg-mocha-surface0 rounded-lg px-6 py-4">
+              <div className="bg-card rounded-lg px-6 py-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div>
-                  <span className="text-mocha-subtext1">Thinking...</span>
+                  <span className="text-muted-foreground">Thinking...</span>
                 </div>
               </div>
             </div>
@@ -319,20 +319,20 @@ export default function StakeholderInterviewPage() {
         </div>
       </div>
       {/* Input or Completion Message */}
-      <div className="flex-shrink-0 bg-mocha-mantle border-t border-mocha-surface0">
+      <div className="flex-shrink-0 bg-muted border-t border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {isComplete ? (
-            <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-6 text-center">
+            <div className="bg-success/20 border border-success/50 rounded-lg p-6 text-center">
               <div className="flex items-center justify-center gap-3 mb-3">
-                <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-8 h-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className="text-2xl font-bold text-green-400">Interview Complete!</h3>
+                <h3 className="text-2xl font-bold text-success">Interview Complete!</h3>
               </div>
-              <p className="text-mocha-text">
+              <p className="text-foreground">
                 Thank you for your valuable insights, {session.stakeholder_name}. Your responses have been saved and will be analyzed alongside other stakeholder perspectives.
               </p>
-              <p className="text-mocha-subtext1 mt-4">
+              <p className="text-muted-foreground mt-4">
                 You may now close this window. Results will be shared by {session.campaigns.facilitator_name}.
               </p>
             </div>
@@ -341,25 +341,25 @@ export default function StakeholderInterviewPage() {
               {/* Submit Confirmation Dialog */}
               {showSubmitConfirm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-6 max-w-md w-full">
-                    <h3 className="text-lg font-semibold text-mocha-text mb-3">
+                  <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full">
+                    <h3 className="text-lg font-semibold text-foreground mb-3">
                       Submit Interview Early?
                     </h3>
-                    <p className="text-mocha-subtext1 mb-6">
+                    <p className="text-muted-foreground mb-6">
                       You've answered {conversationState?.questions_asked || 0} questions so far.
                       Are you sure you want to submit the interview now? This action cannot be undone.
                     </p>
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowSubmitConfirm(false)}
-                        className="flex-1 bg-mocha-surface1 hover:bg-mocha-surface2 text-mocha-text px-4 py-2 rounded-lg transition-colors"
+                        className="flex-1 bg-muted hover:bg-muted/80 text-foreground px-4 py-2 rounded-lg transition-colors"
                       >
                         Continue Interview
                       </button>
                       <button
                         onClick={handleSubmitInterview}
                         disabled={submitting}
-                        className="flex-1 bg-brand-orange hover:bg-brand-orange-dark disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
+                        className="flex-1 bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors"
                       >
                         {submitting ? 'Submitting...' : 'Submit Now'}
                       </button>
@@ -374,12 +374,12 @@ export default function StakeholderInterviewPage() {
                   onChange={(e) => setInputMessage(e.target.value)}
                   disabled={sending || messages.length === 0 || submitting}
                   placeholder="Type your response..."
-                  className="flex-1 bg-mocha-base border border-mocha-surface1 rounded-lg px-4 py-3 text-mocha-text placeholder-mocha-overlay0 focus:outline-none focus:ring-2 focus:ring-brand-orange disabled:opacity-50"
+                  className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand-orange disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!inputMessage.trim() || sending || messages.length === 0 || submitting}
-                  className="bg-brand-orange hover:bg-brand-orange-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-lg transition-colors">
+                  className="bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-lg transition-colors">
                   Send
                 </button>
               </form>
@@ -389,17 +389,17 @@ export default function StakeholderInterviewPage() {
                   <button
                     onClick={() => setShowSubmitConfirm(true)}
                     disabled={submitting}
-                    className="text-sm text-mocha-subtext1 hover:text-brand-orange underline transition-colors disabled:opacity-50"
+                    className="text-sm text-muted-foreground hover:text-brand-orange underline transition-colors disabled:opacity-50"
                   >
                     Submit interview early
                   </button>
                 </div>
               )}
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-mocha-subtext0">
+                <p className="text-xs text-muted-foreground">
                   Your responses are confidential and will be used solely for this assessment.
                 </p>
-                <p className="text-xs text-mocha-subtext1">
+                <p className="text-xs text-muted-foreground">
                   You can close this window anytime and resume later using the same link.
                 </p>
               </div>
