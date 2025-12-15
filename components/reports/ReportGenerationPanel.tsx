@@ -157,20 +157,20 @@ export function ReportGenerationPanel({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-mocha-surface0 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-mocha-text">
+            <h2 className="text-2xl font-bold text-foreground">
               Generate Client Report
             </h2>
-            <p className="text-sm text-mocha-subtext1 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {campaignName}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-mocha-subtext0 hover:text-mocha-text transition-colors">
+            className="text-muted-foreground hover:text-foreground transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -186,19 +186,19 @@ export function ReportGenerationPanel({
                     ? 'Report Regenerated Successfully!'
                     : 'Report Generated Successfully!'}
                 </h3>
-                <p className="text-sm text-mocha-subtext1 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   {generatedReport.is_regeneration
                     ? `Report updated successfully! This is update #${generatedReport.regeneration_count}. The shareable URL below remains unchanged and will continue to work.`
                     : 'Share this URL with your client to provide access to their assessment report. This URL will remain permanent and can be regenerated to update the report content while keeping the same link.'}
                 </p>
 
                 {/* Shareable URL */}
-                <div className="bg-mocha-base border border-mocha-surface1 rounded-lg p-4">
-                  <label className="block text-xs font-medium text-mocha-subtext1 mb-2">
+                <div className="bg-background border border-border rounded-lg p-4">
+                  <label className="block text-xs font-medium text-muted-foreground mb-2">
                     Shareable Report URL
                   </label>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 text-sm text-mocha-text bg-mocha-surface0 px-3 py-2 rounded break-all">
+                    <code className="flex-1 text-sm text-foreground bg-card px-3 py-2 rounded break-all">
                       {generatedReport.url}
                     </code>
                     <button
@@ -224,19 +224,19 @@ export function ReportGenerationPanel({
                 </div>
 
                 {/* Report Access Toggle */}
-                <div className="mt-4 bg-mocha-surface0 border border-mocha-surface1 rounded-lg p-4">
+                <div className="mt-4 bg-card border border-border rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {reportActive ? (
                         <Eye className="w-4 h-4 text-green-400" />
                       ) : (
-                        <EyeOff className="w-4 h-4 text-mocha-subtext0" />
+                        <EyeOff className="w-4 h-4 text-muted-foreground" />
                       )}
                       <div>
-                        <div className="text-sm font-medium text-mocha-text">
+                        <div className="text-sm font-medium text-foreground">
                           Report Access
                         </div>
-                        <div className="text-xs text-mocha-subtext1">
+                        <div className="text-xs text-muted-foreground">
                           {reportActive
                             ? 'Public access enabled - clients can view this report'
                             : 'Access disabled - report is not accessible'}
@@ -266,14 +266,14 @@ export function ReportGenerationPanel({
                 {/* Report Details */}
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-mocha-subtext1">Report Tier:</span>
-                    <span className="ml-2 text-mocha-text font-medium capitalize">
+                    <span className="text-muted-foreground">Report Tier:</span>
+                    <span className="ml-2 text-foreground font-medium capitalize">
                       {selectedTier}
                     </span>
                   </div>
                   <div>
-                    <span className="text-mocha-subtext1">Report ID:</span>
-                    <span className="ml-2 text-mocha-text font-mono text-xs">
+                    <span className="text-muted-foreground">Report ID:</span>
+                    <span className="ml-2 text-foreground font-mono text-xs">
                       {generatedReport.id.slice(0, 8)}...
                     </span>
                   </div>
@@ -293,13 +293,13 @@ export function ReportGenerationPanel({
               <div className="flex-1">
                 <p className="text-sm font-medium text-red-400 mb-1">{error}</p>
                 {errorDetails?.userMessage && (
-                  <p className="text-sm text-mocha-subtext1 mb-2">{errorDetails.userMessage}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{errorDetails.userMessage}</p>
                 )}
                 {errorDetails?.code && (
-                  <p className="text-xs text-mocha-subtext0 font-mono">Error Code: {errorDetails.code}</p>
+                  <p className="text-xs text-muted-foreground font-mono">Error Code: {errorDetails.code}</p>
                 )}
                 {errorDetails?.retryable && (
-                  <p className="text-xs text-mocha-subtext1 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     This error is temporary. Please try again.
                   </p>
                 )}
@@ -313,11 +313,11 @@ export function ReportGenerationPanel({
           <>
             {/* Tier Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-mocha-subtext1 mb-3">
+              <label className="block text-sm font-medium text-muted-foreground mb-3">
                 Report Tier
               </label>
               <div className="space-y-3">
-                <label className="flex items-start gap-3 p-4 bg-mocha-base border border-mocha-surface1 rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-background border border-border rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
                   <input
                     type="radio"
                     name="tier"
@@ -327,14 +327,14 @@ export function ReportGenerationPanel({
                     className="mt-1 accent-brand-orange"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-mocha-text">Basic</div>
-                    <div className="text-sm text-mocha-subtext1 mt-1">
+                    <div className="font-medium text-foreground">Basic</div>
+                    <div className="text-sm text-muted-foreground mt-1">
                       Scores and high-level summary only. Ideal for quick assessments.
                     </div>
                   </div>
                 </label>
 
-                <label className="flex items-start gap-3 p-4 bg-mocha-base border border-mocha-surface1 rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-background border border-border rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
                   <input
                     type="radio"
                     name="tier"
@@ -344,14 +344,14 @@ export function ReportGenerationPanel({
                     className="mt-1 accent-brand-orange"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-mocha-text">Informative</div>
-                    <div className="text-sm text-mocha-subtext1 mt-1">
+                    <div className="font-medium text-foreground">Informative</div>
+                    <div className="text-sm text-muted-foreground mt-1">
                       Scores + themes + stakeholder quotes. Provides context and insights.
                     </div>
                   </div>
                 </label>
 
-                <label className="flex items-start gap-3 p-4 bg-mocha-base border border-mocha-surface1 rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
+                <label className="flex items-start gap-3 p-4 bg-background border border-border rounded-lg cursor-pointer hover:border-brand-orange/50 transition-colors">
                   <input
                     type="radio"
                     name="tier"
@@ -361,8 +361,8 @@ export function ReportGenerationPanel({
                     className="mt-1 accent-brand-orange"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-mocha-text">Premium</div>
-                    <div className="text-sm text-mocha-subtext1 mt-1">
+                    <div className="font-medium text-foreground">Premium</div>
+                    <div className="text-sm text-muted-foreground mt-1">
                       Full analysis + architecture recommendations. Complete strategic assessment.
                     </div>
                   </div>
@@ -372,18 +372,18 @@ export function ReportGenerationPanel({
 
             {/* Consultant Observations */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-mocha-subtext1 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 Consultant Observations
-                <span className="text-mocha-subtext0 font-normal ml-2">(Optional)</span>
+                <span className="text-muted-foreground font-normal ml-2">(Optional)</span>
               </label>
               <textarea
                 value={observations}
                 onChange={(e) => setObservations(e.target.value)}
                 placeholder="Add any additional context, observations, or recommendations for the client..."
                 rows={4}
-                className="w-full bg-mocha-base border border-mocha-surface1 rounded-lg px-4 py-3 text-mocha-text placeholder:text-mocha-subtext0 focus:border-brand-orange/50 focus:outline-none transition-colors resize-none"
+                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-brand-orange/50 focus:outline-none transition-colors resize-none"
               />
-              <p className="text-xs text-mocha-subtext0 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 These notes will be included in the report and visible to the client.
               </p>
             </div>
@@ -394,7 +394,7 @@ export function ReportGenerationPanel({
         <div className="flex justify-end gap-3">
           <button
             onClick={handleClose}
-            className="px-6 py-2 bg-mocha-surface1 hover:bg-mocha-surface2 text-mocha-text rounded-lg font-medium transition-colors">
+            className="px-6 py-2 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-medium transition-colors">
             {generatedReport ? 'Close' : 'Cancel'}
           </button>
           {!generatedReport && (

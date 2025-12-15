@@ -23,8 +23,8 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
 
   if (!data || data.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-96 bg-mocha-surface0 rounded-lg ${className}`}>
-        <p className="text-mocha-subtext1 text-sm">No roadmap data available</p>
+      <div className={`flex items-center justify-center h-96 bg-card rounded-lg ${className}`}>
+        <p className="text-muted-foreground text-sm">No roadmap data available</p>
       </div>
     )
   }
@@ -93,7 +93,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
       aria-label="Transformation roadmap showing phased implementation timeline"
       className={className}
     >
-      <div className="relative overflow-x-auto bg-mocha-surface0 rounded-lg p-6">
+      <div className="relative overflow-x-auto bg-card rounded-lg p-6">
         <div className="min-w-max" onMouseMove={handleMouseMove}>
           {/* Timeline header */}
           <div className="mb-4" style={{ width: timelineWidth + 200 }}>
@@ -104,7 +104,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
               {/* Timeline axis */}
               <div className="relative" style={{ width: timelineWidth }}>
                 {/* Month markers */}
-                <div className="flex justify-between text-mocha-subtext0 text-xs font-medium mb-2">
+                <div className="flex justify-between text-muted-foreground text-xs font-medium mb-2">
                   <span>Month 1</span>
                   <span>Month 3</span>
                   <span>Month 6</span>
@@ -121,7 +121,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                         width: `${((bounds.end - bounds.start) / totalWeeks) * 100}%`,
                         backgroundColor: getPhaseColor(phase as RoadmapInitiative['phase'])
                       }}
-                      className="border-r border-mocha-surface2"
+                      className="border-r border-border"
                     />
                   ))}
                 </div>
@@ -134,7 +134,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                       style={{
                         width: `${((bounds.end - bounds.start) / totalWeeks) * 100}%`
                       }}
-                      className="text-center text-mocha-text"
+                      className="text-center text-foreground"
                     >
                       {bounds.label}
                     </div>
@@ -158,7 +158,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                     {/* Initiative name */}
                     <div
                       style={{ width: 200 }}
-                      className="pr-4 text-mocha-text text-sm font-medium truncate"
+                      className="pr-4 text-foreground text-sm font-medium truncate"
                     >
                       {initiative.name}
                     </div>
@@ -180,8 +180,8 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                           height: isHovered ? 32 : 28,
                           backgroundColor: color,
                           opacity: isHovered ? 1 : 0.8,
-                          border: isHovered ? '2px solid #cdd6f4' : 'none',
-                          boxShadow: isHovered ? '0 4px 12px rgba(0,0,0,0.3)' : 'none'
+                          border: isHovered ? '2px solid #171614' : 'none',
+                          boxShadow: isHovered ? '0 4px 12px rgba(0,0,0,0.15)' : 'none'
                         }}
                         onMouseEnter={() => setHoveredInitiative(initiative)}
                         onMouseLeave={() => setHoveredInitiative(null)}
@@ -197,7 +197,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                       {[...Array(13)].map((_, i) => (
                         <div
                           key={i}
-                          className="absolute top-0 bottom-0 border-l border-mocha-surface2"
+                          className="absolute top-0 bottom-0 border-l border-border"
                           style={{ left: (i * 4 * weekWidth) }}
                         />
                       ))}
@@ -211,7 +211,7 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
           {/* Tooltip */}
           {hoveredInitiative && (
             <div
-              className="absolute pointer-events-none bg-mocha-base border border-mocha-surface2 rounded-lg px-4 py-3 shadow-lg z-10"
+              className="absolute pointer-events-none bg-background border border-border rounded-lg px-4 py-3 shadow-lg z-10"
               style={{
                 left: mousePosition.x + 15,
                 top: mousePosition.y - 100,
@@ -220,22 +220,22 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
             >
               <div className="space-y-2">
                 <div>
-                  <p className="text-mocha-text font-semibold text-sm leading-tight">
+                  <p className="text-foreground font-semibold text-sm leading-tight">
                     {hoveredInitiative.name}
                   </p>
-                  <p className="text-mocha-subtext1 text-xs mt-1">
+                  <p className="text-muted-foreground text-xs mt-1">
                     {hoveredInitiative.pillar}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <p className="text-mocha-subtext0">Phase</p>
-                    <p className="text-mocha-text font-medium capitalize">
+                    <p className="text-muted-foreground">Phase</p>
+                    <p className="text-foreground font-medium capitalize">
                       {hoveredInitiative.phase}
                     </p>
                   </div>
                   <div>
-                    <p className="text-mocha-subtext0">Type</p>
+                    <p className="text-muted-foreground">Type</p>
                     <p
                       className="font-medium capitalize"
                       style={{ color: getTypeColor(hoveredInitiative.type) }}
@@ -244,22 +244,22 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
                     </p>
                   </div>
                   <div>
-                    <p className="text-mocha-subtext0">Start</p>
-                    <p className="text-mocha-text font-medium">
+                    <p className="text-muted-foreground">Start</p>
+                    <p className="text-foreground font-medium">
                       Week {hoveredInitiative.startWeek}
                     </p>
                   </div>
                   <div>
-                    <p className="text-mocha-subtext0">Duration</p>
-                    <p className="text-mocha-text font-medium">
+                    <p className="text-muted-foreground">Duration</p>
+                    <p className="text-foreground font-medium">
                       {hoveredInitiative.durationWeeks} weeks
                     </p>
                   </div>
                 </div>
                 {hoveredInitiative.dimensions.length > 0 && (
-                  <div className="text-xs pt-2 border-t border-mocha-surface2">
-                    <p className="text-mocha-subtext0 mb-1">Dimensions:</p>
-                    <p className="text-mocha-text">
+                  <div className="text-xs pt-2 border-t border-border">
+                    <p className="text-muted-foreground mb-1">Dimensions:</p>
+                    <p className="text-foreground">
                       {hoveredInitiative.dimensions.join(', ')}
                     </p>
                   </div>
@@ -271,18 +271,18 @@ export function TransformationRoadmap({ data, className = '' }: TransformationRo
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-6 px-4 py-3 bg-mocha-surface0 rounded-lg">
+      <div className="flex items-center justify-center gap-6 mt-6 px-4 py-3 bg-card rounded-lg">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#10b981' }} />
-          <span className="text-mocha-text text-sm">Quick Win</span>
+          <span className="text-foreground text-sm">Quick Win</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#F25C05' }} />
-          <span className="text-mocha-text text-sm">Strategic</span>
+          <span className="text-foreground text-sm">Strategic</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#1D9BA3' }} />
-          <span className="text-mocha-text text-sm">Transformative</span>
+          <span className="text-foreground text-sm">Transformative</span>
         </div>
       </div>
 

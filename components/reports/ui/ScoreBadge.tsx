@@ -49,7 +49,7 @@ export function ScoreBadge({
         {score.toFixed(1)}
       </div>
       {showLabel && (
-        <span className="text-sm font-medium text-mocha-subtext0">{label}</span>
+        <span className="text-sm font-medium text-muted-foreground">{label}</span>
       )}
     </div>
   )

@@ -23,7 +23,7 @@ interface HeadingProps {
 export function DisplayHeading({ children, className = '', id }: HeadingProps) {
   const classes = getTypographyClasses('display')
   return (
-    <h1 id={id} className={`${classes} text-mocha-text ${className}`}>
+    <h1 id={id} className={`${classes} text-foreground ${className}`}>
       {children}
     </h1>
   )
@@ -36,7 +36,7 @@ export function DisplayHeading({ children, className = '', id }: HeadingProps) {
 export function Headline({ children, className = '', id }: HeadingProps) {
   const classes = getTypographyClasses('headline')
   return (
-    <h2 id={id} className={`${classes} text-mocha-text ${className}`}>
+    <h2 id={id} className={`${classes} text-foreground ${className}`}>
       {children}
     </h2>
   )
@@ -49,7 +49,7 @@ export function Headline({ children, className = '', id }: HeadingProps) {
 export function Title({ children, className = '', id }: HeadingProps) {
   const classes = getTypographyClasses('title')
   return (
-    <h3 id={id} className={`${classes} text-mocha-text ${className}`}>
+    <h3 id={id} className={`${classes} text-foreground ${className}`}>
       {children}
     </h3>
   )
@@ -62,7 +62,7 @@ export function Title({ children, className = '', id }: HeadingProps) {
 export function Subtitle({ children, className = '', id }: HeadingProps) {
   const classes = getTypographyClasses('subtitle')
   return (
-    <h4 id={id} className={`${classes} text-mocha-text ${className}`}>
+    <h4 id={id} className={`${classes} text-foreground ${className}`}>
       {children}
     </h4>
   )
@@ -75,7 +75,7 @@ export function Subtitle({ children, className = '', id }: HeadingProps) {
 export function BodyText({ children, className = '' }: Omit<HeadingProps, 'id'>) {
   const classes = getTypographyClasses('body')
   return (
-    <p className={`${classes} text-mocha-text ${className}`}>
+    <p className={`${classes} text-foreground ${className}`}>
       {children}
     </p>
   )
@@ -88,7 +88,7 @@ export function BodyText({ children, className = '' }: Omit<HeadingProps, 'id'>)
 export function Caption({ children, className = '' }: Omit<HeadingProps, 'id'>) {
   const classes = getTypographyClasses('caption')
   return (
-    <p className={`${classes} text-mocha-subtext0 ${className}`}>
+    <p className={`${classes} text-muted-foreground ${className}`}>
       {children}
     </p>
   )
@@ -135,13 +135,13 @@ interface InsightCalloutProps {
 
 export function InsightCallout({ children, title, className = '' }: InsightCalloutProps) {
   return (
-    <div className={`bg-mocha-surface0 border-l-4 border-brand-orange rounded-r-lg p-6 my-6 ${className}`}>
+    <div className={`bg-card border-l-4 border-brand-orange rounded-r-lg p-6 my-6 ${className}`}>
       {title && (
         <p className="text-brand-orange font-semibold text-sm uppercase tracking-wider mb-2">
           {title}
         </p>
       )}
-      <div className="text-mocha-text text-base leading-relaxed">
+      <div className="text-foreground text-base leading-relaxed">
         {children}
       </div>
     </div>
@@ -158,7 +158,7 @@ interface KeyTakeawayProps {
 
 export function KeyTakeaway({ children, className = '' }: KeyTakeawayProps) {
   return (
-    <div className={`bg-gradient-to-r from-brand-orange/10 to-brand-teal/10 border-2 border-mocha-surface2 rounded-lg p-8 my-10 ${className}`}>
+    <div className={`bg-gradient-to-r from-brand-orange/10 to-brand-teal/10 border-2 border-border rounded-lg p-8 my-10 ${className}`}>
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-orange flex items-center justify-center">
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,8 +166,8 @@ export function KeyTakeaway({ children, className = '' }: KeyTakeawayProps) {
           </svg>
         </div>
         <div className="flex-1">
-          <p className="text-mocha-text font-semibold text-lg mb-2">Key Takeaway</p>
-          <div className="text-mocha-text text-base leading-relaxed">
+          <p className="text-foreground font-semibold text-lg mb-2">Key Takeaway</p>
+          <div className="text-foreground text-base leading-relaxed">
             {children}
           </div>
         </div>

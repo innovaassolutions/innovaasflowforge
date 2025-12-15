@@ -46,14 +46,14 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
   }
 
   return (
-    <section className={`min-h-screen bg-mocha-base py-25 ${className}`}>
+    <section className={`min-h-screen bg-background py-25 ${className}`}>
       <div className="max-w-[1600px] mx-auto px-[100px]">
         {/* Page Title */}
         <div className="text-center mb-20">
-          <DisplayHeading className="text-mocha-text">
+          <DisplayHeading className="text-foreground">
             Executive Summary
           </DisplayHeading>
-          <Subtitle className="text-mocha-subtext0 mt-4">
+          <Subtitle className="text-muted-foreground mt-4">
             Digital Transformation Readiness Assessment
           </Subtitle>
         </div>
@@ -64,17 +64,17 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
             <div className="relative">
               {/* Score Circle */}
               <div className="w-64 h-64 rounded-full bg-gradient-to-br from-brand-orange to-brand-teal p-1 mx-auto">
-                <div className="w-full h-full rounded-full bg-mocha-base flex flex-col items-center justify-center">
+                <div className="w-full h-full rounded-full bg-background flex flex-col items-center justify-center">
                   <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-teal">
                     {assessment.overallScore.toFixed(1)}
                   </div>
-                  <div className="text-mocha-subtext1 text-sm mt-2">out of 5.0</div>
+                  <div className="text-muted-foreground text-sm mt-2">out of 5.0</div>
                 </div>
               </div>
 
               {/* Context Label */}
               <div className="mt-6">
-                <p className="text-xl font-semibold text-mocha-text">
+                <p className="text-xl font-semibold text-foreground">
                   {getReadinessContext(assessment.overallScore)}
                 </p>
               </div>
@@ -85,36 +85,36 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
         {/* Strategic Imperatives + Mini Matrix */}
         <HeroGrid className="mb-16">
           {/* Mini Priority Matrix */}
-          <div className="lg:col-span-5 bg-mocha-surface0 rounded-lg p-8">
-            <h3 className="text-2xl font-bold text-mocha-text mb-6">Priority Matrix</h3>
+          <div className="lg:col-span-5 bg-card rounded-lg p-8">
+            <h3 className="text-2xl font-bold text-foreground mb-6">Priority Matrix</h3>
             <MiniPriorityMatrix data={matrixData.slice(0, 12)} />
             <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }} />
-                <span className="text-mocha-text">{quickWinsCount} Quick Wins</span>
+                <span className="text-foreground">{quickWinsCount} Quick Wins</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#F25C05' }} />
-                <span className="text-mocha-text">Strategic Bets</span>
+                <span className="text-foreground">Strategic Bets</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#eab308' }} />
-                <span className="text-mocha-text">Fill-ins</span>
+                <span className="text-foreground">Fill-ins</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#6b7280' }} />
-                <span className="text-mocha-text">Long-term</span>
+                <span className="text-foreground">Long-term</span>
               </div>
             </div>
           </div>
 
           {/* Top 3 Strategic Imperatives */}
           <div className="lg:col-span-7 space-y-4">
-            <h3 className="text-2xl font-bold text-mocha-text mb-6">Strategic Imperatives</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-6">Strategic Imperatives</h3>
             {topImperatives.map((imperative, idx) => (
               <div
                 key={idx}
-                className="bg-mocha-surface0 rounded-lg p-6 border-l-4"
+                className="bg-card rounded-lg p-6 border-l-4"
                 style={{
                   borderColor: imperative.impact === 'high'
                     ? '#10b981'
@@ -137,15 +137,15 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
                     >
                       {idx + 1}
                     </div>
-                    <h4 className="text-lg font-semibold text-mocha-text">
+                    <h4 className="text-lg font-semibold text-foreground">
                       {imperative.title}
                     </h4>
                   </div>
-                  <span className="text-xs font-medium text-mocha-subtext1 bg-mocha-surface1 px-3 py-1 rounded-full">
+                  <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
                     {imperative.timeframe}
                   </span>
                 </div>
-                <p className="text-mocha-subtext0 text-sm leading-relaxed ml-11">
+                <p className="text-muted-foreground text-sm leading-relaxed ml-11">
                   {imperative.description}
                 </p>
               </div>
@@ -154,8 +154,8 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
         </HeroGrid>
 
         {/* Critical Path - Simplified Roadmap */}
-        <div className="mb-16 bg-mocha-surface0 rounded-lg p-8">
-          <h3 className="text-2xl font-bold text-mocha-text mb-6">Critical Path Forward</h3>
+        <div className="mb-16 bg-card rounded-lg p-8">
+          <h3 className="text-2xl font-bold text-foreground mb-6">Critical Path Forward</h3>
           <SimplifiedRoadmap initiatives={roadmapInitiatives.slice(0, 8)} />
         </div>
 
@@ -175,7 +175,7 @@ export function ExecutiveOnePager({ assessment, className = '' }: ExecutiveOnePa
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-mocha-text leading-relaxed">{insight}</span>
+                <span className="text-foreground leading-relaxed">{insight}</span>
               </li>
             ))}
           </ul>
@@ -203,8 +203,8 @@ function MiniPriorityMatrix({ data }: { data: ReturnType<typeof transformToMatri
         <rect x={innerSize/2} y={innerSize/2} width={innerSize/2} height={innerSize/2} fill="#25252e" opacity={0.3} />
 
         {/* Grid lines */}
-        <line x1={innerSize/2} y1={0} x2={innerSize/2} y2={innerSize} stroke="#313244" strokeWidth={1} strokeDasharray="2 2" />
-        <line x1={0} y1={innerSize/2} x2={innerSize} y2={innerSize/2} stroke="#313244" strokeWidth={1} strokeDasharray="2 2" />
+        <line x1={innerSize/2} y1={0} x2={innerSize/2} y2={innerSize} stroke="#E7E5E4" strokeWidth={1} strokeDasharray="2 2" />
+        <line x1={0} y1={innerSize/2} x2={innerSize} y2={innerSize/2} stroke="#E7E5E4" strokeWidth={1} strokeDasharray="2 2" />
 
         {/* Data points */}
         {data.map((dim, idx) => {
@@ -226,14 +226,14 @@ function MiniPriorityMatrix({ data }: { data: ReturnType<typeof transformToMatri
         })}
 
         {/* Axes */}
-        <line x1={0} y1={innerSize} x2={innerSize} y2={innerSize} stroke="#cdd6f4" strokeWidth={1} />
-        <line x1={0} y1={0} x2={0} y2={innerSize} stroke="#cdd6f4" strokeWidth={1} />
+        <line x1={0} y1={innerSize} x2={innerSize} y2={innerSize} stroke="#171614" strokeWidth={1} />
+        <line x1={0} y1={0} x2={0} y2={innerSize} stroke="#171614" strokeWidth={1} />
 
         {/* Labels */}
-        <text x={innerSize/2} y={innerSize + 15} textAnchor="middle" fill="#cdd6f4" fontSize={10}>
+        <text x={innerSize/2} y={innerSize + 15} textAnchor="middle" fill="#171614" fontSize={10}>
           Effort →
         </text>
-        <text x={-10} y={innerSize/2} textAnchor="end" fill="#cdd6f4" fontSize={10} transform={`rotate(-90, -10, ${innerSize/2})`}>
+        <text x={-10} y={innerSize/2} textAnchor="end" fill="#171614" fontSize={10} transform={`rotate(-90, -10, ${innerSize/2})`}>
           Impact →
         </text>
       </g>
@@ -258,21 +258,21 @@ function SimplifiedRoadmap({ initiatives }: { initiatives: ReturnType<typeof tra
           <div key={phase}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-2 h-2 rounded-full bg-brand-orange" />
-              <h4 className="text-sm font-semibold text-mocha-text uppercase tracking-wider">
+              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">
                 {phase}
               </h4>
-              <div className="flex-1 h-px bg-mocha-surface2" />
+              <div className="flex-1 h-px bg-border" />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 ml-5">
               {phaseInitiatives.slice(0, 4).map((initiative, idx) => (
                 <div
                   key={idx}
-                  className="bg-mocha-surface1 rounded px-3 py-2"
+                  className="bg-muted rounded px-3 py-2"
                 >
-                  <p className="text-xs text-mocha-text font-medium leading-tight">
+                  <p className="text-xs text-foreground font-medium leading-tight">
                     {initiative.name}
                   </p>
-                  <p className="text-[10px] text-mocha-subtext1 mt-1">
+                  <p className="text-[10px] text-muted-foreground mt-1">
                     {initiative.durationWeeks}w
                   </p>
                 </div>

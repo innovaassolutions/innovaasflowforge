@@ -99,16 +99,16 @@ export function EnhancedRecommendations({ assessment, className = '' }: Enhanced
         <div className="mt-20">
           <InsightCallout title="Implementation Guidance">
             <div className="space-y-4">
-              <p className="text-mocha-text leading-relaxed">
+              <p className="text-foreground leading-relaxed">
                 <strong>Sequencing Strategy:</strong> Execute Quick Wins first to build momentum and demonstrate value.
                 This creates organizational buy-in for larger Strategic Investments. Incremental Improvements can
                 be addressed opportunistically as resources become available.
               </p>
-              <p className="text-mocha-text leading-relaxed">
+              <p className="text-foreground leading-relaxed">
                 <strong>Resource Allocation:</strong> Prioritize initiatives based on available budget, team capacity,
                 and strategic alignment. Consider phasing large initiatives into smaller milestones.
               </p>
-              <p className="text-mocha-text leading-relaxed">
+              <p className="text-foreground leading-relaxed">
                 <strong>Success Metrics:</strong> Define clear KPIs for each initiative. Track progress monthly and
                 adjust course as needed. Schedule reassessment in 6-12 months to measure transformation impact.
               </p>
@@ -151,11 +151,11 @@ function RecommendationGroup({
           {icon}
         </div>
         <div className="flex-1">
-          <h3 className="text-2xl font-bold text-mocha-text">{title}</h3>
-          <p className="text-mocha-subtext1 text-sm mt-1">{subtitle}</p>
+          <h3 className="text-2xl font-bold text-foreground">{title}</h3>
+          <p className="text-muted-foreground text-sm mt-1">{subtitle}</p>
           <div className="flex items-center gap-2 mt-2">
-            <Clock size={14} className="text-mocha-subtext0" />
-            <span className="text-xs text-mocha-subtext0 font-medium">{timeframe}</span>
+            <Clock size={14} className="text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-medium">{timeframe}</span>
           </div>
         </div>
       </div>
@@ -185,16 +185,16 @@ function RecommendationCard({ recommendation, accentColor }: RecommendationCardP
 
   return (
     <div
-      className="bg-mocha-surface0 rounded-lg p-6 border-l-4 hover:shadow-lg transition-shadow"
+      className="bg-card rounded-lg p-6 border-l-4 hover:shadow-lg transition-shadow"
       style={{ borderColor: accentColor }}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h4 className="text-lg font-semibold text-mocha-text leading-tight">
+          <h4 className="text-lg font-semibold text-foreground leading-tight">
             {recommendation.dimension}
           </h4>
-          <p className="text-xs text-mocha-subtext1 mt-1">{recommendation.pillar}</p>
+          <p className="text-xs text-muted-foreground mt-1">{recommendation.pillar}</p>
         </div>
       </div>
 
@@ -222,17 +222,17 @@ function RecommendationCard({ recommendation, accentColor }: RecommendationCardP
       </div>
 
       {/* Expected Outcome */}
-      <div className="bg-mocha-surface1 rounded-lg p-4 mb-4">
-        <p className="text-xs text-mocha-subtext0 mb-2 font-medium">Expected Outcome</p>
+      <div className="bg-muted rounded-lg p-4 mb-4">
+        <p className="text-xs text-muted-foreground mb-2 font-medium">Expected Outcome</p>
         <div className="flex items-center gap-2">
-          <span className="text-mocha-text font-semibold">
+          <span className="text-foreground font-semibold">
             {recommendation.score.toFixed(1)}
           </span>
-          <ArrowRight size={16} className="text-mocha-subtext0" />
-          <span className="text-mocha-text font-semibold">
+          <ArrowRight size={16} className="text-muted-foreground" />
+          <span className="text-foreground font-semibold">
             {(recommendation.score + expectedImprovement).toFixed(1)}
           </span>
-          <span className="text-xs text-mocha-subtext0 ml-auto">
+          <span className="text-xs text-muted-foreground ml-auto">
             +{expectedImprovement.toFixed(1)} improvement
           </span>
         </div>
@@ -249,7 +249,7 @@ function RecommendationCard({ recommendation, accentColor }: RecommendationCardP
         >
           {recommendation.priority.charAt(0).toUpperCase() + recommendation.priority.slice(1)} Priority
         </span>
-        <span className="text-xs text-mocha-subtext1">
+        <span className="text-xs text-muted-foreground">
           {getQuadrantLabel(recommendation.quadrant)}
         </span>
       </div>
@@ -274,12 +274,12 @@ function MetricPill({ label, value, max, color, inverse = false }: MetricPillPro
 
   return (
     <div className="text-center">
-      <p className="text-[10px] text-mocha-subtext0 uppercase tracking-wider mb-1">
+      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
         {label}
       </p>
       <div className="relative">
-        <div className="text-lg font-bold text-mocha-text">{value}</div>
-        <div className="h-1 bg-mocha-surface2 rounded-full mt-1 overflow-hidden">
+        <div className="text-lg font-bold text-foreground">{value}</div>
+        <div className="h-1 bg-border rounded-full mt-1 overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
             style={{

@@ -47,7 +47,7 @@ export function CalloutBox({
               {title}
             </h4>
           )}
-          <div className="text-sm text-mocha-text leading-relaxed">{children}</div>
+          <div className="text-sm text-foreground leading-relaxed">{children}</div>
         </div>
       </div>
     </div>

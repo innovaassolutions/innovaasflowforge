@@ -24,8 +24,8 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-96 bg-mocha-surface0 rounded-lg ${className}`}>
-        <p className="text-mocha-subtext1 text-sm">No data available for priority matrix</p>
+      <div className={`flex items-center justify-center h-96 bg-card rounded-lg ${className}`}>
+        <p className="text-muted-foreground text-sm">No data available for priority matrix</p>
       </div>
     )
   }
@@ -115,7 +115,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
               y1={0}
               x2={xThreshold}
               y2={innerHeight}
-              stroke="#313244"
+              stroke="#E7E5E4"
               strokeWidth={2}
               strokeDasharray="4 4"
             />
@@ -124,7 +124,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
               y1={yThreshold}
               x2={innerWidth}
               y2={yThreshold}
-              stroke="#313244"
+              stroke="#E7E5E4"
               strokeWidth={2}
               strokeDasharray="4 4"
             />
@@ -185,7 +185,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
               y1={innerHeight}
               x2={innerWidth}
               y2={innerHeight}
-              stroke="#cdd6f4"
+              stroke="#171614"
               strokeWidth={2}
             />
             <line
@@ -193,7 +193,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
               y1={0}
               x2={0}
               y2={innerHeight}
-              stroke="#cdd6f4"
+              stroke="#171614"
               strokeWidth={2}
             />
 
@@ -213,7 +213,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
                   r={r}
                   fill={color}
                   fillOpacity={isHovered ? 0.8 : 0.6}
-                  stroke={isHovered ? '#cdd6f4' : color}
+                  stroke={isHovered ? '#171614' : color}
                   strokeWidth={isHovered ? 2 : 1}
                   style={{
                     cursor: 'pointer',
@@ -231,7 +231,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
             x={width / 2}
             y={height - 20}
             textAnchor="middle"
-            fill="#cdd6f4"
+            fill="#171614"
             fontSize={14}
             fontWeight={500}
           >
@@ -241,7 +241,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
             x={20}
             y={height / 2}
             textAnchor="middle"
-            fill="#cdd6f4"
+            fill="#171614"
             fontSize={14}
             fontWeight={500}
             transform={`rotate(-90, 20, ${height / 2})`}
@@ -252,24 +252,24 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
           {/* Axis tick labels */}
           <g transform={`translate(${margin.left},${margin.top})`}>
             {/* X-axis ticks */}
-            <text x={xScale(1)} y={innerHeight + 20} textAnchor="middle" fill="#a6adc8" fontSize={11}>
+            <text x={xScale(1)} y={innerHeight + 20} textAnchor="middle" fill="#78716C" fontSize={11}>
               Low
             </text>
-            <text x={xScale(3)} y={innerHeight + 20} textAnchor="middle" fill="#a6adc8" fontSize={11}>
+            <text x={xScale(3)} y={innerHeight + 20} textAnchor="middle" fill="#78716C" fontSize={11}>
               Medium
             </text>
-            <text x={xScale(5)} y={innerHeight + 20} textAnchor="middle" fill="#a6adc8" fontSize={11}>
+            <text x={xScale(5)} y={innerHeight + 20} textAnchor="middle" fill="#78716C" fontSize={11}>
               High
             </text>
 
             {/* Y-axis ticks */}
-            <text x={-10} y={yScale(1)} textAnchor="end" dominantBaseline="middle" fill="#a6adc8" fontSize={11}>
+            <text x={-10} y={yScale(1)} textAnchor="end" dominantBaseline="middle" fill="#78716C" fontSize={11}>
               Low
             </text>
-            <text x={-10} y={yScale(3)} textAnchor="end" dominantBaseline="middle" fill="#a6adc8" fontSize={11}>
+            <text x={-10} y={yScale(3)} textAnchor="end" dominantBaseline="middle" fill="#78716C" fontSize={11}>
               Medium
             </text>
-            <text x={-10} y={yScale(5)} textAnchor="end" dominantBaseline="middle" fill="#a6adc8" fontSize={11}>
+            <text x={-10} y={yScale(5)} textAnchor="end" dominantBaseline="middle" fill="#78716C" fontSize={11}>
               High
             </text>
           </g>
@@ -278,7 +278,7 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
         {/* Tooltip */}
         {hoveredDimension && (
           <div
-            className="absolute pointer-events-none bg-mocha-base border border-mocha-surface2 rounded-lg px-4 py-3 shadow-lg z-10"
+            className="absolute pointer-events-none bg-background border border-border rounded-lg px-4 py-3 shadow-lg z-10"
             style={{
               left: mousePosition.x + 15,
               top: mousePosition.y - 80,
@@ -287,34 +287,34 @@ export function PriorityMatrix({ data, className = '' }: PriorityMatrixProps) {
           >
             <div className="space-y-2">
               <div>
-                <p className="text-mocha-text font-semibold text-sm leading-tight">
+                <p className="text-foreground font-semibold text-sm leading-tight">
                   {hoveredDimension.dimension}
                 </p>
-                <p className="text-mocha-subtext1 text-xs mt-1">
+                <p className="text-muted-foreground text-xs mt-1">
                   {hoveredDimension.pillar}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <p className="text-mocha-subtext0">Impact</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Impact</p>
+                  <p className="text-foreground font-medium">
                     {hoveredDimension.impact.toFixed(1)} / 5.0
                   </p>
                 </div>
                 <div>
-                  <p className="text-mocha-subtext0">Effort</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Effort</p>
+                  <p className="text-foreground font-medium">
                     {hoveredDimension.effort.toFixed(1)} / 5.0
                   </p>
                 </div>
                 <div>
-                  <p className="text-mocha-subtext0">Current</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Current</p>
+                  <p className="text-foreground font-medium">
                     {hoveredDimension.score.toFixed(1)} / 5.0
                   </p>
                 </div>
                 <div>
-                  <p className="text-mocha-subtext0">Quadrant</p>
+                  <p className="text-muted-foreground">Quadrant</p>
                   <p
                     className="font-medium text-xs"
                     style={{ color: getQuadrantColor(hoveredDimension.quadrant) }}

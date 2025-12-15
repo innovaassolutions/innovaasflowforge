@@ -17,13 +17,13 @@ interface QuoteCardProps {
 export function QuoteCard({ quote, author, title, className = '' }: QuoteCardProps) {
   return (
     <blockquote
-      className={`bg-mocha-surface0 border-l-4 border-brand-teal rounded-r-lg p-4 ${className}`}
+      className={`bg-card border-l-4 border-brand-teal rounded-r-lg p-4 ${className}`}
       role="blockquote">
-      <p className="text-mocha-text italic text-sm leading-relaxed mb-2">
+      <p className="text-foreground italic text-sm leading-relaxed mb-2">
         "{quote}"
       </p>
       {(author || title) && (
-        <footer className="text-xs text-mocha-subtext1 mt-2">
+        <footer className="text-xs text-muted-foreground mt-2">
           {author && <span className="font-medium">{author}</span>}
           {author && title && <span className="mx-1">—</span>}
           {title && <span>{title}</span>}

@@ -92,10 +92,10 @@ export function AIIllustration({
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center bg-mocha-surface0 rounded-lg ${className}`}>
+      <div className={`flex items-center justify-center bg-card rounded-lg ${className}`}>
         <div className="text-center space-y-3 p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-mocha-surface2 border-t-brand-orange mx-auto" />
-          <p className="text-mocha-subtext1 text-sm">Generating illustration...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-border border-t-brand-orange mx-auto" />
+          <p className="text-muted-foreground text-sm">Generating illustration...</p>
         </div>
       </div>
     )
@@ -103,14 +103,14 @@ export function AIIllustration({
 
   if (error || !svgContent) {
     return (
-      <div className={`flex items-center justify-center bg-mocha-surface0 rounded-lg ${className}`}>
+      <div className={`flex items-center justify-center bg-card rounded-lg ${className}`}>
         <div className="text-center space-y-2 p-8">
           <svg
             width="64"
             height="64"
             viewBox="0 0 64 64"
             fill="none"
-            className="mx-auto text-mocha-subtext0"
+            className="mx-auto text-muted-foreground"
           >
             <circle cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="2" opacity="0.3" />
             <path
@@ -120,7 +120,7 @@ export function AIIllustration({
               strokeLinecap="round"
             />
           </svg>
-          <p className="text-mocha-subtext1 text-sm">
+          <p className="text-muted-foreground text-sm">
             {error?.message || 'Failed to load illustration'}
           </p>
         </div>

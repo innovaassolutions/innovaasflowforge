@@ -63,7 +63,7 @@ export function PageIndicator({
           className={`w-3 h-3 rounded-full transition-all ${
             page === currentPage
               ? 'bg-brand-orange scale-125'
-              : 'bg-mocha-surface2 hover:bg-mocha-surface1'
+              : 'bg-muted hover:bg-muted/80'
           }`}
           aria-label={`Go to page ${page}`}
           aria-current={page === currentPage ? 'page' : undefined}
@@ -85,21 +85,21 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, progress, className = '' }: PageHeaderProps) {
   return (
-    <header className={`sticky top-0 z-40 bg-mocha-base/95 backdrop-blur-sm border-b border-mocha-surface1 ${className}`}>
+    <header className={`sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border ${className}`}>
       <div className="py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-mocha-text">{title}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{title}</h1>
             {subtitle && (
-              <p className="text-sm text-mocha-subtext1 mt-1">{subtitle}</p>
+              <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
             )}
           </div>
           {progress !== undefined && (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-mocha-subtext1">
+              <span className="text-sm text-muted-foreground">
                 {Math.round(progress)}% complete
               </span>
-              <div className="w-32 h-2 bg-mocha-surface0 rounded-full overflow-hidden">
+              <div className="w-32 h-2 bg-card rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-brand-orange to-brand-teal rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
@@ -123,8 +123,8 @@ interface PageFooterProps {
 
 export function PageFooter({ children, className = '' }: PageFooterProps) {
   return (
-    <footer className={`border-t border-mocha-surface1 py-8 mt-20 ${className}`}>
-      <div className="flex items-center justify-between text-sm text-mocha-subtext1">
+    <footer className={`border-t border-border py-8 mt-20 ${className}`}>
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
         {children || (
           <p>Generated with Innovaas FlowForge Digital Transformation Assessment</p>
         )}

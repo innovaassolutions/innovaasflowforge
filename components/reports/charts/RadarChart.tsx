@@ -20,8 +20,8 @@ interface RadarChartProps {
 export function RadarChart({ data, className = '' }: RadarChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-64 bg-mocha-surface0 rounded-lg ${className}`}>
-        <p className="text-mocha-subtext1 text-sm">No data available</p>
+      <div className={`flex items-center justify-center h-64 bg-card rounded-lg ${className}`}>
+        <p className="text-muted-foreground text-sm">No data available</p>
       </div>
     )
   }
@@ -30,10 +30,10 @@ export function RadarChart({ data, className = '' }: RadarChartProps) {
     <figure role="img" aria-label="Digital transformation readiness by pillar" className={className}>
       <ResponsiveContainer width="100%" height={300}>
         <RechartsRadarChart data={data}>
-          <PolarGrid stroke="#313244" />
+          <PolarGrid stroke="#E7E5E4" />
           <PolarAngleAxis
             dataKey="axis"
-            tick={{ fill: '#cdd6f4', fontSize: 12 }}
+            tick={{ fill: '#171614', fontSize: 12 }}
           />
           <Radar
             name="Score"
@@ -44,10 +44,10 @@ export function RadarChart({ data, className = '' }: RadarChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e1e2e',
-              border: '1px solid #313244',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E7E5E4',
               borderRadius: '8px',
-              color: '#cdd6f4'
+              color: '#171614'
             }}
             formatter={(value: number) => [`${value.toFixed(1)} / 5.0`, 'Score']}
           />

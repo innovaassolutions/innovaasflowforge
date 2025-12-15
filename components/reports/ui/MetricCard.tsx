@@ -35,14 +35,14 @@ export function MetricCard({
 
   return (
     <div
-      className={`bg-mocha-surface0 rounded-lg p-6 border border-mocha-surface1 hover:border-mocha-surface2 transition-colors ${className}`}
+      className={`bg-card rounded-lg p-6 border border-border hover:border-brand-orange/30 transition-colors ${className}`}
       role="article"
       aria-label={`${label}: ${value}`}
       title={tooltip}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm text-mocha-subtext0 mb-1">{label}</p>
-          <p className="text-3xl font-bold text-mocha-text">{value}</p>
+          <p className="text-sm text-muted-foreground mb-1">{label}</p>
+          <p className="text-3xl font-bold text-foreground">{value}</p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <Icon size={24} style={{ color }} />

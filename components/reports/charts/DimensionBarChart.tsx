@@ -20,8 +20,8 @@ interface DimensionBarChartProps {
 export function DimensionBarChart({ data, className = '' }: DimensionBarChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-64 bg-mocha-surface0 rounded-lg ${className}`}>
-        <p className="text-mocha-subtext1 text-sm">No data available</p>
+      <div className={`flex items-center justify-center h-64 bg-card rounded-lg ${className}`}>
+        <p className="text-muted-foreground text-sm">No data available</p>
       </div>
     )
   }
@@ -33,25 +33,25 @@ export function DimensionBarChart({ data, className = '' }: DimensionBarChartPro
           data={data}
           layout="vertical"
           margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#313244" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E7E5E4" />
           <XAxis
             type="number"
             domain={[0, 5]}
-            tick={{ fill: '#cdd6f4', fontSize: 11 }}
-            label={{ value: 'Score (0-5)', position: 'insideBottom', offset: -5, fill: '#cdd6f4' }}
+            tick={{ fill: '#171614', fontSize: 11 }}
+            label={{ value: 'Score (0-5)', position: 'insideBottom', offset: -5, fill: '#171614' }}
           />
           <YAxis
             type="category"
             dataKey="dimension"
-            tick={{ fill: '#cdd6f4', fontSize: 11 }}
+            tick={{ fill: '#171614', fontSize: 11 }}
             width={90}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e1e2e',
-              border: '1px solid #313244',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E7E5E4',
               borderRadius: '8px',
-              color: '#cdd6f4'
+              color: '#171614'
             }}
             formatter={(value: number, name: string, props: any) => [
               `${value.toFixed(1)} / 5.0`,

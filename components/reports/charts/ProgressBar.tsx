@@ -24,13 +24,13 @@ export function ProgressBar({ data, className = '' }: ProgressBarProps) {
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-mocha-text">{level}</span>
-        <span className="text-mocha-subtext0">
+        <span className="font-medium text-foreground">{level}</span>
+        <span className="text-muted-foreground">
           {current.toFixed(1)} / {target.toFixed(1)}
         </span>
       </div>
 
-      <div className="relative w-full h-3 bg-mocha-surface1 rounded-full overflow-hidden">
+      <div className="relative w-full h-3 bg-muted rounded-full overflow-hidden">
         <div
           className="absolute top-0 left-0 h-full rounded-full transition-all duration-500 ease-out"
           style={{
@@ -45,7 +45,7 @@ export function ProgressBar({ data, className = '' }: ProgressBarProps) {
         />
       </div>
 
-      <p className="text-xs text-mocha-subtext1">
+      <p className="text-xs text-muted-foreground">
         {percentage < 100 ? (
           <>
             {(target - current).toFixed(1)} points to {getNextLevelName(target)}

@@ -182,24 +182,24 @@ export const whiteSpace = {
  */
 export const visualAccents = {
   // Dividers
-  dividerThin: 'border-t border-mocha-surface1',
-  dividerThick: 'border-t-2 border-mocha-surface2',
+  dividerThin: 'border-t border-border',
+  dividerThick: 'border-t-2 border-border',
   dividerAccent: 'border-t-2 border-brand-orange',
 
   // Pull quotes
-  pullQuote: 'border-l-4 border-brand-orange pl-6 italic text-xl text-mocha-text',
+  pullQuote: 'border-l-4 border-brand-orange pl-6 italic text-xl text-foreground',
 
   // Callout boxes
-  calloutInfo: 'border-l-4 border-brand-teal bg-mocha-surface0 p-6 rounded-r',
-  calloutWarning: 'border-l-4 border-yellow-500 bg-mocha-surface0 p-6 rounded-r',
-  calloutSuccess: 'border-l-4 border-green-500 bg-mocha-surface0 p-6 rounded-r',
+  calloutInfo: 'border-l-4 border-brand-teal bg-card p-6 rounded-r',
+  calloutWarning: 'border-l-4 border-yellow-500 bg-card p-6 rounded-r',
+  calloutSuccess: 'border-l-4 border-green-500 bg-card p-6 rounded-r',
 
   // Section headers
-  sectionHeader: 'border-b-2 border-mocha-surface2 pb-4 mb-8',
+  sectionHeader: 'border-b-2 border-border pb-4 mb-8',
 
   // Cards
-  card: 'bg-mocha-surface0 rounded-lg p-6 shadow-sm',
-  cardElevated: 'bg-mocha-surface0 rounded-lg p-8 shadow-lg',
+  card: 'bg-card rounded-lg p-6 shadow-sm',
+  cardElevated: 'bg-card rounded-lg p-8 shadow-lg',
 }
 
 /**
@@ -207,7 +207,7 @@ export const visualAccents = {
  */
 export const pageStructure = {
   // Full-page containers
-  page: `min-h-screen bg-mocha-base`,
+  page: `min-h-screen bg-background`,
   pageContent: `max-w-[${gridConfig.maxWidth}px] mx-auto px-[${gridConfig.marginOuter}px]`,
 
   // Sections

@@ -103,7 +103,7 @@ export function PullQuote({ children, author, className = '' }: PullQuoteProps) 
     <blockquote className={`${visualAccents.pullQuote} my-10 ${className}`}>
       {children}
       {author && (
-        <footer className="text-base not-italic text-mocha-subtext0 mt-4">
+        <footer className="text-base not-italic text-muted-foreground mt-4">
           — {author}
         </footer>
       )}
@@ -127,7 +127,7 @@ export function Divider({ label, accent = false, className = '' }: DividerProps)
     return (
       <div className={`flex items-center gap-4 my-10 ${className}`}>
         <div className={`flex-1 ${dividerClass}`} />
-        <span className="text-mocha-subtext1 text-sm font-medium uppercase tracking-wider">
+        <span className="text-muted-foreground text-sm font-medium uppercase tracking-wider">
           {label}
         </span>
         <div className={`flex-1 ${dividerClass}`} />

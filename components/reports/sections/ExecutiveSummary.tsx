@@ -26,9 +26,9 @@ export function ExecutiveSummary({ assessment, className = '' }: ExecutiveSummar
 
   return (
     <section
-      className={`bg-mocha-base border border-mocha-surface0 rounded-lg p-8 ${className}`}
+      className={`bg-background border border-border rounded-lg p-8 ${className}`}
       aria-labelledby="executive-summary-heading">
-      <h2 id="executive-summary-heading" className="text-2xl font-bold text-mocha-text mb-6">
+      <h2 id="executive-summary-heading" className="text-2xl font-bold text-foreground mb-6">
         Executive Summary
       </h2>
 
@@ -38,10 +38,10 @@ export function ExecutiveSummary({ assessment, className = '' }: ExecutiveSummar
           <ScoreBadge score={assessment.overallScore} size="xl" showLabel />
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-mocha-text mb-3">
+          <h3 className="text-xl font-semibold text-foreground mb-3">
             Overall Readiness Assessment
           </h3>
-          <div className="text-mocha-subtext0 leading-relaxed">
+          <div className="text-muted-foreground leading-relaxed">
             {assessment.executiveSummary.split('\n\n').map((paragraph, idx) => (
               <p key={idx} className="mb-3 last:mb-0">
                 {paragraph}
@@ -67,13 +67,13 @@ export function ExecutiveSummary({ assessment, className = '' }: ExecutiveSummar
 
       {/* Key Themes */}
       {assessment.keyThemes.length > 0 && (
-        <div className="mt-8 pt-8 border-t border-mocha-surface1">
-          <h3 className="text-lg font-semibold text-mocha-text mb-4">Key Themes</h3>
+        <div className="mt-8 pt-8 border-t border-border">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Key Themes</h3>
           <ul className="space-y-2">
             {assessment.keyThemes.map((theme, idx) => (
               <li key={idx} className="flex items-start gap-3">
-                <span className="text-mocha-teal mt-1">•</span>
-                <span className="text-mocha-subtext0">{theme}</span>
+                <span className="text-brand-teal mt-1">•</span>
+                <span className="text-muted-foreground">{theme}</span>
               </li>
             ))}
           </ul>

@@ -23,8 +23,8 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
 
   if (!data || data.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-96 bg-mocha-surface0 rounded-lg ${className}`}>
-        <p className="text-mocha-subtext1 text-sm">No data available for heat map</p>
+      <div className={`flex items-center justify-center h-96 bg-card rounded-lg ${className}`}>
+        <p className="text-muted-foreground text-sm">No data available for heat map</p>
       </div>
     )
   }
@@ -76,9 +76,9 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
             {pillars.map((pillar, idx) => (
               <div
                 key={`header-${idx}`}
-                className="h-20 flex items-center justify-center bg-mocha-surface0 rounded-t-lg px-2"
+                className="h-20 flex items-center justify-center bg-card rounded-t-lg px-2"
               >
-                <p className="text-mocha-text font-semibold text-sm text-center leading-tight">
+                <p className="text-foreground font-semibold text-sm text-center leading-tight">
                   {pillar}
                 </p>
               </div>
@@ -95,8 +95,8 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
               }}
             >
               {/* Row header (dimension name from first cell) */}
-              <div className="h-24 flex items-center px-4 bg-mocha-surface0 rounded-l-lg">
-                <p className="text-mocha-text text-sm font-medium leading-tight">
+              <div className="h-24 flex items-center px-4 bg-card rounded-l-lg">
+                <p className="text-foreground text-sm font-medium leading-tight">
                   {row[0]?.dimension || `Dimension ${rowIdx + 1}`}
                 </p>
               </div>
@@ -115,7 +115,7 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
                     style={{
                       backgroundColor: color,
                       opacity: isHovered ? 1 : opacity,
-                      borderColor: isHovered ? '#cdd6f4' : 'transparent',
+                      borderColor: isHovered ? '#171614' : 'transparent',
                       transform: isHovered ? 'scale(1.05)' : 'scale(1)'
                     }}
                     onMouseEnter={() => setHoveredCell(cell)}
@@ -137,7 +137,7 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
         {/* Tooltip */}
         {hoveredCell && (
           <div
-            className="absolute pointer-events-none bg-mocha-base border border-mocha-surface2 rounded-lg px-4 py-3 shadow-lg z-10"
+            className="absolute pointer-events-none bg-background border border-border rounded-lg px-4 py-3 shadow-lg z-10"
             style={{
               left: mousePosition.x + 15,
               top: mousePosition.y - 80,
@@ -146,29 +146,29 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
           >
             <div className="space-y-2">
               <div>
-                <p className="text-mocha-text font-semibold text-sm leading-tight">
+                <p className="text-foreground font-semibold text-sm leading-tight">
                   {hoveredCell.dimension}
                 </p>
-                <p className="text-mocha-subtext1 text-xs mt-1">
+                <p className="text-muted-foreground text-xs mt-1">
                   {hoveredCell.pillar}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <p className="text-mocha-subtext0">Current Score</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Current Score</p>
+                  <p className="text-foreground font-medium">
                     {hoveredCell.score.toFixed(1)} / 5.0
                   </p>
                 </div>
                 <div>
-                  <p className="text-mocha-subtext0">Gap to Target</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Gap to Target</p>
+                  <p className="text-foreground font-medium">
                     {hoveredCell.gap.toFixed(1)}
                   </p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-mocha-subtext0">Maturity Level</p>
-                  <p className="text-mocha-text font-medium">
+                  <p className="text-muted-foreground">Maturity Level</p>
+                  <p className="text-foreground font-medium">
                     {hoveredCell.score >= 4.0 ? 'Expert' :
                      hoveredCell.score >= 3.0 ? 'Experienced' :
                      hoveredCell.score >= 2.0 ? 'Intermediate' :
@@ -182,22 +182,22 @@ export function CapabilityHeatMap({ data, className = '' }: CapabilityHeatMapPro
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-6 px-4 py-3 bg-mocha-surface0 rounded-lg">
+      <div className="flex items-center justify-center gap-6 mt-6 px-4 py-3 bg-card rounded-lg">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#10b981' }} />
-          <span className="text-mocha-text text-sm">Expert (4.0-5.0)</span>
+          <span className="text-foreground text-sm">Expert (4.0-5.0)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#eab308' }} />
-          <span className="text-mocha-text text-sm">Experienced (3.0-3.9)</span>
+          <span className="text-foreground text-sm">Experienced (3.0-3.9)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#f97316' }} />
-          <span className="text-mocha-text text-sm">Intermediate (2.0-2.9)</span>
+          <span className="text-foreground text-sm">Intermediate (2.0-2.9)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#ef4444' }} />
-          <span className="text-mocha-text text-sm">Beginner (0-1.9)</span>
+          <span className="text-foreground text-sm">Beginner (0-1.9)</span>
         </div>
       </div>
 
