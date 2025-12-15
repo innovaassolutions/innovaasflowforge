@@ -33,7 +33,7 @@ export default function GlobalHeader() {
             href="/"
             className="flex items-center gap-3 text-foreground hover:text-primary transition-colors group">
             <Image
-              src="/icon-orb.svg"
+              src="https://www.innovaas.co/flowforge/icon-orb.svg"
               alt="Innovaas FlowForge"
               width={40}
               height={40}
