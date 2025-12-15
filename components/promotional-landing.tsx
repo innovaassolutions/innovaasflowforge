@@ -3,231 +3,295 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  Factory,
-  Briefcase,
-  Target,
   Check,
   Clock,
   Shield,
   TrendingUp,
-  Brain
+  Brain,
+  ArrowRight
 } from 'lucide-react'
-import ManufacturingMockup from './mockups/manufacturing-mockup'
+import { useIndustryPreference } from '@/hooks/use-industry-preference'
+import { getIndustryContent, IndustryKey } from '@/lib/industry-content'
+import IndustrySelector from './industry-selector'
+import IndustryHeroMockup from './mockups/industry-hero-index'
 import DashboardMockup from './mockups/dashboard-mockup'
+import ManufacturingMockup from './mockups/manufacturing-mockup'
 import ReportMockup from './mockups/report-mockup'
 import HeroBackground from './mockups/hero-background'
 
 export default function PromotionalLanding() {
+  const { industry, setIndustry, isLoaded } = useIndustryPreference()
   const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
+
+  // Get industry-specific content
+  const content = getIndustryContent(industry)
+
+  // Prevent hydration issues by not rendering industry-specific content until loaded
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Industry Selector Bar */}
+      <div className="bg-muted border-b border-border py-3 px-4
+                      sm:py-4">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-2
+                        sm:flex-row sm:justify-between">
+          <span className="text-sm text-muted-foreground">
+            Select your industry:
+          </span>
+          <IndustrySelector
+            selected={industry}
+            onSelect={setIndustry}
+            variant="pills"
+          />
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20
-                          md:py-28
-                          lg:py-36">
+      <section className="relative overflow-hidden py-12
+                          md:py-16
+                          lg:py-20">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-brand-teal/10" />
         <HeroBackground />
 
         <div className="relative max-w-7xl mx-auto px-6
                         lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold text-foreground mb-6
-                           sm:text-5xl
-                           md:text-6xl
-                           lg:text-7xl">
-              Transform Stakeholder Insights Into{' '}
-              <span className="text-primary">
-                Strategic Action
-              </span>
-            </h1>
+          <div className="grid grid-cols-1 gap-8 items-center
+                          lg:grid-cols-2 lg:gap-12">
+            {/* Left: Text Content */}
+            <div className="text-center
+                            lg:text-left">
+              <h1 className="text-3xl font-bold text-foreground mb-4
+                             sm:text-4xl
+                             md:text-5xl
+                             lg:text-6xl">
+                {content.heroHeadline.split(content.heroHighlight)[0]}
+                <span className="text-primary">
+                  {content.heroHighlight}
+                </span>
+                {content.heroHeadline.split(content.heroHighlight)[1]}
+              </h1>
 
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto
-                          md:text-xl
-                          lg:text-2xl">
-              AI-powered assessment platform that conducts intelligent stakeholder interviews
-              and synthesizes insights into actionable transformation roadmaps.
-            </p>
+              <p className="text-base text-muted-foreground mb-6 max-w-xl mx-auto
+                            md:text-lg
+                            lg:text-xl lg:mx-0">
+                {content.heroDescription}
+              </p>
 
-            <div className="flex flex-col gap-4 items-center
-                            sm:flex-row sm:justify-center
-                            md:gap-6">
-              <Link
-                href="/auth/signup"
-                className="w-full px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg
-                           hover:bg-[hsl(var(--accent-hover))] transition-colors
-                           sm:w-auto
-                           md:px-10 md:py-5 md:text-lg">
-                Start Free Assessment
-              </Link>
+              {/* Stats row */}
+              <div className="flex flex-wrap justify-center gap-6 mb-8
+                              lg:justify-start">
+                {content.stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-2xl font-bold text-primary
+                                    md:text-3xl">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-muted-foreground
+                                    md:text-sm">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-              <Link
-                href="#how-it-works"
-                className="w-full px-8 py-4 border-2 border-border bg-card text-foreground font-semibold rounded-lg
-                           hover:bg-muted hover:border-primary transition-colors
-                           sm:w-auto
-                           md:px-10 md:py-5 md:text-lg">
-                See How It Works
-              </Link>
+              <div className="flex flex-col gap-3 items-center
+                              sm:flex-row sm:justify-center
+                              lg:justify-start
+                              md:gap-4">
+                <Link
+                  href="/auth/signup"
+                  className="w-full px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg
+                             hover:bg-[hsl(var(--accent-hover))] transition-colors flex items-center justify-center gap-2
+                             sm:w-auto
+                             md:px-8 md:py-4 md:text-lg">
+                  {content.ctaPrimary}
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <Link
+                  href="#how-it-works"
+                  className="w-full px-6 py-3 border-2 border-border bg-card text-foreground font-semibold rounded-lg
+                             hover:bg-muted hover:border-primary transition-colors
+                             sm:w-auto
+                             md:px-8 md:py-4 md:text-lg">
+                  {content.ctaSecondary}
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Industry-Specific Hero Mockup */}
+            <div className="relative">
+              <div className="rounded-lg overflow-hidden shadow-2xl">
+                <IndustryHeroMockup industry={industry} />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Target Audience Section */}
-      <section className="py-16 bg-muted
-                          md:py-20
-                          lg:py-24">
+      {/* Value Props Section */}
+      <section className="py-12 bg-muted
+                          md:py-16
+                          lg:py-20">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-12
-                         md:text-4xl
-                         lg:text-5xl lg:mb-16">
-            Built For Transformation Leaders
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8
+                         md:text-3xl
+                         lg:text-4xl lg:mb-12">
+            What You Get
+          </h2>
+
+          <div className="grid grid-cols-1 gap-6
+                          md:grid-cols-3 md:gap-8">
+            {content.valueProps.map((prop, index) => (
+              <div
+                key={index}
+                className="bg-card p-6 rounded-lg border border-border text-center
+                           hover:border-primary transition-colors
+                           md:p-8"
+              >
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4
+                                md:w-14 md:h-14">
+                  <Check className="w-6 h-6 text-primary-foreground
+                                   md:w-7 md:h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
+                  {prop.title}
+                </h3>
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
+                  {prop.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Target Personas Section */}
+      <section className="py-12 bg-background
+                          md:py-16
+                          lg:py-20">
+        <div className="max-w-7xl mx-auto px-6
+                        lg:px-8">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8
+                         md:text-3xl
+                         lg:text-4xl lg:mb-12">
+            Built For {content.name} Leaders
           </h2>
 
           <div className="grid grid-cols-1 gap-6
                           md:grid-cols-2 md:gap-8
                           lg:grid-cols-3 lg:gap-10">
-            {/* Persona 1 */}
-            <div className="bg-card p-6 rounded-lg border border-border
-                            hover:border-brand-teal transition-colors
-                            md:p-8">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
-                              md:w-14 md:h-14">
-                <Factory className="w-6 h-6 text-primary-foreground
-                                   md:w-7 md:h-7" />
+            {content.personas.map((persona, index) => (
+              <div
+                key={index}
+                className="bg-card p-6 rounded-lg border border-border
+                           hover:border-primary transition-colors
+                           md:p-8"
+              >
+                <h3 className="text-xl font-bold text-foreground mb-3
+                               md:text-2xl">
+                  {persona.title}
+                </h3>
+                <p className="text-muted-foreground mb-4
+                              md:text-lg">
+                  {persona.description}
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground
+                               md:text-base">
+                  {persona.benefits.map((benefit, benefitIndex) => (
+                    <li key={benefitIndex} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3
-                             md:text-2xl">
-                Manufacturing Leaders
-              </h3>
-              <p className="text-muted-foreground mb-4
-                            md:text-lg">
-                Assess Industry 4.0 readiness across production facilities and stakeholder teams.
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
-                             md:text-base">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Digital transformation maturity</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Automation readiness analysis</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Stakeholder alignment mapping</span>
-                </li>
-              </ul>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Persona 2 */}
-            <div className="bg-card p-6 rounded-lg border border-border
-                            hover:border-brand-teal transition-colors
-                            md:p-8">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
-                              md:w-14 md:h-14">
-                <Briefcase className="w-6 h-6 text-primary-foreground
-                                     md:w-7 md:h-7" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-3
-                             md:text-2xl">
-                Management Consultants
-              </h3>
-              <p className="text-muted-foreground mb-4
-                            md:text-lg">
-                Facilitate structured workshops and synthesize insights across diverse methodologies.
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
-                             md:text-base">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Lean Six Sigma workshops</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Business Model Canvas sessions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Theory of Constraints analysis</span>
-                </li>
-              </ul>
-            </div>
+      {/* Pain Points Section */}
+      <section className="py-12 bg-muted
+                          md:py-16
+                          lg:py-20">
+        <div className="max-w-7xl mx-auto px-6
+                        lg:px-8">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-3
+                         md:text-3xl
+                         lg:text-4xl">
+            We Understand Your Challenges
+          </h2>
+          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto
+                        md:text-lg md:mb-12">
+            Traditional assessments are slow, expensive, and often miss what matters most.
+          </p>
 
-            {/* Persona 3 */}
-            <div className="bg-card p-6 rounded-lg border border-border
-                            hover:border-brand-teal transition-colors
-                            md:p-8 md:col-span-2
-                            lg:col-span-1">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
-                              md:w-14 md:h-14">
-                <Target className="w-6 h-6 text-primary-foreground
-                                  md:w-7 md:h-7" />
+          <div className="grid grid-cols-1 gap-6
+                          md:grid-cols-3 md:gap-8">
+            {content.painPoints.map((pain, index) => (
+              <div
+                key={index}
+                className="bg-card p-6 rounded-lg border-l-4 border-primary
+                           md:p-8"
+              >
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
+                  {pain.title}
+                </h3>
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
+                  {pain.description}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3
-                             md:text-2xl">
-                Strategic Planners
-              </h3>
-              <p className="text-muted-foreground mb-4
-                            md:text-lg">
-                Gather cross-functional insights and build data-driven strategic roadmaps.
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
-                             md:text-base">
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Jobs To Be Done research</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Strategic brainstorming facilitation</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
-                  <span>Multi-stakeholder synthesis</span>
-                </li>
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 bg-background
-                                             md:py-20
-                                             lg:py-24">
+      <section id="how-it-works" className="py-12 bg-background
+                                             md:py-16
+                                             lg:py-20">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-12
-                         md:text-4xl
-                         lg:text-5xl lg:mb-16">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8
+                         md:text-3xl
+                         lg:text-4xl lg:mb-12">
             Three Steps to Strategic Clarity
           </h2>
 
-          <div className="grid grid-cols-1 gap-12
+          <div className="grid grid-cols-1 gap-8
                           lg:grid-cols-3 lg:gap-8">
             {/* Step 1 */}
             <div className="relative">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-base font-bold text-primary-foreground
-                                md:w-14 md:h-14 md:text-xl">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground
+                                md:w-12 md:h-12 md:text-lg">
                   1
                 </div>
                 <div className="flex-1 h-1 bg-primary/50 ml-4
                                 lg:hidden" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4
-                             md:text-3xl">
+              <h3 className="text-xl font-bold text-foreground mb-3
+                             md:text-2xl">
                 Create Campaign
               </h3>
-              <p className="text-muted-foreground mb-4
+              <p className="text-muted-foreground mb-3
                             md:text-lg">
                 Define your assessment scope and invite stakeholders via secure, personalized links.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
+              <ul className="space-y-1 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Multi-stakeholder coordination</li>
                 <li>• Flexible methodology selection</li>
@@ -237,23 +301,23 @@ export default function PromotionalLanding() {
 
             {/* Step 2 */}
             <div className="relative">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-base font-bold text-primary-foreground
-                                md:w-14 md:h-14 md:text-xl">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground
+                                md:w-12 md:h-12 md:text-lg">
                   2
                 </div>
                 <div className="flex-1 h-1 bg-primary/50 ml-4
                                 lg:hidden" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4
-                             md:text-3xl">
+              <h3 className="text-xl font-bold text-foreground mb-3
+                             md:text-2xl">
                 AI-Facilitated Interviews
               </h3>
-              <p className="text-muted-foreground mb-4
+              <p className="text-muted-foreground mb-3
                             md:text-lg">
                 Stakeholders engage in intelligent conversations that adapt based on their responses.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
+              <ul className="space-y-1 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Context-aware questioning</li>
                 <li>• Natural conversation flow</li>
@@ -263,21 +327,21 @@ export default function PromotionalLanding() {
 
             {/* Step 3 */}
             <div className="relative">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold
-                                md:w-14 md:h-14 md:text-xl">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold
+                                md:w-12 md:h-12 md:text-lg">
                   3
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4
-                             md:text-3xl">
+              <h3 className="text-xl font-bold text-foreground mb-3
+                             md:text-2xl">
                 Strategic Synthesis
               </h3>
-              <p className="text-muted-foreground mb-4
+              <p className="text-muted-foreground mb-3
                             md:text-lg">
                 AI analyzes all interviews and generates comprehensive readiness assessments.
               </p>
-              <ul className="space-y-2 text-sm text-muted-foreground
+              <ul className="space-y-1 text-sm text-muted-foreground
                              md:text-base">
                 <li>• Multi-dimensional analysis</li>
                 <li>• Visual data representations</li>
@@ -289,21 +353,21 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Feature Showcase with Mockups */}
-      <section className="py-16 bg-muted
-                          md:py-20
-                          lg:py-24">
+      <section className="py-12 bg-muted
+                          md:py-16
+                          lg:py-20">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-12
-                         md:text-4xl
-                         lg:text-5xl lg:mb-16">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8
+                         md:text-3xl
+                         lg:text-4xl lg:mb-12">
             See FlowForge In Action
           </h2>
 
           {/* Mockup Selector */}
           <div className="flex flex-col gap-3 mb-8
                           sm:flex-row sm:justify-center sm:gap-4
-                          md:mb-12">
+                          md:mb-10">
             <button
               onClick={() => setSelectedMockup('dashboard')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all
@@ -344,12 +408,12 @@ export default function PromotionalLanding() {
           </div>
 
           {/* Feature Description */}
-          <div className="mt-8 max-w-3xl mx-auto text-center
-                          md:mt-12">
+          <div className="mt-6 max-w-3xl mx-auto text-center
+                          md:mt-10">
             {selectedMockup === 'dashboard' && (
               <div>
-                <h3 className="text-2xl font-bold text-foreground mb-4
-                               md:text-3xl">
+                <h3 className="text-xl font-bold text-foreground mb-3
+                               md:text-2xl">
                   Centralized Campaign Management
                 </h3>
                 <p className="text-muted-foreground
@@ -361,8 +425,8 @@ export default function PromotionalLanding() {
             )}
             {selectedMockup === 'interview' && (
               <div>
-                <h3 className="text-2xl font-bold text-foreground mb-4
-                               md:text-3xl">
+                <h3 className="text-xl font-bold text-foreground mb-3
+                               md:text-2xl">
                   Intelligent Interview Agent
                 </h3>
                 <p className="text-muted-foreground
@@ -374,8 +438,8 @@ export default function PromotionalLanding() {
             )}
             {selectedMockup === 'report' && (
               <div>
-                <h3 className="text-2xl font-bold text-foreground mb-4
-                               md:text-3xl">
+                <h3 className="text-xl font-bold text-foreground mb-3
+                               md:text-2xl">
                   Comprehensive Assessment Reports
                 </h3>
                 <p className="text-muted-foreground
@@ -390,20 +454,20 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-background
-                          md:py-20
-                          lg:py-24">
+      <section className="py-12 bg-background
+                          md:py-16
+                          lg:py-20">
         <div className="max-w-7xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-12
-                         md:text-4xl
-                         lg:text-5xl lg:mb-16">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8
+                         md:text-3xl
+                         lg:text-4xl lg:mb-12">
             Why FlowForge?
           </h2>
 
-          <div className="grid grid-cols-1 gap-8
+          <div className="grid grid-cols-1 gap-6
                           md:grid-cols-2
-                          lg:gap-12">
+                          lg:gap-10">
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
@@ -411,12 +475,12 @@ export default function PromotionalLanding() {
                                  md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2
-                               md:text-2xl">
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
                   Save 80% of Assessment Time
                 </h3>
-                <p className="text-muted-foreground
-                              md:text-lg">
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
                   Automate stakeholder interviews while maintaining depth and quality.
                   What used to take weeks now takes days.
                 </p>
@@ -430,12 +494,12 @@ export default function PromotionalLanding() {
                                   md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2
-                               md:text-2xl">
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
                   Eliminate Interview Bias
                 </h3>
-                <p className="text-muted-foreground
-                              md:text-lg">
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
                   Consistent, structured questioning ensures every stakeholder receives
                   the same rigorous assessment experience.
                 </p>
@@ -449,12 +513,12 @@ export default function PromotionalLanding() {
                                       md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2
-                               md:text-2xl">
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
                   Scale Without Limits
                 </h3>
-                <p className="text-muted-foreground
-                              md:text-lg">
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
                   Conduct assessments with 10 or 1,000 stakeholders simultaneously.
                   Your capacity is no longer bottlenecked by interviewer availability.
                 </p>
@@ -468,12 +532,12 @@ export default function PromotionalLanding() {
                                  md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2
-                               md:text-2xl">
+                <h3 className="text-lg font-bold text-foreground mb-2
+                               md:text-xl">
                   Data-Driven Insights
                 </h3>
-                <p className="text-muted-foreground
-                              md:text-lg">
+                <p className="text-muted-foreground text-sm
+                              md:text-base">
                   AI synthesis identifies patterns, themes, and strategic opportunities
                   across hundreds of interview transcripts instantly.
                 </p>
@@ -484,21 +548,21 @@ export default function PromotionalLanding() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-card via-muted to-card
-                          md:py-20
-                          lg:py-28">
+      <section className="py-12 bg-gradient-to-br from-card via-muted to-card
+                          md:py-16
+                          lg:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center
                         lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-6
-                         md:text-4xl
-                         lg:text-5xl lg:mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4
+                         md:text-3xl
+                         lg:text-4xl lg:mb-6">
             Ready to Transform Your Assessment Process?
           </h2>
 
-          <p className="text-lg text-muted-foreground mb-8
-                        md:text-xl
-                        lg:text-2xl lg:mb-12">
-            Join transformation leaders who are leveraging AI to accelerate strategic insights.
+          <p className="text-base text-muted-foreground mb-6
+                        md:text-lg
+                        lg:text-xl lg:mb-10">
+            Join {content.name.toLowerCase()} leaders who are leveraging AI to accelerate strategic insights.
           </p>
 
           <div className="flex flex-col gap-4 items-center
@@ -506,19 +570,20 @@ export default function PromotionalLanding() {
                           md:gap-6">
             <Link
               href="/auth/signup"
-              className="w-full px-10 py-5 bg-primary text-primary-foreground font-bold rounded-lg text-lg
-                         hover:bg-[hsl(var(--accent-hover))] transition-colors
+              className="w-full px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg
+                         hover:bg-[hsl(var(--accent-hover))] transition-colors flex items-center justify-center gap-2
                          sm:w-auto
-                         md:px-12 md:py-6 md:text-xl">
-              Start Your Free Assessment
+                         md:px-10 md:py-5 md:text-xl">
+              {content.ctaPrimary}
+              <ArrowRight className="w-5 h-5" />
             </Link>
 
             <Link
               href="/auth/login"
-              className="w-full px-10 py-5 border-2 border-border bg-card text-foreground font-bold rounded-lg text-lg
+              className="w-full px-8 py-4 border-2 border-border bg-card text-foreground font-bold rounded-lg text-lg
                          hover:bg-muted hover:border-primary transition-colors
                          sm:w-auto
-                         md:px-12 md:py-6 md:text-xl">
+                         md:px-10 md:py-5 md:text-xl">
               Sign In
             </Link>
           </div>
