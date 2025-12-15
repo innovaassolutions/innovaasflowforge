@@ -31,9 +31,11 @@ export default function GlobalHeader() {
           <Link
             href="/"
             className="flex items-center gap-3 text-foreground hover:text-primary transition-colors group">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
-              <span className="text-primary-foreground font-bold text-lg">IF</span>
-            </div>
+            <img
+              src="/icon-orb.svg"
+              alt="Innovaas FlowForge"
+              className="w-10 h-10"
+            />
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold">Innovaas FlowForge</h1>
               <p className="text-xs text-muted-foreground">Assessment Platform</p>

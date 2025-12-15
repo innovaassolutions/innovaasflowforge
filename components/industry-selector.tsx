@@ -17,6 +17,14 @@ const industryIcons: Record<IndustryKey, React.ComponentType<{ className?: strin
   'professional-services': Briefcase
 }
 
+// Button labels for each industry
+const industryLabels: Record<IndustryKey, string> = {
+  manufacturing: 'For Industry',
+  pharma: 'For Pharma',
+  education: 'For Education',
+  'professional-services': 'For Consultants'
+}
+
 export default function IndustrySelector({
   selected,
   onSelect,
@@ -27,7 +35,6 @@ export default function IndustrySelector({
       <div className="flex flex-wrap justify-center gap-2
                       sm:gap-3">
         {industryOrder.map((key) => {
-          const content = industryContent[key]
           const Icon = industryIcons[key]
           const isSelected = selected === key
 
@@ -44,10 +51,7 @@ export default function IndustrySelector({
               aria-pressed={isSelected}
             >
               <Icon className="w-4 h-4" />
-              <span className="hidden
-                               xs:inline">
-                {content.shortName}
-              </span>
+              <span>{industryLabels[key]}</span>
             </button>
           )
         })}

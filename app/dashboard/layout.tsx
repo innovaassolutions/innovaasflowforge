@@ -7,7 +7,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import { Menu } from 'lucide-react'
-import Image from 'next/image'
 
 interface UserProfile {
   full_name: string
@@ -84,9 +83,11 @@ export default function DashboardLayout({
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-primary-foreground font-bold text-lg shrink-0">
-            FF
-          </div>
+          <img
+            src="/icon-orb.svg"
+            alt="Innovaas FlowForge"
+            className="w-10 h-10 shrink-0"
+          />
           <div className="hidden sm:block">
             <h1 className="text-sm font-bold text-foreground">Innovaas FlowForge</h1>
             <p className="text-xs text-muted-foreground">Assessment Platform</p>
