@@ -223,7 +223,7 @@ export default function StakeholderInterviewPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-foreground">
                 {session.campaigns.name}
               </h1>
               <p className="text-muted-foreground mt-1">

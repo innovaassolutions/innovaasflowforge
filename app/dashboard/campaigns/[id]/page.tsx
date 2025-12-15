@@ -388,7 +388,7 @@ export default function CampaignDetailPage() {
           <div className="mt-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-foreground">
                   {campaign.name}
                 </h1>
                 <p className="text-muted-foreground mt-2">
@@ -407,14 +407,14 @@ export default function CampaignDetailPage() {
                     {existingReport ? (
                       <button
                         onClick={() => window.open(existingReport.url, '_blank')}
-                        className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                        className="bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
                         <Share2 className="w-4 h-4" />
                         View Report
                       </button>
                     ) : (
                       <button
                         onClick={() => setShowReportPanel(true)}
-                        className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                        className="bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
                         <Share2 className="w-4 h-4" />
                         Generate Client Report
                       </button>
@@ -512,7 +512,7 @@ export default function CampaignDetailPage() {
           </div>
           <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-brand-orange to-brand-teal h-full transition-all duration-500 rounded-full"
+              className="bg-primary h-full transition-all duration-500 rounded-full"
               style={{ width: `${campaign.progress.percentComplete}%` }}
             />
           </div>
@@ -542,14 +542,14 @@ export default function CampaignDetailPage() {
                   {existingReport ? (
                     <button
                       onClick={() => window.open(existingReport.url, '_blank')}
-                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                      className="bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
                       <Share2 className="w-4 h-4" />
                       View Report
                     </button>
                   ) : (
                     <button
                       onClick={() => setShowReportPanel(true)}
-                      className="bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-opacity flex items-center gap-2">
+                      className="bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
                       <Share2 className="w-4 h-4" />
                       Generate Client Report
                     </button>

@@ -54,8 +54,8 @@ export default function PromotionalLanding() {
                             md:gap-6">
               <Link
                 href="/auth/signup"
-                className="w-full px-8 py-4 bg-gradient-to-r from-brand-orange to-brand-teal text-white font-semibold rounded-lg
-                           hover:opacity-90 transition-opacity
+                className="w-full px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg
+                           hover:bg-[hsl(var(--accent-hover))] transition-colors
                            sm:w-auto
                            md:px-10 md:py-5 md:text-lg">
                 Start Free Assessment
@@ -63,8 +63,8 @@ export default function PromotionalLanding() {
 
               <Link
                 href="#how-it-works"
-                className="w-full px-8 py-4 border-2 border-border text-foreground font-semibold rounded-lg
-                           hover:border-brand-teal hover:text-brand-teal transition-colors
+                className="w-full px-8 py-4 border-2 border-border bg-card text-foreground font-semibold rounded-lg
+                           hover:bg-muted hover:border-primary transition-colors
                            sm:w-auto
                            md:px-10 md:py-5 md:text-lg">
                 See How It Works
@@ -93,9 +93,9 @@ export default function PromotionalLanding() {
             <div className="bg-card p-6 rounded-lg border border-border
                             hover:border-brand-teal transition-colors
                             md:p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center mb-4
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Factory className="w-6 h-6 text-white
+                <Factory className="w-6 h-6 text-primary-foreground
                                    md:w-7 md:h-7" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3
@@ -127,9 +127,9 @@ export default function PromotionalLanding() {
             <div className="bg-card p-6 rounded-lg border border-border
                             hover:border-brand-teal transition-colors
                             md:p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center mb-4
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Briefcase className="w-6 h-6 text-white
+                <Briefcase className="w-6 h-6 text-primary-foreground
                                      md:w-7 md:h-7" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3
@@ -162,9 +162,9 @@ export default function PromotionalLanding() {
                             hover:border-brand-teal transition-colors
                             md:p-8 md:col-span-2
                             lg:col-span-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-success to-brand-teal rounded-lg flex items-center justify-center mb-4
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4
                               md:w-14 md:h-14">
-                <Target className="w-6 h-6 text-white
+                <Target className="w-6 h-6 text-primary-foreground
                                   md:w-7 md:h-7" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-3
@@ -212,11 +212,11 @@ export default function PromotionalLanding() {
             {/* Step 1 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-brand-orange to-brand-teal rounded-full flex items-center justify-center text-base font-bold text-white
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-base font-bold text-primary-foreground
                                 md:w-14 md:h-14 md:text-xl">
                   1
                 </div>
-                <div className="flex-1 h-1 bg-gradient-to-r from-brand-orange to-transparent ml-4
+                <div className="flex-1 h-1 bg-primary/50 ml-4
                                 lg:hidden" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4
@@ -238,11 +238,11 @@ export default function PromotionalLanding() {
             {/* Step 2 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-brand-teal to-primary rounded-full flex items-center justify-center text-base font-bold text-white
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-base font-bold text-primary-foreground
                                 md:w-14 md:h-14 md:text-xl">
                   2
                 </div>
-                <div className="flex-1 h-1 bg-gradient-to-r from-brand-teal to-transparent ml-4
+                <div className="flex-1 h-1 bg-primary/50 ml-4
                                 lg:hidden" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4
@@ -264,7 +264,7 @@ export default function PromotionalLanding() {
             {/* Step 3 */}
             <div className="relative">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-bold
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold
                                 md:w-14 md:h-14 md:text-xl">
                   3
                 </div>
@@ -309,8 +309,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'dashboard'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
-                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
                           }`}>
               Campaign Dashboard
             </button>
@@ -319,8 +319,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'interview'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
-                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
                           }`}>
               AI Interview
             </button>
@@ -329,8 +329,8 @@ export default function PromotionalLanding() {
               className={`px-6 py-3 rounded-lg font-semibold transition-all
                           md:px-8 md:py-4
                           ${selectedMockup === 'report'
-                            ? 'bg-gradient-to-r from-brand-orange to-brand-teal text-white'
-                            : 'bg-card text-muted-foreground hover:text-foreground border border-border'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
                           }`}>
               Assessment Report
             </button>
@@ -405,9 +405,9 @@ export default function PromotionalLanding() {
                           md:grid-cols-2
                           lg:gap-12">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-orange to-brand-teal rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Clock className="w-5 h-5 text-white
+                <Clock className="w-5 h-5 text-primary-foreground
                                  md:w-6 md:h-6" />
               </div>
               <div>
@@ -424,9 +424,9 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-brand-teal to-primary rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Shield className="w-5 h-5 text-white
+                <Shield className="w-5 h-5 text-primary-foreground
                                   md:w-6 md:h-6" />
               </div>
               <div>
@@ -443,9 +443,9 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <TrendingUp className="w-5 h-5 text-white
+                <TrendingUp className="w-5 h-5 text-primary-foreground
                                       md:w-6 md:h-6" />
               </div>
               <div>
@@ -462,9 +462,9 @@ export default function PromotionalLanding() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-accent to-brand-orange rounded-lg flex items-center justify-center
+              <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
                               md:w-12 md:h-12">
-                <Brain className="w-5 h-5 text-white
+                <Brain className="w-5 h-5 text-primary-foreground
                                  md:w-6 md:h-6" />
               </div>
               <div>
@@ -506,8 +506,8 @@ export default function PromotionalLanding() {
                           md:gap-6">
             <Link
               href="/auth/signup"
-              className="w-full px-10 py-5 bg-gradient-to-r from-brand-orange to-brand-teal text-white font-bold rounded-lg text-lg
-                         hover:opacity-90 transition-opacity
+              className="w-full px-10 py-5 bg-primary text-primary-foreground font-bold rounded-lg text-lg
+                         hover:bg-[hsl(var(--accent-hover))] transition-colors
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
               Start Your Free Assessment
@@ -515,8 +515,8 @@ export default function PromotionalLanding() {
 
             <Link
               href="/auth/login"
-              className="w-full px-10 py-5 border-2 border-border text-foreground font-bold rounded-lg text-lg
-                         hover:border-brand-teal hover:text-brand-teal transition-colors
+              className="w-full px-10 py-5 border-2 border-border bg-card text-foreground font-bold rounded-lg text-lg
+                         hover:bg-muted hover:border-primary transition-colors
                          sm:w-auto
                          md:px-12 md:py-6 md:text-xl">
               Sign In

@@ -31,8 +31,8 @@ export default function GlobalHeader() {
           <Link
             href="/"
             className="flex items-center gap-3 text-foreground hover:text-primary transition-colors group">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-brand-orange to-brand-teal">
-              <span className="text-white font-bold text-lg">IF</span>
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary">
+              <span className="text-primary-foreground font-bold text-lg">IF</span>
             </div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold">Innovaas FlowForge</h1>

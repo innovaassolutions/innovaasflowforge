@@ -153,10 +153,10 @@ export default function StakeholderWelcomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ctp-base flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-ctp-peach border-r-transparent"></div>
-          <p className="text-ctp-subtext1 mt-4">Loading...</p>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p className="text-muted-foreground mt-4">Loading...</p>
         </div>
       </div>
     )
@@ -164,10 +164,10 @@ export default function StakeholderWelcomePage() {
 
   if (error && !session) {
     return (
-      <div className="min-h-screen bg-ctp-base flex items-center justify-center p-4">
-        <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-8 max-w-md text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-lg p-8 max-w-md text-center">
           <svg
-            className="mx-auto h-12 w-12 text-ctp-peach"
+            className="mx-auto h-12 w-12 text-primary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor">
@@ -178,7 +178,7 @@ export default function StakeholderWelcomePage() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h2 className="mt-4 text-xl font-semibold text-ctp-text">{error}</h2>
+          <h2 className="mt-4 text-xl font-semibold text-foreground">{error}</h2>
         </div>
       </div>
     )
@@ -187,15 +187,15 @@ export default function StakeholderWelcomePage() {
   if (!session) return null
 
   return (
-    <div className="min-h-screen bg-ctp-base flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-ctp-mantle border-b border-ctp-surface0">
+      <header className="bg-muted border-b border-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-ctp-peach to-ctp-teal bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-foreground">
               {session.campaigns.name}
             </h1>
-            <p className="text-ctp-subtext1 mt-2">
+            <p className="text-muted-foreground mt-2">
               {session.campaigns.company_name}
             </p>
           </div>
@@ -205,30 +205,30 @@ export default function StakeholderWelcomePage() {
       {/* Main Content */}
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         {/* Welcome Section */}
-        <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-8 mb-8">
-          <h2 className="text-2xl font-bold text-ctp-text mb-4">
+        <div className="bg-card border border-border rounded-lg p-8 mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
             Welcome, {session.stakeholder_name}!
           </h2>
-          <p className="text-ctp-subtext1 mb-4">
+          <p className="text-muted-foreground mb-4">
             Thank you for participating in this assessment. This AI-facilitated interview will help us understand your perspective on {session.campaigns.company_name}'s current state and transformation opportunities.
           </p>
-          <div className="bg-ctp-surface1 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-ctp-text mb-2">What to expect:</h3>
-            <ul className="space-y-2 text-ctp-subtext1 text-sm">
+          <div className="bg-border rounded-lg p-4 mb-4">
+            <h3 className="font-semibold text-foreground mb-2">What to expect:</h3>
+            <ul className="space-y-2 text-muted-foreground text-sm">
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-ctp-green mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <span>15-20 conversational questions tailored to your role as {session.stakeholder_title}</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-ctp-green mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <span>Approximately 20-30 minutes to complete</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-ctp-green mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <span>You can pause and resume anytime using this same link</span>
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-ctp-green mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
                 <span>Your responses are confidential and will be analyzed alongside other stakeholder perspectives</span>
               </li>
             </ul>
@@ -236,19 +236,19 @@ export default function StakeholderWelcomePage() {
         </div>
 
         {/* Document Upload Section */}
-        <div className="bg-ctp-surface0 border border-ctp-surface1 rounded-lg p-8 mb-8">
+        <div className="bg-card border border-border rounded-lg p-8 mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <Upload className="w-6 h-6 text-ctp-peach" />
-            <h3 className="text-xl font-semibold text-ctp-text">
+            <Upload className="w-6 h-6 text-primary" />
+            <h3 className="text-xl font-semibold text-foreground">
               Share Supporting Documents (Optional)
             </h3>
           </div>
-          <p className="text-ctp-subtext1 mb-6">
+          <p className="text-muted-foreground mb-6">
             If you have any relevant documents (SOPs, diagrams, specifications, reports), you can upload them here. The AI will reference these during our conversation to ask more informed questions.
           </p>
 
           {/* Upload Area */}
-          <div className="border-2 border-dashed border-ctp-surface2 rounded-lg p-8 text-center mb-6 hover:border-ctp-peach transition-colors">
+          <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center mb-6 hover:border-primary transition-colors">
             <input
               type="file"
               id="file-upload"
@@ -261,11 +261,11 @@ export default function StakeholderWelcomePage() {
             <label
               htmlFor="file-upload"
               className="cursor-pointer block">
-              <Upload className="w-12 h-12 text-ctp-overlay0 mx-auto mb-3" />
-              <p className="text-ctp-text font-medium mb-1">
+              <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-foreground font-medium mb-1">
                 Click to upload files
               </p>
-              <p className="text-sm text-ctp-subtext0">
+              <p className="text-sm text-muted-foreground">
                 PDF, Word, Text, or Image files (max 10MB each)
               </p>
             </label>
@@ -275,14 +275,14 @@ export default function StakeholderWelcomePage() {
           {Object.keys(uploadProgress).length > 0 && (
             <div className="space-y-2 mb-6">
               {Object.entries(uploadProgress).map(([filename, progress]) => (
-                <div key={filename} className="bg-ctp-surface1 rounded-lg p-3">
+                <div key={filename} className="bg-border rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-ctp-text truncate">{filename}</span>
-                    <span className="text-sm text-ctp-subtext0">{progress}%</span>
+                    <span className="text-sm text-foreground truncate">{filename}</span>
+                    <span className="text-sm text-muted-foreground">{progress}%</span>
                   </div>
-                  <div className="w-full bg-ctp-surface2 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-ctp-peach to-ctp-teal h-2 rounded-full transition-all duration-300"
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -294,25 +294,25 @@ export default function StakeholderWelcomePage() {
           {/* Uploaded Documents List */}
           {uploadedDocs.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-ctp-text">Uploaded Documents:</h4>
+              <h4 className="font-medium text-foreground">Uploaded Documents:</h4>
               {uploadedDocs.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between bg-ctp-surface1 rounded-lg p-4">
+                  className="flex items-center justify-between bg-border rounded-lg p-4">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <FileText className="w-5 h-5 text-ctp-teal flex-shrink-0" />
+                    <FileText className="w-5 h-5 text-brand-teal flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-ctp-text truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {doc.document_name}
                       </p>
-                      <p className="text-xs text-ctp-subtext0">
+                      <p className="text-xs text-muted-foreground">
                         {formatFileSize(doc.file_size)}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleRemoveDocument(doc.id)}
-                    className="p-2 text-ctp-subtext0 hover:text-ctp-red hover:bg-ctp-red/10 rounded-lg transition-colors flex-shrink-0"
+                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors flex-shrink-0"
                     title="Remove document">
                     <X className="w-4 h-4" />
                   </button>
@@ -322,7 +322,7 @@ export default function StakeholderWelcomePage() {
           )}
 
           {error && (
-            <div className="mt-4 bg-ctp-red/20 border border-ctp-red/50 rounded-lg p-3 text-sm text-ctp-red">
+            <div className="mt-4 bg-destructive/20 border border-destructive/50 rounded-lg p-3 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -332,20 +332,20 @@ export default function StakeholderWelcomePage() {
         <div className="text-center">
           <button
             onClick={handleContinueToInterview}
-            className="bg-gradient-to-r from-ctp-peach to-ctp-teal text-white font-semibold py-4 px-8 rounded-lg hover:opacity-90 transition-opacity text-lg">
+            className="bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
             {uploadedDocs.length > 0 ? 'Continue to Interview' : 'Skip & Start Interview'}
           </button>
-          <p className="text-sm text-ctp-subtext0 mt-3">
+          <p className="text-sm text-muted-foreground mt-3">
             Facilitated by {session.campaigns.facilitator_name}
           </p>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-ctp-mantle border-t border-ctp-surface0 mt-auto">
+      <footer className="bg-muted border-t border-card mt-auto">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-end items-center gap-2">
-            <p className="text-sm text-ctp-subtext0">Powered by</p>
+            <p className="text-sm text-muted-foreground">Powered by</p>
             <Image
               src="/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
               alt="Innovaas"

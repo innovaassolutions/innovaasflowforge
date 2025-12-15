@@ -181,7 +181,7 @@ export default function ReportViewerPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-orange/20 to-brand-teal/20 border-b border-border">
+      <div className="bg-muted border-b border-border">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
             <div className="flex-1">

@@ -106,22 +106,22 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ctp-base flex items-center justify-center">
-        <div className="text-ctp-text">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
       </div>
     )
   }
 
   if (error && !company) {
     return (
-      <div className="min-h-screen bg-ctp-base">
+      <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-ctp-red/10 border border-ctp-red rounded-lg p-6 text-ctp-red">
+          <div className="bg-destructive/10 border border-destructive rounded-lg p-6 text-destructive">
             {error}
           </div>
           <Link
             href="/dashboard/companies"
-            className="inline-block mt-4 text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors"
+            className="inline-block mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Back to Companies
           </Link>
@@ -131,59 +131,59 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <Link
             href={`/dashboard/companies/${companyId}`}
-            className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 inline-block"
           >
             ← Back to {company?.company_name}
           </Link>
-          <h1 className="text-3xl font-bold text-ctp-text">Add Stakeholder</h1>
-          <p className="mt-2 text-sm text-ctp-subtext0">
+          <h1 className="text-3xl font-bold text-foreground">Add Stakeholder</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Create a new stakeholder profile for {company?.company_name}
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-ctp-red/10 border border-ctp-red rounded-lg text-ctp-red">
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg text-destructive">
             {error}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
               Personal Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
-                  Full Name <span className="text-ctp-red">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Full Name <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => updateField('fullName', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="John Doe"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2 flex items-center gap-2">
+                <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  Email Address <span className="text-ctp-red">*</span>
+                  Email Address <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateField('email', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="john.doe@company.com"
                   required
                 />
@@ -192,20 +192,20 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
           </div>
 
           {/* Professional Information */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Briefcase className="w-5 h-5" />
               Professional Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
-                  Role Type <span className="text-ctp-red">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Role Type <span className="text-destructive">*</span>
                 </label>
                 <select
                   value={formData.roleType}
                   onChange={(e) => updateField('roleType', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   required
                 >
                   {ROLE_TYPES.map(role => (
@@ -215,20 +215,20 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Job Title
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => updateField('title', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="Senior Manager"
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-ctp-text mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                   <Building2 className="w-4 h-4" />
                   Department
                 </label>
@@ -236,7 +236,7 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
                   type="text"
                   value={formData.department}
                   onChange={(e) => updateField('department', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="Operations"
                 />
               </div>
@@ -247,14 +247,14 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
           <div className="flex items-center justify-end gap-4">
             <Link
               href={`/dashboard/companies/${companyId}`}
-              className="px-6 py-2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
+              className="px-6 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary hover:bg-[hsl(var(--accent-hover))] rounded-lg text-primary-foreground font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Creating...' : 'Add Stakeholder'}
             </button>

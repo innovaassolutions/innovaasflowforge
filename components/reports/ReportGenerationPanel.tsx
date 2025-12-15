@@ -401,7 +401,7 @@ export function ReportGenerationPanel({
             <button
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="px-6 py-2 bg-gradient-to-r from-brand-orange to-brand-teal hover:opacity-90 text-white rounded-lg font-medium transition-opacity disabled:opacity-50 flex items-center gap-2">
+              className="px-6 py-2 bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2">
               {isGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />

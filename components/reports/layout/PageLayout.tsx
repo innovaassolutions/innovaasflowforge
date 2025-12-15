@@ -101,7 +101,7 @@ export function PageHeader({ title, subtitle, progress, className = '' }: PageHe
               </span>
               <div className="w-32 h-2 bg-card rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-brand-orange to-brand-teal rounded-full transition-all duration-500"
+                  className="h-full bg-primary rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>

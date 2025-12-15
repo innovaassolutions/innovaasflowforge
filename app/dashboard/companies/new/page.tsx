@@ -114,59 +114,59 @@ export default function NewCompanyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-ctp-base">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <Link
             href="/dashboard/companies"
-            className="text-sm text-ctp-subtext0 hover:text-ctp-text transition-colors mb-4 inline-block"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 inline-block"
           >
             ← Back to Companies
           </Link>
-          <h1 className="text-3xl font-bold text-ctp-text">Create Company Profile</h1>
-          <p className="mt-2 text-sm text-ctp-subtext0">
+          <h1 className="text-3xl font-bold text-foreground">Create Company Profile</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Add a new company to manage campaigns and stakeholders
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-ctp-red/10 border border-ctp-red rounded-lg text-ctp-red">
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg text-destructive">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Building2 className="w-5 h-5" />
               Basic Information
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
-                  Company Name <span className="text-ctp-red">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Company Name <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.companyName}
                   onChange={(e) => updateField('companyName', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="Acme Manufacturing"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
-                  Industry <span className="text-ctp-red">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Industry <span className="text-destructive">*</span>
                 </label>
                 <select
                   value={formData.industry}
                   onChange={(e) => updateField('industry', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   required
                 >
                   {INDUSTRIES.map(industry => (
@@ -176,14 +176,14 @@ export default function NewCompanyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="Brief description of what the company does..."
                 />
               </div>
@@ -191,16 +191,16 @@ export default function NewCompanyPage() {
           </div>
 
           {/* Market & Location */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Globe className="w-5 h-5" />
               Market & Location
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
-                  Market Scope <span className="text-ctp-red">*</span>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Market Scope <span className="text-destructive">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {MARKET_SCOPES.map(scope => (
@@ -210,8 +210,8 @@ export default function NewCompanyPage() {
                       onClick={() => updateField('marketScope', scope.value)}
                       className={`p-3 rounded-lg border text-left transition-colors ${
                         formData.marketScope === scope.value
-                          ? 'border-ctp-peach bg-ctp-peach/10 text-ctp-text'
-                          : 'border-ctp-surface1 bg-ctp-base text-ctp-subtext0 hover:border-ctp-surface2'
+                          ? 'border-primary bg-primary/10 text-foreground'
+                          : 'border-border bg-background text-muted-foreground hover:border-muted'
                       }`}
                     >
                       <div className="font-medium">{scope.label}</div>
@@ -222,7 +222,7 @@ export default function NewCompanyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2 flex items-center gap-2">
+                <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   Website
                 </label>
@@ -230,13 +230,13 @@ export default function NewCompanyPage() {
                   type="url"
                   value={formData.website}
                   onChange={(e) => updateField('website', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="https://example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2 flex items-center gap-2">
+                <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Headquarters Location
                 </label>
@@ -244,7 +244,7 @@ export default function NewCompanyPage() {
                   type="text"
                   value={formData.headquartersLocation}
                   onChange={(e) => updateField('headquartersLocation', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                   placeholder="Detroit, MI"
                 />
               </div>
@@ -252,21 +252,21 @@ export default function NewCompanyPage() {
           </div>
 
           {/* Company Size */}
-          <div className="bg-ctp-surface0 rounded-lg border border-ctp-surface1 p-6">
-            <h2 className="text-lg font-semibold text-ctp-text mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
               Company Size
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Employee Count
                 </label>
                 <select
                   value={formData.employeeCountRange}
                   onChange={(e) => updateField('employeeCountRange', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                 >
                   <option value="">Select range...</option>
                   {EMPLOYEE_RANGES.map(range => (
@@ -276,13 +276,13 @@ export default function NewCompanyPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-ctp-text mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Annual Revenue
                 </label>
                 <select
                   value={formData.annualRevenueRange}
                   onChange={(e) => updateField('annualRevenueRange', e.target.value)}
-                  className="w-full px-4 py-2 bg-white border border-ctp-surface1 rounded-lg text-gray-900 placeholder-gray-600 focus:border-ctp-peach focus:outline-none"
+                  className="w-full px-4 py-2 bg-white border border-border rounded-lg text-gray-900 placeholder-gray-600 focus:border-primary focus:outline-none"
                 >
                   <option value="">Select range...</option>
                   {REVENUE_RANGES.map(range => (
@@ -297,14 +297,14 @@ export default function NewCompanyPage() {
           <div className="flex items-center justify-end gap-4">
             <Link
               href="/dashboard/companies"
-              className="px-6 py-2 text-ctp-subtext0 hover:text-ctp-text transition-colors"
+              className="px-6 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-gradient-to-r from-ctp-peach to-ctp-teal rounded-lg text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary hover:bg-[hsl(var(--accent-hover))] rounded-lg text-primary-foreground font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Creating...' : 'Create Company Profile'}
             </button>
