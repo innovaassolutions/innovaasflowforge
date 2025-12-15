@@ -35,7 +35,7 @@ export function MetricCard({
 
   return (
     <div
-      className={`bg-card rounded-lg p-6 border border-border hover:border-brand-orange/30 transition-colors ${className}`}
+      className={`bg-card rounded-lg p-6 border border-border hover:border-primary/30 transition-colors ${className}`}
       role="article"
       aria-label={`${label}: ${value}`}
       title={tooltip}>

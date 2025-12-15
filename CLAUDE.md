@@ -13,7 +13,7 @@
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Database**: Supabase (PostgreSQL)
-- **Styling**: TailwindCSS with Catppuccin Mocha theme
+- **Styling**: TailwindCSS with Pearl Vibrant theme (see Design System below)
 - **AI**: Anthropic Claude API
 - **PDF Generation**: @react-pdf/renderer
 - **Email**: Resend
@@ -56,12 +56,34 @@ This comprehensive guide covers:
 - Brand colors: Orange (#F25C05) primary, Teal (#1D9BA3) secondary
 - Charts should be clear, accessible, and professionally styled
 
-### UI Design
+### UI Design System (MANDATORY)
 
-- **Theme**: Catppuccin Mocha (dark mode optimized)
-- **Brand Colors**: Orange and Teal gradient for primary actions
-- **No Emojis**: User explicitly requested no emojis in UI (icons only)
-- **Typography**: Clean, modern sans-serif fonts
+**CRITICAL**: Before making ANY UI changes, you MUST read the design system documentation:
+
+1. **[Design System Reference](docs/design-system.md)** - Color tokens, typography, spacing, component specs
+2. **[UX Color Themes](docs/ux-color-themes.html)** - Full color palette explorer
+3. **[UX Design Directions](docs/ux-design-directions.html)** - Complete page mockups and patterns
+
+**Pearl Vibrant Theme - Quick Reference:**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--accent` | `#F25C05` | CTAs, active states, progress bars |
+| `--accent-hover` | `#DC5204` | Button hover states |
+| `--accent-subtle` | `#FEF5EE` | Badge backgrounds, highlights |
+| `--bg` | `#FFFEFB` | Main page backgrounds |
+| `--bg-subtle` | `#FAF8F3` | Cards, inputs, sidebars |
+| `--bg-muted` | `#F2EFE7` | Hover states, dividers |
+| `--border` | `#E6E2D6` | Borders, separators |
+| `--text` | `#171614` | Primary text |
+| `--text-muted` | `#71706B` | Secondary text, labels |
+
+**Design Rules:**
+- **Font**: Inter (Google Fonts)
+- **No Emojis**: Use Lucide icons only
+- **Orange Sparingly**: Only for interactive elements (CTAs, active nav, progress)
+- **Border Radius**: 8px for buttons/inputs, 12px for cards
+- **Spacing**: Follow 12/16/20/24/32/40px scale
+- **Shadows**: Subtle only - use borders for depth
 
 ## Code Conventions
 
@@ -135,6 +157,9 @@ supabase/
 
 ## Documentation
 
+- **UI Design System**: [docs/design-system.md](docs/design-system.md) - MANDATORY for all UI work
+- **UX Color Themes**: [docs/ux-color-themes.html](docs/ux-color-themes.html) - Visual color explorer
+- **UX Design Directions**: [docs/ux-design-directions.html](docs/ux-design-directions.html) - Page mockups
 - **PDF Design**: [docs/pdf-design-guidelines.md](docs/pdf-design-guidelines.md)
 - **Report Design**: [docs/report-design-guidelines.md](docs/report-design-guidelines.md)
 - **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Assessment framework reference materials
@@ -156,4 +181,16 @@ supabase/
 
 ---
 
-**For AI Assistants**: When working on this project, prioritize reading relevant documentation (especially PDF design guidelines when working on reports), following established patterns, and maintaining the professional, data-driven aesthetic. Always test changes thoroughly before considering work complete.
+## For AI Assistants
+
+**BEFORE ANY UI WORK:**
+1. Read [docs/design-system.md](docs/design-system.md) for color tokens and component specs
+2. Reference [docs/ux-design-directions.html](docs/ux-design-directions.html) for layout patterns
+3. Verify your changes match the Pearl Vibrant theme exactly
+
+**General Guidelines:**
+- Prioritize reading relevant documentation before making changes
+- Follow established patterns in the codebase
+- Maintain the professional, data-driven aesthetic
+- Always test changes thoroughly before considering work complete
+- When in doubt, reference the design system files

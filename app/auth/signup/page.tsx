@@ -138,7 +138,7 @@ export default function SignupPage() {
                   onClick={() => setUserType('consultant')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     formData.userType === 'consultant'
-                      ? 'border-primary bg-primary/10 text-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/50'
+                      ? 'border-primary bg-[hsl(var(--accent-subtle))] text-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/50'
                       : 'border-border bg-background text-muted-foreground hover:border-muted hover:bg-muted'
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function SignupPage() {
               Already have an account?{' '}
               <Link
                 href="/auth/login"
-                className="text-primary hover:text-brand-teal transition-colors font-medium">
+                className="text-primary hover:text-[hsl(var(--accent-hover))] transition-colors font-medium">
                 Sign in
               </Link>
             </p>

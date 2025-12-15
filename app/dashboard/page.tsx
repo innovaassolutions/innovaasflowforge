@@ -323,9 +323,9 @@ export default function DashboardPage() {
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                         campaign.status === 'active'
-                          ? 'bg-success/20 text-success'
+                          ? 'bg-[hsl(var(--accent-subtle))] text-primary'
                           : campaign.status === 'completed'
-                          ? 'bg-brand-teal/20 text-brand-teal'
+                          ? 'bg-[hsl(var(--success-subtle))] text-[hsl(var(--success))]'
                           : 'bg-muted text-muted-foreground'
                       }`}>
                       {campaign.status}

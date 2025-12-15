@@ -214,7 +214,7 @@ export default function PromotionalLanding() {
                                md:text-base">
                   {persona.benefits.map((benefit, benefitIndex) => (
                     <li key={benefitIndex} className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-brand-teal flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-[hsl(var(--success))] flex-shrink-0 mt-0.5" />
                       <span>{benefit}</span>
                     </li>
                   ))}

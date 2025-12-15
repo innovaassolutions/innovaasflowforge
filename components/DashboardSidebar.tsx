@@ -125,8 +125,8 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                 title={item.name}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                   active
-                    ? 'bg-muted text-foreground'
-                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                    ? 'bg-[hsl(var(--accent-subtle))] text-primary font-medium'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}>
                 <Icon className={`w-5 h-5 shrink-0 transition-colors ${
                   active
@@ -164,7 +164,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
 
           {showUserMenu && (
             <div className="absolute bottom-full left-0 right-0 mb-2 bg-card border border-border rounded-lg shadow-xl overflow-hidden">
-              <div className="px-4 py-3 bg-gradient-to-r from-primary/10 to-brand-teal/10 border-b border-border">
+              <div className="px-4 py-3 bg-[hsl(var(--accent-subtle))] border-b border-border">
                 <p className="text-sm font-medium text-foreground truncate">
                   {userProfile?.full_name}
                 </p>

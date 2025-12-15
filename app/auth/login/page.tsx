@@ -133,7 +133,7 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <Link
                 href="/auth/signup"
-                className="text-primary hover:text-brand-teal transition-colors font-medium">
+                className="text-primary hover:text-[hsl(var(--accent-hover))] transition-colors font-medium">
                 Sign up
               </Link>
             </p>

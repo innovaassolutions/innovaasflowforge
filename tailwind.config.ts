@@ -11,9 +11,42 @@ const config: Config = {
     extend: {
       /* ============================================
          Pearl Vibrant Theme Colors
+         Reference: docs/design-system.md
          ============================================ */
       colors: {
-        /* Brand Colors */
+        /* ------------------------------------------------
+           FlowForge Design System Tokens (Direct Hex)
+           Use these for explicit color values:
+           - bg-ff-bg, bg-ff-subtle, bg-ff-muted
+           - text-ff-text, text-ff-muted
+           - border-ff-border
+           - bg-ff-accent, hover:bg-ff-accent-hover
+           ------------------------------------------------ */
+        ff: {
+          /* Backgrounds */
+          bg: "#FFFEFB",
+          subtle: "#FAF8F3",
+          muted: "#F2EFE7",
+          /* Text */
+          text: "#171614",
+          "text-muted": "#71706B",
+          /* Borders */
+          border: "#E6E2D6",
+          /* Accent (Orange) */
+          accent: "#F25C05",
+          "accent-hover": "#DC5204",
+          "accent-subtle": "#FEF5EE",
+          /* Status */
+          success: "#16A34A",
+          "success-subtle": "#DCFCE7",
+          warning: "#CA8A04",
+          "warning-subtle": "#FEF9C3",
+          /* Teal */
+          teal: "#1D9BA3",
+          "teal-dark": "#14737A",
+        },
+
+        /* Legacy brand namespace (prefer ff.*) */
         brand: {
           orange: "#F25C05",
           "orange-dark": "#DC5204",

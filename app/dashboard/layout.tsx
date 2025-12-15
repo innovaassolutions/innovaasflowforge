@@ -84,7 +84,7 @@ export default function DashboardLayout({
 
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-orange text-white font-bold text-lg shrink-0">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-primary-foreground font-bold text-lg shrink-0">
             FF
           </div>
           <div className="hidden sm:block">
