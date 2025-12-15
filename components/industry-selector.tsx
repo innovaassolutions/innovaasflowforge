@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Factory, FlaskConical, GraduationCap, Briefcase } from 'lucide-react'
 import { IndustryKey, industryContent, industryOrder } from '@/lib/industry-content'
 
@@ -66,7 +67,6 @@ export default function IndustrySelector({
                       lg:grid-cols-4">
         {industryOrder.map((key) => {
           const content = industryContent[key]
-          const Icon = industryIcons[key]
           const isSelected = selected === key
 
           return (
@@ -81,12 +81,15 @@ export default function IndustrySelector({
                           }`}
               aria-pressed={isSelected}
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-3
-                              sm:w-14 sm:h-14
-                              ${isSelected ? 'bg-primary' : 'bg-muted'}`}>
-                <Icon className={`w-6 h-6
-                                 sm:w-7 sm:h-7
-                                 ${isSelected ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+              <div className="w-16 h-16 mb-3 relative
+                              sm:w-20 sm:h-20">
+                <Image
+                  src={content.illustration}
+                  alt={content.name}
+                  fill
+                  className={`object-contain transition-all
+                              ${isSelected ? 'opacity-100' : 'opacity-70 grayscale-[30%]'}`}
+                />
               </div>
               <span className={`text-sm font-semibold text-center
                                sm:text-base

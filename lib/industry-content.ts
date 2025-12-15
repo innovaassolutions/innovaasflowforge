@@ -21,6 +21,8 @@ export interface IndustryContent {
   // Color accents (CSS custom property values)
   accentColor: string
   accentColorLight: string
+  // Character illustration for this industry
+  illustration: string
   // Hero section
   heroHeadline: string
   heroHighlight: string
@@ -53,6 +55,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     shortName: 'Manufacturing',
     accentColor: 'hsl(25, 95%, 53%)', // Industrial orange
     accentColorLight: 'hsl(25, 95%, 93%)',
+    illustration: '/illustrations/industrialist.png',
     heroHeadline: 'Accelerate Your Industry 4.0 Transformation',
     heroHighlight: 'Industry 4.0',
     heroDescription: 'AI-powered assessment platform that interviews your operations team, identifies digital maturity gaps, and delivers actionable transformation roadmaps in days, not months.',
@@ -129,6 +132,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     shortName: 'Pharma',
     accentColor: 'hsl(170, 60%, 45%)', // Medical teal
     accentColorLight: 'hsl(170, 60%, 93%)',
+    illustration: '/illustrations/chemist.png',
     heroHeadline: 'Streamline Regulatory Compliance & Digital Health',
     heroHighlight: 'Digital Health',
     heroDescription: 'AI-powered assessment platform that evaluates compliance readiness, identifies process gaps, and delivers validated transformation strategies aligned with FDA and EMA requirements.',
@@ -205,6 +209,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     shortName: 'Education',
     accentColor: 'hsl(220, 70%, 55%)', // Academic blue
     accentColorLight: 'hsl(220, 70%, 93%)',
+    illustration: '/illustrations/teacher.png',
     heroHeadline: 'Transform Learning Outcomes Through Strategic Insight',
     heroHighlight: 'Learning Outcomes',
     heroDescription: 'AI-powered assessment platform that interviews faculty, administrators, parents, and staff to identify institutional strengths, gaps, and pathways to educational excellence.',
@@ -281,6 +286,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     shortName: 'Prof Services',
     accentColor: 'hsl(260, 60%, 55%)', // Corporate purple
     accentColorLight: 'hsl(260, 60%, 93%)',
+    illustration: '/illustrations/consultant.png',
     heroHeadline: 'Elevate Client Delivery Through Strategic Alignment',
     heroHighlight: 'Client Delivery',
     heroDescription: 'AI-powered assessment platform that interviews partners, consultants, and staff to optimize service delivery, identify growth opportunities, and strengthen client relationships.',

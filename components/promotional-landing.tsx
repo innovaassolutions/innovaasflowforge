@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Check,
   Clock,
@@ -122,8 +123,19 @@ export default function PromotionalLanding() {
               </div>
             </div>
 
-            {/* Right: Industry-Specific Hero Mockup */}
+            {/* Right: Industry Illustration + Mockup */}
             <div className="relative">
+              {/* Character Illustration */}
+              <div className="absolute -left-16 -top-8 w-40 h-40 z-10
+                              hidden lg:block">
+                <Image
+                  src={content.illustration}
+                  alt={`${content.name} professional`}
+                  width={160}
+                  height={160}
+                  className="object-contain drop-shadow-lg"
+                />
+              </div>
               <div className="rounded-lg overflow-hidden shadow-2xl">
                 <IndustryHeroMockup industry={industry} />
               </div>
