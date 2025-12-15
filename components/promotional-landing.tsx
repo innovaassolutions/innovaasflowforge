@@ -126,10 +126,10 @@ export default function PromotionalLanding() {
             {/* Right: Industry Illustration + Mockup */}
             <div className="relative">
               {/* Character Illustration - positioned right side, hand pointing at mockup */}
-              <div className="absolute -right-44 bottom-24 w-56 h-56 z-10
+              <div className="absolute -right-40 bottom-4 w-52 h-52 z-10
                               hidden md:block
-                              lg:-right-60 lg:bottom-36 lg:w-80 lg:h-80
-                              xl:-right-72 xl:bottom-44 xl:w-96 xl:h-96">
+                              lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64
+                              xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72">
                 <Image
                   src={content.illustration}
                   alt={`${content.name} professional`}
