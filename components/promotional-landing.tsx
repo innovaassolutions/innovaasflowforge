@@ -37,7 +37,7 @@ export default function PromotionalLanding() {
                            md:text-6xl
                            lg:text-7xl">
               Transform Stakeholder Insights Into{' '}
-              <span className="bg-gradient-to-r from-brand-orange to-brand-teal bg-clip-text text-transparent">
+              <span className="text-primary">
                 Strategic Action
               </span>
             </h1>
