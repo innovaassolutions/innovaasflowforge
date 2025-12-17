@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await resend.emails.send({
-          from: 'FlowForge <noreply@innovaas.co>',
+          from: 'FlowForge <admin@innovaas.co>',
           to: body.email,
           subject: 'Welcome to FlowForge - Your Account Details',
           html: `
