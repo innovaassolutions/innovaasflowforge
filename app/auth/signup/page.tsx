@@ -54,7 +54,7 @@ export default function SignupPage() {
             {/* Illustration */}
             <div className="hidden md:flex flex-shrink-0 items-center justify-center">
               <Image
-                src="/illustrations/welcome-greeter.png"
+                src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
                 alt="Welcome"
                 width={280}
                 height={280}
