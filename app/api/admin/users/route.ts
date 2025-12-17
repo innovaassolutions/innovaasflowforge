@@ -97,6 +97,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Update user_profiles table with the correct user_type
+    // The trigger creates the profile, but we need to update user_type
+    // Using type assertion to bypass strict TypeScript checking
+    const { error: profileUpdateError } = await (supabaseAdmin
+      .from('user_profiles') as any)
+      .update({ user_type: body.userType || 'consultant' })
+      .eq('id', newUser.user.id)
+
+    if (profileUpdateError) {
+      console.error('Profile update error:', profileUpdateError)
+      // Don't fail - user was created, just log the error
+    }
+
     // Send welcome email with credentials
     if (body.sendWelcomeEmail !== false) {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -105,7 +118,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await resend.emails.send({
-          from: 'FlowForge <onboarding@resend.dev>',
+          from: 'FlowForge <noreply@innovaas.co>',
           to: body.email,
           subject: 'Welcome to FlowForge - Your Account Details',
           html: `
