@@ -67,10 +67,10 @@ export default function AccountSettingsPage() {
       .from('user_profiles')
       .select('id, full_name, email, user_type')
       .eq('id', user.id)
-      .single()
+      .single() as { data: UserProfile | null }
 
     if (profileData) {
-      setProfile(profileData as UserProfile)
+      setProfile(profileData)
       setProfileForm({
         fullName: profileData.full_name || '',
         email: profileData.email || user.email || '',
@@ -120,8 +120,8 @@ export default function AccountSettingsPage() {
       }
 
       // Update user_profiles table
-      const { error: profileError } = await supabase
-        .from('user_profiles')
+      const { error: profileError } = await (supabase
+        .from('user_profiles') as any)
         .update({
           full_name: profileForm.fullName,
           email: profileForm.email,
