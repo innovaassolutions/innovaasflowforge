@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { UserPlus, Users, Mail, Building2, Shield, Loader2, CheckCircle, XCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { apiUrl } from '@/lib/api-url'
 
 interface User {
   id: string
@@ -18,7 +19,7 @@ interface User {
 interface CreateUserForm {
   email: string
   fullName: string
-  userType: 'consultant' | 'company'
+  userType: 'consultant' | 'company' | 'admin'
   sendWelcomeEmail: boolean
 }
 
@@ -70,7 +71,7 @@ export default function AdminUsersPage() {
 
   async function loadUsers() {
     try {
-      const response = await fetch('/api/admin/users')
+      const response = await fetch(apiUrl('api/admin/users'))
       const data = await response.json()
 
       if (data.success) {
@@ -92,7 +93,7 @@ export default function AdminUsersPage() {
     setSuccess(null)
 
     try {
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch(apiUrl('api/admin/users'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -239,7 +240,7 @@ export default function AdminUsersPage() {
                 <label className="block text-sm font-medium text-foreground mb-3">
                   User Type
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, userType: 'consultant' }))}
@@ -265,6 +266,20 @@ export default function AdminUsersPage() {
                     <div className="flex flex-col items-center gap-1">
                       <Building2 className={`w-5 h-5 ${formData.userType === 'company' ? 'text-brand-teal' : ''}`} />
                       <span className="font-medium text-sm">Company</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, userType: 'admin' }))}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      formData.userType === 'admin'
+                        ? 'border-purple-500 bg-purple-100 text-foreground'
+                        : 'border-border bg-background text-muted-foreground hover:border-muted'
+                    }`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className={`w-5 h-5 ${formData.userType === 'admin' ? 'text-purple-600' : ''}`} />
+                      <span className="font-medium text-sm">Admin</span>
                     </div>
                   </button>
                 </div>
