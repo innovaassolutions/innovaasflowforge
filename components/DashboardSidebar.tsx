@@ -12,7 +12,8 @@ import {
   LogOut,
   ChevronDown,
   X,
-  Shield
+  Shield,
+  UserCog
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -216,6 +217,13 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
                   {userProfile?.user_type || userProfile?.role || 'member'}
                 </p>
               </div>
+              <Link
+                href="/dashboard/account"
+                onClick={onCloseMobile}
+                className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2 border-b border-border">
+                <UserCog className="w-4 h-4 text-muted-foreground" />
+                <span>Account Settings</span>
+              </Link>
               <button
                 onClick={onLogout}
                 className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors flex items-center gap-2 group">

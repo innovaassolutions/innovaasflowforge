@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
       user_metadata: {
         full_name: body.fullName,
         user_type: body.userType || 'consultant',
+        password_change_required: true, // Force password change on first login
       },
     })
 

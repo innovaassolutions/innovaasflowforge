@@ -245,9 +245,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
     // Generate new temporary password
     const temporaryPassword = generateTemporaryPassword()
 
-    // Update user's password
+    // Update user's password and set password_change_required flag
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(id, {
       password: temporaryPassword,
+      user_metadata: {
+        ...user.user.user_metadata,
+        password_change_required: true,
+      },
     })
 
     if (updateError) {

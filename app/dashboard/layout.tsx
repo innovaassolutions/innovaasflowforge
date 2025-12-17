@@ -41,6 +41,12 @@ export default function DashboardLayout({
       return
     }
 
+    // Check if password change is required
+    if (user.user_metadata?.password_change_required === true) {
+      router.push('/auth/change-password')
+      return
+    }
+
     // Fetch user profile
     const { data: profile } = await client
       .from('user_profiles')
