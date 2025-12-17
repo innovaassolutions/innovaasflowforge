@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single() as { data: { role: string } | null }
 
     if (!profile || profile.role !== 'admin') {
       setIsAdmin(false)
