@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-  X
+  X,
+  Shield
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -74,6 +75,16 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
       matchPaths: ['/dashboard/campaigns']
     }
   ]
+
+  // Admin-only nav items
+  const adminNavItems = userProfile?.role === 'admin' ? [
+    {
+      name: 'Users',
+      href: '/dashboard/admin/users',
+      icon: Shield,
+      matchPaths: ['/dashboard/admin']
+    }
+  ] : []
 
   function isActive(matchPaths: string[]) {
     return matchPaths.some(path => {
@@ -139,6 +150,39 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
               </Link>
             )
           })}
+
+          {/* Admin Section */}
+          {adminNavItems.length > 0 && (
+            <>
+              <div className="my-3 border-t border-border" />
+              {adminNavItems.map((item) => {
+                const Icon = item.icon
+                const active = isActive(item.matchPaths)
+
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={onCloseMobile}
+                    title={item.name}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                      active
+                        ? 'bg-purple-100 text-purple-700 font-medium'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}>
+                    <Icon className={`w-5 h-5 shrink-0 transition-colors ${
+                      active
+                        ? 'text-purple-700'
+                        : 'text-muted-foreground group-hover:text-purple-600'
+                    }`} />
+                    <span className="font-medium whitespace-nowrap lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 overflow-hidden">
+                      {item.name}
+                    </span>
+                  </Link>
+                )
+              })}
+            </>
+          )}
         </nav>
 
         {/* User Menu */}
