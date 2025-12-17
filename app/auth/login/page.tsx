@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+// import Link from 'next/link' // Unused - signup link disabled
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import SocialAuthButtons from '@/components/social-auth-buttons'
+// OAuth disabled - users are created by admins with email/password
+// import SocialAuthButtons from '@/components/social-auth-buttons'
 
 // Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
@@ -72,6 +73,7 @@ export default function LoginPage() {
             </div>
           )}
 
+{/* OAuth disabled - users are created by admins with email/password
           <SocialAuthButtons />
 
           <div className="relative my-6">
@@ -84,6 +86,7 @@ export default function LoginPage() {
               </span>
             </div>
           </div>
+          */}
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
@@ -128,6 +131,7 @@ export default function LoginPage() {
             </button>
           </form>
 
+{/* Public signup disabled - users are created by admins
           <div className="mt-6 text-center">
             <p className="text-muted-foreground text-sm">
               Don't have an account?{' '}
@@ -138,6 +142,7 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
+          */}
         </div>
       </div>
     </div>
