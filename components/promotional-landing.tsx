@@ -126,17 +126,17 @@ export default function PromotionalLanding() {
             {/* Right: Industry Illustration + Mockup */}
             <div className="relative">
               {/* Character Illustration - positioned right side, hand pointing at mockup */}
-              {/* Teacher illustration needs to be ~50% larger than others */}
+              {/* Teacher illustration needs to be significantly larger than others */}
               <div className={`absolute z-10 hidden md:block
                               ${industry === 'education'
-                                ? '-right-56 -bottom-28 w-80 h-80 lg:-right-72 lg:-bottom-24 lg:w-96 lg:h-96 xl:-right-80 xl:-bottom-24 xl:w-[28rem] xl:h-[28rem]'
+                                ? '-right-64 -bottom-32 w-96 h-96 lg:-right-80 lg:-bottom-28 lg:w-[28rem] lg:h-[28rem] xl:-right-96 xl:-bottom-28 xl:w-[34rem] xl:h-[34rem]'
                                 : '-right-40 bottom-4 w-52 h-52 lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64 xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72'
                               }`}>
                 <Image
                   src={content.illustration}
                   alt={`${content.name} professional`}
-                  width={384}
-                  height={384}
+                  width={544}
+                  height={544}
                   className="object-contain drop-shadow-2xl"
                   unoptimized
                 />

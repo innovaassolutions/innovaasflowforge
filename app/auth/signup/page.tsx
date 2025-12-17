@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShieldAlert } from 'lucide-react'
 
 // Disable static generation for auth pages
@@ -13,35 +14,54 @@ export const dynamic = 'force-dynamic'
 export default function SignupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
-          <div className="flex flex-col items-center text-center">
-            {/* Icon */}
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-              <ShieldAlert className="w-8 h-8 text-muted-foreground" />
+      <div className="w-full max-w-4xl">
+        <div className="bg-card rounded-xl p-8 shadow-lg border border-border
+                        md:p-12">
+          <div className="flex flex-col items-center gap-8
+                          md:flex-row md:items-center md:gap-12">
+            {/* Message Content */}
+            <div className="flex-1 flex flex-col items-center text-center
+                            md:items-start md:text-left">
+              {/* Icon */}
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                <ShieldAlert className="w-8 h-8 text-muted-foreground" />
+              </div>
+
+              {/* Message */}
+              <h1 className="text-2xl font-bold text-foreground mb-3">
+                Registration by Invitation Only
+              </h1>
+              <p className="text-muted-foreground mb-6">
+                New accounts are created by your organization administrator.
+                If you need access, please contact your administrator.
+              </p>
+
+              {/* Divider */}
+              <div className="w-full border-t border-border my-6"></div>
+
+              {/* Already have account */}
+              <p className="text-muted-foreground text-sm mb-4">
+                Already have an account?
+              </p>
+              <Link
+                href="/auth/login"
+                className="w-full bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors text-center block
+                           md:w-auto">
+                Sign In
+              </Link>
             </div>
 
-            {/* Message */}
-            <h1 className="text-2xl font-bold text-foreground mb-3">
-              Registration by Invitation Only
-            </h1>
-            <p className="text-muted-foreground mb-6">
-              New accounts are created by your organization administrator.
-              If you need access, please contact your administrator.
-            </p>
-
-            {/* Divider */}
-            <div className="w-full border-t border-border my-6"></div>
-
-            {/* Already have account */}
-            <p className="text-muted-foreground text-sm mb-4">
-              Already have an account?
-            </p>
-            <Link
-              href="/auth/login"
-              className="w-full bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors text-center block">
-              Sign In
-            </Link>
+            {/* Illustration */}
+            <div className="hidden md:flex flex-shrink-0 items-center justify-center">
+              <Image
+                src="/illustrations/welcome-greeter.png"
+                alt="Welcome"
+                width={280}
+                height={280}
+                className="object-contain"
+                priority
+              />
+            </div>
           </div>
         </div>
       </div>
