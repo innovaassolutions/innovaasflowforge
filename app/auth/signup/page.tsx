@@ -60,6 +60,7 @@ export default function SignupPage() {
                 height={280}
                 className="object-contain"
                 priority
+                unoptimized
               />
             </div>
           </div>

@@ -361,10 +361,9 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 // Default industry for new visitors
 export const defaultIndustry: IndustryKey = 'manufacturing'
 
-// All industries in display order
+// All industries in display order (pharma temporarily hidden)
 export const industryOrder: IndustryKey[] = [
   'manufacturing',
-  'pharma',
   'education',
   'professional-services'
 ]
