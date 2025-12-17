@@ -124,12 +124,13 @@ export default function LoginPage() {
             {/* Right side - Soldier illustration */}
             <div className="hidden md:flex md:items-center md:justify-center">
               <Image
-                src="/illustrations/soldier-guard.png"
+                src="https://www.innovaas.co/flowforge/illustrations/soldier-guard.png"
                 alt="Security guard illustration"
                 width={200}
                 height={280}
                 className="object-contain"
                 priority
+                unoptimized
               />
             </div>
           </div>
