@@ -126,8 +126,8 @@ export default function LoginPage() {
               <Image
                 src="https://www.innovaas.co/flowforge/illustrations/soldier-guard.png"
                 alt="Security guard illustration"
-                width={200}
-                height={280}
+                width={320}
+                height={400}
                 className="object-contain"
                 priority
                 unoptimized

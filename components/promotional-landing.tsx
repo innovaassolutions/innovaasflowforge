@@ -129,7 +129,7 @@ export default function PromotionalLanding() {
               {/* Teacher illustration is larger and positioned lower */}
               <div className={`absolute z-10 hidden md:block
                               ${industry === 'education'
-                                ? '-right-56 -bottom-20 w-96 h-96 lg:-right-72 lg:-bottom-24 lg:w-[28rem] lg:h-[28rem] xl:-right-80 xl:-bottom-28 xl:w-[32rem] xl:h-[32rem]'
+                                ? '-right-44 bottom-4 w-64 h-64 lg:-right-56 lg:bottom-6 lg:w-80 lg:h-80 xl:-right-64 xl:bottom-8 xl:w-96 xl:h-96'
                                 : '-right-40 bottom-4 w-52 h-52 lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64 xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72'
                               }`}>
                 <Image
