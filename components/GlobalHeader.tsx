@@ -41,8 +41,8 @@ export default function GlobalHeader() {
               unoptimized
             />
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold">Innovaas FlowForge</h1>
-              <p className="text-xs text-muted-foreground">Assessment Platform</p>
+              <h1 className="text-xl font-bold">FlowForge</h1>
+              <p className="text-xs text-muted-foreground">OPEX Assessment Platform</p>
             </div>
           </Link>
 
