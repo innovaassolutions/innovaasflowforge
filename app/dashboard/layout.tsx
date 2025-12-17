@@ -99,8 +99,8 @@ export default function DashboardLayout({
             unoptimized
           />
           <div className="hidden sm:block">
-            <h1 className="text-sm font-bold text-foreground">Innovaas FlowForge</h1>
-            <p className="text-xs text-muted-foreground">Assessment Platform</p>
+            <h1 className="text-sm font-bold text-foreground">FlowForge</h1>
+            <p className="text-xs text-muted-foreground">OPEX Assessment Platform</p>
           </div>
         </div>
       </header>
