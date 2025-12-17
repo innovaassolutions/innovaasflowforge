@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { UserPlus, Users, Mail, Building2, Shield, Loader2, CheckCircle, XCircle, ArrowLeft } from 'lucide-react'
+import { UserPlus, Users, Mail, Building2, Shield, Loader2, CheckCircle, XCircle, ArrowLeft, Pencil, Trash2, Send } from 'lucide-react'
 import Link from 'next/link'
 import { apiUrl } from '@/lib/api-url'
 
@@ -12,7 +12,7 @@ interface User {
   email: string
   full_name: string
   role: string
-  user_type: 'consultant' | 'company' | null
+  user_type: 'consultant' | 'company' | 'admin' | null
   created_at: string
 }
 
@@ -21,6 +21,13 @@ interface CreateUserForm {
   fullName: string
   userType: 'consultant' | 'company' | 'admin'
   sendWelcomeEmail: boolean
+}
+
+interface EditUserForm {
+  id: string
+  email: string
+  fullName: string
+  userType: 'consultant' | 'company' | 'admin'
 }
 
 export default function AdminUsersPage() {
@@ -38,6 +45,24 @@ export default function AdminUsersPage() {
     userType: 'consultant',
     sendWelcomeEmail: true,
   })
+
+  // Edit user state
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
+  const [editFormData, setEditFormData] = useState<EditUserForm>({
+    id: '',
+    email: '',
+    fullName: '',
+    userType: 'consultant',
+  })
+
+  // Delete user state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+
+  // Resend email state
+  const [resendLoading, setResendLoading] = useState<string | null>(null)
 
   useEffect(() => {
     checkAdminAndLoadUsers()
@@ -127,6 +152,107 @@ export default function AdminUsersPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
+  }
+
+  function openEditForm(user: User) {
+    setEditFormData({
+      id: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      userType: (user.user_type as 'consultant' | 'company' | 'admin') || 'consultant',
+    })
+    setShowEditForm(true)
+  }
+
+  async function handleEditUser(e: React.FormEvent) {
+    e.preventDefault()
+    setEditLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch(apiUrl(`api/admin/users/${editFormData.id}`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: editFormData.email,
+          fullName: editFormData.fullName,
+          userType: editFormData.userType,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSuccess('User updated successfully.')
+        setShowEditForm(false)
+        await loadUsers()
+      } else {
+        setError(data.error || 'Failed to update user')
+      }
+    } catch (err) {
+      setError('Failed to update user')
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  function openDeleteConfirm(user: User) {
+    setUserToDelete(user)
+    setShowDeleteConfirm(true)
+  }
+
+  async function handleDeleteUser() {
+    if (!userToDelete) return
+
+    setDeleteLoading(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch(apiUrl(`api/admin/users/${userToDelete.id}`), {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSuccess(`User ${userToDelete.full_name} deleted successfully.`)
+        setShowDeleteConfirm(false)
+        setUserToDelete(null)
+        await loadUsers()
+      } else {
+        setError(data.error || 'Failed to delete user')
+      }
+    } catch (err) {
+      setError('Failed to delete user')
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
+
+  async function handleResendEmail(user: User) {
+    setResendLoading(user.id)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch(apiUrl(`api/admin/users/${user.id}`), {
+        method: 'POST',
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSuccess(`New credentials sent to ${user.email}`)
+      } else {
+        setError(data.error || 'Failed to send email')
+      }
+    } catch (err) {
+      setError('Failed to send email')
+    } finally {
+      setResendLoading(null)
+    }
   }
 
   if (loading) {
@@ -330,6 +456,166 @@ export default function AdminUsersPage() {
         </div>
       )}
 
+      {/* Edit User Modal */}
+      {showEditForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-card rounded-lg p-6 max-w-md w-full border border-border shadow-xl">
+            <h2 className="text-xl font-bold text-foreground mb-6">Edit User</h2>
+
+            <form onSubmit={handleEditUser} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.fullName}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                  required
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground
+                             focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={editFormData.email}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground
+                             focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-3">
+                  User Type
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData(prev => ({ ...prev, userType: 'consultant' }))}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      editFormData.userType === 'consultant'
+                        ? 'border-primary bg-[hsl(var(--accent-subtle))] text-foreground'
+                        : 'border-border bg-background text-muted-foreground hover:border-muted'
+                    }`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <Users className={`w-5 h-5 ${editFormData.userType === 'consultant' ? 'text-primary' : ''}`} />
+                      <span className="font-medium text-sm">Consultant</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData(prev => ({ ...prev, userType: 'company' }))}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      editFormData.userType === 'company'
+                        ? 'border-brand-teal bg-brand-teal/10 text-foreground'
+                        : 'border-border bg-background text-muted-foreground hover:border-muted'
+                    }`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <Building2 className={`w-5 h-5 ${editFormData.userType === 'company' ? 'text-brand-teal' : ''}`} />
+                      <span className="font-medium text-sm">Company</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData(prev => ({ ...prev, userType: 'admin' }))}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      editFormData.userType === 'admin'
+                        ? 'border-purple-500 bg-purple-100 text-foreground'
+                        : 'border-border bg-background text-muted-foreground hover:border-muted'
+                    }`}>
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield className={`w-5 h-5 ${editFormData.userType === 'admin' ? 'text-purple-600' : ''}`} />
+                      <span className="font-medium text-sm">Admin</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditForm(false)}
+                  className="flex-1 px-4 py-3 border border-border rounded-lg text-foreground hover:bg-muted transition-colors">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  className="flex-1 bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-3 rounded-lg
+                             font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                  {editLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Pencil className="w-4 h-4" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && userToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-card rounded-lg p-6 max-w-md w-full border border-border shadow-xl">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6 text-destructive" />
+              </div>
+              <h2 className="text-xl font-bold text-foreground mb-2">Delete User</h2>
+              <p className="text-muted-foreground mb-6">
+                Are you sure you want to delete <strong>{userToDelete.full_name}</strong>? This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirm(false)
+                  setUserToDelete(null)
+                }}
+                className="flex-1 px-4 py-3 border border-border rounded-lg text-foreground hover:bg-muted transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deleteLoading}
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground px-4 py-3 rounded-lg
+                           font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                {deleteLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete User
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Users Table */}
       <div className="bg-card border border-border rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
@@ -361,6 +647,9 @@ export default function AdminUsersPage() {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Created
                   </th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -376,10 +665,14 @@ export default function AdminUsersPage() {
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                         user.user_type === 'consultant'
                           ? 'bg-[hsl(var(--accent-subtle))] text-primary'
+                          : user.user_type === 'admin'
+                          ? 'bg-purple-100 text-purple-700'
                           : 'bg-brand-teal/10 text-brand-teal'
                       }`}>
                         {user.user_type === 'consultant' ? (
                           <Users className="w-3 h-3" />
+                        ) : user.user_type === 'admin' ? (
+                          <Shield className="w-3 h-3" />
                         ) : (
                           <Building2 className="w-3 h-3" />
                         )}
@@ -398,6 +691,33 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => openEditForm(user)}
+                          title="Edit user"
+                          className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleResendEmail(user)}
+                          disabled={resendLoading === user.id}
+                          title="Resend credentials email"
+                          className="p-2 text-muted-foreground hover:text-primary hover:bg-[hsl(var(--accent-subtle))] rounded-lg transition-colors disabled:opacity-50">
+                          {resendLoading === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Send className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => openDeleteConfirm(user)}
+                          title="Delete user"
+                          className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
