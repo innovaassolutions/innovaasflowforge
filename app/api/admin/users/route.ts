@@ -42,14 +42,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if current user is an admin
+    // Check if current user is a platform admin (user_type = 'admin')
     const { data: currentProfile } = await supabase
       .from('user_profiles')
-      .select('role')
+      .select('user_type')
       .eq('id', currentUser.id)
       .single()
 
-    if (!currentProfile || currentProfile.role !== 'admin') {
+    if (!currentProfile || currentProfile.user_type !== 'admin') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }
@@ -217,14 +217,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Check if current user is an admin
+    // Check if current user is a platform admin (user_type = 'admin')
     const { data: currentProfile } = await supabase
       .from('user_profiles')
-      .select('role')
+      .select('user_type')
       .eq('id', currentUser.id)
       .single()
 
-    if (!currentProfile || currentProfile.role !== 'admin') {
+    if (!currentProfile || currentProfile.user_type !== 'admin') {
       return NextResponse.json(
         { error: 'Forbidden - Admin access required' },
         { status: 403 }

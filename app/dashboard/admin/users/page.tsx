@@ -51,14 +51,14 @@ export default function AdminUsersPage() {
       return
     }
 
-    // Check if user is admin
+    // Check if user is platform admin (user_type = 'admin')
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('role')
+      .select('user_type')
       .eq('id', user.id)
-      .single() as { data: { role: string } | null }
+      .single() as { data: { user_type: string | null } | null }
 
-    if (!profile || profile.role !== 'admin') {
+    if (!profile || profile.user_type !== 'admin') {
       setIsAdmin(false)
       setLoading(false)
       return

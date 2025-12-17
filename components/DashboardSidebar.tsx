@@ -20,7 +20,7 @@ interface UserProfile {
   full_name: string
   email: string
   role: string
-  user_type: 'consultant' | 'company' | null
+  user_type: 'consultant' | 'company' | 'admin' | null
 }
 
 interface DashboardSidebarProps {
@@ -76,8 +76,8 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ]
 
-  // Admin-only nav items
-  const adminNavItems = userProfile?.role === 'admin' ? [
+  // Admin-only nav items (check user_type for platform admin access)
+  const adminNavItems = userProfile?.user_type === 'admin' ? [
     {
       name: 'Users',
       href: '/dashboard/admin/users',

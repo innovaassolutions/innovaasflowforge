@@ -13,7 +13,7 @@ interface UserProfile {
   full_name: string
   email: string
   role: string
-  user_type: 'consultant' | 'company' | null
+  user_type: 'consultant' | 'company' | 'admin' | null
 }
 
 export default function DashboardLayout({
