@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo - Stats Banner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-subtle: #FEF5EE;
+      --teal: #1D9BA3;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8f6f1 0%, #fff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .banner {
+      width: 700px;
+      background: linear-gradient(135deg, var(--accent) 0%, #e54d00 100%);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(242, 92, 5, 0.3);
+      padding: 40px 48px;
+      color: white;
+    }
+
+    .banner-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .logo-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .banner-footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      color: var(--accent);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .cta-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <div class="banner-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <span class="logo-text">FlowForge</span>
+      </div>
+      <div class="divider"></div>
+      <span class="tagline">AI-Powered School Assessments</span>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-value">89%</div>
+        <div class="stat-label">Response Rate</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">12min</div>
+        <div class="stat-label">Avg Interview</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">6x</div>
+        <div class="stat-label">More Insights</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">24hr</div>
+        <div class="stat-label">Report Delivery</div>
+      </div>
+    </div>
+
+    <div class="banner-footer">
+      <span class="footer-text">Transform stakeholder feedback into actionable improvements</span>
+      <a href="#" class="cta-btn">
+        Learn More
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

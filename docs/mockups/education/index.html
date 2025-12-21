@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge Education Mockups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-hover: #DC5204;
+      --accent-subtle: #FEF5EE;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 48px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 16px;
+    }
+
+    .mockups-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .mockup-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .mockup-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(242, 92, 5, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .mockup-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .mockup-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .mockup-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .mockup-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: var(--bg-muted);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 40px 0 24px;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div class="logo-text">Flow<span>Forge</span></div>
+      </div>
+      <h1>Education Vertical Mockups</h1>
+      <p class="subtitle">Interactive mockups showcasing FlowForge for school assessments</p>
+      <span class="badge">6 Mockups - December 2024</span>
+    </div>
+
+    <!-- Landing Page Hero Card -->
+    <div class="mockups-grid" style="margin-bottom: 40px;">
+      <a href="landing-page.html" class="mockup-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #1D9BA3 0%, #167a80 100%); border: none;">
+        <div style="display: flex; align-items: center; gap: 24px;">
+          <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+            <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+          </div>
+          <div style="flex: 1;">
+            <h3 class="mockup-title" style="color: white; margin-bottom: 4px;">Education Landing Page</h3>
+            <p class="mockup-desc" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">Complete marketing landing page for schools featuring hero, features, testimonials, and CTAs.</p>
+          </div>
+          <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+    <div class="section-divider">
+      <span class="section-label">Campaign Management</span>
+    </div>
+
+    <div class="mockups-grid">
+      <a href="01-campaign-dashboard.html" class="mockup-card">
+        <div class="mockup-number">1</div>
+        <h3 class="mockup-title">Campaign Dashboard</h3>
+        <p class="mockup-desc">Overview of all school assessment campaigns with stats, progress tracking, and quick access to active evaluations.</p>
+        <div class="mockup-tags">
+          <span class="tag">Dashboard</span>
+          <span class="tag">Overview</span>
+          <span class="tag">Stats</span>
+        </div>
+      </a>
+
+      <a href="02-campaign-detail.html" class="mockup-card">
+        <div class="mockup-number">2</div>
+        <h3 class="mockup-title">Campaign Detail</h3>
+        <p class="mockup-desc">Detailed view of a specific campaign showing stakeholders, interview progress, and participant management.</p>
+        <div class="mockup-tags">
+          <span class="tag">Stakeholders</span>
+          <span class="tag">Progress</span>
+          <span class="tag">Management</span>
+        </div>
+      </a>
+
+      <a href="03-create-campaign.html" class="mockup-card">
+        <div class="mockup-number">3</div>
+        <h3 class="mockup-title">Create Campaign</h3>
+        <p class="mockup-desc">Step-by-step wizard for creating new school assessment campaigns with assessment type selection.</p>
+        <div class="mockup-tags">
+          <span class="tag">Wizard</span>
+          <span class="tag">Form</span>
+          <span class="tag">Setup</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="section-divider">
+      <span class="section-label">Interview Session</span>
+    </div>
+
+    <div class="mockups-grid">
+      <a href="04-parent-interview.html" class="mockup-card">
+        <div class="mockup-number">4</div>
+        <h3 class="mockup-title">Parent Interview Session</h3>
+        <p class="mockup-desc">AI-facilitated interview with a parent stakeholder, showing conversation flow, topic progression, and real-time insights.</p>
+        <div class="mockup-tags">
+          <span class="tag">AI Chat</span>
+          <span class="tag">Parent</span>
+          <span class="tag">Interview</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="section-divider">
+      <span class="section-label">Reports & Analysis</span>
+    </div>
+
+    <div class="mockups-grid">
+      <a href="05-report-overview.html" class="mockup-card">
+        <div class="mockup-number">5</div>
+        <h3 class="mockup-title">Report Overview</h3>
+        <p class="mockup-desc">Executive summary of assessment results with overall scores, key findings, and stakeholder participation breakdown.</p>
+        <div class="mockup-tags">
+          <span class="tag">Summary</span>
+          <span class="tag">Scores</span>
+          <span class="tag">Findings</span>
+        </div>
+      </a>
+
+      <a href="06-report-detail.html" class="mockup-card">
+        <div class="mockup-number">6</div>
+        <h3 class="mockup-title">Report Detail - Process Dimension</h3>
+        <p class="mockup-desc">Deep dive into a specific dimension showing sub-scores, detailed findings, quotes, and actionable recommendations.</p>
+        <div class="mockup-tags">
+          <span class="tag">Detail</span>
+          <span class="tag">Analysis</span>
+          <span class="tag">Recommendations</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="section-divider">
+      <span class="section-label">Marketing Collateral</span>
+    </div>
+
+    <div class="mockups-grid">
+      <a href="promo/index.html" class="mockup-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, var(--accent) 0%, #e54d00 100%); border: none;">
+        <div style="display: flex; align-items: center; gap: 24px;">
+          <div style="width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+            <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div style="flex: 1;">
+            <h3 class="mockup-title" style="color: white; margin-bottom: 4px;">Promotional Graphics</h3>
+            <p class="mockup-desc" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">6 standalone graphics for emails, social media posts, and sales collateral. Perfect for screenshots.</p>
+          </div>
+          <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>FlowForge Education Mockups - Pearl Vibrant Theme</p>
+    </div>
+  </div>
+</body>
+</html>

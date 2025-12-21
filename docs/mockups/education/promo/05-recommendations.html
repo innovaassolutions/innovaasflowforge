@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo - Recommendations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-subtle: #FEF5EE;
+      --success: #16A34A;
+      --success-subtle: #DCFCE7;
+      --teal: #1D9BA3;
+      --teal-subtle: #E0F5F6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8f6f1 0%, #fff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .card {
+      width: 400px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: var(--accent);
+      color: white;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .header-text h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .header-text p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .card-body {
+      padding: 24px 28px;
+    }
+
+    .recommendation {
+      display: flex;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .recommendation:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .recommendation:first-child {
+      padding-top: 0;
+    }
+
+    .rec-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .rec-content {
+      flex: 1;
+    }
+
+    .rec-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .rec-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .rec-meta {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rec-tag {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .rec-tag.impact-high {
+      background: var(--success-subtle);
+      color: var(--success);
+    }
+
+    .rec-tag.effort-low {
+      background: var(--teal-subtle);
+      color: var(--teal);
+    }
+
+    .rec-tag.effort-medium {
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+
+    .card-footer {
+      background: var(--bg-subtle);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-stat {
+      text-align: center;
+    }
+
+    .footer-stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .footer-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="header-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h3>Priority Recommendations</h3>
+        <p>Lincoln Elementary School</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="recommendation">
+        <div class="rec-number">1</div>
+        <div class="rec-content">
+          <div class="rec-title">Implement email auto-acknowledgment</div>
+          <div class="rec-desc">Send automatic confirmations when parents email, setting expectations for 24-48 hour response time.</div>
+          <div class="rec-meta">
+            <span class="rec-tag impact-high">High Impact</span>
+            <span class="rec-tag effort-low">Quick Win</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendation">
+        <div class="rec-number">2</div>
+        <div class="rec-content">
+          <div class="rec-title">Consolidate event calendar</div>
+          <div class="rec-desc">Create single source of truth for school events accessible via parent portal with push notifications.</div>
+          <div class="rec-meta">
+            <span class="rec-tag impact-high">High Impact</span>
+            <span class="rec-tag effort-medium">Medium Effort</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommendation">
+        <div class="rec-number">3</div>
+        <div class="rec-content">
+          <div class="rec-title">Define response SLAs by topic</div>
+          <div class="rec-desc">Establish clear ownership and timing expectations for academic, administrative, and scheduling inquiries.</div>
+          <div class="rec-meta">
+            <span class="rec-tag impact-high">Medium Impact</span>
+            <span class="rec-tag effort-low">Quick Win</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <div class="footer-stat">
+        <div class="footer-stat-value">12</div>
+        <div class="footer-stat-label">Total Actions</div>
+      </div>
+      <div class="footer-stat">
+        <div class="footer-stat-value">+18pts</div>
+        <div class="footer-stat-label">Projected Gain</div>
+      </div>
+      <div class="footer-stat">
+        <div class="footer-stat-value">Q1</div>
+        <div class="footer-stat-label">Target Timeline</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

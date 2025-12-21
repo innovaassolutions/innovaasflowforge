@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo - Quote Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-subtle: #FEF5EE;
+      --teal: #1D9BA3;
+      --teal-subtle: #E0F5F6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8f6f1 0%, #fff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .card {
+      width: 440px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .card-accent {
+      height: 6px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--teal) 100%);
+    }
+
+    .card-body {
+      padding: 36px;
+    }
+
+    .quote-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-subtle);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .quote-icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--accent);
+    }
+
+    .quote-text {
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+
+    .quote-source {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .source-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-muted);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .source-info h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .source-info p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .sentiment-tag {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--teal-subtle);
+      padding: 6px 12px;
+      border-radius: 100px;
+    }
+
+    .sentiment-tag svg {
+      width: 14px;
+      height: 14px;
+      color: var(--teal);
+    }
+
+    .sentiment-tag span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .card-footer {
+      background: var(--bg-subtle);
+      padding: 16px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .footer-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .theme-tag {
+      background: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="quote-icon">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+        </svg>
+      </div>
+
+      <p class="quote-text">
+        "The AI interview made me feel heard in a way surveys never do. I could explain the context behind my concerns, and the follow-up questions showed it really understood what I was saying."
+      </p>
+
+      <div class="quote-source">
+        <div class="source-avatar">MJ</div>
+        <div class="source-info">
+          <h4>Maria Johnson</h4>
+          <p>Parent, Grade 10 Student</p>
+        </div>
+        <div class="sentiment-tag">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Positive</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <div>
+        <div class="footer-label">Key Theme Identified</div>
+        <div class="footer-value">Communication Preferences</div>
+      </div>
+      <div class="theme-tag">1 of 6 themes</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge Education - Parent Interview Session</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-hover: #DC5204;
+      --accent-subtle: #FEF5EE;
+      --success: #16A34A;
+      --success-subtle: #DCFCE7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .interview-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Header */
+    .interview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+
+    .campaign-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .campaign-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .school-name {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-mini {
+      width: 200px;
+      height: 6px;
+      background: var(--bg-muted);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill-mini {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .progress-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-muted);
+      color: var(--text);
+    }
+
+    .btn-ghost svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Chat Container */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 32px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding-bottom: 24px;
+    }
+
+    /* Message Styles */
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .message.ai .message-avatar {
+      background: var(--accent);
+    }
+
+    .message.ai .message-avatar svg {
+      width: 18px;
+      height: 18px;
+      color: white;
+    }
+
+    .message.user .message-avatar {
+      background: var(--bg-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .message-content {
+      flex: 1;
+    }
+
+    .message-bubble {
+      padding: 16px 20px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .message.ai .message-bubble {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user .message-bubble {
+      background: var(--accent);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .message.user .message-time {
+      text-align: right;
+    }
+
+    /* Topic Badge */
+    .topic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .topic-badge svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Input Area */
+    .input-container {
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      transition: border-color 0.15s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+    }
+
+    .input-field {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 0.9rem;
+      color: var(--text);
+      font-family: inherit;
+      resize: none;
+      min-height: 24px;
+      max-height: 120px;
+    }
+
+    .input-field:focus {
+      outline: none;
+    }
+
+    .input-field::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .send-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      color: white;
+    }
+
+    .input-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .hint-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hint-item svg {
+      width: 14px;
+      height: 14px;
+    }
+
+
+    /* Stakeholder Info Panel */
+    .stakeholder-panel {
+      position: fixed;
+      top: 80px;
+      right: 32px;
+      width: 260px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stakeholder-panel-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .stakeholder-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stakeholder-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-muted);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .stakeholder-details h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .stakeholder-details p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 0.8rem;
+    }
+
+    .info-label {
+      color: var(--text-muted);
+    }
+
+    .info-value {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .topics-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .topics-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .topic-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 0.8rem;
+    }
+
+    .topic-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .topic-check.done {
+      background: var(--success);
+    }
+
+    .topic-check.current {
+      background: var(--accent);
+    }
+
+    .topic-check.pending {
+      background: var(--bg-muted);
+      border: 2px solid var(--border);
+    }
+
+    .topic-check svg {
+      width: 10px;
+      height: 10px;
+      color: white;
+    }
+
+    .topic-name {
+      color: var(--text);
+    }
+
+    .topic-name.muted {
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="interview-layout">
+    <!-- Header -->
+    <header class="interview-header">
+      <div class="header-left">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div class="logo-text">Flow<span>Forge</span></div>
+        </div>
+        <div class="header-divider"></div>
+        <div class="campaign-info">
+          <span class="campaign-name">Parent Experience Evaluation</span>
+          <span class="school-name">Westside High School</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="progress-container">
+          <span class="progress-label">Interview Progress</span>
+          <div class="progress-bar-mini">
+            <div class="progress-fill-mini" style="width: 60%"></div>
+          </div>
+          <span class="progress-text">60%</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="btn-ghost">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Help
+        </button>
+        <button class="btn-ghost">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Pause
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+      <div class="chat-messages">
+        <!-- AI Welcome Message -->
+        <div class="message ai">
+          <div class="message-avatar">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="message-bubble">
+              Hello Maria! Thank you for taking the time to share your experiences as a parent at Westside High School. Your feedback will help the school understand how to better serve families like yours.<br><br>
+              This conversation will take about 15-20 minutes, and everything you share will be kept confidential. There are no right or wrong answers - we simply want to understand your genuine experiences.<br><br>
+              Ready to get started?
+            </div>
+            <div class="message-time">2:15 PM</div>
+          </div>
+        </div>
+
+        <!-- User Response -->
+        <div class="message user">
+          <div class="message-avatar">MJ</div>
+          <div class="message-content">
+            <div class="message-bubble">
+              Yes, I'm ready. I appreciate the school wanting to hear from parents!
+            </div>
+            <div class="message-time">2:16 PM</div>
+          </div>
+        </div>
+
+        <!-- AI Question -->
+        <div class="message ai">
+          <div class="message-avatar">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="topic-badge">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+              </svg>
+              Topic: Communication
+            </div>
+            <div class="message-bubble">
+              Let's start with communication. When you need information from the school - whether it's about your child's progress, upcoming events, or general questions - how easy is it for you to get answers?<br><br>
+              Can you walk me through a recent example of when you needed to communicate with the school?
+            </div>
+            <div class="message-time">2:16 PM</div>
+          </div>
+        </div>
+
+        <!-- User Response -->
+        <div class="message user">
+          <div class="message-avatar">MJ</div>
+          <div class="message-content">
+            <div class="message-bubble">
+              Honestly, it can be hit or miss. The parent portal is helpful for grades, but when I had a question about my son's schedule change last month, it took three emails and almost a week to get a response. I eventually had to call the front office directly.
+            </div>
+            <div class="message-time">2:18 PM</div>
+          </div>
+        </div>
+
+        <!-- AI Follow-up -->
+        <div class="message ai">
+          <div class="message-avatar">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="message-bubble">
+              That's really helpful context. A week is a long time when you're trying to help your child navigate a schedule change.<br><br>
+              When you did connect with the front office by phone, how was that experience? And in an ideal world, what would timely communication look like to you?
+            </div>
+            <div class="message-time">2:18 PM</div>
+          </div>
+        </div>
+
+        <!-- User Response -->
+        <div class="message user">
+          <div class="message-avatar">MJ</div>
+          <div class="message-content">
+            <div class="message-bubble">
+              The phone call was actually great - the receptionist was friendly and connected me to the counselor right away. I just wish email was as responsive. Ideally, I'd love a 24-48 hour response window for emails, even if it's just to say "we received your message and are looking into it."
+            </div>
+            <div class="message-time">2:20 PM</div>
+          </div>
+        </div>
+
+        <!-- AI Acknowledgment and Transition -->
+        <div class="message ai">
+          <div class="message-avatar">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div class="message-content">
+            <div class="topic-badge">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              Topic: Digital Tools
+            </div>
+            <div class="message-bubble">
+              That's a very reasonable expectation - acknowledgment can go a long way.<br><br>
+              You mentioned the parent portal. Let's talk more about the digital tools the school provides. How would you describe your overall experience with the parent portal and any other online systems you use?
+            </div>
+            <div class="message-time">2:21 PM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea class="input-field" placeholder="Type your response..." rows="1"></textarea>
+          <button class="send-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+        <div class="input-hint">
+          <span class="hint-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Take your time - there's no rush
+          </span>
+          <span class="hint-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Your responses are confidential
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stakeholder Info Panel -->
+    <div class="stakeholder-panel">
+      <div class="stakeholder-panel-title">Stakeholder</div>
+      <div class="stakeholder-profile">
+        <div class="stakeholder-avatar">MJ</div>
+        <div class="stakeholder-details">
+          <h4>Maria Johnson</h4>
+          <p>Parent - Grade 10</p>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Duration</span>
+        <span class="info-value">6 min</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Questions Asked</span>
+        <span class="info-value">3 of 8</span>
+      </div>
+
+      <div class="topics-section">
+        <div class="topics-title">Interview Topics</div>
+        <div class="topic-item">
+          <div class="topic-check done">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <span class="topic-name">Welcome & Context</span>
+        </div>
+        <div class="topic-item">
+          <div class="topic-check done">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <span class="topic-name">Communication</span>
+        </div>
+        <div class="topic-item">
+          <div class="topic-check current"></div>
+          <span class="topic-name">Digital Tools</span>
+        </div>
+        <div class="topic-item">
+          <div class="topic-check pending"></div>
+          <span class="topic-name muted">Issue Resolution</span>
+        </div>
+        <div class="topic-item">
+          <div class="topic-check pending"></div>
+          <span class="topic-name muted">Events & Engagement</span>
+        </div>
+        <div class="topic-item">
+          <div class="topic-check pending"></div>
+          <span class="topic-name muted">Recommendations</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

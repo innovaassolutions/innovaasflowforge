@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowForge Education - Report Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-hover: #DC5204;
+      --accent-subtle: #FEF5EE;
+      --success: #16A34A;
+      --success-subtle: #DCFCE7;
+      --warning: #CA8A04;
+      --warning-subtle: #FEF9C3;
+      --teal: #1D9BA3;
+      --teal-subtle: #E0F5F6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Report Layout */
+    .report-layout {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    /* Hero Section */
+    .report-hero {
+      background: linear-gradient(135deg, var(--bg-subtle) 0%, var(--bg) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .report-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .report-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .report-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .report-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .meta-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Overall Score Section */
+    .score-section {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 32px;
+    }
+
+    .score-circle-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-circle {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0deg 252deg, var(--bg-muted) 252deg 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      background: var(--bg-subtle);
+      border-radius: 50%;
+    }
+
+    .score-value {
+      position: relative;
+      z-index: 1;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .score-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .score-interpretation {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    .score-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .score-details h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .score-details p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .pillar-scores {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .pillar-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .pillar-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 12px;
+      background: var(--teal-subtle);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pillar-icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--teal);
+    }
+
+    .pillar-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .pillar-score {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    .pillar-bar {
+      height: 4px;
+      background: var(--bg-muted);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .pillar-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 2px;
+    }
+
+    /* Key Findings Section */
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .findings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .finding-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .finding-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .finding-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .finding-icon.strength {
+      background: var(--success-subtle);
+    }
+
+    .finding-icon.strength svg {
+      color: var(--success);
+    }
+
+    .finding-icon.opportunity {
+      background: var(--warning-subtle);
+    }
+
+    .finding-icon.opportunity svg {
+      color: var(--warning);
+    }
+
+    .finding-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .finding-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .finding-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 4px;
+    }
+
+    .finding-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Stakeholder Summary */
+    .stakeholder-summary {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .summary-stat {
+      text-align: center;
+    }
+
+    .summary-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Actions Bar */
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 32px;
+    }
+
+    .actions-info {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .actions-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-muted);
+    }
+
+    .btn-secondary svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary svg {
+      width: 18px;
+      height: 18px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="report-layout">
+    <!-- Hero Section -->
+    <div class="report-hero">
+      <div class="report-badge">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Assessment Complete
+      </div>
+      <h1 class="report-title">Parent Experience Evaluation</h1>
+      <p class="report-subtitle">Westside High School - December 2024</p>
+
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-label">Assessment Period</span>
+          <span class="meta-value">Dec 5 - Dec 20, 2024</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Stakeholders Interviewed</span>
+          <span class="meta-value">32 participants</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Response Rate</span>
+          <span class="meta-value">94%</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Generated</span>
+          <span class="meta-value">Dec 21, 2024</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall Score Section -->
+    <div class="score-section">
+      <div class="score-circle-container">
+        <div class="score-circle">
+          <span class="score-value">70</span>
+        </div>
+        <span class="score-label">Overall Readiness Score</span>
+        <span class="score-interpretation">Developing</span>
+      </div>
+
+      <div class="score-details">
+        <h3>Executive Summary</h3>
+        <p>Westside High School demonstrates solid foundations in parent communication infrastructure and staff dedication. Key opportunities exist in response time consistency and digital tool adoption. Parents consistently praised individual staff members while expressing desire for more streamlined processes.</p>
+
+        <div class="pillar-scores">
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div class="pillar-name">Technology</div>
+            <div class="pillar-score">62</div>
+            <div class="pillar-bar">
+              <div class="pillar-bar-fill" style="width: 62%"></div>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </div>
+            <div class="pillar-name">Process</div>
+            <div class="pillar-score">68</div>
+            <div class="pillar-bar">
+              <div class="pillar-bar-fill" style="width: 68%"></div>
+            </div>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="pillar-name">Organization</div>
+            <div class="pillar-score">78</div>
+            <div class="pillar-bar">
+              <div class="pillar-bar-fill" style="width: 78%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stakeholder Summary -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Stakeholder Participation</h2>
+      </div>
+      <div class="stakeholder-summary">
+        <div class="summary-grid">
+          <div class="summary-stat">
+            <div class="summary-value">18</div>
+            <div class="summary-label">Parents</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-value">8</div>
+            <div class="summary-label">Teachers</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-value">4</div>
+            <div class="summary-label">Administrators</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-value">2</div>
+            <div class="summary-label">Support Staff</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Findings -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Key Findings</h2>
+      </div>
+      <div class="findings-grid">
+        <div class="finding-card">
+          <div class="finding-header">
+            <div class="finding-icon strength">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div>
+              <div class="finding-label">Strength</div>
+              <div class="finding-title">Dedicated Staff</div>
+            </div>
+          </div>
+          <p class="finding-text">92% of parents praised individual staff members for their dedication and responsiveness when direct contact is made.</p>
+        </div>
+
+        <div class="finding-card">
+          <div class="finding-header">
+            <div class="finding-icon strength">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div>
+              <div class="finding-label">Strength</div>
+              <div class="finding-title">Grade Portal</div>
+            </div>
+          </div>
+          <p class="finding-text">The online grade portal receives high satisfaction with 87% of parents checking it weekly or more frequently.</p>
+        </div>
+
+        <div class="finding-card">
+          <div class="finding-header">
+            <div class="finding-icon opportunity">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="finding-label">Opportunity</div>
+              <div class="finding-title">Email Response Time</div>
+            </div>
+          </div>
+          <p class="finding-text">68% of parents report email responses taking 3+ days. Parents suggest a 24-48 hour acknowledgment window.</p>
+        </div>
+
+        <div class="finding-card">
+          <div class="finding-header">
+            <div class="finding-icon opportunity">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="finding-label">Opportunity</div>
+              <div class="finding-title">Event Communication</div>
+            </div>
+          </div>
+          <p class="finding-text">Parents express confusion about event calendars, with information spread across multiple platforms.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <span class="actions-info">Full report includes 24 pages of detailed analysis and recommendations</span>
+      <div class="actions-buttons">
+        <button class="btn-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+          </svg>
+          Share
+        </button>
+        <button class="btn-primary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

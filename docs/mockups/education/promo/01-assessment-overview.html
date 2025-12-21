@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promo - Assessment Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFEFB;
+      --bg-subtle: #FAF8F3;
+      --bg-muted: #F2EFE7;
+      --border: #E6E2D6;
+      --text: #171614;
+      --text-muted: #71706B;
+      --accent: #F25C05;
+      --accent-subtle: #FEF5EE;
+      --success: #16A34A;
+      --success-subtle: #DCFCE7;
+      --warning: #CA8A04;
+      --warning-subtle: #FEF9C3;
+      --teal: #1D9BA3;
+      --teal-subtle: #E0F5F6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8f6f1 0%, #fff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .promo-container {
+      display: flex;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    /* Assessment Card */
+    .assessment-card {
+      width: 380px;
+      padding: 28px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--teal);
+      border-radius: 50%;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .school-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .school-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--teal-subtle);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .school-icon svg {
+      width: 32px;
+      height: 32px;
+      color: var(--teal);
+    }
+
+    .school-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .school-type {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .satisfaction-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .score-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) 0deg 295deg, var(--bg-muted) 295deg 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .score-value {
+      position: relative;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .satisfaction-info h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .satisfaction-info p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .gap-alert {
+      background: var(--warning-subtle);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gap-icon {
+      width: 28px;
+      height: 28px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .gap-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--warning);
+    }
+
+    .gap-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .gap-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .accreditation {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .accreditation a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* Comparison Card */
+    .comparison-card {
+      width: 340px;
+    }
+
+    .comparison-header {
+      background: var(--text);
+      color: white;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comparison-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .comparison-header .status-dot {
+      background: var(--success);
+    }
+
+    .comparison-body {
+      padding: 24px;
+    }
+
+    .dept-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .dept-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .dept-name {
+      width: 110px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .dept-bar {
+      flex: 1;
+      height: 14px;
+      background: var(--bg-muted);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .dept-bar-fill {
+      height: 100%;
+      border-radius: 7px;
+    }
+
+    .dept-bar-fill.high { background: var(--success); }
+    .dept-bar-fill.medium { background: var(--teal); }
+    .dept-bar-fill.low { background: var(--warning); }
+
+    .dept-score {
+      width: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .dept-score.high { color: var(--success); }
+    .dept-score.medium { color: var(--teal); }
+    .dept-score.low { color: var(--warning); }
+
+    .priority-section {
+      margin-top: 24px;
+    }
+
+    .priority-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .priority-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--teal-subtle);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .priority-number {
+      width: 24px;
+      height: 24px;
+      background: var(--teal);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .priority-text h5 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .priority-text p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="promo-container">
+    <!-- Assessment Card -->
+    <div class="card assessment-card">
+      <div class="card-header">
+        <div class="status-dot"></div>
+        <span class="card-title">Institutional Assessment</span>
+      </div>
+
+      <div class="school-info">
+        <div class="school-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
+          </svg>
+        </div>
+        <div>
+          <div class="school-name">State University</div>
+          <div class="school-type">Complete Assessment - Faculty + Parents</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-value">72</div>
+          <div class="stat-label">Faculty</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">248</div>
+          <div class="stat-label">Parents</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">85%</div>
+          <div class="stat-label">Response</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">6</div>
+          <div class="stat-label">Depts</div>
+        </div>
+      </div>
+
+      <div class="section-label">Parent Satisfaction</div>
+      <div class="satisfaction-row">
+        <div class="score-circle">
+          <span class="score-value">82%</span>
+        </div>
+        <div class="satisfaction-info">
+          <h4>Parents recommend institution</h4>
+          <p>+8% vs last year - Top driver: Communication</p>
+        </div>
+      </div>
+
+      <div class="gap-alert">
+        <div class="gap-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="gap-title">Gap Identified</div>
+          <div class="gap-desc">Parents want more progress updates - faculty unaware</div>
+        </div>
+      </div>
+
+      <div class="accreditation">
+        Accreditation evidence: <a href="#">SACSCOC aligned documentation</a>
+      </div>
+    </div>
+
+    <!-- Comparison Card -->
+    <div class="card comparison-card">
+      <div class="comparison-header">
+        <h3>Department Comparison</h3>
+        <div class="status-dot"></div>
+      </div>
+
+      <div class="comparison-body">
+        <div class="dept-section-label">Digital Readiness by Department</div>
+
+        <div class="dept-row">
+          <span class="dept-name">Business</span>
+          <div class="dept-bar"><div class="dept-bar-fill high" style="width: 85%"></div></div>
+          <span class="dept-score high">85%</span>
+        </div>
+        <div class="dept-row">
+          <span class="dept-name">STEM</span>
+          <div class="dept-bar"><div class="dept-bar-fill medium" style="width: 78%"></div></div>
+          <span class="dept-score medium">78%</span>
+        </div>
+        <div class="dept-row">
+          <span class="dept-name">Arts & Humanities</span>
+          <div class="dept-bar"><div class="dept-bar-fill medium" style="width: 65%"></div></div>
+          <span class="dept-score medium">65%</span>
+        </div>
+        <div class="dept-row">
+          <span class="dept-name">Education</span>
+          <div class="dept-bar"><div class="dept-bar-fill medium" style="width: 72%"></div></div>
+          <span class="dept-score medium">72%</span>
+        </div>
+        <div class="dept-row">
+          <span class="dept-name">Health Sciences</span>
+          <div class="dept-bar"><div class="dept-bar-fill low" style="width: 58%"></div></div>
+          <span class="dept-score low">58%</span>
+        </div>
+
+        <div class="priority-section">
+          <div class="priority-title">Priority Actions</div>
+          <div class="priority-item">
+            <div class="priority-number">1</div>
+            <div class="priority-text">
+              <h5>Launch faculty development program</h5>
+              <p>Address training gap cited by 68% of faculty</p>
+            </div>
+          </div>
+          <div class="priority-item">
+            <div class="priority-number">2</div>
+            <div class="priority-text">
+              <h5>Implement parent progress portal</h5>
+              <p>Address #1 parent request - boost satisfaction 12%</p>
+            </div>
+          </div>
+          <div class="priority-item">
+            <div class="priority-number">3</div>
+            <div class="priority-text">
+              <h5>Pilot hybrid learning in Health Sciences</h5>
+              <p>Lowest digital readiness - targeted support</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
