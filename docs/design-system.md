@@ -242,42 +242,21 @@ When implementing styles, use these CSS variable names:
 
 ---
 
-## Tailwind CSS Classes
+## Tailwind CSS Equivalents
 
-Custom `ff-*` classes are defined in `tailwind.config.ts` for exact design system colors:
+When using Tailwind, map to these approximate values:
 
-| Design Token | Tailwind Class | Hex Value |
-|--------------|----------------|-----------|
-| Background | `bg-ff-bg` | #FFFEFB |
-| Background Subtle | `bg-ff-subtle` | #FAF8F3 |
-| Background Muted | `bg-ff-muted` | #F2EFE7 |
-| Border | `border-ff-border` | #E6E2D6 |
-| Text Primary | `text-ff-text` | #171614 |
-| Text Muted | `text-ff-text-muted` | #71706B |
-| Accent | `bg-ff-accent` / `text-ff-accent` | #F25C05 |
-| Accent Hover | `hover:bg-ff-accent-hover` | #DC5204 |
-| Accent Subtle | `bg-ff-accent-subtle` | #FEF5EE |
-| Success | `bg-ff-success` / `text-ff-success` | #16A34A |
-| Success Subtle | `bg-ff-success-subtle` | #DCFCE7 |
-| Warning | `bg-ff-warning` / `text-ff-warning` | #CA8A04 |
-| Warning Subtle | `bg-ff-warning-subtle` | #FEF9C3 |
-| Teal | `bg-ff-teal` / `text-ff-teal` | #1D9BA3 |
+| Design Token | Tailwind Class |
+|--------------|----------------|
+| `--bg` (#FFFEFB) | `bg-stone-50` or custom |
+| `--bg-subtle` (#FAF8F3) | `bg-stone-100` or custom |
+| `--bg-muted` (#F2EFE7) | `bg-stone-200` or custom |
+| `--border` (#E6E2D6) | `border-stone-300` or custom |
+| `--text` (#171614) | `text-stone-900` |
+| `--text-muted` (#71706B) | `text-stone-500` |
+| `--accent` (#F25C05) | `text-orange-600` / `bg-orange-600` |
 
-**Usage Examples:**
-```html
-<!-- Card with proper background -->
-<div class="bg-ff-subtle border border-ff-border rounded-xl p-6">
-
-<!-- Primary button -->
-<button class="bg-ff-accent hover:bg-ff-accent-hover text-white">
-
-<!-- Text hierarchy -->
-<h1 class="text-ff-text">Heading</h1>
-<p class="text-ff-text-muted">Secondary text</p>
-
-<!-- Status badge -->
-<span class="bg-ff-success-subtle text-ff-success">Complete</span>
-```
+**Recommendation:** Define custom colors in `tailwind.config.js` to match exact hex values.
 
 ---
 
