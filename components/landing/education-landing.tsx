@@ -83,7 +83,7 @@ const CONTENT = {
           'Available 24/7 on any device',
           'Complete anonymity ensures candor',
         ],
-        image: `${BASE_PATH}/mockups/education/promo/png/02-interview-insights.png`,
+        image: `${BASE_PATH}/mockups/education/promo/png/parentinterview_with_motherdaughter.png`,
       },
       {
         title: 'Multi-Dimensional Analysis',
@@ -93,7 +93,7 @@ const CONTENT = {
           'Sentiment analysis by stakeholder group',
           'Term-over-term trend tracking',
         ],
-        image: `${BASE_PATH}/mockups/education/promo/png/03-score-card.png`,
+        image: `${BASE_PATH}/mockups/education/promo/png/overallscore_with_teacher.png`,
         reverse: true,
       },
       {
@@ -104,7 +104,7 @@ const CONTENT = {
           'Evidence-backed with stakeholder quotes',
           'Ready for next-term planning',
         ],
-        image: `${BASE_PATH}/mockups/education/promo/png/05-recommendations.png`,
+        image: `${BASE_PATH}/mockups/education/promo/png/recommendations_with_maleteacher.png`,
       },
     ],
   },
@@ -305,7 +305,7 @@ export default function EducationLanding() {
             {/* Hero Image */}
             <div className="relative">
               <Image
-                src={`${BASE_PATH}/mockups/education/promo/png/01-assessment-overview.png`}
+                src={`${BASE_PATH}/mockups/education/promo/png/dashboard_and_principle_beside.png`}
                 alt="FlowForge Assessment Overview"
                 width={600}
                 height={400}
