@@ -303,15 +303,14 @@ export default function EducationLanding() {
             </div>
 
             {/* Hero Image */}
-            <div className="relative flex justify-center">
+            <div className="relative">
               <Image
                 src={`${BASE_PATH}/mockups/education/promo/png/dashboard_and_principle_beside.png`}
                 alt="FlowForge Assessment Overview"
-                width={301}
-                height={407}
-                className="max-w-full h-auto rounded-2xl shadow-2xl"
+                width={591}
+                height={814}
+                className="w-full rounded-2xl shadow-2xl"
                 priority
-                unoptimized
               />
             </div>
           </div>
@@ -531,14 +530,13 @@ export default function EducationLanding() {
                     ))}
                   </div>
                 </div>
-                <div className={`${row.reverse ? 'lg:[direction:ltr]' : ''} flex justify-center`}>
+                <div className={row.reverse ? 'lg:[direction:ltr]' : ''}>
                   <Image
                     src={row.image}
                     alt={row.title}
-                    width={500}
-                    height={600}
-                    className="max-w-full h-auto rounded-2xl shadow-xl"
-                    unoptimized
+                    width={600}
+                    height={800}
+                    className="w-full rounded-2xl shadow-xl"
                   />
                 </div>
               </div>
