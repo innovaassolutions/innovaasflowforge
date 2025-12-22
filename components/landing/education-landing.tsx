@@ -20,6 +20,9 @@ import {
 } from 'lucide-react'
 import { useLandingAnalytics, submitLead } from '@/hooks/use-landing-analytics'
 
+// Base path for static assets
+const BASE_PATH = '/flowforge'
+
 // Static content - can be replaced with CMS content from Supabase
 const CONTENT = {
   hero: {
@@ -80,7 +83,7 @@ const CONTENT = {
           'Available 24/7 on any device',
           'Complete anonymity ensures candor',
         ],
-        image: '/mockups/education/promo/png/02-interview-insights.png',
+        image: `${BASE_PATH}/mockups/education/promo/png/02-interview-insights.png`,
       },
       {
         title: 'Multi-Dimensional Analysis',
@@ -90,7 +93,7 @@ const CONTENT = {
           'Sentiment analysis by stakeholder group',
           'Term-over-term trend tracking',
         ],
-        image: '/mockups/education/promo/png/03-score-card.png',
+        image: `${BASE_PATH}/mockups/education/promo/png/03-score-card.png`,
         reverse: true,
       },
       {
@@ -101,7 +104,7 @@ const CONTENT = {
           'Evidence-backed with stakeholder quotes',
           'Ready for next-term planning',
         ],
-        image: '/mockups/education/promo/png/05-recommendations.png',
+        image: `${BASE_PATH}/mockups/education/promo/png/05-recommendations.png`,
       },
     ],
   },
@@ -302,7 +305,7 @@ export default function EducationLanding() {
             {/* Hero Image */}
             <div className="relative">
               <Image
-                src="/mockups/education/promo/png/01-assessment-overview.png"
+                src={`${BASE_PATH}/mockups/education/promo/png/01-assessment-overview.png`}
                 alt="FlowForge Assessment Overview"
                 width={600}
                 height={400}
