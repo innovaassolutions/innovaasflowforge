@@ -93,7 +93,7 @@ const CONTENT = {
           'Sentiment analysis by stakeholder group',
           'Term-over-term trend tracking',
         ],
-        image: `${BASE_PATH}/mockups/education/promo/png/overallscore_with_teacher.png`,
+        image: `${BASE_PATH}/mockups/education/promo/png/overallscore_femaleteacher.png`,
         reverse: true,
       },
       {
