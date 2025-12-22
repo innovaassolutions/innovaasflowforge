@@ -12,6 +12,7 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { useIndustryPreference } from '@/hooks/use-industry-preference'
+import { useLandingAnalytics } from '@/hooks/use-landing-analytics'
 import { getIndustryContent, IndustryKey } from '@/lib/industry-content'
 import IndustrySelector from './industry-selector'
 import IndustryHeroMockup from './mockups/industry-hero-index'
@@ -23,6 +24,12 @@ import HeroBackground from './mockups/hero-background'
 export default function PromotionalLanding() {
   const { industry, setIndustry, isLoaded } = useIndustryPreference()
   const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
+
+  // Analytics tracking for CRM dashboard
+  useLandingAnalytics({
+    pageSlug: 'home',
+    pageTitle: 'FlowForge - AI-Powered Strategic Assessment Platform',
+  })
 
   // Get industry-specific content
   const content = getIndustryContent(industry)

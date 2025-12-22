@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createCRMClient } from '@/lib/supabase/crm-client'
 
-// Note: These tables are created by migration 20241221_landing_pages_cms.sql
-// Type assertions are used until the database types are regenerated
+// Note: Analytics and leads are stored in the CRM Supabase database
+// Tables required: analytics_sessions, analytics_page_views, analytics_events, leads
+// Run the migration 20241221_landing_pages_cms.sql on the CRM database
 
 interface AnalyticsConfig {
   pageSlug: string
@@ -98,7 +99,7 @@ function getUTMParams() {
 }
 
 export function useLandingAnalytics({ pageSlug, pageTitle }: AnalyticsConfig) {
-  const supabase = createClient()
+  const supabase = createCRMClient()
   const sessionIdRef = useRef<string>('')
   const pageViewIdRef = useRef<string | null>(null)
   const startTimeRef = useRef<number>(Date.now())
@@ -276,7 +277,7 @@ export function useLandingAnalytics({ pageSlug, pageTitle }: AnalyticsConfig) {
   }
 }
 
-// Lead submission helper
+// Lead submission helper - sends to CRM database
 export async function submitLead(data: {
   pageSlug: string
   email: string
@@ -288,7 +289,7 @@ export async function submitLead(data: {
   country?: string
   source?: string
 }) {
-  const supabase = createClient()
+  const supabase = createCRMClient()
   const sessionId = getSessionId()
   const utmParams = getUTMParams()
 
