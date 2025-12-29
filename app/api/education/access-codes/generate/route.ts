@@ -155,9 +155,10 @@ export async function POST(request: NextRequest) {
       created_by: user.id
     }))
 
+    // Note: Using type assertion as education_access_codes table types not yet generated
     const { data: insertedCodes, error: insertError } = await supabaseAdmin
-      .from('education_access_codes')
-      .insert(insertData)
+      .from('education_access_codes' as any)
+      .insert(insertData as any)
       .select('id, code, expires_at')
 
     if (insertError) {

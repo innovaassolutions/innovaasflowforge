@@ -144,8 +144,9 @@ export async function POST(request: NextRequest) {
     const code = `${codePrefix}-${codeSuffix}`
 
     // Create school using admin client (bypasses RLS for insert)
+    // Note: Using type assertion as schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
-      .from('schools')
+      .from('schools' as any)
       .insert({
         organization_id: profile.organization_id,
         name,

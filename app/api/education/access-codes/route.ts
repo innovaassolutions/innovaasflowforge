@@ -70,8 +70,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Build base query
+    // Note: Using type assertion as education tables not yet in generated types
     let query = supabaseAdmin
-      .from('education_access_codes')
+      .from('education_access_codes' as any)
       .select(`
         id,
         code,
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     // Get summary statistics
     let summaryQuery = supabaseAdmin
-      .from('education_access_codes')
+      .from('education_access_codes' as any)
       .select('id, status, code_type')
       .in('school_id', schoolIds)
 
@@ -230,7 +231,7 @@ export async function PATCH(request: NextRequest) {
 
     // Update codes
     const { data: updatedCodes, error: updateError } = await supabaseAdmin
-      .from('education_access_codes')
+      .from('education_access_codes' as any)
       .update({ status: 'revoked' })
       .in('id', code_ids)
       .in('school_id', schoolIds)

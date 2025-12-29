@@ -70,8 +70,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get token details for response
+    // Note: Using type assertion as education tables not yet in generated types
     const { data: tokenDetails } = await supabaseAdmin
-      .from('education_participant_tokens')
+      .from('education_participant_tokens' as any)
       .select(`
         token,
         participant_type,
