@@ -14,7 +14,8 @@ import {
   Shield,
   Building2,
   Globe,
-  AlertTriangle
+  AlertTriangle,
+  FileText
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -124,12 +125,20 @@ export default function SchoolsPage() {
               </p>
             </div>
           </div>
-          <Button asChild className="self-start">
-            <Link href="/dashboard/education/schools/new">
-              <Plus className="w-5 h-5 mr-2" />
-              Add School
-            </Link>
-          </Button>
+          <div className="flex gap-3 self-start">
+            <Button asChild variant="outline">
+              <Link href="/dashboard/education/campaigns/new">
+                <FileText className="w-5 h-5 mr-2" />
+                Create Campaign
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/dashboard/education/schools/new">
+                <Plus className="w-5 h-5 mr-2" />
+                Add School
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {error && (
