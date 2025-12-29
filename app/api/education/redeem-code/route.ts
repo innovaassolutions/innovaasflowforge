@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     // This ensures participants can only redeem codes on their school's portal
     if (school_code) {
       const normalizedSchoolCode = school_code.trim().toUpperCase()
+      // @ts-ignore - schools join not in generated types
       const accessCodeSchool = accessCode.schools as { code: string; name: string } | null
 
       if (!accessCodeSchool) {
