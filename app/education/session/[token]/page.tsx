@@ -1,0 +1,483 @@
+'use client'
+
+import { useState, useEffect, useRef, use } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { apiUrl } from '@/lib/api-url'
+import {
+  MessageCircle,
+  Send,
+  Loader2,
+  CheckCircle,
+  ArrowLeft,
+  Shield,
+  AlertTriangle,
+  RefreshCw,
+  Info
+} from 'lucide-react'
+
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp?: string
+}
+
+interface SessionData {
+  id: string
+  module: string
+  participant_type: string
+  cohort_metadata: Record<string, string>
+  school_name: string
+  campaign_name: string
+}
+
+interface ConversationState {
+  phase?: string
+  questions_asked?: number
+  topics_covered?: string[]
+  is_complete?: boolean
+}
+
+const PARTICIPANT_LABELS: Record<string, string> = {
+  student: 'Student Voice',
+  teacher: 'Teacher Insights',
+  parent: 'Parent Perspective',
+  leadership: 'Leadership View'
+}
+
+const MODULE_LABELS: Record<string, string> = {
+  student_wellbeing: 'Student Wellbeing',
+  teaching_learning: 'Teaching & Learning',
+  parent_confidence: 'Parent Confidence',
+  leadership_strategy: 'Strategic Leadership'
+}
+
+/**
+ * Education Session Chat Interface
+ * Pseudonymous participant view for AI-guided interviews
+ * This is a PUBLIC page - token is the authentication
+ */
+export default function EducationSessionPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = use(params)
+  const router = useRouter()
+
+  const [session, setSession] = useState<SessionData | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [conversationState, setConversationState] = useState<ConversationState | null>(null)
+  const [isComplete, setIsComplete] = useState(false)
+  const [isResuming, setIsResuming] = useState(false)
+  const [availableModules, setAvailableModules] = useState<string[]>([])
+  const [completedModules, setCompletedModules] = useState<string[]>([])
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    loadSession()
+  }, [token])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  async function loadSession() {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch(apiUrl(`api/education/session/${token}`))
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'Unable to access session')
+        return
+      }
+
+      if (data.status === 'module_completed') {
+        setIsComplete(true)
+        setCompletedModules(data.completed_modules || [])
+        setAvailableModules(data.available_modules || [])
+        return
+      }
+
+      setSession(data.session)
+      setAvailableModules(data.available_modules || [])
+      setCompletedModules(data.completed_modules || [])
+
+      // Handle conversation state
+      if (data.conversationHistory && data.conversationHistory.length > 0) {
+        setMessages(data.conversationHistory.map((m: { role: string; content: string; created_at?: string }) => ({
+          role: m.role,
+          content: m.content,
+          timestamp: m.created_at
+        })))
+        setIsResuming(true)
+      } else if (data.greeting) {
+        // New session with greeting
+        setMessages([{
+          role: 'assistant',
+          content: data.greeting,
+          timestamp: new Date().toISOString()
+        }])
+      }
+
+      setConversationState(data.conversationState)
+
+    } catch (err) {
+      console.error('Session load error:', err)
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function sendMessage(e: React.FormEvent) {
+    e.preventDefault()
+    if (!inputMessage.trim() || sending || !session) return
+
+    const message = inputMessage.trim()
+    setInputMessage('')
+
+    // Add user message optimistically
+    const userMessage: Message = {
+      role: 'user',
+      content: message,
+      timestamp: new Date().toISOString()
+    }
+    setMessages(prev => [...prev, userMessage])
+
+    try {
+      setSending(true)
+
+      const response = await fetch(apiUrl(`api/education/session/${token}/messages`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          module: session.module
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Add assistant response
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: data.response,
+          timestamp: new Date().toISOString()
+        }
+        setMessages(prev => [...prev, assistantMessage])
+        setConversationState(data.conversationState)
+
+        // Check if complete
+        if (data.isComplete) {
+          setIsComplete(true)
+        }
+      } else {
+        setError(data.error || 'Failed to send message')
+        // Remove optimistic message on error
+        setMessages(prev => prev.slice(0, -1))
+      }
+    } catch (err) {
+      console.error('Send message error:', err)
+      setError('Failed to send message. Please try again.')
+      // Remove optimistic message on error
+      setMessages(prev => prev.slice(0, -1))
+    } finally {
+      setSending(false)
+      inputRef.current?.focus()
+    }
+  }
+
+  function scrollToBottom() {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function calculateProgress(): number {
+    const questions = conversationState?.questions_asked || 0
+    return Math.min(Math.round((questions / 15) * 100), 100)
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-brand-teal/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="w-8 h-8 text-brand-teal animate-spin" />
+          </div>
+          <p className="text-muted-foreground">Loading your session...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error && !session) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-2xl p-8 max-w-md text-center">
+          <div className="w-16 h-16 bg-destructive/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">{error}</h2>
+          <p className="text-muted-foreground mb-6">
+            Please check your access link or contact your school administrator.
+          </p>
+          <button
+            onClick={() => router.push('/education/session')}
+            className="inline-flex items-center gap-2 text-brand-teal hover:underline"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Try a different code
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Module completed (before current session loaded)
+  if (isComplete && !session) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card border border-border rounded-2xl p-8 max-w-md text-center">
+          <div className="w-16 h-16 bg-success-subtle rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-[hsl(var(--success))]" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Assessment Complete!</h2>
+          <p className="text-muted-foreground mb-6">
+            Thank you for your participation. Your responses have been recorded.
+          </p>
+          {availableModules.length > completedModules.length && (
+            <p className="text-sm text-muted-foreground">
+              You have {availableModules.length - completedModules.length} more module(s) available.
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) return null
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="border-b border-border bg-card flex-shrink-0">
+        <div className="max-w-4xl mx-auto px-4 py-4
+                        sm:px-6
+                        lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Image
+                src="https://www.innovaas.co/flowforge/icon-orb.svg"
+                alt="FlowForge"
+                width={32}
+                height={32}
+                className="w-8 h-8"
+                unoptimized
+              />
+              <div>
+                <h1 className="text-lg font-bold text-foreground">{session.campaign_name}</h1>
+                <p className="text-xs text-muted-foreground">{session.school_name}</p>
+              </div>
+            </div>
+
+            {/* Progress Indicator */}
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:block text-right">
+                <p className="text-xs text-muted-foreground">
+                  {PARTICIPANT_LABELS[session.participant_type] || 'Assessment'}
+                </p>
+                <p className="text-sm font-medium text-brand-teal">
+                  {calculateProgress()}% complete
+                </p>
+              </div>
+              <div className="w-12 h-12 relative">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    className="text-muted"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    className="text-brand-teal"
+                    strokeWidth="3"
+                    strokeDasharray={`${calculateProgress()}, 100`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-foreground">
+                  {conversationState?.questions_asked || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Resume Notice */}
+      {isResuming && messages.length > 0 && !isComplete && (
+        <div className="bg-brand-teal/10 border-b border-brand-teal/30">
+          <div className="max-w-4xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center gap-2 text-sm text-brand-teal">
+              <RefreshCw className="w-4 h-4" />
+              <span>Your conversation has been restored. Continue where you left off.</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-4 py-6 space-y-4
+                        sm:px-6
+                        lg:px-8">
+          {/* Privacy Reminder */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success-subtle text-sm text-[hsl(var(--success))]">
+              <Shield className="w-4 h-4" />
+              <span>Your responses are anonymous and confidential</span>
+            </div>
+          </div>
+
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[85%] rounded-2xl px-5 py-4 ${
+                  message.role === 'user'
+                    ? 'bg-brand-teal text-white rounded-br-md'
+                    : 'bg-card border border-border rounded-bl-md'
+                }`}
+              >
+                {message.role === 'assistant' && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageCircle className="w-4 h-4 text-brand-teal" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Assessment Guide
+                    </span>
+                  </div>
+                )}
+                <div className="prose prose-sm max-w-none whitespace-pre-wrap text-inherit">
+                  {message.content}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Typing indicator */}
+          {sending && (
+            <div className="flex justify-start">
+              <div className="bg-card border border-border rounded-2xl rounded-bl-md px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-brand-teal" />
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-brand-teal rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-brand-teal rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-brand-teal rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="border-t border-destructive/30 bg-destructive/10">
+          <div className="max-w-4xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <AlertTriangle className="w-4 h-4" />
+                <span>{error}</span>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="text-xs text-destructive/70 hover:text-destructive underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Input Area */}
+      <div className="flex-shrink-0 border-t border-border bg-card">
+        <div className="max-w-4xl mx-auto px-4 py-4
+                        sm:px-6
+                        lg:px-8">
+          {isComplete ? (
+            <div className="bg-success-subtle border border-[hsl(var(--success))]/30 rounded-2xl p-6 text-center">
+              <CheckCircle className="w-12 h-12 text-[hsl(var(--success))] mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-foreground mb-2">Assessment Complete!</h3>
+              <p className="text-muted-foreground">
+                Thank you for sharing your valuable insights. Your responses have been recorded
+                and will contribute to improving school outcomes.
+              </p>
+              <p className="text-sm text-muted-foreground mt-4">
+                You may now close this window.
+              </p>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={sendMessage} className="flex gap-3">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  disabled={sending}
+                  placeholder="Type your response..."
+                  className="flex-1 bg-background border border-border rounded-xl px-4 py-3 text-foreground
+                             placeholder:text-muted-foreground
+                             focus:outline-none focus:ring-2 focus:ring-brand-teal/50 focus:border-brand-teal
+                             disabled:opacity-50 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputMessage.trim() || sending}
+                  className="bg-brand-teal hover:bg-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed
+                             text-white font-semibold px-6 py-3 rounded-xl
+                             flex items-center gap-2 transition-colors"
+                >
+                  {sending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </button>
+              </form>
+
+              <div className="flex items-center justify-between mt-3">
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Info className="w-3 h-3" />
+                  Share openly - your identity is protected
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {MODULE_LABELS[session.module] || session.module}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -13,7 +13,8 @@ import {
   ChevronDown,
   X,
   Shield,
-  UserCog
+  UserCog,
+  GraduationCap
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -22,6 +23,15 @@ interface UserProfile {
   email: string
   role: string
   user_type: 'consultant' | 'company' | 'admin' | null
+  permissions?: {
+    education?: {
+      view_schools?: boolean
+      manage_schools?: boolean
+      view_safeguarding_alerts?: boolean
+    }
+  }
+  // Verticals this user has access to
+  verticals?: ('industry' | 'education')[]
 }
 
 interface DashboardSidebarProps {
@@ -50,19 +60,29 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   }, [showUserMenu])
 
-  const navItems = [
+  // Check if user has access to specific verticals
+  // Admin users see everything; otherwise check verticals array
+  // If no verticals set, default to showing industry (legacy behavior)
+  const hasIndustryAccess = userProfile?.user_type === 'admin' ||
+    userProfile?.verticals?.includes('industry') ||
+    (!userProfile?.verticals || userProfile?.verticals.length === 0)
+
+  const hasEducationAccess = userProfile?.user_type === 'admin' ||
+    userProfile?.verticals?.includes('education') ||
+    userProfile?.permissions?.education?.view_schools
+
+  // Base nav items everyone sees
+  const baseNavItems = [
     {
       name: 'Home',
       href: '/dashboard',
       icon: Home,
       matchPaths: ['/dashboard']
-    },
-    {
-      name: 'Dashboard',
-      href: '/dashboard',
-      icon: LayoutDashboard,
-      matchPaths: ['/dashboard']
-    },
+    }
+  ]
+
+  // Industry vertical items
+  const industryNavItems = hasIndustryAccess ? [
     {
       name: 'Companies',
       href: '/dashboard/companies',
@@ -75,7 +95,19 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
       icon: BarChart3,
       matchPaths: ['/dashboard/campaigns']
     }
-  ]
+  ] : []
+
+  // Education vertical items
+  const educationNavItems = hasEducationAccess ? [
+    {
+      name: 'Education',
+      href: '/dashboard/education/schools',
+      icon: GraduationCap,
+      matchPaths: ['/dashboard/education']
+    }
+  ] : []
+
+  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [

@@ -14,6 +14,14 @@ interface UserProfile {
   email: string
   role: string
   user_type: 'consultant' | 'company' | 'admin' | null
+  permissions?: {
+    education?: {
+      view_schools?: boolean
+      manage_schools?: boolean
+      view_safeguarding_alerts?: boolean
+    }
+  }
+  verticals?: ('industry' | 'education')[]
 }
 
 export default function DashboardLayout({
@@ -47,10 +55,10 @@ export default function DashboardLayout({
       return
     }
 
-    // Fetch user profile
+    // Fetch user profile including permissions and verticals
     const { data: profile } = await client
       .from('user_profiles')
-      .select('full_name, email, role, user_type')
+      .select('full_name, email, role, user_type, permissions, verticals')
       .eq('id', user.id)
       .single()
 
