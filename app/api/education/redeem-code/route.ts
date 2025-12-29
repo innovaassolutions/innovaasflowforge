@@ -9,23 +9,60 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { code, campaign_id } = body
+    const { code } = body
 
-    if (!code || !campaign_id) {
+    if (!code) {
       return NextResponse.json(
-        { error: 'Code and campaign_id are required' },
+        { error: 'Access code is required' },
         { status: 400 }
       )
     }
 
-    // Normalize code (uppercase, trim)
-    const normalizedCode = code.trim().toUpperCase()
+    // Normalize code (uppercase, trim, remove dashes/spaces)
+    const normalizedCode = code.trim().toUpperCase().replace(/[-\s]/g, '')
+
+    // First, look up the access code to get its campaign_id
+    // @ts-ignore - education_access_codes table not yet in generated types
+    const { data: accessCode, error: lookupError } = await supabaseAdmin
+      .from('education_access_codes')
+      .select('id, campaign_id, status, expires_at')
+      .eq('code', normalizedCode)
+      .single()
+
+    if (lookupError || !accessCode) {
+      return NextResponse.json(
+        { error: 'Invalid access code. Please check and try again.' },
+        { status: 404 }
+      )
+    }
+
+    // Check if code is still valid
+    if (accessCode.status === 'redeemed') {
+      return NextResponse.json(
+        { error: 'This access code has already been used.' },
+        { status: 409 }
+      )
+    }
+
+    if (accessCode.status === 'revoked') {
+      return NextResponse.json(
+        { error: 'This access code has been revoked. Please contact your school administrator.' },
+        { status: 410 }
+      )
+    }
+
+    if (accessCode.status === 'expired' || (accessCode.expires_at && new Date(accessCode.expires_at) < new Date())) {
+      return NextResponse.json(
+        { error: 'This access code has expired. Please contact your school administrator.' },
+        { status: 410 }
+      )
+    }
 
     // Call the database function to redeem the code
     // @ts-ignore - redeem_access_code function not yet in generated types
     const { data, error } = await supabaseAdmin.rpc('redeem_access_code', {
       input_code: normalizedCode,
-      input_campaign_id: campaign_id
+      input_campaign_id: accessCode.campaign_id
     })
 
     if (error) {

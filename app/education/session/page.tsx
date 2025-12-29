@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { apiUrl } from '@/lib/api-url'
 import {
@@ -37,8 +37,6 @@ function EducationSessionLoading() {
 
 function EducationSessionContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const campaignId = searchParams.get('campaign')
 
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -65,11 +63,6 @@ function EducationSessionContent() {
       return
     }
 
-    if (!campaignId) {
-      setError('Missing campaign information. Please use the link provided by your school.')
-      return
-    }
-
     try {
       setLoading(true)
       setError(null)
@@ -78,8 +71,7 @@ function EducationSessionContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: code.trim(),
-          campaign_id: campaignId
+          code: code.trim()
         })
       })
 
