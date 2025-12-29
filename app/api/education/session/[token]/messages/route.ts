@@ -86,6 +86,7 @@ export async function POST(
     }
 
     // Find active agent session
+    // Note: Using .contains() for JSONB field filtering (Supabase JS doesn't support ->> syntax)
     const targetModule = module || 'student_wellbeing'
     const { data: agentSessionData, error: sessionError } = await supabaseAdmin
       .from('agent_sessions')
@@ -95,7 +96,7 @@ export async function POST(
         conversation_state
       `)
       .eq('participant_token_id', participantToken.id)
-      .eq('education_session_context->>module', targetModule)
+      .contains('education_session_context', { module: targetModule })
       .single()
 
     // Type assertion for agent session
