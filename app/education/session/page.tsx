@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { apiUrl } from '@/lib/api-url'
 import {
@@ -37,6 +37,10 @@ function EducationSessionLoading() {
 
 function EducationSessionContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Get school code from URL (e.g., /education/session?school=SAIS)
+  const schoolCode = searchParams.get('school')
 
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -71,7 +75,8 @@ function EducationSessionContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: code.trim()
+          code: code.trim(),
+          school_code: schoolCode || undefined
         })
       })
 
@@ -129,6 +134,14 @@ function EducationSessionContent() {
               <p className="text-white/80 mt-2 text-sm">
                 Use the code provided by your school to begin
               </p>
+              {schoolCode && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full">
+                  <Shield className="w-4 h-4 text-white" />
+                  <span className="text-white text-sm font-medium">
+                    {schoolCode} Portal
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Form Section */}

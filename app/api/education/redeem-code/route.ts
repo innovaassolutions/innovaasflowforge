@@ -9,7 +9,7 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { code } = body
+    const { code, school_code } = body
 
     if (!code) {
       return NextResponse.json(
@@ -21,11 +21,18 @@ export async function POST(request: NextRequest) {
     // Normalize code (uppercase, trim, remove dashes/spaces)
     const normalizedCode = code.trim().toUpperCase().replace(/[-\s]/g, '')
 
-    // First, look up the access code to get its campaign_id
+    // First, look up the access code to get its campaign_id and school_id
     // @ts-ignore - education_access_codes table not yet in generated types
     const { data: accessCode, error: lookupError } = await supabaseAdmin
       .from('education_access_codes')
-      .select('id, campaign_id, status, expires_at')
+      .select(`
+        id,
+        campaign_id,
+        school_id,
+        status,
+        expires_at,
+        schools:school_id(code, name)
+      `)
       .eq('code', normalizedCode)
       .single()
 
@@ -34,6 +41,27 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid access code. Please check and try again.' },
         { status: 404 }
       )
+    }
+
+    // Validate school code if provided
+    // This ensures participants can only redeem codes on their school's portal
+    if (school_code) {
+      const normalizedSchoolCode = school_code.trim().toUpperCase()
+      const accessCodeSchool = accessCode.schools as { code: string; name: string } | null
+
+      if (!accessCodeSchool) {
+        return NextResponse.json(
+          { error: 'This access code is not associated with a school.' },
+          { status: 400 }
+        )
+      }
+
+      if (accessCodeSchool.code.toUpperCase() !== normalizedSchoolCode) {
+        return NextResponse.json(
+          { error: 'This access code is not valid for this school portal.' },
+          { status: 403 }
+        )
+      }
     }
 
     // Check if code is still valid
