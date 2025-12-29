@@ -131,7 +131,9 @@ export async function POST(
     const participant = {
       token: participantToken.token,
       participant_type: participantToken.participant_type as 'student' | 'teacher' | 'parent' | 'leadership',
-      cohort_metadata: participantToken.cohort_metadata as Record<string, string>
+      cohort_metadata: participantToken.cohort_metadata as Record<string, string>,
+      campaign_id: participantToken.campaign_id,
+      school_id: participantToken.school_id
     }
 
     const campaignData = {
