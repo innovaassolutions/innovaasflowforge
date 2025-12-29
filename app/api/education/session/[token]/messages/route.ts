@@ -267,8 +267,21 @@ export async function POST(
 
   } catch (error) {
     console.error('Message processing error:', error)
+
+    // Provide more specific error info for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const isAnthropicError = errorMessage.includes('401') ||
+                            errorMessage.includes('credit') ||
+                            errorMessage.includes('api_key') ||
+                            errorMessage.includes('authentication')
+
     return NextResponse.json(
-      { error: 'Failed to process message' },
+      {
+        error: isAnthropicError
+          ? 'AI service configuration error. Please contact support.'
+          : 'Failed to process message',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
