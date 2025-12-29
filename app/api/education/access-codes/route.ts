@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
     const campaign_id = searchParams.get('campaign_id')
     const status = searchParams.get('status')
     const participant_type = searchParams.get('participant_type')
-    const batch_id = searchParams.get('batch_id')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = (page - 1) * limit
@@ -76,13 +75,11 @@ export async function GET(request: NextRequest) {
       .select(`
         id,
         code,
-        code_type,
+        participant_type,
         cohort_metadata,
         status,
-        used_at,
+        redeemed_at,
         expires_at,
-        batch_id,
-        batch_name,
         created_at,
         school_id,
         campaign_id,
@@ -103,10 +100,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status)
     }
     if (participant_type) {
-      query = query.eq('code_type', participant_type)
-    }
-    if (batch_id) {
-      query = query.eq('batch_id', batch_id)
+      query = query.eq('participant_type', participant_type)
     }
 
     // Apply pagination
@@ -126,7 +120,7 @@ export async function GET(request: NextRequest) {
     // @ts-ignore - education_access_codes table not yet in generated types
     let summaryQuery = supabaseAdmin
       .from('education_access_codes')
-      .select('id, status, code_type')
+      .select('id, status, participant_type')
       .in('school_id', schoolIds)
 
     if (school_id) {
@@ -139,7 +133,7 @@ export async function GET(request: NextRequest) {
     const { data: summaryData } = await summaryQuery
 
     // Type assertion for summary data
-    const typedSummaryData = summaryData as Array<{ id: string; status: string; code_type: string }> | null
+    const typedSummaryData = summaryData as Array<{ id: string; status: string; participant_type: string }> | null
 
     const summary = {
       total: typedSummaryData?.length || 0,
@@ -149,7 +143,7 @@ export async function GET(request: NextRequest) {
 
     typedSummaryData?.forEach(code => {
       summary.by_status[code.status] = (summary.by_status[code.status] || 0) + 1
-      summary.by_type[code.code_type] = (summary.by_type[code.code_type] || 0) + 1
+      summary.by_type[code.participant_type] = (summary.by_type[code.participant_type] || 0) + 1
     })
 
     return NextResponse.json({
