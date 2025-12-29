@@ -121,7 +121,7 @@ export async function GET(
     }
 
     // Find or create agent session for this participant + module
-    const { data: existingSession } = await supabaseAdmin
+    const { data: existingSessionData } = await supabaseAdmin
       .from('agent_sessions')
       .select(`
         id,
@@ -133,7 +133,15 @@ export async function GET(
       .eq('education_session_context->>module', module)
       .single()
 
-    let agentSession = existingSession
+    // Type assertion for existing session
+    type AgentSessionType = {
+      id: string
+      education_session_context: Record<string, unknown>
+      conversation_state: Record<string, unknown>
+      conversation_history: Array<{ role: string; content: string; created_at: string }>
+    } | null
+
+    let agentSession: AgentSessionType = existingSessionData as AgentSessionType
     let isResuming = false
     let greeting: string | null = null
 
@@ -183,13 +191,13 @@ export async function GET(
       }
 
       // Fetch the created session
-      const { data: newSession } = await supabaseAdmin
+      const { data: newSessionData } = await supabaseAdmin
         .from('agent_sessions')
         .select('id, education_session_context, conversation_state, conversation_history')
         .eq('id', newSessionId)
         .single()
 
-      agentSession = newSession
+      agentSession = newSessionData as AgentSessionType
 
       // Save greeting as first assistant message
       if (greeting && agentSession) {

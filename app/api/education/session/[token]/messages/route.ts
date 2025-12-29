@@ -85,7 +85,7 @@ export async function POST(
 
     // Find active agent session
     const targetModule = module || 'student_wellbeing'
-    const { data: agentSession, error: sessionError } = await supabaseAdmin
+    const { data: agentSessionData, error: sessionError } = await supabaseAdmin
       .from('agent_sessions')
       .select(`
         id,
@@ -95,6 +95,13 @@ export async function POST(
       .eq('participant_token_id', participantToken.id)
       .eq('education_session_context->>module', targetModule)
       .single()
+
+    // Type assertion for agent session
+    const agentSession = agentSessionData as {
+      id: string
+      education_session_context: Record<string, unknown>
+      conversation_state: Record<string, unknown>
+    } | null
 
     if (sessionError || !agentSession) {
       return NextResponse.json(
