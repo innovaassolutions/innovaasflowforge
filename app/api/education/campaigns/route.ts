@@ -88,6 +88,8 @@ export async function GET() {
  * Create a new education campaign
  */
 export async function POST(request: NextRequest) {
+  console.log('🚀 POST /api/education/campaigns - Request received')
+
   try {
     const supabase = await createClient()
 
@@ -101,11 +103,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's organization, permissions, and profile info for facilitator fields
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select('organization_id, role, permissions, full_name, email')
+      .select('organization_id, role, permissions, full_name, email, user_type')
       .eq('id', user.id)
       .single()
+
+    console.log('📋 Profile lookup:', {
+      userId: user.id,
+      userEmail: user.email,
+      profile,
+      profileError,
+      hasOrgId: !!profile?.organization_id
+    })
+
+    if (profileError) {
+      console.error('❌ Profile query error:', profileError)
+      return NextResponse.json(
+        { error: 'Failed to fetch user profile', details: profileError.message },
+        { status: 500 }
+      )
+    }
 
     if (!profile?.organization_id) {
       return NextResponse.json(
@@ -114,15 +132,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user email from auth if not in profile
-    const facilitatorEmail = profile.email || user.email || ''
+    // Get user email from auth if not in profile - ensure non-empty values
+    const facilitatorEmail = profile.email || user.email || 'education@innovaas.co'
     const facilitatorName = profile.full_name || user.email?.split('@')[0] || 'Education Facilitator'
 
-    // Check permission (owners, admins, or users with manage_campaigns permission)
+    console.log('👤 Facilitator info:', { facilitatorEmail, facilitatorName })
+
+    // Check permission - platform admins, org owners/admins, or users with manage_campaigns permission
+    const isPlatformAdmin = profile.user_type === 'admin'
     const canManageCampaigns =
+      isPlatformAdmin ||
       profile.role === 'owner' ||
       profile.role === 'admin' ||
       (profile.permissions as Record<string, Record<string, boolean>>)?.education?.manage_campaigns
+
+    console.log('🔐 Permission check:', {
+      isPlatformAdmin,
+      role: profile.role,
+      userType: profile.user_type,
+      canManageCampaigns
+    })
 
     if (!canManageCampaigns) {
       return NextResponse.json(
@@ -207,6 +236,10 @@ export async function POST(request: NextRequest) {
       campaign_type,
       school_id,
       school_name: (school as { name: string }).name,
+      organization_id: profile.organization_id,
+      facilitator_name: facilitatorName,
+      facilitator_email: facilitatorEmail,
+      created_by: user.id,
       hasEducationConfig: !!finalEducationConfig,
       modules: finalEducationConfig.modules,
       hasCohorts: !!finalEducationConfig.cohorts
@@ -262,9 +295,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ campaign }, { status: 201 })
 
   } catch (error) {
-    console.error('Campaign creation error:', error)
+    console.error('❌ Campaign creation catch error:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
