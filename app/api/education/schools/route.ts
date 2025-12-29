@@ -147,6 +147,7 @@ export async function POST(request: NextRequest) {
     // @ts-ignore - schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
       .from('schools')
+      // @ts-ignore - schools table not yet in generated types
       .insert({
         organization_id: profile.organization_id,
         name,

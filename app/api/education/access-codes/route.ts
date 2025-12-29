@@ -237,6 +237,7 @@ export async function PATCH(request: NextRequest) {
     // @ts-ignore - education_access_codes table not yet in generated types
     const { data: updatedCodes, error: updateError } = await supabaseAdmin
       .from('education_access_codes')
+      // @ts-ignore - education_access_codes table not yet in generated types
       .update({ status: 'revoked' })
       .in('id', code_ids)
       .in('school_id', schoolIds)
