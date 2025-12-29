@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import {
   processEducationMessage,
-  detectSafeguardingConcerns
+  detectSafeguardingConcerns,
+  EducationCampaign
 } from '@/lib/agents/education-interview-agent'
 
 /**
@@ -144,7 +145,7 @@ export async function POST(
         name: school.name,
         country: 'Unknown' // Default value - not available in this context
       },
-      education_config: campaign.education_config
+      education_config: campaign.education_config as EducationCampaign['education_config']
     }
 
     // Process message through education agent
