@@ -105,13 +105,13 @@ export async function GET(
 
     // Find or create agent session for this participant + module
     // Note: Using .contains() for JSONB field filtering (Supabase JS doesn't support ->> syntax)
+    // Note: conversation_history is NOT a column - messages are in agent_messages table
     const { data: existingSessionData } = await supabaseAdmin
       .from('agent_sessions')
       .select(`
         id,
         education_session_context,
-        conversation_state,
-        conversation_history
+        conversation_state
       `)
       .eq('participant_token_id', participantToken.id)
       .contains('education_session_context', { module })
@@ -180,7 +180,7 @@ export async function GET(
       // Fetch the created session
       const { data: newSessionData } = await supabaseAdmin
         .from('agent_sessions')
-        .select('id, education_session_context, conversation_state, conversation_history')
+        .select('id, education_session_context, conversation_state')
         .eq('id', newSessionId)
         .single()
 
