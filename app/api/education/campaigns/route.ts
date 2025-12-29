@@ -100,10 +100,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user's organization and permissions
+    // Get user's organization, permissions, and profile info for facilitator fields
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('organization_id, role, permissions')
+      .select('organization_id, role, permissions, full_name, email')
       .eq('id', user.id)
       .single()
 
@@ -113,6 +113,10 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       )
     }
+
+    // Get user email from auth if not in profile
+    const facilitatorEmail = profile.email || user.email || ''
+    const facilitatorName = profile.full_name || user.email?.split('@')[0] || 'Education Facilitator'
 
     // Check permission (owners, admins, or users with manage_campaigns permission)
     const canManageCampaigns =
@@ -214,7 +218,10 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         campaign_type,
+        organization_id: profile.organization_id, // Required field
         company_name: (school as { name: string }).name, // Legacy field for compatibility
+        facilitator_name: facilitatorName, // Required field
+        facilitator_email: facilitatorEmail, // Required field
         school_id,
         description,
         education_config: finalEducationConfig,
