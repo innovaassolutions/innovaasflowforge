@@ -1,28 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import { generateEducationGreeting } from '@/lib/agents/education-interview-agent'
-
-interface EducationParticipant {
-  token: string
-  participant_type: 'student' | 'teacher' | 'parent' | 'leadership'
-  cohort_metadata: {
-    year_band?: string
-    division?: string
-    role_category?: string
-    relationship_type?: string
-  }
-}
-
-interface EducationCampaign {
-  id: string
-  name: string
-  school_name: string
-  education_config: {
-    modules: string[]
-    pilot_duration_days: number
-    anonymity_level: string
-  }
-}
+import {
+  generateEducationGreeting,
+  EducationParticipant,
+  EducationCampaign,
+  EducationModule
+} from '@/lib/agents/education-interview-agent'
 
 /**
  * GET /api/education/session/[token]
@@ -151,7 +134,9 @@ export async function GET(
       const participant: EducationParticipant = {
         token: participantToken.token,
         participant_type: participantToken.participant_type as 'student' | 'teacher' | 'parent' | 'leadership',
-        cohort_metadata: participantToken.cohort_metadata as EducationParticipant['cohort_metadata']
+        cohort_metadata: participantToken.cohort_metadata as EducationParticipant['cohort_metadata'],
+        campaign_id: participantToken.campaign_id,
+        school_id: participantToken.school_id
       }
 
       const campaignData: EducationCampaign = {
@@ -169,22 +154,19 @@ export async function GET(
       greeting = await generateEducationGreeting(
         participant,
         campaignData,
-        module
+        module as EducationModule
       )
 
       // Create new agent session using database function
       // @ts-ignore - create_education_agent_session function not yet in generated types
-      const { data: newSessionId, error: createError } = await supabaseAdmin.rpc(
-        'create_education_agent_session',
-        {
-          input_participant_token_id: participantToken.id,
-          input_agent_type: 'education_interview',
-          input_module: module,
-          input_participant_type: participantToken.participant_type,
-          input_cohort_metadata: participantToken.cohort_metadata,
-          input_system_prompt: `Education interview agent for ${module}`
-        }
-      )
+      const { data: newSessionId, error: createError } = await supabaseAdmin.rpc('create_education_agent_session', {
+        input_participant_token_id: participantToken.id,
+        input_agent_type: 'education_interview',
+        input_module: module,
+        input_participant_type: participantToken.participant_type,
+        input_cohort_metadata: participantToken.cohort_metadata,
+        input_system_prompt: `Education interview agent for ${module}`
+      })
 
       if (createError) {
         console.error('Session creation error:', createError)
@@ -207,6 +189,7 @@ export async function GET(
       if (greeting && agentSession) {
         await supabaseAdmin
           .from('agent_messages')
+          // @ts-ignore - agent_messages table types may not include all columns
           .insert({
             agent_session_id: agentSession.id,
             role: 'assistant',

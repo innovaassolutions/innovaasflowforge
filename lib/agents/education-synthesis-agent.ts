@@ -365,7 +365,7 @@ export async function generateEducationSynthesis(
   model: 'claude-sonnet-4-5-20250929' | 'claude-opus-4-20250514' = 'claude-sonnet-4-5-20250929'
 ): Promise<EducationSynthesisResult> {
   // Fetch all completed sessions for this campaign/module
-  const { data: sessions, error: sessionsError } = await supabaseAdmin
+  const { data: sessionsData, error: sessionsError } = await supabaseAdmin
     .from('agent_sessions')
     .select(`
       id,
@@ -379,6 +379,16 @@ export async function generateEducationSynthesis(
     .not('participant_token_id', 'is', null)
     .order('created_at', { ascending: true })
 
+  // Type assertion for sessions
+  const sessions = sessionsData as Array<{
+    id: string
+    participant_token_id: string
+    education_session_context: Record<string, unknown>
+    conversation_state: Record<string, unknown>
+    created_at: string
+    updated_at: string
+  }> | null
+
   if (sessionsError) {
     console.error('Error fetching sessions:', sessionsError)
     throw new Error('Failed to fetch education sessions')
@@ -391,11 +401,18 @@ export async function generateEducationSynthesis(
   // Fetch messages for each session
   const transcripts: EducationTranscript[] = await Promise.all(
     sessions.map(async (session) => {
-      const { data: messages } = await supabaseAdmin
+      const { data: messagesData } = await supabaseAdmin
         .from('agent_messages')
         .select('role, content, created_at')
         .eq('agent_session_id', session.id)
         .order('created_at', { ascending: true })
+
+      // Type assertion for messages
+      const messages = messagesData as Array<{
+        role: string
+        content: string
+        created_at: string
+      }> | null
 
       const context = session.education_session_context as EducationSession['education_session_context']
 
@@ -568,8 +585,10 @@ export async function saveSynthesisResult(
   result: EducationSynthesisResult,
   sourceTokenIds: string[]
 ): Promise<string> {
+  // @ts-ignore - synthesis table not yet in generated types
   const { data, error } = await supabaseAdmin
     .from('synthesis')
+    // @ts-ignore - synthesis table not yet in generated types
     .insert({
       campaign_id: result.campaign_id,
       synthesis_type: 'education_module',
@@ -590,5 +609,5 @@ export async function saveSynthesisResult(
     throw new Error('Failed to save synthesis result')
   }
 
-  return data.id
+  return (data as { id: string }).id
 }

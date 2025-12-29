@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { apiUrl } from '@/lib/api-url'
@@ -20,6 +20,22 @@ import {
  * This is a PUBLIC page - no authentication required
  */
 export default function EducationSessionEntryPage() {
+  return (
+    <Suspense fallback={<EducationSessionLoading />}>
+      <EducationSessionContent />
+    </Suspense>
+  )
+}
+
+function EducationSessionLoading() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-brand-teal" />
+    </div>
+  )
+}
+
+function EducationSessionContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const campaignId = searchParams.get('campaign')

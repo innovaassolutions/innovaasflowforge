@@ -3,7 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import {
   processEducationMessage,
   detectSafeguardingConcerns,
-  EducationCampaign
+  EducationCampaign,
+  ConversationState
 } from '@/lib/agents/education-interview-agent'
 
 /**
@@ -166,16 +167,20 @@ export async function POST(
         content: m.content,
         timestamp: m.created_at
       })),
-      (agentSession.education_session_context as Record<string, unknown>)?.progress as Record<string, unknown> || {
-        phase: 'introduction',
-        topics_covered: [],
-        questions_asked: 0
-      }
+      (agentSession.education_session_context as Record<string, unknown>)?.progress as ConversationState || {
+        phase: 'opening',
+        sections_completed: [],
+        questions_asked: 0,
+        rapport_established: false,
+        anonymity_confirmed: false,
+        safeguarding_flags: []
+      } as ConversationState
     )
 
     // Save user message
     await supabaseAdmin
       .from('agent_messages')
+      // @ts-ignore - agent_messages table types may not include all columns
       .insert({
         agent_session_id: agentSession.id,
         role: 'user',
@@ -185,6 +190,7 @@ export async function POST(
     // Save assistant response
     await supabaseAdmin
       .from('agent_messages')
+      // @ts-ignore - agent_messages table types may not include all columns
       .insert({
         agent_session_id: agentSession.id,
         role: 'assistant',
@@ -196,7 +202,7 @@ export async function POST(
     await supabaseAdmin.rpc('update_education_session_progress', {
       input_session_id: agentSession.id,
       input_questions_asked: updatedState.questions_asked || 0,
-      input_sections_completed: JSON.stringify(updatedState.topics_covered || []),
+      input_sections_completed: JSON.stringify(updatedState.sections_completed || []),
       input_estimated_completion: Math.min((updatedState.questions_asked || 0) / 15, 1)
     })
 
@@ -224,7 +230,8 @@ export async function POST(
             input_trigger_context: response,
             input_confidence: flag.confidence,
             input_ai_analysis: JSON.stringify({
-              patterns_matched: flag.patterns,
+              trigger_type: flag.type,
+              trigger_content: flag.content,
               agent_assessment: safeguardingAlert
             })
           })

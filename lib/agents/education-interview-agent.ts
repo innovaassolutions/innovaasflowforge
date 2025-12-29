@@ -149,8 +149,10 @@ export async function createSafeguardingAlert(
   triggerContext: string
 ): Promise<string | null> {
   try {
+    // @ts-ignore - education_safeguarding_alerts table not yet in generated types
     const { data, error } = await supabaseAdmin
       .from('education_safeguarding_alerts')
+      // @ts-ignore - education_safeguarding_alerts table not yet in generated types
       .insert({
         campaign_id: participant.campaign_id,
         school_id: participant.school_id,
@@ -174,7 +176,7 @@ export async function createSafeguardingAlert(
       return null
     }
 
-    return data?.id || null
+    return (data as { id: string } | null)?.id || null
   } catch (error) {
     console.error('Error creating safeguarding alert:', error)
     return null
