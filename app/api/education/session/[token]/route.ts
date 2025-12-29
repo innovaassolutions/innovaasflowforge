@@ -157,7 +157,11 @@ export async function GET(
       const campaignData: EducationCampaign = {
         id: campaign.id,
         name: campaign.name,
-        school_name: school.name,
+        school: {
+          id: school.id,
+          name: school.name,
+          country: 'Unknown' // Default value - not available in this context
+        },
         education_config: campaign.education_config as EducationCampaign['education_config']
       }
 
