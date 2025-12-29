@@ -142,10 +142,10 @@ export async function PATCH(
     }
 
     // Update school
-    // Note: Using type assertion as schools table not yet in generated types
+    // @ts-expect-error - schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
-      .from('schools' as any)
-      .update(updateData as any)
+      .from('schools')
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
@@ -219,9 +219,10 @@ export async function DELETE(
     }
 
     // Soft delete (set is_active = false)
+    // @ts-expect-error - schools table not yet in generated types
     const { error } = await supabaseAdmin
-      .from('schools' as any)
-      .update({ is_active: false } as any)
+      .from('schools')
+      .update({ is_active: false })
       .eq('id', id)
 
     if (error) {

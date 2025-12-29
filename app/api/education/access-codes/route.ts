@@ -70,9 +70,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Build base query
-    // Note: Using type assertion as education tables not yet in generated types
+    // @ts-expect-error - education_access_codes table not yet in generated types
     let query = supabaseAdmin
-      .from('education_access_codes' as any)
+      .from('education_access_codes')
       .select(`
         id,
         code,
@@ -123,8 +123,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Get summary statistics
+    // @ts-expect-error - education_access_codes table not yet in generated types
     let summaryQuery = supabaseAdmin
-      .from('education_access_codes' as any)
+      .from('education_access_codes')
       .select('id, status, code_type')
       .in('school_id', schoolIds)
 
@@ -233,9 +234,10 @@ export async function PATCH(request: NextRequest) {
     const schoolIds = userSchools?.map(s => s.id) || []
 
     // Update codes
+    // @ts-expect-error - education_access_codes table not yet in generated types
     const { data: updatedCodes, error: updateError } = await supabaseAdmin
-      .from('education_access_codes' as any)
-      .update({ status: 'revoked' } as any)
+      .from('education_access_codes')
+      .update({ status: 'revoked' })
       .in('id', code_ids)
       .in('school_id', schoolIds)
       .eq('status', 'active') // Only revoke active codes

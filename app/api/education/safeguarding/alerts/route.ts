@@ -46,9 +46,9 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(url.searchParams.get('offset') || '0')
 
     // Build query
-    // Note: Using type assertion as education tables not yet in generated types
+    // @ts-expect-error - education_safeguarding_alerts table not yet in generated types
     let query = supabaseAdmin
-      .from('education_safeguarding_alerts' as any)
+      .from('education_safeguarding_alerts')
       .select(`
         id,
         participant_token,
@@ -186,8 +186,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Verify alert belongs to user's organization
+    // @ts-expect-error - education_safeguarding_alerts table not yet in generated types
     const { data: alert } = await supabaseAdmin
-      .from('education_safeguarding_alerts' as any)
+      .from('education_safeguarding_alerts')
       .select('id, school_id, schools:school_id(organization_id)')
       .eq('id', alert_id)
       .single()
@@ -236,8 +237,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Fetch updated alert
+    // @ts-expect-error - education_safeguarding_alerts table not yet in generated types
     const { data: updatedAlert } = await supabaseAdmin
-      .from('education_safeguarding_alerts' as any)
+      .from('education_safeguarding_alerts')
       .select('*')
       .eq('id', alert_id)
       .single()
