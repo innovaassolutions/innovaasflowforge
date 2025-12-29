@@ -22,7 +22,7 @@ export interface Campaign {
   id: string
   name: string
   description: string | null
-  campaign_type: CampaignType
+  campaign_type: CampaignType | 'education_pilot' | 'education_annual'
   status: CampaignStatus
 
   // Campaign configuration
@@ -30,6 +30,17 @@ export interface Campaign {
   facilitator_email: string
   company_name: string | null
   company_industry: string | null
+
+  // Multi-tenancy fields
+  organization_id: string
+  created_by: string | null
+
+  // Education-specific fields
+  school_id: string | null
+  education_config: Json | null
+
+  // Report configuration
+  report_tier: 'basic' | 'standard' | 'premium' | null
 
   // Knowledge base configuration
   knowledge_base_ids: string[] | null

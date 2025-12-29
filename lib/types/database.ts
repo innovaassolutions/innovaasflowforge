@@ -260,12 +260,16 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
+          education_config: Json | null
           facilitator_email: string
           facilitator_name: string
           id: string
           knowledge_base_ids: string[] | null
           metadata: Json | null
           name: string
+          organization_id: string
+          report_tier: string | null
+          school_id: string | null
           started_at: string | null
           status: string
           updated_at: string
@@ -279,12 +283,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          education_config?: Json | null
           facilitator_email: string
           facilitator_name: string
           id?: string
           knowledge_base_ids?: string[] | null
           metadata?: Json | null
           name: string
+          organization_id: string
+          report_tier?: string | null
+          school_id?: string | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -298,12 +306,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          education_config?: Json | null
           facilitator_email?: string
           facilitator_name?: string
           id?: string
           knowledge_base_ids?: string[] | null
           metadata?: Json | null
           name?: string
+          organization_id?: string
+          report_tier?: string | null
+          school_id?: string | null
           started_at?: string | null
           status?: string
           updated_at?: string
