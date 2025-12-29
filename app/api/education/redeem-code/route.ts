@@ -21,9 +21,19 @@ export async function POST(request: NextRequest) {
     // Normalize code (uppercase, trim, remove dashes/spaces)
     const normalizedCode = code.trim().toUpperCase().replace(/[-\s]/g, '')
 
+    // Type for access code lookup result
+    type AccessCodeResult = {
+      id: string
+      campaign_id: string
+      school_id: string
+      status: string
+      expires_at: string | null
+      schools: { code: string; name: string } | null
+    }
+
     // First, look up the access code to get its campaign_id and school_id
     // @ts-ignore - education_access_codes table not yet in generated types
-    const { data: accessCode, error: lookupError } = await supabaseAdmin
+    const { data: accessCodeData, error: lookupError } = await supabaseAdmin
       .from('education_access_codes')
       .select(`
         id,
@@ -36,6 +46,8 @@ export async function POST(request: NextRequest) {
       .eq('code', normalizedCode)
       .single()
 
+    const accessCode = accessCodeData as AccessCodeResult | null
+
     if (lookupError || !accessCode) {
       return NextResponse.json(
         { error: 'Invalid access code. Please check and try again.' },
@@ -47,8 +59,7 @@ export async function POST(request: NextRequest) {
     // This ensures participants can only redeem codes on their school's portal
     if (school_code) {
       const normalizedSchoolCode = school_code.trim().toUpperCase()
-      // @ts-ignore - schools join not in generated types
-      const accessCodeSchool = accessCode.schools as { code: string; name: string } | null
+      const accessCodeSchool = accessCode.schools
 
       if (!accessCodeSchool) {
         return NextResponse.json(
