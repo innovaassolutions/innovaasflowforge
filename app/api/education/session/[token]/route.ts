@@ -111,7 +111,7 @@ export async function GET(
       .select(`
         id,
         education_session_context,
-        conversation_state
+        session_context
       `)
       .eq('participant_token_id', participantToken.id)
       .contains('education_session_context', { module })
@@ -121,7 +121,7 @@ export async function GET(
     type AgentSessionType = {
       id: string
       education_session_context: Record<string, unknown>
-      conversation_state: Record<string, unknown>
+      session_context: Record<string, unknown>
       conversation_history: Array<{ role: string; content: string; created_at: string }>
     } | null
 
@@ -180,7 +180,7 @@ export async function GET(
       // Fetch the created session
       const { data: newSessionData } = await supabaseAdmin
         .from('agent_sessions')
-        .select('id, education_session_context, conversation_state')
+        .select('id, education_session_context, session_context')
         .eq('id', newSessionId)
         .single()
 
@@ -236,7 +236,7 @@ export async function GET(
         campaign_name: campaign.name
       },
       conversationHistory: agentSession?.conversation_history || [],
-      conversationState: agentSession?.education_session_context || null,
+      conversationState: agentSession?.session_context || null,
       greeting: !isResuming ? greeting : null,
       isResuming,
       available_modules: availableModules,

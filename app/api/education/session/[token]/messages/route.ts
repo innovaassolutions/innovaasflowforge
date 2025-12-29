@@ -93,7 +93,7 @@ export async function POST(
       .select(`
         id,
         education_session_context,
-        conversation_state
+        session_context
       `)
       .eq('participant_token_id', participantToken.id)
       .contains('education_session_context', { module: targetModule })
@@ -103,7 +103,7 @@ export async function POST(
     const agentSession = agentSessionData as {
       id: string
       education_session_context: Record<string, unknown>
-      conversation_state: Record<string, unknown>
+      session_context: Record<string, unknown>
     } | null
 
     if (sessionError || !agentSession) {
