@@ -46,7 +46,7 @@ export async function GET(
 
     // Find participant token
     // @ts-ignore - education_participant_tokens table not yet in generated types
-    const { data: participantToken, error: tokenError } = await supabaseAdmin
+    const { data: participantTokenData, error: tokenError } = await supabaseAdmin
       .from('education_participant_tokens')
       .select(`
         id,
@@ -66,6 +66,20 @@ export async function GET(
       `)
       .eq('token', token)
       .single()
+
+    // Type assertion for participant token
+    const participantToken = participantTokenData as {
+      id: string
+      token: string
+      participant_type: string
+      cohort_metadata: Record<string, string>
+      school_id: string
+      campaign_id: string
+      modules_completed: string[] | null
+      is_active: boolean
+      schools: { id: string; name: string }
+      campaigns: { id: string; name: string; education_config: Record<string, unknown> }
+    } | null
 
     if (tokenError || !participantToken) {
       return NextResponse.json(

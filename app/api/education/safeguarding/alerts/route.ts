@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('alert_status', status)
     }
 
-    const { data: alerts, error, count } = await query
+    const { data: alertsData, error, count } = await query
 
     if (error) {
       console.error('Alerts fetch error:', error)
@@ -106,6 +106,26 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Type assertion for alerts
+    const alerts = alertsData as Array<{
+      id: string
+      participant_token: string
+      participant_type: string
+      cohort_metadata: Record<string, string>
+      trigger_type: string
+      trigger_confidence: number
+      detected_at: string
+      alert_status: string
+      alert_sent_at: string | null
+      alert_channel: string | null
+      acknowledged_at: string | null
+      acknowledged_by_role: string | null
+      resolved_at: string | null
+      resolution_type: string | null
+      schools: { id: string; name: string }
+      campaigns: { id: string; name: string }
+    }> | null
 
     // Calculate summary stats
     const statusCounts: Record<string, number> = {}
@@ -187,11 +207,18 @@ export async function PATCH(request: NextRequest) {
 
     // Verify alert belongs to user's organization
     // @ts-ignore - education_safeguarding_alerts table not yet in generated types
-    const { data: alert } = await supabaseAdmin
+    const { data: alertData } = await supabaseAdmin
       .from('education_safeguarding_alerts')
       .select('id, school_id, schools:school_id(organization_id)')
       .eq('id', alert_id)
       .single()
+
+    // Type assertion for alert
+    const alert = alertData as {
+      id: string
+      school_id: string
+      schools: { organization_id: string }
+    } | null
 
     if (!alert) {
       return NextResponse.json(
@@ -200,7 +227,7 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const school = alert.schools as unknown as { organization_id: string }
+    const school = alert.schools
     if (school?.organization_id !== profile?.organization_id) {
       return NextResponse.json(
         { error: 'Alert not found' },
