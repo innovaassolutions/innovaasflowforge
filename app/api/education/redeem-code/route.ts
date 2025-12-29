@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     // Get token details for response
     // @ts-ignore - education_participant_tokens table not yet in generated types
-    const { data: tokenDetails } = await supabaseAdmin
+    const { data: tokenDetailsData } = await supabaseAdmin
       .from('education_participant_tokens')
       .select(`
         token,
@@ -84,6 +84,16 @@ export async function POST(request: NextRequest) {
       `)
       .eq('id', data)
       .single()
+
+    // Type assertion for token details
+    const tokenDetails = tokenDetailsData as {
+      token: string
+      participant_type: string
+      cohort_metadata: Record<string, string>
+      school_id: string
+      campaign_id: string
+      schools: { name: string }
+    } | null
 
     if (!tokenDetails) {
       return NextResponse.json(
