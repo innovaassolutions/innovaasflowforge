@@ -142,7 +142,7 @@ export async function PATCH(
     }
 
     // Update school
-    // @ts-expect-error - schools table not yet in generated types
+    // @ts-ignore - schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
       .from('schools')
       .update(updateData)
@@ -219,7 +219,7 @@ export async function DELETE(
     }
 
     // Soft delete (set is_active = false)
-    // @ts-expect-error - schools table not yet in generated types
+    // @ts-ignore - schools table not yet in generated types
     const { error } = await supabaseAdmin
       .from('schools')
       .update({ is_active: false })

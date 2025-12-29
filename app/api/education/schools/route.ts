@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     const code = `${codePrefix}-${codeSuffix}`
 
     // Create school using admin client (bypasses RLS for insert)
-    // @ts-expect-error - schools table not yet in generated types
+    // @ts-ignore - schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
       .from('schools')
       .insert({

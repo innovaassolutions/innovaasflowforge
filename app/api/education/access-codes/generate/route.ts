@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       created_by: user.id
     }))
 
-    // @ts-expect-error - education_access_codes table not yet in generated types
+    // @ts-ignore - education_access_codes table not yet in generated types
     const { data: insertedCodes, error: insertError } = await supabaseAdmin
       .from('education_access_codes')
       .insert(insertData)

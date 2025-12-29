@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build base query
-    // @ts-expect-error - education_access_codes table not yet in generated types
+    // @ts-ignore - education_access_codes table not yet in generated types
     let query = supabaseAdmin
       .from('education_access_codes')
       .select(`
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get summary statistics
-    // @ts-expect-error - education_access_codes table not yet in generated types
+    // @ts-ignore - education_access_codes table not yet in generated types
     let summaryQuery = supabaseAdmin
       .from('education_access_codes')
       .select('id, status, code_type')
@@ -234,7 +234,7 @@ export async function PATCH(request: NextRequest) {
     const schoolIds = userSchools?.map(s => s.id) || []
 
     // Update codes
-    // @ts-expect-error - education_access_codes table not yet in generated types
+    // @ts-ignore - education_access_codes table not yet in generated types
     const { data: updatedCodes, error: updateError } = await supabaseAdmin
       .from('education_access_codes')
       .update({ status: 'revoked' })

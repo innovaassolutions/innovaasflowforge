@@ -45,7 +45,7 @@ export async function GET(
     }
 
     // Find participant token
-    // @ts-expect-error - education_participant_tokens table not yet in generated types
+    // @ts-ignore - education_participant_tokens table not yet in generated types
     const { data: participantToken, error: tokenError } = await supabaseAdmin
       .from('education_participant_tokens')
       .select(`

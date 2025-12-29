@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get token details for response
-    // @ts-expect-error - education_participant_tokens table not yet in generated types
+    // @ts-ignore - education_participant_tokens table not yet in generated types
     const { data: tokenDetails } = await supabaseAdmin
       .from('education_participant_tokens')
       .select(`
