@@ -112,11 +112,18 @@ export async function POST(
     }
 
     // Get conversation history
-    const { data: messageHistory } = await supabaseAdmin
+    const { data: messageHistoryData } = await supabaseAdmin
       .from('agent_messages')
       .select('role, content, created_at')
       .eq('agent_session_id', agentSession.id)
       .order('created_at', { ascending: true })
+
+    // Type assertion for message history
+    const messageHistory = messageHistoryData as Array<{
+      role: string
+      content: string
+      created_at: string
+    }> | null
 
     // Check for safeguarding concerns BEFORE processing
     const safeguardingFlags = detectSafeguardingConcerns(message)
