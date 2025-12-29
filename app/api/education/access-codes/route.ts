@@ -137,13 +137,16 @@ export async function GET(request: NextRequest) {
 
     const { data: summaryData } = await summaryQuery
 
+    // Type assertion for summary data
+    const typedSummaryData = summaryData as Array<{ id: string; status: string; code_type: string }> | null
+
     const summary = {
-      total: summaryData?.length || 0,
+      total: typedSummaryData?.length || 0,
       by_status: {} as Record<string, number>,
       by_type: {} as Record<string, number>
     }
 
-    summaryData?.forEach(code => {
+    typedSummaryData?.forEach(code => {
       summary.by_status[code.status] = (summary.by_status[code.status] || 0) + 1
       summary.by_type[code.code_type] = (summary.by_type[code.code_type] || 0) + 1
     })
