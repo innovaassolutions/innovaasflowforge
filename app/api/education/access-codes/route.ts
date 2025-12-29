@@ -235,7 +235,7 @@ export async function PATCH(request: NextRequest) {
     // Update codes
     const { data: updatedCodes, error: updateError } = await supabaseAdmin
       .from('education_access_codes' as any)
-      .update({ status: 'revoked' })
+      .update({ status: 'revoked' } as any)
       .in('id', code_ids)
       .in('school_id', schoolIds)
       .eq('status', 'active') // Only revoke active codes

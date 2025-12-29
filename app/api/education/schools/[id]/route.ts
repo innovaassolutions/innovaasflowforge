@@ -145,7 +145,7 @@ export async function PATCH(
     // Note: Using type assertion as schools table not yet in generated types
     const { data: school, error } = await supabaseAdmin
       .from('schools' as any)
-      .update(updateData)
+      .update(updateData as any)
       .eq('id', id)
       .select()
       .single()
@@ -221,7 +221,7 @@ export async function DELETE(
     // Soft delete (set is_active = false)
     const { error } = await supabaseAdmin
       .from('schools' as any)
-      .update({ is_active: false })
+      .update({ is_active: false } as any)
       .eq('id', id)
 
     if (error) {

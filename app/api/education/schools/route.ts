@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         safeguarding_lead_email,
         safeguarding_lead_phone,
         safeguarding_protocol
-      })
+      } as any)
       .select()
       .single()
 
