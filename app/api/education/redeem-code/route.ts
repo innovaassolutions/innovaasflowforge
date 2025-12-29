@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     const normalizedCode = code.trim().toUpperCase()
 
     // Call the database function to redeem the code
+    // @ts-ignore - redeem_access_code function not yet in generated types
     const { data, error } = await supabaseAdmin.rpc('redeem_access_code', {
       input_code: normalizedCode,
       input_campaign_id: campaign_id

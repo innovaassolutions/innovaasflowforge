@@ -210,6 +210,7 @@ export async function PATCH(request: NextRequest) {
 
     // Perform action
     if (action === 'acknowledge') {
+      // @ts-ignore - acknowledge_alert function not yet in generated types
       await supabaseAdmin.rpc('acknowledge_alert', {
         input_alert_id: alert_id,
         input_acknowledged_by_role: role_title || profile?.role,
@@ -223,6 +224,7 @@ export async function PATCH(request: NextRequest) {
         )
       }
 
+      // @ts-ignore - resolve_alert function not yet in generated types
       await supabaseAdmin.rpc('resolve_alert', {
         input_alert_id: alert_id,
         input_resolved_by_role: role_title || profile?.role,

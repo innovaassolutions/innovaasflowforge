@@ -158,6 +158,7 @@ export async function POST(
       })
 
     // Update session progress
+    // @ts-ignore - update_education_session_progress function not yet in generated types
     await supabaseAdmin.rpc('update_education_session_progress', {
       input_session_id: agentSession.id,
       input_questions_asked: updatedState.questions_asked || 0,
@@ -169,6 +170,7 @@ export async function POST(
     if (safeguardingFlags.length > 0 || safeguardingAlert) {
       // Record flags in session
       for (const flag of safeguardingFlags) {
+        // @ts-ignore - record_safeguarding_flag function not yet in generated types
         await supabaseAdmin.rpc('record_safeguarding_flag', {
           input_session_id: agentSession.id,
           input_flag: JSON.stringify(flag)
@@ -176,6 +178,7 @@ export async function POST(
 
         // Create safeguarding alert if confidence is high enough
         if (flag.confidence >= 0.7) {
+          // @ts-ignore - create_safeguarding_alert function not yet in generated types
           await supabaseAdmin.rpc('create_safeguarding_alert', {
             input_campaign_id: participantToken.campaign_id,
             input_school_id: participantToken.school_id,
@@ -199,6 +202,7 @@ export async function POST(
     const isComplete = updatedState.is_complete || false
     if (isComplete) {
       // Mark module as completed
+      // @ts-ignore - mark_module_completed function not yet in generated types
       await supabaseAdmin.rpc('mark_module_completed', {
         input_token_id: participantToken.id,
         input_module: targetModule
@@ -206,6 +210,7 @@ export async function POST(
     }
 
     // Update participant activity
+    // @ts-ignore - update_participant_activity function not yet in generated types
     await supabaseAdmin.rpc('update_participant_activity', {
       input_token_id: participantToken.id
     })

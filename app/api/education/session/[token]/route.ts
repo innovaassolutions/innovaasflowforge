@@ -147,6 +147,7 @@ export async function GET(
       )
 
       // Create new agent session using database function
+      // @ts-ignore - create_education_agent_session function not yet in generated types
       const { data: newSessionId, error: createError } = await supabaseAdmin.rpc(
         'create_education_agent_session',
         {
@@ -188,6 +189,7 @@ export async function GET(
       }
 
       // Mark module as started
+      // @ts-ignore - mark_module_started function not yet in generated types
       await supabaseAdmin.rpc('mark_module_started', {
         input_token_id: participantToken.id,
         input_module: module
