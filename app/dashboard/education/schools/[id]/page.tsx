@@ -130,8 +130,8 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
       const schoolData = await schoolResponse.json()
       setSchool(schoolData.school)
 
-      // Load campaigns for this school
-      const campaignsResponse = await fetch(apiUrl('api/campaigns'), {
+      // Load education campaigns for this school
+      const campaignsResponse = await fetch(apiUrl('api/education/campaigns'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
         }
@@ -243,7 +243,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                 </Link>
               </Button>
               <Button asChild>
-                <Link href={`/dashboard/campaigns/new?schoolId=${school.id}&type=education`}>
+                <Link href={`/dashboard/education/campaigns/new?schoolId=${school.id}`}>
                   <Plus className="w-4 h-4 mr-2" />
                   Create Campaign
                 </Link>
@@ -360,7 +360,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                   Campaigns
                 </h2>
                 <Button size="sm" asChild>
-                  <Link href={`/dashboard/campaigns/new?schoolId=${school.id}&type=education`}>
+                  <Link href={`/dashboard/education/campaigns/new?schoolId=${school.id}`}>
                     <Plus className="w-4 h-4 mr-1" />
                     New
                   </Link>
@@ -372,7 +372,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                   <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground mb-4">No campaigns created yet</p>
                   <Button asChild>
-                    <Link href={`/dashboard/campaigns/new?schoolId=${school.id}&type=education`}>
+                    <Link href={`/dashboard/education/campaigns/new?schoolId=${school.id}`}>
                       <Plus className="w-4 h-4 mr-2" />
                       Create First Campaign
                     </Link>
