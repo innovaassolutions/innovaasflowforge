@@ -1,42 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import type { Database } from '@/types/database'
 
 /**
  * GET /api/education/campaigns
  * List all education campaigns for the user's organization
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Get auth token from header (API routes don't use cookies)
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.replace('Bearer ', '')
-
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized - missing authentication token' },
-        { status: 401 }
-      )
-    }
-
-    // Create a Supabase client with the user's JWT token
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get: () => undefined,
-          set: () => {},
-          remove: () => {},
-        },
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      }
-    )
+    const supabase = await createClient()
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -117,53 +89,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Get auth token from header (API routes don't use cookies)
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.replace('Bearer ', '')
-
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized - missing authentication token' },
-        { status: 401 }
-      )
-    }
-
-    // Create a Supabase client with the user's JWT token
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get: () => undefined,
-          set: () => {},
-          remove: () => {},
-        },
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      }
-    )
+    const supabase = await createClient()
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      console.error('❌ Auth error:', {
-        error: authError,
-        hasUser: !!user,
-        tokenPrefix: token?.substring(0, 20)
-      })
       return NextResponse.json(
-        { error: 'Unauthorized - invalid or expired token', details: authError?.message },
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
-
-    console.log('✅ User authenticated for campaign creation:', {
-      userId: user.id,
-      email: user.email
-    })
 
     // Get user's organization and permissions
     const { data: profile } = await supabase
