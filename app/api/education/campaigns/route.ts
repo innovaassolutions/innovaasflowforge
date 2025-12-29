@@ -1,14 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import type { Database } from '@/types/database'
 
 /**
  * GET /api/education/campaigns
  * List all education campaigns for the user's organization
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    // Get auth token from header (API routes don't use cookies)
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - missing authentication token' },
+        { status: 401 }
+      )
+    }
+
+    // Create a Supabase client with the user's JWT token
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: () => undefined,
+          set: () => {},
+          remove: () => {},
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -89,16 +117,53 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    // Get auth token from header (API routes don't use cookies)
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Unauthorized - missing authentication token' },
+        { status: 401 }
+      )
+    }
+
+    // Create a Supabase client with the user's JWT token
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: () => undefined,
+          set: () => {},
+          remove: () => {},
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
+      console.error('❌ Auth error:', {
+        error: authError,
+        hasUser: !!user,
+        tokenPrefix: token?.substring(0, 20)
+      })
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - invalid or expired token', details: authError?.message },
         { status: 401 }
       )
     }
+
+    console.log('✅ User authenticated for campaign creation:', {
+      userId: user.id,
+      email: user.email
+    })
 
     // Get user's organization and permissions
     const { data: profile } = await supabase
@@ -198,11 +263,19 @@ export async function POST(request: NextRequest) {
 
     const finalEducationConfig = education_config || defaultEducationConfig
 
+    console.log('📦 Creating education campaign:', {
+      name,
+      campaign_type,
+      school_id,
+      school_name: (school as { name: string }).name,
+      hasEducationConfig: !!finalEducationConfig,
+      modules: finalEducationConfig.modules,
+      hasCohorts: !!finalEducationConfig.cohorts
+    })
+
     // Create campaign using admin client (bypasses RLS for insert)
-    // @ts-ignore - campaigns table types don't include education fields
     const { data: campaign, error: createError } = await supabaseAdmin
       .from('campaigns')
-      // @ts-ignore - campaigns table types don't include education fields
       .insert({
         name,
         campaign_type,
@@ -212,7 +285,7 @@ export async function POST(request: NextRequest) {
         education_config: finalEducationConfig,
         status: 'active',
         created_by: user.id
-      })
+      } as any)
       .select(`
         id,
         name,
@@ -223,15 +296,26 @@ export async function POST(request: NextRequest) {
         education_config,
         created_at
       `)
-      .single()
+      .single() as any
 
     if (createError) {
-      console.error('Campaign creation error:', createError)
+      console.error('❌ Campaign creation error:', {
+        error: createError,
+        code: createError.code,
+        message: createError.message,
+        details: createError.details,
+        hint: createError.hint
+      })
       return NextResponse.json(
         { error: 'Failed to create campaign', details: createError.message },
         { status: 500 }
       )
     }
+
+    console.log('✅ Education campaign created:', {
+      campaignId: campaign?.id,
+      campaignName: campaign?.name
+    })
 
     return NextResponse.json({ campaign }, { status: 201 })
 
