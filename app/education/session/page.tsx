@@ -47,13 +47,13 @@ function EducationSessionContent() {
   const [error, setError] = useState<string | null>(null)
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false)
 
-  // Format code as user types (add dashes)
+  // Format code as user types - preserve dashes, convert to uppercase
   function handleCodeChange(value: string) {
-    // Remove any existing dashes and spaces, convert to uppercase
-    const cleaned = value.replace(/[-\s]/g, '').toUpperCase()
+    // Convert to uppercase and allow alphanumeric plus dashes
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9-]/g, '')
 
-    // Don't exceed max length (about 20 chars without dashes)
-    if (cleaned.length > 20) return
+    // Don't exceed max length (code format like PILOT-STU-Y7-CFTR57)
+    if (cleaned.length > 25) return
 
     setCode(cleaned)
     setError(null)

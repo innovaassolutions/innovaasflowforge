@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Normalize code (uppercase, trim, remove dashes/spaces)
-    const normalizedCode = code.trim().toUpperCase().replace(/[-\s]/g, '')
+    // Normalize code (uppercase, trim) - keep dashes as they're part of the code format
+    const normalizedCode = code.trim().toUpperCase()
 
     // Type for access code lookup result
     type AccessCodeResult = {
