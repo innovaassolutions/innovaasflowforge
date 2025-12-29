@@ -139,7 +139,11 @@ export async function POST(
     const campaignData = {
       id: campaign.id,
       name: campaign.name,
-      school_name: school.name,
+      school: {
+        id: school.id,
+        name: school.name,
+        country: 'Unknown' // Default value - not available in this context
+      },
       education_config: campaign.education_config
     }
 
