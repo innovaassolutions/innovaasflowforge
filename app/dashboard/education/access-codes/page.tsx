@@ -30,14 +30,14 @@ import { Button } from '@/components/ui/button'
 interface AccessCode {
   id: string
   code: string
-  code_type: 'student' | 'teacher' | 'parent' | 'leadership'
+  participant_type: 'student' | 'teacher' | 'parent' | 'leadership'
   cohort_metadata: {
     year_band?: string
     division?: string
     role_category?: string
   }
-  status: 'active' | 'used' | 'expired' | 'revoked'
-  used_at: string | null
+  status: 'active' | 'redeemed' | 'expired' | 'revoked'
+  redeemed_at: string | null
   expires_at: string
   batch_id: string | null
   batch_name: string | null
@@ -76,6 +76,7 @@ const PARTICIPANT_TYPES = [
 const STATUS_CONFIG: Record<string, { label: string; icon: typeof CheckCircle; className: string }> = {
   active: { label: 'Active', icon: CheckCircle, className: 'text-[hsl(var(--success))] bg-success-subtle' },
   used: { label: 'Used', icon: Clock, className: 'text-brand-teal bg-brand-teal/10' },
+  redeemed: { label: 'Used', icon: Clock, className: 'text-brand-teal bg-brand-teal/10' }, // Database uses 'redeemed' status
   expired: { label: 'Expired', icon: XCircle, className: 'text-muted-foreground bg-muted' },
   revoked: { label: 'Revoked', icon: Ban, className: 'text-destructive bg-destructive/10' }
 }
@@ -326,7 +327,7 @@ export default function AccessCodesPage() {
       ['Code', 'Type', 'School', 'Campaign', 'Year Band', 'Division', 'Expires'].join(','),
       ...activeCodes.map(c => [
         c.code,
-        c.code_type,
+        c.participant_type,
         c.schools?.name || '',
         c.campaigns?.name || '',
         c.cohort_metadata?.year_band || '',
@@ -468,7 +469,7 @@ export default function AccessCodesPage() {
             <div className="bg-brand-teal/10 rounded-xl border border-brand-teal/30 p-4">
               <p className="text-sm text-brand-teal mb-1">Used</p>
               <p className="text-2xl font-bold text-brand-teal">
-                {summary.by_status?.used || 0}
+                {(summary.by_status?.used || 0) + (summary.by_status?.redeemed || 0)}
               </p>
             </div>
             <div className="bg-muted rounded-xl border border-border p-4">
@@ -539,7 +540,7 @@ export default function AccessCodesPage() {
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
-                <option value="used">Used</option>
+                <option value="redeemed">Used</option>
                 <option value="expired">Expired</option>
                 <option value="revoked">Revoked</option>
               </select>
@@ -714,7 +715,7 @@ export default function AccessCodesPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="capitalize text-sm">{code.code_type}</span>
+                          <span className="capitalize text-sm">{code.participant_type}</span>
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {code.schools?.name || '-'}
