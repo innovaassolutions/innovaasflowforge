@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Clock, Mail, Pause, Share2, Plus, Pencil, Trash2 } from 'lucide-react'
+import { CheckCircle2, Clock, Mail, Pause, Share2, Plus, Pencil, Trash2, Key, ExternalLink, Users } from 'lucide-react'
 import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
 import { Button } from '@/components/ui/button'
 import { apiUrl } from '@/lib/api-url'
@@ -37,6 +37,21 @@ interface Campaign {
     pending: number
     percentComplete: number
   }
+  // Education campaign fields
+  school_id?: string
+  campaign_type?: string
+  education_config?: {
+    modules: string[]
+    pilot_type: string
+  }
+}
+
+interface AccessCodeSummary {
+  total: number
+  active: number
+  redeemed: number
+  expired: number
+  revoked: number
 }
 
 export default function CampaignDetailPage() {
@@ -52,6 +67,7 @@ export default function CampaignDetailPage() {
   const [generatingPDF, setGeneratingPDF] = useState(false)
   const [showReportPanel, setShowReportPanel] = useState(false)
   const [existingReport, setExistingReport] = useState<{ id: string; url: string; access_token: string } | null>(null)
+  const [accessCodeSummary, setAccessCodeSummary] = useState<AccessCodeSummary | null>(null)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -61,6 +77,7 @@ export default function CampaignDetailPage() {
   useEffect(() => {
     fetchCampaign()
     checkForExistingReport()
+    fetchAccessCodeSummary()
     // Poll for updates every 10 seconds
     const interval = setInterval(fetchCampaign, 10000)
     return () => clearInterval(interval)
@@ -104,6 +121,25 @@ export default function CampaignDetailPage() {
     } catch (err) {
       console.error('Error checking for existing report:', err)
       setExistingReport(null)
+    }
+  }
+
+  async function fetchAccessCodeSummary() {
+    try {
+      const response = await fetch(apiUrl(`api/education/access-codes?campaign_id=${params.id}`))
+      const data = await response.json()
+
+      if (data.summary) {
+        setAccessCodeSummary({
+          total: data.summary.total || 0,
+          active: data.summary.by_status?.active || 0,
+          redeemed: data.summary.by_status?.redeemed || 0,
+          expired: data.summary.by_status?.expired || 0,
+          revoked: data.summary.by_status?.revoked || 0
+        })
+      }
+    } catch (err) {
+      console.error('Error fetching access codes:', err)
     }
   }
 
@@ -585,6 +621,72 @@ export default function CampaignDetailPage() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Education Access Codes Section */}
+        {accessCodeSummary && accessCodeSummary.total > 0 && (
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <Key className="w-5 h-5 text-brand-teal" />
+                Education Access Codes
+              </h2>
+              <Link
+                href={`/dashboard/education/access-codes?campaign_id=${campaign.id}`}
+                className="flex items-center gap-2 text-sm text-brand-teal hover:text-brand-teal/80 transition-colors">
+                View All Codes
+                <ExternalLink className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Access Code Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+              <div className="bg-background border border-border rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-foreground">{accessCodeSummary.total}</p>
+                <p className="text-xs text-muted-foreground mt-1">Total Codes</p>
+              </div>
+              <div className="bg-background border border-border rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-success">{accessCodeSummary.active}</p>
+                <p className="text-xs text-muted-foreground mt-1">Active</p>
+              </div>
+              <div className="bg-background border border-border rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-brand-teal">{accessCodeSummary.redeemed}</p>
+                <p className="text-xs text-muted-foreground mt-1">Redeemed</p>
+              </div>
+              <div className="bg-background border border-border rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-muted-foreground">{accessCodeSummary.expired}</p>
+                <p className="text-xs text-muted-foreground mt-1">Expired</p>
+              </div>
+              <div className="bg-background border border-border rounded-lg p-4 text-center">
+                <p className="text-2xl font-bold text-destructive">{accessCodeSummary.revoked}</p>
+                <p className="text-xs text-muted-foreground mt-1">Revoked</p>
+              </div>
+            </div>
+
+            {/* Progress for Education Campaign */}
+            {accessCodeSummary.total > 0 && (
+              <div className="bg-muted/50 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Participation Rate
+                  </span>
+                  <span className="text-sm font-bold text-foreground">
+                    {Math.round((accessCodeSummary.redeemed / accessCodeSummary.total) * 100)}%
+                  </span>
+                </div>
+                <div className="w-full bg-border rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-brand-teal h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${(accessCodeSummary.redeemed / accessCodeSummary.total) * 100}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {accessCodeSummary.redeemed} of {accessCodeSummary.total} codes have been used by participants
+                </p>
+              </div>
+            )}
           </div>
         )}
 
