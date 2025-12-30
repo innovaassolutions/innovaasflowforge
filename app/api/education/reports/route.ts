@@ -20,6 +20,7 @@ import {
   buildSafeguardingEmailContent,
   buildSafeguardingEmailText,
 } from '@/lib/report/education-report-utils';
+import { buildPublicUrl } from '@/lib/api-url';
 
 interface CreateReportRequest {
   synthesis_id: string;
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
 
     if (existingReport) {
       // Return existing report info
-      const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL}/education/report/${existingReport.access_token}`;
+      const reportUrl = buildPublicUrl(`/education/report/${existingReport.access_token}`);
       return NextResponse.json({
         success: true,
         report_id: existingReport.id,
@@ -185,7 +186,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build report URL
-    const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL}/education/report/${accessToken}`;
+    const reportUrl = buildPublicUrl(`/education/report/${accessToken}`);
 
     // Send safeguarding notification if signals detected
     let safeguardingNotificationSent = false;
@@ -377,7 +378,7 @@ export async function GET() {
         module: synthesis?.module,
         campaign_id: synthesis?.campaign_id,
         access_token: report.access_token,
-        report_url: `${process.env.NEXT_PUBLIC_APP_URL}/education/report/${report.access_token}`,
+        report_url: buildPublicUrl(`/education/report/${report.access_token}`),
         is_active: report.is_active,
         has_safeguarding_signals: report.has_safeguarding_signals,
         safeguarding_notified_at: report.safeguarding_notified_at,
