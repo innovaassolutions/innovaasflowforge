@@ -382,8 +382,13 @@ function calculateDataQuality(transcripts: EducationTranscript[]): {
     const type = t.participant_type
     coverage[type] = (coverage[type] || 0) + 1
 
-    // Check completion
-    if (t.session.session_context?.is_complete) {
+    // Check completion - use education_session_context.progress.estimated_completion
+    // Consider 70%+ completion as "complete" for reporting purposes
+    const eduContext = t.session.education_session_context as {
+      progress?: { estimated_completion?: number }
+    } | undefined
+    const estimatedCompletion = eduContext?.progress?.estimated_completion || 0
+    if (estimatedCompletion >= 0.7) {
       completeCount++
     }
 
