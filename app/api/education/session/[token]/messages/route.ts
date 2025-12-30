@@ -246,7 +246,7 @@ export async function POST(
       // Mark module as completed
       // @ts-ignore - mark_module_completed function not yet in generated types
       await supabaseAdmin.rpc('mark_module_completed', {
-        input_token: participantToken.token,  // Function expects token string, not UUID
+        input_token_id: participantToken.id,  // Function expects UUID
         input_module: targetModule
       })
     }
@@ -254,7 +254,7 @@ export async function POST(
     // Update participant activity
     // @ts-ignore - update_participant_activity function not yet in generated types
     await supabaseAdmin.rpc('update_participant_activity', {
-      input_token: participantToken.token  // Function expects token string, not UUID
+      input_token_id: participantToken.id  // Function expects UUID
     })
 
     return NextResponse.json({

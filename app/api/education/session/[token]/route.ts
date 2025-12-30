@@ -201,7 +201,7 @@ export async function GET(
       // Mark module as started
       // @ts-ignore - mark_module_started function not yet in generated types
       await supabaseAdmin.rpc('mark_module_started', {
-        input_token: participantToken.token,  // Function expects token string, not UUID
+        input_token_id: participantToken.id,  // Function expects UUID
         input_module: module
       })
     } else {
