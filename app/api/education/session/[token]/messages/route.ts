@@ -268,12 +268,20 @@ export async function POST(
   } catch (error) {
     console.error('Message processing error:', error)
 
+    // Log full error stack for debugging
+    if (error instanceof Error) {
+      console.error('Error stack:', error.stack)
+      console.error('Error name:', error.name)
+    }
+
     // Provide more specific error info for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     const isAnthropicError = errorMessage.includes('401') ||
                             errorMessage.includes('credit') ||
                             errorMessage.includes('api_key') ||
-                            errorMessage.includes('authentication')
+                            errorMessage.includes('authentication') ||
+                            errorMessage.includes('first message') ||
+                            errorMessage.includes('user role')
 
     return NextResponse.json(
       {

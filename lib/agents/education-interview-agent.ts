@@ -730,16 +730,26 @@ export async function processEducationMessage(
   )
 
   // Prepare messages for Claude
-  const messages = [
+  // IMPORTANT: Anthropic API requires the first message to be from the user role.
+  // Since we save the greeting as an assistant message, we need to prepend a synthetic
+  // user message to satisfy this requirement.
+  const messages: Array<{ role: 'user' | 'assistant'; content: string }> = []
+
+  if (messageHistory.length > 0 && messageHistory[0].role === 'assistant') {
+    // Add a synthetic user message to satisfy Anthropic API requirement
+    messages.push({ role: 'user', content: 'Hello, I\'m ready to begin.' })
+  }
+
+  messages.push(
     ...messageHistory.map(msg => ({
-      role: msg.role,
+      role: msg.role as 'user' | 'assistant',
       content: msg.content
     })),
     {
       role: 'user' as const,
       content: message
     }
-  ]
+  )
 
   // Call Claude API
   const response = await anthropic.messages.create({
