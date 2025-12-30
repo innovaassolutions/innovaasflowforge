@@ -622,9 +622,9 @@ function updateConversationState(
 ): ConversationState {
   const questionsAsked = (currentState.questions_asked || 0) + 1
 
-  // Detect safeguarding flags
+  // Detect safeguarding flags (ensure array safety)
   const newFlags = detectSafeguardingConcerns(userMessage)
-  const safeguardingFlags = [...currentState.safeguarding_flags, ...newFlags]
+  const safeguardingFlags = [...(currentState.safeguarding_flags || []), ...newFlags]
 
   // Phase progression
   let phase: ConversationPhase = currentState.phase
@@ -647,8 +647,8 @@ function updateConversationState(
     isComplete = true
   }
 
-  // Track sections based on keywords in conversation
-  const sections = [...currentState.sections_completed]
+  // Track sections based on keywords in conversation (ensure array safety)
+  const sections = [...(currentState.sections_completed || [])]
   const framework = QUESTION_FRAMEWORKS[participantType][module]
 
   framework.sections.forEach(section => {
