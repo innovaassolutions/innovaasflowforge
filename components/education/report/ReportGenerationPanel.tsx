@@ -81,7 +81,10 @@ export function ReportGenerationPanel({
 
       if (!synthesisResponse.ok) {
         const synthesisError = await synthesisResponse.json();
-        throw new Error(synthesisError.error || 'Failed to generate synthesis');
+        const errorMessage = synthesisError.details
+          ? `${synthesisError.error}: ${synthesisError.details}`
+          : synthesisError.error || 'Failed to generate synthesis';
+        throw new Error(errorMessage);
       }
 
       const synthesisResult = await synthesisResponse.json();
