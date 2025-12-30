@@ -60,7 +60,7 @@ interface Campaign {
   name: string
   status: string
   education_config: {
-    modules_enabled?: string[]
+    modules?: string[]
     participant_targets?: Record<string, number>
   } | null
   created_at: string
@@ -424,7 +424,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                             {campaign.name}
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {campaign.education_config?.modules_enabled?.join(', ') || 'Education Assessment'}
+                            {campaign.education_config?.modules?.join(', ') || 'Education Assessment'}
                           </p>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${

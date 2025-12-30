@@ -18,7 +18,7 @@ interface Campaign {
   name: string;
   status: string;
   education_config?: {
-    modules_enabled?: string[];
+    modules?: string[];
   } | null;
 }
 
@@ -51,7 +51,7 @@ export function ReportGenerationPanel({
   const [copied, setCopied] = useState(false);
 
   // Get the first module from education_config or use default
-  const module = campaign.education_config?.modules_enabled?.[0] || 'wellbeing';
+  const module = campaign.education_config?.modules?.[0] || 'student_wellbeing';
 
   async function handleGenerateReport() {
     setState('generating');
