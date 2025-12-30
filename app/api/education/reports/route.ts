@@ -360,9 +360,9 @@ export async function GET(request: NextRequest) {
     const { data: reports, error } = await query;
 
     // Filter by campaign_id if provided (campaign_id is in the synthesis relation)
-    let filteredReports = reports;
-    if (campaignId && reports) {
-      filteredReports = (reports as Array<Record<string, unknown>>).filter((report) => {
+    let filteredReports: Array<Record<string, unknown>> | null = reports as Array<Record<string, unknown>> | null;
+    if (campaignId && filteredReports) {
+      filteredReports = filteredReports.filter((report) => {
         const synthesis = report.education_synthesis as { campaign_id?: string } | null;
         return synthesis?.campaign_id === campaignId;
       });
