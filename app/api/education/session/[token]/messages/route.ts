@@ -87,7 +87,12 @@ export async function POST(
 
     // Find active agent session
     // Note: Using .contains() for JSONB field filtering (Supabase JS doesn't support ->> syntax)
-    const targetModule = module || 'student_wellbeing'
+    // Validate module
+    const validModules = ['student_wellbeing', 'teaching_learning', 'parent_confidence'] as const
+    const rawModule = module?.toLowerCase() || 'student_wellbeing'
+    const targetModule = validModules.includes(rawModule as typeof validModules[number])
+      ? rawModule
+      : 'student_wellbeing'
     const { data: agentSessionData, error: sessionError } = await supabaseAdmin
       .from('agent_sessions')
       .select(`
@@ -138,9 +143,16 @@ export async function POST(
       education_config: Record<string, unknown>
     }
 
+    // Normalize and validate participant type
+    const rawParticipantType = participantToken.participant_type?.toLowerCase() || 'student'
+    const validParticipantTypes = ['student', 'teacher', 'parent', 'leadership'] as const
+    const participantType = validParticipantTypes.includes(rawParticipantType as typeof validParticipantTypes[number])
+      ? rawParticipantType as 'student' | 'teacher' | 'parent' | 'leadership'
+      : 'student' // Default fallback
+
     const participant = {
       token: participantToken.token,
-      participant_type: participantToken.participant_type as 'student' | 'teacher' | 'parent' | 'leadership',
+      participant_type: participantType,
       cohort_metadata: participantToken.cohort_metadata as Record<string, string>,
       campaign_id: participantToken.campaign_id,
       school_id: participantToken.school_id
