@@ -367,7 +367,7 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
                   <div className="flex items-center gap-2 mb-2">
                     <MessageCircle className="w-4 h-4 text-brand-teal" />
                     <span className="text-xs font-medium text-muted-foreground">
-                      Assessment Guide
+                      Jippity
                     </span>
                   </div>
                 )}
