@@ -320,6 +320,51 @@ function prepareTranscriptsForAnalysis(
 }
 
 /**
+ * Normalize recommendations to ensure correct structure
+ * Handles case where Claude returns array instead of object
+ */
+function normalizeRecommendations(
+  recommendations: unknown
+): { immediate_actions: string[]; short_term: string[]; strategic: string[] } {
+  const defaultRecs = {
+    immediate_actions: [],
+    short_term: [],
+    strategic: []
+  }
+
+  if (!recommendations) {
+    return defaultRecs
+  }
+
+  // If it's already the correct object structure
+  if (
+    typeof recommendations === 'object' &&
+    !Array.isArray(recommendations) &&
+    ('immediate_actions' in recommendations || 'short_term' in recommendations || 'strategic' in recommendations)
+  ) {
+    const recs = recommendations as Record<string, unknown>
+    return {
+      immediate_actions: Array.isArray(recs.immediate_actions) ? recs.immediate_actions as string[] : [],
+      short_term: Array.isArray(recs.short_term) ? recs.short_term as string[] : [],
+      strategic: Array.isArray(recs.strategic) ? recs.strategic as string[] : []
+    }
+  }
+
+  // If it's an array of strings, distribute them across categories
+  if (Array.isArray(recommendations)) {
+    const strings = recommendations.filter((r): r is string => typeof r === 'string')
+    // Put first 2 in immediate, next 2 in short_term, rest in strategic
+    return {
+      immediate_actions: strings.slice(0, 2),
+      short_term: strings.slice(2, 4),
+      strategic: strings.slice(4)
+    }
+  }
+
+  return defaultRecs
+}
+
+/**
  * Calculate data quality metrics
  */
 function calculateDataQuality(transcripts: EducationTranscript[]): {
@@ -585,11 +630,7 @@ Generate your synthesis as JSON matching the EducationSynthesisResult interface.
       safeguarding_signals: 0,
       intervention_recommended: false
     },
-    recommendations: synthesisData.recommendations || {
-      immediate_actions: [],
-      short_term: [],
-      strategic: []
-    },
+    recommendations: normalizeRecommendations(synthesisData.recommendations),
     data_quality: dataQuality
   }
 
