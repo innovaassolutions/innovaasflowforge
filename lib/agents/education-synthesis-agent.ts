@@ -364,7 +364,28 @@ export async function generateEducationSynthesis(
   module: string,
   model: 'claude-sonnet-4-5-20250929' | 'claude-opus-4-20250514' = 'claude-sonnet-4-5-20250929'
 ): Promise<EducationSynthesisResult> {
-  // Fetch all completed sessions for this campaign/module
+  // First get participant tokens for this campaign
+  // @ts-ignore - education_participant_tokens table not yet in generated types
+  const { data: tokensData, error: tokensError } = await supabaseAdmin
+    .from('education_participant_tokens')
+    .select('id')
+    .eq('campaign_id', campaignId)
+
+  const tokens = tokensData as Array<{ id: string }> | null
+
+  if (tokensError) {
+    console.error('Error fetching campaign tokens:', tokensError)
+    throw new Error('Failed to fetch campaign participant tokens')
+  }
+
+  const tokenIds = tokens?.map(t => t.id) || []
+
+  if (tokenIds.length === 0) {
+    throw new Error('No participant tokens found for this campaign')
+  }
+
+  // Fetch all sessions for this campaign's tokens
+  // @ts-ignore - agent_sessions education fields not yet in generated types
   const { data: sessionsData, error: sessionsError } = await supabaseAdmin
     .from('agent_sessions')
     .select(`
@@ -375,12 +396,12 @@ export async function generateEducationSynthesis(
       created_at,
       updated_at
     `)
-    .eq('education_session_context->>module', module)
+    .in('participant_token_id', tokenIds)
     .not('participant_token_id', 'is', null)
     .order('created_at', { ascending: true })
 
   // Type assertion for sessions
-  const sessions = sessionsData as Array<{
+  const allSessions = sessionsData as Array<{
     id: string
     participant_token_id: string
     education_session_context: Record<string, unknown>
@@ -394,8 +415,14 @@ export async function generateEducationSynthesis(
     throw new Error('Failed to fetch education sessions')
   }
 
-  if (!sessions || sessions.length === 0) {
-    throw new Error('No completed education sessions found for analysis')
+  // Filter by module in JS (Supabase client doesn't support JSONB ->> syntax)
+  const sessions = (allSessions || []).filter(s => {
+    const context = s.education_session_context as { module?: string } | null
+    return context?.module === module
+  })
+
+  if (sessions.length === 0) {
+    throw new Error(`No education sessions found for module "${module}" in this campaign`)
   }
 
   // Fetch messages for each session

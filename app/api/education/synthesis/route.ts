@@ -93,12 +93,48 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
 
-    // Check if campaign has completed sessions
-    const { count: sessionCount, error: countError } = await supabaseAdmin
+    // Get participant tokens for this campaign
+    // @ts-ignore - education_participant_tokens table not yet in generated types
+    const { data: campaignTokensData, error: tokensError } = await supabaseAdmin
+      .from('education_participant_tokens')
+      .select('id')
+      .eq('campaign_id', campaign_id);
+
+    const campaignTokens = campaignTokensData as Array<{ id: string }> | null;
+
+    if (tokensError) {
+      console.error('Error fetching campaign tokens:', tokensError);
+      return NextResponse.json(
+        { error: 'Failed to verify campaign participants' },
+        { status: 500 }
+      );
+    }
+
+    const tokenIds = campaignTokens?.map((t) => t.id) || [];
+
+    if (tokenIds.length === 0) {
+      return NextResponse.json(
+        {
+          error: 'No participants found for this campaign',
+          details: 'Campaign has no participant tokens yet',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if campaign has sessions for this module
+    // @ts-ignore - agent_sessions education fields not yet in generated types
+    const { data: sessionsRawData, error: countError } = await supabaseAdmin
       .from('agent_sessions')
-      .select('id', { count: 'exact', head: true })
-      .not('participant_token_id', 'is', null)
-      .eq('education_session_context->>module', module);
+      .select('id, participant_token_id, education_session_context')
+      .in('participant_token_id', tokenIds)
+      .not('participant_token_id', 'is', null);
+
+    const sessionsWithData = sessionsRawData as Array<{
+      id: string;
+      participant_token_id: string;
+      education_session_context: { module?: string } | null;
+    }> | null;
 
     if (countError) {
       console.error('Error counting sessions:', countError);
@@ -108,11 +144,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!sessionCount || sessionCount === 0) {
+    // Filter sessions by module (JSONB filtering done in JS since Supabase client doesn't support ->> syntax)
+    const moduleSessions = (sessionsWithData || []).filter((session) => {
+      return session.education_session_context?.module === module;
+    });
+
+    const sessionCount = moduleSessions.length;
+
+    if (sessionCount === 0) {
       return NextResponse.json(
         {
-          error: 'No completed sessions found for this campaign/module',
-          details: 'At least one completed interview session is required for synthesis',
+          error: 'No sessions found for this campaign/module',
+          details: `No sessions found for module "${module}" in this campaign. Found ${tokenIds.length} participant tokens.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check for sessions with actual conversation data in agent_messages table
+    const sessionIds = moduleSessions.map((s) => s.id);
+    // @ts-ignore - agent_messages not yet in generated types
+    const { data: messagesRawData, error: messagesError } = await supabaseAdmin
+      .from('agent_messages')
+      .select('agent_session_id')
+      .in('agent_session_id', sessionIds);
+
+    const messagesData = messagesRawData as Array<{ agent_session_id: string }> | null;
+
+    if (messagesError) {
+      console.error('Error checking messages:', messagesError);
+      return NextResponse.json(
+        { error: 'Failed to verify session messages' },
+        { status: 500 }
+      );
+    }
+
+    // Get unique session IDs that have messages
+    const sessionIdsWithMessages = new Set(
+      (messagesData || []).map((m) => m.agent_session_id)
+    );
+
+    const sessionsWithConversations = moduleSessions.filter((session) =>
+      sessionIdsWithMessages.has(session.id)
+    );
+
+    if (sessionsWithConversations.length === 0) {
+      return NextResponse.json(
+        {
+          error: 'No completed interviews found',
+          details: `Found ${sessionCount} sessions for module "${module}", but none have conversation data. Interviews need to be completed before synthesis.`,
         },
         { status: 400 }
       );
@@ -129,16 +209,10 @@ export async function POST(request: NextRequest) {
       module
     );
 
-    // Get participant token IDs used in synthesis
-    const { data: sessions } = await supabaseAdmin
-      .from('agent_sessions')
-      .select('participant_token_id')
-      .not('participant_token_id', 'is', null)
-      .eq('education_session_context->>module', module);
-
-    const sourceTokenIds = (sessions as Array<{ participant_token_id: string | null }> | null)
-      ?.map((s) => s.participant_token_id)
-      .filter((id): id is string => id !== null) || [];
+    // Get participant token IDs used in synthesis (reuse already-fetched sessions)
+    const sourceTokenIds = sessionsWithConversations
+      .map((s) => (s as { participant_token_id?: string }).participant_token_id)
+      .filter((id): id is string => !!id);
 
     // Save synthesis to database using admin client (bypasses RLS)
     // @ts-ignore - education_synthesis table not yet in generated types
