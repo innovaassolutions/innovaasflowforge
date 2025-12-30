@@ -201,13 +201,27 @@ export async function POST(request: NextRequest) {
     console.log(
       `Generating synthesis for campaign ${campaign_id}, school ${school_id}, module ${module} (${sessionCount} sessions)`
     );
+    console.log(`Sessions with conversations: ${sessionsWithConversations.length}`);
 
     // Generate synthesis using the education synthesis agent
-    const synthesisResult = await generateEducationSynthesis(
-      campaign_id,
-      school_id,
-      module
-    );
+    let synthesisResult;
+    try {
+      synthesisResult = await generateEducationSynthesis(
+        campaign_id,
+        school_id,
+        module
+      );
+      console.log('Synthesis generation successful');
+    } catch (synthesisError) {
+      console.error('Synthesis generation failed:', synthesisError);
+      return NextResponse.json(
+        {
+          error: 'Synthesis generation failed',
+          details: synthesisError instanceof Error ? synthesisError.message : 'Unknown synthesis error',
+        },
+        { status: 500 }
+      );
+    }
 
     // Get participant token IDs used in synthesis (reuse already-fetched sessions)
     const sourceTokenIds = sessionsWithConversations

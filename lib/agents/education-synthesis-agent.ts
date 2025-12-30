@@ -469,41 +469,66 @@ export async function generateEducationSynthesis(
   const systemPrompt = generateSynthesisPrompt(module, stakeholderGroups, transcripts.length)
 
   // Call Claude for synthesis
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 8192,
-    system: systemPrompt,
-    messages: [
-      {
-        role: 'user',
-        content: `Analyze the following pseudonymous interview transcripts and generate a comprehensive synthesis:
+  console.log(`[Synthesis] Calling Claude API with model: ${model}`)
+  console.log(`[Synthesis] Prepared data length: ${preparedData.length} chars`)
+  console.log(`[Synthesis] Stakeholder groups: ${stakeholderGroups.join(', ')}`)
+
+  let response
+  try {
+    response = await anthropic.messages.create({
+      model,
+      max_tokens: 8192,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: `Analyze the following pseudonymous interview transcripts and generate a comprehensive synthesis:
 
 ${preparedData}
 
 ---
 
 Generate your synthesis as JSON matching the EducationSynthesisResult interface. Focus on patterns and themes, never individuals.`
-      }
-    ]
-  })
+        }
+      ]
+    })
+    console.log(`[Synthesis] Claude API call successful, response type: ${response.content[0]?.type}`)
+  } catch (claudeError) {
+    console.error('[Synthesis] Claude API error:', claudeError)
+    throw new Error(`Claude API call failed: ${claudeError instanceof Error ? claudeError.message : 'Unknown error'}`)
+  }
 
   // Extract response text
   const responseText = response.content[0].type === 'text'
     ? response.content[0].text
     : ''
 
+  console.log(`[Synthesis] Response text length: ${responseText.length} chars`)
+  console.log(`[Synthesis] Response preview: ${responseText.substring(0, 200)}...`)
+
   // Parse JSON (handle potential markdown wrapper)
   let synthesisData: Partial<EducationSynthesisResult>
   try {
     // Try direct parse first
     synthesisData = JSON.parse(responseText)
-  } catch {
+    console.log('[Synthesis] Direct JSON parse successful')
+  } catch (parseError) {
+    console.log('[Synthesis] Direct parse failed, trying markdown extraction')
     // Try extracting from markdown code block
     const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/)
     if (jsonMatch) {
-      synthesisData = JSON.parse(jsonMatch[1])
+      try {
+        synthesisData = JSON.parse(jsonMatch[1])
+        console.log('[Synthesis] Markdown JSON extraction successful')
+      } catch (mdParseError) {
+        console.error('[Synthesis] Markdown JSON parse error:', mdParseError)
+        console.error('[Synthesis] Extracted content preview:', jsonMatch[1].substring(0, 500))
+        throw new Error(`Failed to parse extracted JSON: ${mdParseError instanceof Error ? mdParseError.message : 'Unknown error'}`)
+      }
     } else {
-      throw new Error('Failed to parse synthesis response as JSON')
+      console.error('[Synthesis] No JSON code block found in response')
+      console.error('[Synthesis] Full response:', responseText.substring(0, 1000))
+      throw new Error('Failed to parse synthesis response as JSON - no code block found')
     }
   }
 
