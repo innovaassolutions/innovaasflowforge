@@ -47,7 +47,7 @@ interface EducationTranscript {
   cohort_metadata: Record<string, string>
 }
 
-interface StakeholderGroupAnalysis {
+export interface StakeholderGroupAnalysis {
   participant_type: string
   session_count: number
   cohort_breakdown: Record<string, number>
@@ -57,7 +57,7 @@ interface StakeholderGroupAnalysis {
   representative_quotes: string[] // Anonymized, no attribution
 }
 
-interface TriangulationInsight {
+export interface TriangulationInsight {
   theme: string
   student_perspective?: string
   teacher_perspective?: string
@@ -68,7 +68,7 @@ interface TriangulationInsight {
   synthesis: string
 }
 
-interface EducationSynthesisResult {
+export interface EducationSynthesisResult {
   campaign_id: string
   school_id: string
   module: string
@@ -555,13 +555,24 @@ export async function generateCohortAnalysis(
 }
 
 /**
- * Compare synthesis across multiple time periods
+ * Longitudinal data point for trend analysis
  */
-export async function generateLongitudinalComparison(
-  schoolId: string,
-  module: string,
-  synthesisIds: string[]
-): Promise<{
+export interface LongitudinalDataPoint {
+  synthesisId: string
+  generatedAt: string
+  termLabel: string
+  urgencyLevel: 'low' | 'medium' | 'high' | 'critical'
+  holdingScore: number
+  slippingScore: number
+  riskScore: number
+  misunderstoodScore: number
+}
+
+/**
+ * Longitudinal comparison result
+ */
+export interface LongitudinalComparisonResult {
+  dataPoints: LongitudinalDataPoint[]
   trend_analysis: {
     improving: string[]
     declining: string[]
@@ -569,13 +580,167 @@ export async function generateLongitudinalComparison(
   }
   key_changes: string[]
   recommendations: string[]
-}> {
-  // This would compare multiple synthesis results over time
-  // Useful for tracking progress in annual assessments
+  hasSufficientData: boolean
+}
 
-  console.log(`Comparing ${synthesisIds.length} synthesis periods for school ${schoolId}`)
+/**
+ * Generate term label from date
+ */
+function getTermLabel(date: Date): string {
+  const month = date.getMonth()
+  const year = date.getFullYear()
 
-  throw new Error('Longitudinal comparison not yet implemented')
+  // UK academic terms approximation
+  if (month >= 0 && month <= 3) {
+    return `Spring ${year}`
+  } else if (month >= 4 && month <= 7) {
+    return `Summer ${year}`
+  } else {
+    return `Autumn ${year}`
+  }
+}
+
+/**
+ * Compare synthesis across multiple time periods
+ */
+export async function generateLongitudinalComparison(
+  schoolId: string,
+  module: string,
+  synthesisIds?: string[]
+): Promise<LongitudinalComparisonResult> {
+  // Fetch all synthesis records for this school/module, ordered by date
+  const { data: synthesesData, error } = await supabaseAdmin
+    .from('education_synthesis')
+    .select('id, content, generated_at')
+    .eq('school_id', schoolId)
+    .eq('module', module)
+    .order('generated_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching longitudinal data:', error)
+    throw new Error('Failed to fetch longitudinal data')
+  }
+
+  const syntheses = synthesesData as Array<{
+    id: string
+    content: Record<string, unknown>
+    generated_at: string
+  }> | null
+
+  // Handle case with insufficient data
+  if (!syntheses || syntheses.length < 2) {
+    return {
+      dataPoints: syntheses ? syntheses.map(s => {
+        const content = s.content as unknown as EducationSynthesisResult
+        return {
+          synthesisId: s.id,
+          generatedAt: s.generated_at,
+          termLabel: getTermLabel(new Date(s.generated_at)),
+          urgencyLevel: content.executive_summary?.urgency_level || 'medium',
+          holdingScore: content.what_is_holding?.stakeholder_agreement || 0,
+          slippingScore: content.what_is_slipping?.stakeholder_agreement || 0,
+          riskScore: content.what_is_at_risk?.safeguarding_signals || 0,
+          misunderstoodScore: content.what_is_misunderstood?.perception_gaps?.length || 0,
+        }
+      }) : [],
+      trend_analysis: {
+        improving: [],
+        declining: [],
+        stable: [],
+      },
+      key_changes: [],
+      recommendations: [],
+      hasSufficientData: false,
+    }
+  }
+
+  // Extract data points from each synthesis
+  const dataPoints: LongitudinalDataPoint[] = syntheses.map(s => {
+    const content = s.content as unknown as EducationSynthesisResult
+    return {
+      synthesisId: s.id,
+      generatedAt: s.generated_at,
+      termLabel: getTermLabel(new Date(s.generated_at)),
+      urgencyLevel: content.executive_summary?.urgency_level || 'medium',
+      holdingScore: content.what_is_holding?.stakeholder_agreement || 0,
+      slippingScore: content.what_is_slipping?.stakeholder_agreement || 0,
+      riskScore: content.what_is_at_risk?.safeguarding_signals || 0,
+      misunderstoodScore: content.what_is_misunderstood?.perception_gaps?.length || 0,
+    }
+  })
+
+  // Analyze trends by comparing first and last data points
+  const first = dataPoints[0]
+  const last = dataPoints[dataPoints.length - 1]
+
+  const improving: string[] = []
+  const declining: string[] = []
+  const stable: string[] = []
+
+  // Holding score - higher is better
+  if (last.holdingScore > first.holdingScore + 5) {
+    improving.push('What\'s Holding - stakeholder agreement improved')
+  } else if (last.holdingScore < first.holdingScore - 5) {
+    declining.push('What\'s Holding - stakeholder agreement declined')
+  } else {
+    stable.push('What\'s Holding - stakeholder agreement stable')
+  }
+
+  // Slipping score - lower is better
+  if (last.slippingScore < first.slippingScore - 5) {
+    improving.push('What\'s Slipping - fewer concerns')
+  } else if (last.slippingScore > first.slippingScore + 5) {
+    declining.push('What\'s Slipping - more concerns emerging')
+  } else {
+    stable.push('What\'s Slipping - concern level stable')
+  }
+
+  // Risk score - lower is better
+  if (last.riskScore < first.riskScore) {
+    improving.push('What\'s At Risk - fewer safeguarding signals')
+  } else if (last.riskScore > first.riskScore) {
+    declining.push('What\'s At Risk - more safeguarding signals')
+  } else {
+    stable.push('What\'s At Risk - signal count unchanged')
+  }
+
+  // Urgency level changes
+  const urgencyOrder = ['low', 'medium', 'high', 'critical']
+  const firstUrgency = urgencyOrder.indexOf(first.urgencyLevel)
+  const lastUrgency = urgencyOrder.indexOf(last.urgencyLevel)
+
+  const key_changes: string[] = []
+  if (lastUrgency < firstUrgency) {
+    key_changes.push(`Urgency level improved from ${first.urgencyLevel} to ${last.urgencyLevel}`)
+  } else if (lastUrgency > firstUrgency) {
+    key_changes.push(`Urgency level increased from ${first.urgencyLevel} to ${last.urgencyLevel}`)
+  }
+
+  // Generate recommendations based on trends
+  const recommendations: string[] = []
+  if (declining.length > improving.length) {
+    recommendations.push('Consider scheduling a review meeting to address declining trends')
+  }
+  if (last.riskScore > 0) {
+    recommendations.push('Prioritize safeguarding follow-up actions')
+  }
+  if (improving.length > 0) {
+    recommendations.push('Document successful interventions for future reference')
+  }
+
+  console.log(`Generated longitudinal comparison for ${dataPoints.length} assessments for school ${schoolId}`)
+
+  return {
+    dataPoints,
+    trend_analysis: {
+      improving,
+      declining,
+      stable,
+    },
+    key_changes,
+    recommendations,
+    hasSufficientData: true,
+  }
 }
 
 /**

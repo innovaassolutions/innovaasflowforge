@@ -47,3 +47,11 @@ development_status:
   1-3-report-landing-page-visualizations: in-progress
   1-4-document-upload-enhancements: backlog
   epic-1-retrospective: optional
+
+  # Epic 2: Education Synthesis Reports
+  epic-2: contexted
+  2-1-database-api-foundation: done  # story-education-reports-1.md
+  2-2-dashboard-ui-report-generation: done  # story-education-reports-2.md
+  2-3-report-landing-page-visualizations: done  # story-education-reports-3.md
+  2-4-longitudinal-safeguarding-notifications: done  # story-education-reports-4.md
+  epic-2-retrospective: optional

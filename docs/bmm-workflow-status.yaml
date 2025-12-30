@@ -31,3 +31,29 @@ workflow_status:
 
   # Phase 2: Implementation
   sprint-planning: required  # agent: sm
+
+# Active Epics
+# ============
+active_epics:
+  education-reports:
+    tech-spec: docs/tech-spec-education-reports.md
+    epic: docs/sprint-artifacts/epic-education-reports.md
+    story_count: 4
+    total_points: 12
+    stories:
+      - story: story-education-reports-1.md
+        title: "Database & API Foundation"
+        status: TODO
+        points: 3
+      - story: story-education-reports-2.md
+        title: "Dashboard UI & Report Generation"
+        status: TODO
+        points: 2
+      - story: story-education-reports-3.md
+        title: "Report Landing Page & Visualizations"
+        status: TODO
+        points: 5
+      - story: story-education-reports-4.md
+        title: "Longitudinal & Safeguarding Notifications"
+        status: TODO
+        points: 2

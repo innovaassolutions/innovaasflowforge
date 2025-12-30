@@ -25,6 +25,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ReportGenerationPanel } from '@/components/education/report/ReportGenerationPanel'
 
 interface School {
   id: string
@@ -72,6 +73,16 @@ interface AlertSummary {
   resolved: number
 }
 
+interface CampaignReport {
+  id: string
+  campaign_id: string
+  synthesis_id: string
+  access_token: string
+  report_url: string
+  has_safeguarding_signals: boolean
+  created_at: string
+}
+
 const CURRICULUM_LABELS: Record<string, string> = {
   'IB': 'International Baccalaureate',
   'British': 'British Curriculum',
@@ -91,6 +102,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default function SchoolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [school, setSchool] = useState<School | null>(null)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [campaignReports, setCampaignReports] = useState<Record<string, CampaignReport>>({})
   const [alertSummary, setAlertSummary] = useState<AlertSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -143,6 +155,24 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
           (c: Campaign & { school_id?: string }) => c.school_id === schoolId
         )
         setCampaigns(schoolCampaigns)
+      }
+
+      // Load existing education reports for this school's campaigns
+      const reportsResponse = await fetch(apiUrl('api/education/reports'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      if (reportsResponse.ok) {
+        const reportsData = await reportsResponse.json()
+        const reportsMap: Record<string, CampaignReport> = {}
+        ;(reportsData.reports || []).forEach((report: CampaignReport & { campaign_id?: string }) => {
+          if (report.campaign_id) {
+            reportsMap[report.campaign_id] = report
+          }
+        })
+        setCampaignReports(reportsMap)
       }
 
       // Load safeguarding alerts summary
@@ -381,14 +411,18 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
               ) : (
                 <div className="space-y-3">
                   {campaigns.map(campaign => (
-                    <Link
+                    <div
                       key={campaign.id}
-                      href={`/dashboard/campaigns/${campaign.id}`}
-                      className="block p-4 rounded-lg border border-border hover:border-primary/50 transition-colors"
+                      className="p-4 rounded-lg border border-border"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-medium text-foreground">{campaign.name}</h3>
+                          <Link
+                            href={`/dashboard/campaigns/${campaign.id}`}
+                            className="font-medium text-foreground hover:text-primary transition-colors"
+                          >
+                            {campaign.name}
+                          </Link>
                           <p className="text-sm text-muted-foreground mt-1">
                             {campaign.education_config?.modules_enabled?.join(', ') || 'Education Assessment'}
                           </p>
@@ -403,7 +437,30 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                           {campaign.status}
                         </span>
                       </div>
-                    </Link>
+
+                      {/* Report Generation Panel */}
+                      <ReportGenerationPanel
+                        campaign={campaign}
+                        schoolId={school.id}
+                        existingReport={campaignReports[campaign.id] ? {
+                          id: campaignReports[campaign.id].id,
+                          access_token: campaignReports[campaign.id].access_token,
+                          report_url: campaignReports[campaign.id].report_url,
+                          has_safeguarding_signals: campaignReports[campaign.id].has_safeguarding_signals,
+                          created_at: campaignReports[campaign.id].created_at,
+                        } : null}
+                        onReportGenerated={(newReport) => {
+                          setCampaignReports(prev => ({
+                            ...prev,
+                            [campaign.id]: {
+                              ...newReport,
+                              campaign_id: campaign.id,
+                              synthesis_id: '',
+                            }
+                          }))
+                        }}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
