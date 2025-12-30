@@ -17,8 +17,8 @@ export interface ModelConfig {
 
 export const MODEL_CONFIGURATIONS: Record<ReportTier, ModelConfig> = {
   standard: {
-    modelId: 'claude-sonnet-4-5-20250929',
-    displayName: 'Claude Sonnet 4.5',
+    modelId: 'claude-sonnet-4-20250514',
+    displayName: 'Claude Sonnet 4',
     description: 'Balanced performance and cost for comprehensive analysis',
     estimatedCostPerReport: '$0.30 - $0.60',
     capabilities: [
