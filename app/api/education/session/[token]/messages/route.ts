@@ -158,25 +158,41 @@ export async function POST(
     }
 
     // Process message through education agent
-    const { response, updatedState, safeguardingAlert } = await processEducationMessage(
-      message,
-      participant,
-      campaignData,
-      targetModule,
-      (messageHistory || []).map(m => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-        timestamp: m.created_at
-      })),
-      (agentSession.education_session_context as Record<string, unknown>)?.progress as ConversationState || {
-        phase: 'opening',
-        sections_completed: [],
-        questions_asked: 0,
-        rapport_established: false,
-        anonymity_confirmed: false,
-        safeguarding_flags: []
-      } as ConversationState
-    )
+    let response: string
+    let updatedState: ConversationState
+    let safeguardingAlert: string | undefined
+
+    try {
+      const result = await processEducationMessage(
+        message,
+        participant,
+        campaignData,
+        targetModule,
+        (messageHistory || []).map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: m.created_at
+        })),
+        (agentSession.education_session_context as Record<string, unknown>)?.progress as ConversationState || {
+          phase: 'opening',
+          sections_completed: [],
+          questions_asked: 0,
+          rapport_established: false,
+          anonymity_confirmed: false,
+          safeguarding_flags: []
+        } as ConversationState
+      )
+      response = result.response
+      updatedState = result.updatedState
+      safeguardingAlert = result.safeguardingAlert
+    } catch (agentError) {
+      console.error('Education agent error:', agentError)
+      console.error('Agent error message:', agentError instanceof Error ? agentError.message : 'Unknown')
+      console.error('Message history length:', messageHistory?.length || 0)
+      console.error('Participant type:', participant.participant_type)
+      console.error('Target module:', targetModule)
+      throw agentError // Re-throw to be caught by outer handler
+    }
 
     // Save user message
     await supabaseAdmin
@@ -272,23 +288,32 @@ export async function POST(
     if (error instanceof Error) {
       console.error('Error stack:', error.stack)
       console.error('Error name:', error.name)
+      console.error('Full error message:', error.message)
     }
 
     // Provide more specific error info for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorName = error instanceof Error ? error.name : 'UnknownError'
+
+    // Check for various Anthropic API errors
     const isAnthropicError = errorMessage.includes('401') ||
                             errorMessage.includes('credit') ||
                             errorMessage.includes('api_key') ||
                             errorMessage.includes('authentication') ||
                             errorMessage.includes('first message') ||
-                            errorMessage.includes('user role')
+                            errorMessage.includes('user role') ||
+                            errorMessage.includes('messages:') ||
+                            errorName === 'APIError' ||
+                            errorName === 'AuthenticationError'
 
     return NextResponse.json(
       {
         error: isAnthropicError
           ? 'AI service configuration error. Please contact support.'
           : 'Failed to process message',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        details: process.env.NODE_ENV === 'development' ? `${errorName}: ${errorMessage}` : undefined,
+        // Include error type hint for debugging even in production
+        errorType: isAnthropicError ? 'anthropic' : 'processing'
       },
       { status: 500 }
     )

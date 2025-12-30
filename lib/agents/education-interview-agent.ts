@@ -752,6 +752,9 @@ export async function processEducationMessage(
   )
 
   // Call Claude API
+  console.log('Calling Anthropic API with', messages.length, 'messages')
+  console.log('Messages structure:', JSON.stringify(messages.map(m => ({ role: m.role, contentLength: m.content.length }))))
+
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-5-20250929',
     max_tokens: 1024,
