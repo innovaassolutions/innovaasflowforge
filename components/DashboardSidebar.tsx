@@ -81,14 +81,28 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ]
 
-  // Industry vertical items
+  // Industry vertical items - Companies only
   const industryNavItems = hasIndustryAccess ? [
     {
       name: 'Companies',
       href: '/dashboard/companies',
       icon: Building2,
       matchPaths: ['/dashboard/companies']
-    },
+    }
+  ] : []
+
+  // Education vertical items
+  const educationNavItems = hasEducationAccess ? [
+    {
+      name: 'Schools',
+      href: '/dashboard/education/schools',
+      icon: GraduationCap,
+      matchPaths: ['/dashboard/education']
+    }
+  ] : []
+
+  // Campaigns - shown after Schools
+  const campaignNavItems = hasIndustryAccess ? [
     {
       name: 'Campaigns',
       href: '/dashboard/campaigns',
@@ -97,17 +111,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  // Education vertical items
-  const educationNavItems = hasEducationAccess ? [
-    {
-      name: 'Education',
-      href: '/dashboard/education/schools',
-      icon: GraduationCap,
-      matchPaths: ['/dashboard/education']
-    }
-  ] : []
-
-  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems]
+  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
