@@ -309,17 +309,32 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Message processing error:', error)
+    console.error('=== MESSAGE PROCESSING ERROR ===')
+    console.error('Error object:', error)
+    console.error('Error type:', typeof error)
+    console.error('Error constructor:', error?.constructor?.name)
 
-    // Log full error stack for debugging
+    // Log full error details for debugging
     if (error instanceof Error) {
-      console.error('Error stack:', error.stack)
       console.error('Error name:', error.name)
-      console.error('Full error message:', error.message)
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+
+      // Check for Anthropic SDK specific error properties
+      const anyError = error as Record<string, unknown>
+      if ('status' in anyError) {
+        console.error('HTTP status:', anyError.status)
+      }
+      if ('error' in anyError) {
+        console.error('Error body:', JSON.stringify(anyError.error))
+      }
+      if ('cause' in anyError) {
+        console.error('Error cause:', anyError.cause)
+      }
     }
 
     // Provide more specific error info for debugging
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorMessage = error instanceof Error ? error.message : String(error)
     const errorName = error instanceof Error ? error.name : 'UnknownError'
 
     // Check for various Anthropic API errors
@@ -335,20 +350,27 @@ export async function POST(
                             errorMessage.includes('invalid') ||
                             errorMessage.includes('rate limit') ||
                             errorMessage.includes('overloaded') ||
+                            errorMessage.includes('timeout') ||
+                            errorMessage.includes('ECONNREFUSED') ||
+                            errorMessage.includes('ENOTFOUND') ||
                             errorName === 'APIError' ||
                             errorName === 'AuthenticationError' ||
                             errorName === 'BadRequestError' ||
                             errorName === 'NotFoundError' ||
-                            errorName === 'RateLimitError'
+                            errorName === 'RateLimitError' ||
+                            errorName === 'InternalServerError' ||
+                            errorName === 'APIConnectionError'
 
+    // Always include error details in response for debugging
+    // Production frontend can choose to hide these from users
     return NextResponse.json(
       {
         error: isAnthropicError
-          ? 'AI service configuration error. Please contact support.'
+          ? 'AI service error. Please try again in a moment.'
           : 'Failed to process message',
-        details: process.env.NODE_ENV === 'development' ? `${errorName}: ${errorMessage}` : undefined,
-        // Include error type hint for debugging even in production
-        errorType: isAnthropicError ? 'anthropic' : 'processing'
+        details: `${errorName}: ${errorMessage}`,
+        errorType: isAnthropicError ? 'anthropic' : 'processing',
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     )
