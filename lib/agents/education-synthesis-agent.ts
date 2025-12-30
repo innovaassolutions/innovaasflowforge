@@ -426,7 +426,8 @@ export async function generateEducationSynthesis(
   }
 
   // Fetch messages for each session
-  const transcripts: EducationTranscript[] = await Promise.all(
+  console.log(`[Synthesis] Fetching messages for ${sessions.length} sessions`)
+  const allTranscripts: EducationTranscript[] = await Promise.all(
     sessions.map(async (session) => {
       const { data: messagesData } = await supabaseAdmin
         .from('agent_messages')
@@ -455,6 +456,18 @@ export async function generateEducationSynthesis(
       }
     })
   )
+
+  // Filter to only include transcripts with actual user messages
+  const transcripts = allTranscripts.filter(t => {
+    const userMessages = t.messages.filter(m => m.role === 'user')
+    return userMessages.length > 0
+  })
+
+  console.log(`[Synthesis] ${transcripts.length} of ${allTranscripts.length} sessions have user messages`)
+
+  if (transcripts.length === 0) {
+    throw new Error('No sessions with user messages found - interviews may be incomplete')
+  }
 
   // Get unique stakeholder types
   const stakeholderGroups = [...new Set(transcripts.map(t => t.participant_type))]
