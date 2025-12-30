@@ -203,7 +203,7 @@ export async function POST(
     await supabaseAdmin.rpc('update_education_session_progress', {
       input_session_id: agentSession.id,
       input_questions_asked: updatedState.questions_asked || 0,
-      input_sections_completed: JSON.stringify(updatedState.sections_completed || []),
+      input_sections_completed: updatedState.sections_completed || [],  // Pass array directly, Supabase handles JSONB conversion
       input_estimated_completion: Math.min((updatedState.questions_asked || 0) / 15, 1)
     })
 
@@ -214,7 +214,7 @@ export async function POST(
         // @ts-ignore - record_safeguarding_flag function not yet in generated types
         await supabaseAdmin.rpc('record_safeguarding_flag', {
           input_session_id: agentSession.id,
-          input_flag: JSON.stringify(flag)
+          input_flag: flag  // Pass object directly, Supabase handles JSONB conversion
         })
 
         // Create safeguarding alert if confidence is high enough
@@ -225,16 +225,16 @@ export async function POST(
             input_school_id: participantToken.school_id,
             input_participant_token: participantToken.token,
             input_participant_type: participantToken.participant_type,
-            input_cohort_metadata: participantToken.cohort_metadata,
+            input_cohort_metadata: participantToken.cohort_metadata,  // Already an object, Supabase handles JSONB conversion
             input_trigger_type: flag.type,
             input_trigger_content: message,
             input_trigger_context: response,
             input_confidence: flag.confidence,
-            input_ai_analysis: JSON.stringify({
+            input_ai_analysis: {  // Pass object directly, Supabase handles JSONB conversion
               trigger_type: flag.type,
               trigger_content: flag.content,
               agent_assessment: safeguardingAlert
-            })
+            }
           })
         }
       }
@@ -246,7 +246,7 @@ export async function POST(
       // Mark module as completed
       // @ts-ignore - mark_module_completed function not yet in generated types
       await supabaseAdmin.rpc('mark_module_completed', {
-        input_token_id: participantToken.id,
+        input_token: participantToken.token,  // Function expects token string, not UUID
         input_module: targetModule
       })
     }
@@ -254,7 +254,7 @@ export async function POST(
     // Update participant activity
     // @ts-ignore - update_participant_activity function not yet in generated types
     await supabaseAdmin.rpc('update_participant_activity', {
-      input_token_id: participantToken.id
+      input_token: participantToken.token  // Function expects token string, not UUID
     })
 
     return NextResponse.json({
