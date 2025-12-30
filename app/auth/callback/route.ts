@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     // Update last_seen_at for the user
     if (data.user) {
-      await supabase
-        .from('user_profiles')
+      await (supabase
+        .from('user_profiles') as any)
         .update({ last_seen_at: new Date().toISOString() })
         .eq('id', data.user.id)
     }
