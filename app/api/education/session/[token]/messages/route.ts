@@ -315,8 +315,16 @@ export async function POST(
                             errorMessage.includes('first message') ||
                             errorMessage.includes('user role') ||
                             errorMessage.includes('messages:') ||
+                            errorMessage.includes('model') ||
+                            errorMessage.includes('does not exist') ||
+                            errorMessage.includes('invalid') ||
+                            errorMessage.includes('rate limit') ||
+                            errorMessage.includes('overloaded') ||
                             errorName === 'APIError' ||
-                            errorName === 'AuthenticationError'
+                            errorName === 'AuthenticationError' ||
+                            errorName === 'BadRequestError' ||
+                            errorName === 'NotFoundError' ||
+                            errorName === 'RateLimitError'
 
     return NextResponse.json(
       {

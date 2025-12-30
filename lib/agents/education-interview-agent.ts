@@ -735,32 +735,77 @@ export async function processEducationMessage(
   // user message to satisfy this requirement.
   const messages: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
+  console.log('=== MESSAGE PREPARATION ===')
+  console.log('History length:', messageHistory.length)
+  console.log('History first role:', messageHistory[0]?.role)
+  console.log('Current message length:', message.length)
+
   if (messageHistory.length > 0 && messageHistory[0].role === 'assistant') {
     // Add a synthetic user message to satisfy Anthropic API requirement
     messages.push({ role: 'user', content: 'Hello, I\'m ready to begin.' })
+    console.log('Added synthetic user message')
   }
 
+  // Map history messages, ensuring content is always a string
+  const historyMapped = messageHistory.map(msg => ({
+    role: msg.role as 'user' | 'assistant',
+    content: String(msg.content || '')
+  }))
+
   messages.push(
-    ...messageHistory.map(msg => ({
-      role: msg.role as 'user' | 'assistant',
-      content: msg.content
-    })),
+    ...historyMapped,
     {
       role: 'user' as const,
-      content: message
+      content: String(message || '')
     }
   )
 
-  // Call Claude API
-  console.log('Calling Anthropic API with', messages.length, 'messages')
-  console.log('Messages structure:', JSON.stringify(messages.map(m => ({ role: m.role, contentLength: m.content.length }))))
+  // Validate message structure
+  console.log('Final messages count:', messages.length)
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i]
+    console.log(`Message ${i}: role=${msg.role}, contentLength=${msg.content?.length || 0}`)
+    if (!msg.content || typeof msg.content !== 'string') {
+      console.error(`Invalid message at index ${i}:`, JSON.stringify(msg))
+      throw new Error(`Invalid message content at index ${i}`)
+    }
+  }
 
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages
-  })
+  // Verify alternating pattern starts with user
+  if (messages.length > 0 && messages[0].role !== 'user') {
+    console.error('First message is not user role:', messages[0].role)
+    throw new Error('First message must be user role')
+  }
+
+  // Call Claude API
+  console.log('=== EDUCATION AGENT API CALL ===')
+  console.log('Messages count:', messages.length)
+  console.log('Messages structure:', JSON.stringify(messages.map(m => ({ role: m.role, contentLength: m.content.length }))))
+  console.log('System prompt length:', systemPrompt.length)
+  console.log('Participant type:', participant.participant_type)
+  console.log('Module:', module)
+
+  let response
+  try {
+    response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages
+    })
+    console.log('API call successful, response type:', response.content[0]?.type)
+  } catch (apiError) {
+    console.error('=== ANTHROPIC API ERROR ===')
+    console.error('Error type:', apiError instanceof Error ? apiError.constructor.name : typeof apiError)
+    console.error('Error message:', apiError instanceof Error ? apiError.message : String(apiError))
+    if (apiError instanceof Error && 'status' in apiError) {
+      console.error('HTTP status:', (apiError as { status?: number }).status)
+    }
+    if (apiError instanceof Error && 'error' in apiError) {
+      console.error('Error details:', JSON.stringify((apiError as { error?: unknown }).error))
+    }
+    throw apiError
+  }
 
   const assistantResponse = response.content[0].type === 'text'
     ? response.content[0].text
