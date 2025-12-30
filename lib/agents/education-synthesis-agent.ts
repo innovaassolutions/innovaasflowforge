@@ -362,7 +362,7 @@ export async function generateEducationSynthesis(
   campaignId: string,
   schoolId: string,
   module: string,
-  model: 'claude-sonnet-4-5-20250929' | 'claude-opus-4-20250514' = 'claude-sonnet-4-5-20250929'
+  model: 'claude-sonnet-4-20250514' | 'claude-opus-4-20250514' = 'claude-sonnet-4-20250514'
 ): Promise<EducationSynthesisResult> {
   // First get participant tokens for this campaign
   // @ts-ignore - education_participant_tokens table not yet in generated types

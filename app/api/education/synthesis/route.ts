@@ -238,7 +238,7 @@ export async function POST(request: NextRequest) {
         school_id,
         module,
         content: synthesisResult as unknown as Record<string, unknown>,
-        model_used: 'claude-sonnet-4-5-20250929',
+        model_used: 'claude-sonnet-4-20250514',
         source_token_ids: sourceTokenIds,
         generated_at: new Date().toISOString(),
       })
