@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Clock, Mail, Pause, Share2, Plus, Pencil, Trash2, Key, ExternalLink, Users } from 'lucide-react'
+import { CheckCircle2, Clock, Mail, Pause, Share2, Plus, Pencil, Trash2, Key, ExternalLink, Users, FileText, AlertTriangle } from 'lucide-react'
 import { ReportGenerationPanel } from '@/components/reports/ReportGenerationPanel'
 import { Button } from '@/components/ui/button'
 import { apiUrl } from '@/lib/api-url'
@@ -54,6 +54,17 @@ interface AccessCodeSummary {
   revoked: number
 }
 
+interface EducationReport {
+  id: string
+  access_token: string
+  has_safeguarding_signals: boolean
+  created_at: string
+  synthesis: {
+    module: string
+    generated_at: string
+  }
+}
+
 export default function CampaignDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -68,6 +79,7 @@ export default function CampaignDetailPage() {
   const [showReportPanel, setShowReportPanel] = useState(false)
   const [existingReport, setExistingReport] = useState<{ id: string; url: string; access_token: string } | null>(null)
   const [accessCodeSummary, setAccessCodeSummary] = useState<AccessCodeSummary | null>(null)
+  const [educationReport, setEducationReport] = useState<EducationReport | null>(null)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -78,6 +90,7 @@ export default function CampaignDetailPage() {
     fetchCampaign()
     checkForExistingReport()
     fetchAccessCodeSummary()
+    fetchEducationReport()
     // Poll for updates every 10 seconds
     const interval = setInterval(fetchCampaign, 10000)
     return () => clearInterval(interval)
@@ -140,6 +153,33 @@ export default function CampaignDetailPage() {
       }
     } catch (err) {
       console.error('Error fetching access codes:', err)
+    }
+  }
+
+  async function fetchEducationReport() {
+    try {
+      const response = await fetch(apiUrl(`api/education/reports?campaign_id=${params.id}`))
+      const data = await response.json()
+
+      if (data.success && data.reports && data.reports.length > 0) {
+        // Get the most recent report
+        const report = data.reports[0]
+        setEducationReport({
+          id: report.id,
+          access_token: report.access_token,
+          has_safeguarding_signals: report.has_safeguarding_signals,
+          created_at: report.created_at,
+          synthesis: {
+            module: report.module || 'student_wellbeing',
+            generated_at: report.synthesis_generated_at || report.created_at
+          }
+        })
+      } else {
+        setEducationReport(null)
+      }
+    } catch (err) {
+      console.error('Error fetching education report:', err)
+      setEducationReport(null)
     }
   }
 
@@ -510,52 +550,56 @@ export default function CampaignDetailPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-        {/* Progress Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Stakeholders</h3>
-            <p className="text-3xl font-bold text-foreground mt-2">
-              {campaign.progress.total}
-            </p>
+        {/* Progress Overview - Only for non-education campaigns */}
+        {!campaign.school_id && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">Total Stakeholders</h3>
+              <p className="text-3xl font-bold text-foreground mt-2">
+                {campaign.progress.total}
+              </p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">Completed</h3>
+              <p className="text-3xl font-bold text-success mt-2">
+                {campaign.progress.completed}
+              </p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">In Progress</h3>
+              <p className="text-3xl font-bold text-brand-teal mt-2">
+                {campaign.progress.inProgress}
+              </p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-sm font-medium text-muted-foreground">Pending</h3>
+              <p className="text-3xl font-bold text-muted-foreground mt-2">
+                {campaign.progress.pending}
+              </p>
+            </div>
           </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Completed</h3>
-            <p className="text-3xl font-bold text-success mt-2">
-              {campaign.progress.completed}
-            </p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">In Progress</h3>
-            <p className="text-3xl font-bold text-brand-teal mt-2">
-              {campaign.progress.inProgress}
-            </p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Pending</h3>
-            <p className="text-3xl font-bold text-muted-foreground mt-2">
-              {campaign.progress.pending}
-            </p>
-          </div>
-        </div>
+        )}
 
-        {/* Progress Bar */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium text-muted-foreground">Overall Progress</h3>
-            <span className="text-2xl font-bold text-foreground">
-              {campaign.progress.percentComplete}%
-            </span>
+        {/* Progress Bar - Only for non-education campaigns */}
+        {!campaign.school_id && (
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-sm font-medium text-muted-foreground">Overall Progress</h3>
+              <span className="text-2xl font-bold text-foreground">
+                {campaign.progress.percentComplete}%
+              </span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
+              <div
+                className="bg-primary h-full transition-all duration-500 rounded-full"
+                style={{ width: `${campaign.progress.percentComplete}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
-            <div
-              className="bg-primary h-full transition-all duration-500 rounded-full"
-              style={{ width: `${campaign.progress.percentComplete}%` }}
-            />
-          </div>
-        </div>
+        )}
 
-        {/* Synthesis Readiness */}
-        {campaign.progress.completed > 0 && (
+        {/* Synthesis Readiness - Only for non-education campaigns */}
+        {!campaign.school_id && campaign.progress.completed > 0 && (
           <div className="bg-gradient-to-r from-primary/10 to-brand-teal/10 border border-primary/30 rounded-lg p-6">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
@@ -690,96 +734,165 @@ export default function CampaignDetailPage() {
           </div>
         )}
 
-        {/* Stakeholder List */}
-        <div className="bg-card border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-foreground mb-6">
-            Stakeholder Sessions
-          </h2>
-          <div className="space-y-4">
-            {campaign.stakeholders.map((stakeholder) => {
-              const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
-              const accessLink = `${window.location.origin}${basePath}/session/${stakeholder.access_token}`
+        {/* Education Report Section - Only for education campaigns */}
+        {campaign.school_id && educationReport && (
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-brand-teal" />
+                Education Report
+              </h2>
+            </div>
 
-              return (
-                <div
-                  key={stakeholder.id}
-                  className="bg-background border border-border rounded-lg p-5">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        {getStatusIcon(stakeholder.status, stakeholder.started_at)}
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {stakeholder.stakeholder_name}
-                        </h3>
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                          {getRoleTypeLabel(stakeholder.stakeholder_role)}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${getStatusColor(
-                            stakeholder.status
-                          )}`}>
-                          {getStatusLabel(stakeholder.status, stakeholder.started_at)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {stakeholder.stakeholder_title}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {stakeholder.stakeholder_email}
-                      </p>
+            <div className="bg-background border border-border rounded-lg p-5">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {educationReport.synthesis.module
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, c => c.toUpperCase())} Report
+                    </h3>
+                    {educationReport.has_safeguarding_signals && (
+                      <span className="flex items-center gap-1 text-xs bg-warning/20 text-warning px-2 py-1 rounded">
+                        <AlertTriangle className="w-3 h-3" />
+                        Safeguarding Alert
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Generated: {new Date(educationReport.synthesis.generated_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+                <Link
+                  href={`/education/report/${educationReport.access_token}`}
+                  target="_blank"
+                  className="flex items-center gap-2 bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors">
+                  <ExternalLink className="w-4 h-4" />
+                  View Report
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
-                      {/* Timeline */}
-                      <div className="flex gap-6 mt-3 text-xs text-muted-foreground">
-                        {stakeholder.started_at && (
-                          <span>
-                            Started: {new Date(stakeholder.started_at).toLocaleString()}
+        {/* No Report Yet Message - Only for education campaigns without a report */}
+        {campaign.school_id && !educationReport && (
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0">
+                <FileText className="w-12 h-12 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-1">
+                  No Report Generated Yet
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Once enough participants complete the assessment, a synthesis report will be generated and available here.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stakeholder List - Only for non-education campaigns */}
+        {!campaign.school_id && (
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-6">
+              Stakeholder Sessions
+            </h2>
+            <div className="space-y-4">
+              {campaign.stakeholders.map((stakeholder) => {
+                const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+                const accessLink = `${window.location.origin}${basePath}/session/${stakeholder.access_token}`
+
+                return (
+                  <div
+                    key={stakeholder.id}
+                    className="bg-background border border-border rounded-lg p-5">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          {getStatusIcon(stakeholder.status, stakeholder.started_at)}
+                          <h3 className="text-lg font-semibold text-foreground">
+                            {stakeholder.stakeholder_name}
+                          </h3>
+                          <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                            {getRoleTypeLabel(stakeholder.stakeholder_role)}
                           </span>
-                        )}
-                        {stakeholder.completed_at && (
-                          <span>
-                            Completed: {new Date(stakeholder.completed_at).toLocaleString()}
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${getStatusColor(
+                              stakeholder.status
+                            )}`}>
+                            {getStatusLabel(stakeholder.status, stakeholder.started_at)}
                           </span>
-                        )}
-                      </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {stakeholder.stakeholder_title}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {stakeholder.stakeholder_email}
+                        </p>
 
-                      {/* Access Link */}
-                      <div className="mt-4 bg-muted border border-border rounded-lg p-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1">
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              Interview Access Link
-                            </p>
-                            <code className="text-xs text-foreground bg-background px-2 py-1 rounded break-all block">
-                              {accessLink}
-                            </code>
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(accessLink)
-                                alert('Access link copied to clipboard!')
-                              }}
-                              className="flex-shrink-0 bg-brand-teal/20 hover:bg-brand-teal/30 text-brand-teal px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                              Copy Link
-                            </button>
-                            {stakeholder.status !== 'completed' && (
+                        {/* Timeline */}
+                        <div className="flex gap-6 mt-3 text-xs text-muted-foreground">
+                          {stakeholder.started_at && (
+                            <span>
+                              Started: {new Date(stakeholder.started_at).toLocaleString()}
+                            </span>
+                          )}
+                          {stakeholder.completed_at && (
+                            <span>
+                              Completed: {new Date(stakeholder.completed_at).toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Access Link */}
+                        <div className="mt-4 bg-muted border border-border rounded-lg p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex-1">
+                              <p className="text-xs font-medium text-muted-foreground mb-1">
+                                Interview Access Link
+                              </p>
+                              <code className="text-xs text-foreground bg-background px-2 py-1 rounded break-all block">
+                                {accessLink}
+                              </code>
+                            </div>
+                            <div className="flex gap-2">
                               <button
-                                onClick={() => handleCompleteSession(stakeholder.id, stakeholder.stakeholder_name)}
-                                disabled={completingSession === stakeholder.id}
-                                className="flex-shrink-0 bg-success/20 hover:bg-success/30 text-success px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
-                                {completingSession === stakeholder.id ? 'Completing...' : 'Mark as Complete'}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(accessLink)
+                                  alert('Access link copied to clipboard!')
+                                }}
+                                className="flex-shrink-0 bg-brand-teal/20 hover:bg-brand-teal/30 text-brand-teal px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Copy Link
                               </button>
-                            )}
+                              {stakeholder.status !== 'completed' && (
+                                <button
+                                  onClick={() => handleCompleteSession(stakeholder.id, stakeholder.stakeholder_name)}
+                                  disabled={completingSession === stakeholder.id}
+                                  className="flex-shrink-0 bg-success/20 hover:bg-success/30 text-success px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+                                  {completingSession === stakeholder.id ? 'Completing...' : 'Mark as Complete'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Campaign Info */}
         <div className="bg-card border border-border rounded-lg p-6">

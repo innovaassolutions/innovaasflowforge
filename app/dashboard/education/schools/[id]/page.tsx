@@ -284,7 +284,7 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4 mb-8
-                        lg:grid-cols-4">
+                        lg:grid-cols-3">
           <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center gap-3 mb-2">
               <BarChart3 className="w-5 h-5 text-brand-teal" />
@@ -295,18 +295,10 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
 
           <div className="bg-card rounded-xl border border-border p-5">
             <div className="flex items-center gap-3 mb-2">
-              <Key className="w-5 h-5 text-primary" />
-              <p className="text-sm text-muted-foreground">Active Codes</p>
+              <BookOpen className="w-5 h-5 text-primary" />
+              <p className="text-sm text-muted-foreground">Reports</p>
             </div>
-            <p className="text-3xl font-bold text-foreground">-</p>
-          </div>
-
-          <div className="bg-card rounded-xl border border-border p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-[hsl(var(--success))]" />
-              <p className="text-sm text-muted-foreground">Participants</p>
-            </div>
-            <p className="text-3xl font-bold text-foreground">-</p>
+            <p className="text-3xl font-bold text-foreground">{Object.keys(campaignReports).length}</p>
           </div>
 
           <Link
@@ -419,12 +411,14 @@ export default function SchoolDetailPage({ params }: { params: Promise<{ id: str
                         <div>
                           <Link
                             href={`/dashboard/campaigns/${campaign.id}`}
-                            className="font-medium text-foreground hover:text-primary transition-colors"
+                            className="font-medium text-foreground hover:text-primary hover:underline transition-colors"
                           >
                             {campaign.name}
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {campaign.education_config?.modules?.join(', ') || 'Education Assessment'}
+                            {campaign.education_config?.modules?.map(m =>
+                              m.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                            ).join(', ') || 'Education Assessment'}
                           </p>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${

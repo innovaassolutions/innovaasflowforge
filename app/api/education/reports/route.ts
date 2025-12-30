@@ -279,10 +279,13 @@ export async function POST(request: NextRequest) {
  * GET /api/education/reports
  *
  * List all education reports for the user's organization.
+ * Supports optional filtering by campaign_id query parameter.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const campaignId = searchParams.get('campaign_id');
 
     // Get current user
     const {
@@ -350,11 +353,20 @@ export async function GET() {
           schoolIds.map((s) => s.id)
         );
       } else {
-        return NextResponse.json({ reports: [] });
+        return NextResponse.json({ success: true, reports: [] });
       }
     }
 
     const { data: reports, error } = await query;
+
+    // Filter by campaign_id if provided (campaign_id is in the synthesis relation)
+    let filteredReports = reports;
+    if (campaignId && reports) {
+      filteredReports = (reports as Array<Record<string, unknown>>).filter((report) => {
+        const synthesis = report.education_synthesis as { campaign_id?: string } | null;
+        return synthesis?.campaign_id === campaignId;
+      });
+    }
 
     if (error) {
       console.error('Reports fetch error:', error);
@@ -365,7 +377,7 @@ export async function GET() {
     }
 
     // Transform response with safe type handling
-    const transformedReports = (reports as Array<Record<string, unknown>> | null)?.map((report) => {
+    const transformedReports = (filteredReports as Array<Record<string, unknown>> | null)?.map((report) => {
       const synthesis = report.education_synthesis as { module?: string; generated_at?: string; campaign_id?: string } | null;
       const school = report.schools as { name?: string; code?: string } | null;
 
@@ -389,7 +401,7 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ reports: transformedReports || [] });
+    return NextResponse.json({ success: true, reports: transformedReports || [] });
   } catch (error) {
     console.error('Reports list error:', error);
     return NextResponse.json(

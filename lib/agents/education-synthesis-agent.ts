@@ -245,14 +245,24 @@ ${framework.triangulation_themes.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 RISK INDICATORS TO WATCH:
 ${framework.risk_indicators.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
-THE FOUR LENSES FRAMEWORK:
-1. WHAT'S HOLDING: What is working well? What foundations are strong? What should be protected and celebrated?
+THE FOUR LENSES FRAMEWORK (CRITICAL - populate each with actual evidence from transcripts):
 
-2. WHAT'S SLIPPING: What was working but is declining? What risks are emerging? What needs attention before it becomes critical?
+1. WHAT'S HOLDING (what_is_holding):
+   - What is working well? What foundations are strong? What should be protected and celebrated?
+   - Extract 3-5 specific quotes that show what's working well
 
-3. WHAT'S MISUNDERSTOOD: Where are perception gaps between stakeholder groups? What do some see that others don't? What assumptions are proving false?
+2. WHAT'S SLIPPING (what_is_slipping):
+   - What was working but is declining? What risks are emerging? What needs attention before it becomes critical?
+   - Extract 3-5 specific quotes that show emerging concerns or declining areas
 
-4. WHAT'S AT RISK: What requires immediate attention? What safeguarding signals emerged? What could cause significant harm if unaddressed?
+3. WHAT'S MISUNDERSTOOD (what_is_misunderstood):
+   - Where are perception gaps between stakeholder groups? What do some see that others don't?
+   - Extract quotes showing differing perspectives between groups
+
+4. WHAT'S AT RISK (what_is_at_risk):
+   - What requires immediate attention? What safeguarding signals emerged?
+   - Extract quotes that reveal concerning patterns or safeguarding issues
+   - Count actual safeguarding signals mentioned (bullying, mental health concerns, safety issues)
 
 TRIANGULATION PRINCIPLES:
 - When all stakeholder groups agree → High confidence insight
@@ -267,9 +277,103 @@ CRITICAL REQUIREMENTS:
 - Balance critique with recognition of strengths
 - Make recommendations actionable and specific
 - Flag any safeguarding concerns prominently
+- EVIDENCE ARRAYS MUST contain actual quotes from the transcripts (3-5 per lens minimum)
 
-OUTPUT FORMAT:
-Respond with valid JSON matching the EducationSynthesisResult interface.`
+REQUIRED JSON OUTPUT STRUCTURE:
+{
+  "executive_summary": {
+    "headline": "One sentence headline",
+    "key_finding": "Most important finding",
+    "primary_recommendation": "Top priority action",
+    "urgency_level": "low" | "medium" | "high" | "critical"
+  },
+  "stakeholder_analyses": [
+    {
+      "participant_type": "student" | "teacher" | "parent" | "leadership",
+      "session_count": number,
+      "cohort_breakdown": {"Year 10": 2, "Year 11": 1},
+      "themes": ["theme1", "theme2"],
+      "concerns": ["concern1", "concern2"],
+      "strengths": ["strength1", "strength2"],
+      "representative_quotes": ["quote without attribution", "another quote"]
+    }
+  ],
+  "triangulation": {
+    "aligned_themes": [
+      {
+        "theme": "Theme name",
+        "student_perspective": "What students said",
+        "teacher_perspective": "What teachers said",
+        "parent_perspective": "What parents said",
+        "alignment_score": 85,
+        "tension_points": [],
+        "synthesis": "Summary of aligned view"
+      }
+    ],
+    "divergent_themes": [
+      {
+        "theme": "Theme where groups disagree",
+        "student_perspective": "Students see...",
+        "teacher_perspective": "Teachers see...",
+        "alignment_score": 35,
+        "tension_points": ["specific tension"],
+        "synthesis": "Analysis of divergence"
+      }
+    ],
+    "blind_spots": ["What one group sees that others don't"]
+  },
+  "what_is_holding": {
+    "description": "2-3 sentence summary of what's working well",
+    "evidence": [
+      "Direct quote from transcript showing positive aspect",
+      "Another quote showing strength",
+      "Quote demonstrating good practice"
+    ],
+    "stakeholder_agreement": 0-100
+  },
+  "what_is_slipping": {
+    "description": "2-3 sentence summary of declining areas",
+    "evidence": [
+      "Quote showing concern or decline",
+      "Another quote showing emerging issue",
+      "Quote revealing attention needed"
+    ],
+    "stakeholder_agreement": 0-100,
+    "risk_trajectory": "stable" | "declining" | "critical"
+  },
+  "what_is_misunderstood": {
+    "description": "2-3 sentence summary of perception gaps",
+    "evidence": [
+      "Quote showing one perspective",
+      "Quote showing different perspective",
+      "Quote revealing assumption"
+    ],
+    "perception_gaps": [
+      {
+        "group_a": "students",
+        "group_b": "teachers",
+        "gap_description": "What the gap is"
+      }
+    ]
+  },
+  "what_is_at_risk": {
+    "description": "2-3 sentence summary of immediate concerns",
+    "evidence": [
+      "Quote revealing concerning pattern",
+      "Quote about safety or wellbeing issue",
+      "Quote showing urgent matter"
+    ],
+    "safeguarding_signals": number (count of distinct safeguarding concerns),
+    "intervention_recommended": true | false
+  },
+  "recommendations": {
+    "immediate_actions": ["Action within 1 week"],
+    "short_term": ["Action within 1 month"],
+    "strategic": ["Action within term/quarter"]
+  }
+}
+
+IMPORTANT: The "evidence" arrays in each Four Lenses section MUST contain 3-5 actual quotes extracted from the interview transcripts. These quotes should be verbatim or lightly paraphrased, never attributed to individuals, and should clearly support the description provided.`
 }
 
 /**
