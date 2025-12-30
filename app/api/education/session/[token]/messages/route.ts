@@ -206,7 +206,10 @@ export async function POST(
           questions_asked: 0,
           rapport_established: false,
           anonymity_confirmed: false,
-          safeguarding_flags: []
+          safeguarding_flags: [],
+          domains_explored: [],
+          current_domain_id: undefined,
+          domain_coverage_percent: 0
         } as ConversationState
       )
       response = result.response

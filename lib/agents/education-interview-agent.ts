@@ -1,5 +1,13 @@
 import { anthropic } from '@/lib/anthropic'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import {
+  generateConstitutionPrompt,
+  getDomains,
+  getNextUnexploredDomain,
+  getDomainCoveragePercentage,
+  getConstitution,
+  type ConstitutionDomain
+} from './education-constitutions'
 
 // ============================================================================
 // TYPES
@@ -41,6 +49,14 @@ export interface EducationCampaign {
   }
 }
 
+export interface DomainExploration {
+  domain_id: string
+  domain_name: string
+  explored: boolean
+  depth: number  // 0=not explored, 1=touched, 2=explored, 3=deep-dived
+  response_type?: 'positive' | 'neutral' | 'negative'
+}
+
 export interface ConversationState {
   phase: ConversationPhase
   sections_completed: string[]
@@ -51,6 +67,10 @@ export interface ConversationState {
   is_complete?: boolean
   current_section?: string
   safeguarding_flags: SafeguardingFlag[]
+  // New domain tracking fields
+  domains_explored: DomainExploration[]
+  current_domain_id?: string
+  domain_coverage_percent: number
 }
 
 export type ConversationPhase =
@@ -528,9 +548,6 @@ function generateSystemPrompt(
   module: EducationModule,
   conversationState: ConversationState
 ): string {
-  const trustFraming = TRUST_FRAMING[participant.participant_type]
-  const questionFramework = QUESTION_FRAMEWORKS[participant.participant_type][module]
-
   // Build cohort context (for personalisation without identity)
   let cohortContext = ''
   if (participant.cohort_metadata.year_band) {
@@ -543,9 +560,18 @@ function generateSystemPrompt(
     cohortContext += cohortContext ? `, ${participant.cohort_metadata.role_category}` : participant.cohort_metadata.role_category
   }
 
-  const basePrompt = `You are a skilled, empathetic interviewer conducting a ${module.replace(/_/g, ' ')} conversation for ${campaign.school.name}.
+  // Use the constitution-based prompt generator
+  // This provides comprehensive role, tone, rules, and domain guidance
+  const constitutionPrompt = generateConstitutionPrompt(
+    participant.participant_type,
+    module,
+    campaign.school.name,
+    conversationState,
+    cohortContext || undefined
+  )
 
-CRITICAL CONTEXT - ANONYMITY:
+  // Add anonymity context header
+  const anonymityHeader = `CRITICAL CONTEXT - ANONYMITY:
 This is an ANONYMOUS conversation. You do NOT know this participant's name, email, or any identifying information.
 You only know:
 - Participant type: ${participant.participant_type}
@@ -553,65 +579,112 @@ You only know:
 - School: ${campaign.school.name} (${campaign.school.country})
 ${campaign.school.curriculum ? `- Curriculum: ${campaign.school.curriculum}` : ''}
 
-TRUST ARCHITECTURE:
-${trustFraming.anonymity_statement}
+`
 
-What this conversation is NOT:
-${trustFraming.consequence_firewall.map(f => `- ${f}`).join('\n')}
+  // Add domain coverage guidance if we have tracking data
+  let domainGuidance = ''
+  if (conversationState.domains_explored && conversationState.domains_explored.length > 0) {
+    const unexploredDomains = conversationState.domains_explored
+      .filter(d => !d.explored || d.depth < 1)
+      .map(d => d.domain_name)
 
-YOUR MISSION:
-Conduct a trust-first interview to understand this ${participant.participant_type}'s genuine experience.
-Your insights will be aggregated into patterns - never individual reports.
-Focus on PATTERNS, not PEOPLE. Never ask "who" questions.
+    const exploredDomains = conversationState.domains_explored
+      .filter(d => d.explored && d.depth >= 1)
+      .map(d => d.domain_name)
 
-INTERVIEW GUIDELINES:
-- Build rapport before depth
-- Ask ONE clear question at a time
-- Use open-ended, observational language
-- Follow threads that emerge organically
-- Probe gently on signals of strain
-- Never push for identification of individuals
-- Use pattern-focused language: "How do things work here?" not "Who is responsible?"
-- Experience-based questions: "What's your experience?" not "Do you think X is good?"
+    domainGuidance = `
 
-CONVERSATION STATE:
-Current Phase: ${conversationState.phase}
-Questions Asked: ${conversationState.questions_asked}/12
-Sections Completed: ${conversationState.sections_completed.join(', ') || 'none yet'}
-Rapport Established: ${conversationState.rapport_established ? 'Yes' : 'Not yet'}
+DOMAIN COVERAGE STATUS:
+- Coverage: ${conversationState.domain_coverage_percent?.toFixed(0) || 0}%
+- Explored: ${exploredDomains.join(', ') || 'none yet'}
+- Still to explore: ${unexploredDomains.join(', ') || 'all covered'}
+${conversationState.current_domain_id ? `- Currently exploring: ${conversationState.current_domain_id}` : ''}
 
-QUESTION FRAMEWORK FOR THIS MODULE:
-${questionFramework.sections.map(s => `
-${s.name.toUpperCase()} (${s.purpose}):
-${s.questions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
-`).join('\n')}
+GUIDANCE: Naturally transition to unexplored domains while following conversational flow.
+`
+  }
 
-Quantitative Check:
-- "${questionFramework.quantitative_anchor.question}"
-- Follow-up: "${questionFramework.quantitative_anchor.follow_up}"
-
-SAFEGUARDING PROTOCOL:
-If the participant indicates distress, harm, or safety concerns, respond with warmth and care:
-"Thank you for sharing that. It sounds like that's been really difficult.
-I want to make sure you know: if you're feeling unsafe or need someone to talk to,
-the school's pastoral team is there to help.
-Would you like me to let someone know you might want to talk?"
-
-Do NOT try to be a counselor. Acknowledge, support, and offer to connect them with help.
-
-CLOSING:
-When reaching 10-12 questions or natural conclusion:
-1. Ask the quantitative anchor question
-2. Ask if there's anything else they want to share
-3. Thank them warmly for their honesty
-4. Remind them their insights will help the school understand patterns`
-
-  return basePrompt
+  return anonymityHeader + constitutionPrompt + domainGuidance
 }
 
 // ============================================================================
 // CONVERSATION STATE MANAGEMENT
 // ============================================================================
+
+/**
+ * Classify user response sentiment for exploration logic
+ */
+function classifyResponseType(userMessage: string): 'positive' | 'neutral' | 'negative' {
+  const lowerMessage = userMessage.toLowerCase()
+
+  // Positive indicators
+  const positivePatterns = [
+    /\b(great|good|excellent|love|happy|satisfied|works well|no (issues|problems|concerns))\b/,
+    /\b(really (good|like|enjoy)|very (happy|satisfied|good))\b/,
+    /\b(fine|okay|all good|no complaints)\b/
+  ]
+
+  // Negative indicators
+  const negativePatterns = [
+    /\b(frustrated|annoyed|upset|angry|disappointed|concerned|worried)\b/,
+    /\b(problem|issue|difficult|struggle|challenge|hard|tough)\b/,
+    /\b(wish|should|could be better|needs (to|improvement))\b/,
+    /\b(don't|doesn't|can't|won't|never|rarely)\b.*\b(work|help|support|respond)\b/
+  ]
+
+  const positiveScore = positivePatterns.filter(p => p.test(lowerMessage)).length
+  const negativeScore = negativePatterns.filter(p => p.test(lowerMessage)).length
+
+  if (negativeScore > positiveScore) return 'negative'
+  if (positiveScore > negativeScore && positiveScore >= 1) return 'positive'
+  return 'neutral'
+}
+
+/**
+ * Detect which domain is being discussed based on content
+ */
+function detectCurrentDomain(
+  userMessage: string,
+  assistantResponse: string,
+  participantType: ParticipantType,
+  module: EducationModule
+): string | undefined {
+  const domains = getDomains(participantType, module)
+  const combinedText = (userMessage + ' ' + assistantResponse).toLowerCase()
+
+  // Score each domain based on keyword matches
+  let bestMatch: { id: string; score: number } | undefined
+
+  for (const domain of domains) {
+    let score = 0
+
+    // Check domain name keywords
+    const nameWords = domain.name.toLowerCase().split(/[\s&,]+/)
+    score += nameWords.filter(word => word.length > 3 && combinedText.includes(word)).length * 2
+
+    // Check listen_for keywords (high weight)
+    score += domain.listen_for.filter(keyword =>
+      combinedText.includes(keyword.toLowerCase())
+    ).length * 3
+
+    // Check if start question or explore questions appear
+    if (combinedText.includes(domain.start_question.toLowerCase().slice(0, 30))) {
+      score += 5
+    }
+
+    domain.explore_questions.forEach(q => {
+      if (combinedText.includes(q.toLowerCase().slice(0, 25))) {
+        score += 2
+      }
+    })
+
+    if (score > 0 && (!bestMatch || score > bestMatch.score)) {
+      bestMatch = { id: domain.id, score }
+    }
+  }
+
+  return bestMatch?.id
+}
 
 function updateConversationState(
   currentState: ConversationState,
@@ -626,7 +699,44 @@ function updateConversationState(
   const newFlags = detectSafeguardingConcerns(userMessage)
   const safeguardingFlags = [...(currentState.safeguarding_flags || []), ...newFlags]
 
-  // Phase progression
+  // Initialize domains_explored if not present
+  let domainsExplored = currentState.domains_explored || []
+  if (domainsExplored.length === 0) {
+    const domains = getDomains(participantType, module)
+    domainsExplored = domains.map(d => ({
+      domain_id: d.id,
+      domain_name: d.name,
+      explored: false,
+      depth: 0
+    }))
+  }
+
+  // Detect current domain being discussed
+  const detectedDomainId = detectCurrentDomain(userMessage, assistantResponse, participantType, module)
+  const responseType = classifyResponseType(userMessage)
+
+  // Update domain exploration tracking
+  if (detectedDomainId) {
+    domainsExplored = domainsExplored.map(d => {
+      if (d.domain_id === detectedDomainId) {
+        return {
+          ...d,
+          explored: true,
+          depth: Math.min(d.depth + 1, 3),
+          response_type: responseType
+        }
+      }
+      return d
+    })
+  }
+
+  // Calculate domain coverage
+  const exploredCount = domainsExplored.filter(d => d.explored && d.depth >= 1).length
+  const domainCoveragePercent = domainsExplored.length > 0
+    ? (exploredCount / domainsExplored.length) * 100
+    : 0
+
+  // Phase progression (updated for domain-based flow)
   let phase: ConversationPhase = currentState.phase
   let isComplete = false
 
@@ -634,26 +744,21 @@ function updateConversationState(
     phase = 'rapport'
   } else if (questionsAsked <= 3) {
     phase = 'daily_experience'
-  } else if (questionsAsked <= 7) {
+  } else if (questionsAsked <= 10) {
     phase = 'core_exploration'
-  } else if (questionsAsked <= 9) {
-    phase = 'relationships'
-  } else if (questionsAsked <= 11) {
-    phase = 'wellbeing_check'
-  } else if (questionsAsked === 12) {
+  } else if (questionsAsked <= 13) {
     phase = 'open_exploration'
-  } else {
+  } else if (domainCoveragePercent >= 70 || questionsAsked >= 15) {
     phase = 'closing'
-    isComplete = true
+    isComplete = questionsAsked >= 15 || domainCoveragePercent >= 85
   }
 
-  // Track sections based on keywords in conversation (ensure array safety)
+  // Track sections based on keywords in conversation (legacy support)
   const sections = [...(currentState.sections_completed || [])]
   const framework = QUESTION_FRAMEWORKS[participantType][module]
 
   framework.sections.forEach(section => {
     if (!sections.includes(section.name)) {
-      // Check if any section questions were covered
       const covered = section.questions.some(q =>
         assistantResponse.toLowerCase().includes(q.toLowerCase().slice(0, 30))
       )
@@ -667,7 +772,7 @@ function updateConversationState(
   const rapportEstablished = currentState.rapport_established ||
     questionsAsked >= 2 ||
     assistantResponse.toLowerCase().includes('thank') ||
-    userMessage.length > 100 // Long responses indicate engagement
+    userMessage.length > 100
 
   return {
     ...currentState,
@@ -678,7 +783,11 @@ function updateConversationState(
     anonymity_confirmed: currentState.anonymity_confirmed || questionsAsked >= 1,
     last_interaction: new Date().toISOString(),
     is_complete: isComplete,
-    safeguarding_flags: safeguardingFlags
+    safeguarding_flags: safeguardingFlags,
+    // New domain tracking fields
+    domains_explored: domainsExplored,
+    current_domain_id: detectedDomainId,
+    domain_coverage_percent: domainCoveragePercent
   }
 }
 
@@ -907,72 +1016,113 @@ Keep it collegial and respectful. Maximum 4-5 sentences.`
 /**
  * Initialize conversation state for a new education interview
  */
-export function initializeEducationConversationState(): ConversationState {
+export function initializeEducationConversationState(
+  participantType?: ParticipantType,
+  module?: EducationModule
+): ConversationState {
+  // Initialize domain tracking if participant type and module are provided
+  let domainsExplored: DomainExploration[] = []
+  if (participantType && module) {
+    const domains = getDomains(participantType, module)
+    domainsExplored = domains.map(d => ({
+      domain_id: d.id,
+      domain_name: d.name,
+      explored: false,
+      depth: 0
+    }))
+  }
+
   return {
     phase: 'opening',
     sections_completed: [],
     questions_asked: 0,
     rapport_established: false,
     anonymity_confirmed: false,
-    safeguarding_flags: []
+    safeguarding_flags: [],
+    // New domain tracking fields
+    domains_explored: domainsExplored,
+    current_domain_id: undefined,
+    domain_coverage_percent: 0
   }
 }
 
 /**
  * Check if conversation should end
+ * Considers both question count AND domain coverage
  */
 export function shouldEndConversation(state: ConversationState): boolean {
-  return state.is_complete ||
-    state.questions_asked >= 15 ||
-    state.phase === 'completed'
+  // Explicit completion
+  if (state.is_complete || state.phase === 'completed') {
+    return true
+  }
+
+  // Hard limit on questions
+  if (state.questions_asked >= 15) {
+    return true
+  }
+
+  // Good coverage achieved (70%+) AND enough questions asked (12+)
+  const domainCoverage = state.domain_coverage_percent || 0
+  if (domainCoverage >= 70 && state.questions_asked >= 12) {
+    return true
+  }
+
+  return false
 }
 
 /**
- * Generate closing message
+ * Generate closing message using constitution-based guidelines
  */
 export async function generateClosingMessage(
   participant: EducationParticipant,
   campaign: EducationCampaign,
+  module: EducationModule,
   conversationState: ConversationState
 ): Promise<string> {
-  const closingPrompts: Record<ParticipantType, string> = {
-    student: `Generate a warm closing message for a student interview:
-- Thank them for their honesty and time
-- Remind them their responses help the school understand patterns
-- Reassure them again that nothing is linked to their name
-- Wish them well
+  // Get the constitution for this participant type and module
+  const constitution = getConstitution(participant.participant_type, module)
+  const closing = constitution.closing
 
-Keep it friendly and genuine. 2-3 sentences.`,
+  // Build domain coverage summary for context
+  const domainsExplored = conversationState.domains_explored || []
+  const exploredDomainNames = domainsExplored
+    .filter(d => d.explored && d.depth >= 1)
+    .map(d => d.domain_name)
+  const coveragePercent = conversationState.domain_coverage_percent || 0
 
-    teacher: `Generate a professional closing message for a teacher interview:
-- Thank them for sharing their perspective
-- Note that their insights will help identify structural patterns
-- Remind them responses remain anonymised
-- Acknowledge the time they've given
+  // Build constitution-informed closing prompt
+  const closingPrompt = `You are concluding an anonymous interview with a ${participant.participant_type} at ${campaign.school.name}.
 
-Keep it warm but professional. 2-3 sentences.`,
+CLOSING GUIDELINES FROM CONSTITUTION:
 
-    parent: `Generate a respectful closing message for a parent interview:
-- Thank them for their observations
-- Note their perspective helps complete the picture
-- Remind them responses are aggregated into patterns only
-- Express appreciation
+Final Question to Weave In (optional, if natural):
+"${closing.final_question}"
 
-Keep it professional. 2-3 sentences.`,
+Things You Must NOT Do:
+${closing.do_not.map(item => `- ${item}`).join('\n')}
 
-    leadership: `Generate a collegial closing message for a leadership interview:
-- Thank them for their candour
-- Note you'll synthesise this with other perspectives
-- Mention the Day 14 readout conversation
-- Express appreciation
+Required Tone:
+${closing.tone}
 
-Keep it professional and forward-looking. 2-3 sentences.`
-  }
+CONTEXT:
+- Questions asked: ${conversationState.questions_asked}
+- Topics explored: ${exploredDomainNames.join(', ') || 'general conversation'}
+- Coverage: ${coveragePercent.toFixed(0)}%
+
+GENERATE A CLOSING MESSAGE THAT:
+1. Thanks them genuinely for their honesty and time
+2. Acknowledges the specific areas they shared about (if relevant)
+3. Reminds them their responses help identify patterns (not individuals)
+4. Maintains the tone specified above
+5. Optionally weaves in the final reflection question if it feels natural
+6. Keeps it to 2-4 sentences
+
+Do NOT be performative, overly warm, or sound like marketing. Be real.`
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-5-20250929',
     max_tokens: 256,
-    system: closingPrompts[participant.participant_type],
+    system: closingPrompt,
     messages: [
       {
         role: 'user',
