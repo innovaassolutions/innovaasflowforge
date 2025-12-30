@@ -321,7 +321,7 @@ export async function POST(
       console.error('Error stack:', error.stack)
 
       // Check for Anthropic SDK specific error properties
-      const anyError = error as Record<string, unknown>
+      const anyError = error as unknown as Record<string, unknown>
       if ('status' in anyError) {
         console.error('HTTP status:', anyError.status)
       }
