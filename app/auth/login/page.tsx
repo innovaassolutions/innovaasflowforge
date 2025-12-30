@@ -44,6 +44,14 @@ export default function LoginPage() {
         return
       }
 
+      // Update last_seen_at for the user
+      if (data.user) {
+        await supabase
+          .from('user_profiles')
+          .update({ last_seen_at: new Date().toISOString() })
+          .eq('id', data.user.id)
+      }
+
       // Redirect to dashboard
       router.push('/dashboard')
       router.refresh()

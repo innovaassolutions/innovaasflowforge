@@ -14,6 +14,7 @@ interface User {
   role: string
   user_type: 'consultant' | 'company' | 'admin' | null
   created_at: string
+  last_seen_at: string | null
 }
 
 interface CreateUserForm {
@@ -647,6 +648,9 @@ export default function AdminUsersPage() {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Created
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Last Login
+                  </th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
@@ -691,6 +695,11 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {new Date(user.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {user.last_seen_at
+                        ? new Date(user.last_seen_at).toLocaleDateString()
+                        : <span className="text-muted-foreground/50">Never</span>}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">

@@ -256,7 +256,7 @@ export async function GET(request: NextRequest) {
     // Fetch all users from user_profiles
     const { data: users, error: fetchError } = await supabaseAdmin
       .from('user_profiles')
-      .select('id, email, full_name, role, user_type, created_at')
+      .select('id, email, full_name, role, user_type, created_at, last_seen_at')
       .order('created_at', { ascending: false })
 
     if (fetchError) {

@@ -9,7 +9,15 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data } = await supabase.auth.exchangeCodeForSession(code)
+
+    // Update last_seen_at for the user
+    if (data.user) {
+      await supabase
+        .from('user_profiles')
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq('id', data.user.id)
+    }
   }
 
   // URL to redirect to after sign in process completes
