@@ -25,11 +25,11 @@ interface EducationSession {
       estimated_completion: number
     }
   }
-  conversation_state: {
-    phase: string
-    topics_covered: string[]
-    is_complete: boolean
-  }
+  session_context: {
+    phase?: string
+    topics_covered?: string[]
+    is_complete?: boolean
+  } | null
   created_at: string
   updated_at: string
 }
@@ -338,7 +338,7 @@ function calculateDataQuality(transcripts: EducationTranscript[]): {
     coverage[type] = (coverage[type] || 0) + 1
 
     // Check completion
-    if (t.session.conversation_state?.is_complete) {
+    if (t.session.session_context?.is_complete) {
       completeCount++
     }
 
@@ -392,7 +392,7 @@ export async function generateEducationSynthesis(
       id,
       participant_token_id,
       education_session_context,
-      conversation_state,
+      session_context,
       created_at,
       updated_at
     `)
@@ -405,7 +405,7 @@ export async function generateEducationSynthesis(
     id: string
     participant_token_id: string
     education_session_context: Record<string, unknown>
-    conversation_state: Record<string, unknown>
+    session_context: Record<string, unknown>
     created_at: string
     updated_at: string
   }> | null
