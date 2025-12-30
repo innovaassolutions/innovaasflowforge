@@ -135,12 +135,21 @@ export async function POST(
     // Check for safeguarding concerns BEFORE processing
     const safeguardingFlags = detectSafeguardingConcerns(message)
 
-    // Build participant and campaign data
-    const school = participantToken.schools as unknown as { id: string; name: string }
+    // Build participant and campaign data with safe null checks
+    const school = participantToken.schools as unknown as { id: string; name: string } | null
     const campaign = participantToken.campaigns as unknown as {
       id: string
       name: string
       education_config: Record<string, unknown>
+    } | null
+
+    // Validate school and campaign data
+    if (!school || !campaign) {
+      console.error('Missing school or campaign data:', { school, campaign })
+      return NextResponse.json(
+        { error: 'Session data incomplete. Please contact support.' },
+        { status: 400 }
+      )
     }
 
     // Normalize and validate participant type
@@ -150,13 +159,19 @@ export async function POST(
       ? rawParticipantType as 'student' | 'teacher' | 'parent' | 'leadership'
       : 'student' // Default fallback
 
+    // Ensure cohort_metadata is an object, not null/undefined
+    const safeCohotMetadata = participantToken.cohort_metadata || {}
+
     const participant = {
       token: participantToken.token,
       participant_type: participantType,
-      cohort_metadata: participantToken.cohort_metadata as Record<string, string>,
+      cohort_metadata: safeCohotMetadata as Record<string, string>,
       campaign_id: participantToken.campaign_id,
       school_id: participantToken.school_id
     }
+
+    // Ensure education_config has required structure
+    const safeEducationConfig = campaign.education_config || { modules: ['student_wellbeing'], pilot_type: 'standard' }
 
     const campaignData = {
       id: campaign.id,
@@ -166,7 +181,7 @@ export async function POST(
         name: school.name,
         country: 'Unknown' // Default value - not available in this context
       },
-      education_config: campaign.education_config as EducationCampaign['education_config']
+      education_config: safeEducationConfig as EducationCampaign['education_config']
     }
 
     // Process message through education agent
