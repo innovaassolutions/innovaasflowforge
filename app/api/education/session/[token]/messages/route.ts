@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import {
   processEducationMessage,
   detectSafeguardingConcerns,
+  generateClosingMessage,
   EducationCampaign,
   ConversationState
 } from '@/lib/agents/education-interview-agent'
@@ -222,6 +223,25 @@ export async function POST(
       console.error('Participant type:', participant.participant_type)
       console.error('Target module:', targetModule)
       throw agentError // Re-throw to be caught by outer handler
+    }
+
+    // If interview is now complete, replace the AI's response with a proper closing message
+    // This prevents the abrupt ending where the AI asks a follow-up question but the
+    // user can't respond because the completion banner appears
+    if (updatedState.is_complete) {
+      try {
+        console.log('Interview complete - generating proper closing message')
+        response = await generateClosingMessage(
+          participant,
+          campaignData,
+          targetModule,
+          updatedState
+        )
+      } catch (closingError) {
+        console.error('Error generating closing message:', closingError)
+        // Fall back to a warm generic closing if generation fails
+        response = "Thank you so much for sharing your thoughts and experiences with me today. Your insights are genuinely valuable and will help identify patterns that can improve outcomes. I really appreciate your openness throughout our conversation."
+      }
     }
 
     // Save user message
