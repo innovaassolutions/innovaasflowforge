@@ -79,11 +79,12 @@ ELEVENLABS_LLM_SECRET=your_secure_random_secret
 Under "Advanced" > "Custom LLM":
 
 1. **Enable Custom LLM**: Toggle ON
-2. **Server URL**: `https://www.innovaas.ai/flowforge/api/voice/chat/completions`
+2. **Server URL**: `https://innovaas.co/flowforge/api/voice/chat/completions`
    - IMPORTANT: Include `/flowforge` basePath for production!
+   - IMPORTANT: Include `/chat/completions` suffix!
    - For local dev: `http://localhost:3000/api/voice/chat/completions`
 3. **API Key / Authorization**: Add header `Authorization: Bearer your_ELEVENLABS_LLM_SECRET`
-   - This must match the `ELEVENLABS_LLM_SECRET` in your `.env.local`
+   - This must match the `ELEVENLABS_LLM_SECRET` in your Vercel environment variables
 4. **Model**: Leave as default (handled by our endpoint)
 
 ### 4. System Prompt Template
@@ -229,24 +230,63 @@ function InterviewPage({ sessionToken, moduleId }) {
 ## Troubleshooting
 
 ### Voice session connects then immediately disconnects
-This usually means ElevenLabs is NOT calling your Custom LLM. Check:
+This usually means ElevenLabs is NOT calling your Custom LLM. Follow this checklist:
 
-1. **Custom LLM is enabled** in ElevenLabs dashboard under Agent > Advanced > Custom LLM
-2. **Server URL is correct**: `https://www.innovaas.ai/flowforge/api/voice/chat/completions`
-   - Must include `/flowforge` basePath!
-3. **Authorization header is set**: `Authorization: Bearer <your_ELEVENLABS_LLM_SECRET>`
-   - The secret must match what's in your Vercel environment variables
-4. **First Message is EMPTY** in ElevenLabs dashboard
-   - If you have text in "First Message", ElevenLabs will speak that and not call the LLM
-5. **System Prompt includes dynamic variables** with the correct format:
-   ```
-   session_token: {{session_token}}
-   module_id: {{module_id}}
-   vertical_key: {{vertical_key}}
-   stakeholder_name: {{stakeholder_name}}
-   ```
+#### Step-by-Step Verification Checklist
 
-To test if ElevenLabs is calling your endpoint, check Vercel logs for `[voice/chat/completions]` entries.
+**1. Verify Custom LLM is ENABLED:**
+- Go to ElevenLabs Agent > Advanced > Custom LLM
+- The toggle must be ON (enabled)
+
+**2. Verify Server URL is EXACTLY correct:**
+```
+https://innovaas.co/flowforge/api/voice/chat/completions
+```
+- MUST include `/flowforge` basePath
+- MUST include `/chat/completions` suffix (not just `/api/voice`)
+- No trailing slash
+
+**3. Verify Authorization is configured:**
+- Type: `Authorization` header
+- Value: `Bearer YOUR_SECRET_VALUE`
+- The secret value MUST match the `ELEVENLABS_LLM_SECRET` in Vercel environment variables
+- If using ElevenLabs Workspace Secrets, the secret value (not the name) must match
+
+**4. Verify First Message is COMPLETELY EMPTY:**
+- Delete ALL text from the "First Message" field
+- If ANY text exists here, ElevenLabs speaks that instead of calling the LLM
+- The field should be blank/empty
+
+**5. Verify System Prompt includes dynamic variables:**
+```
+You are conducting a voice interview for FlowForge.
+
+Session Context:
+- session_token: {{session_token}}
+- module_id: {{module_id}}
+- vertical_key: {{vertical_key}}
+- stakeholder_name: {{stakeholder_name}}
+
+Follow the interview structure provided by the LLM endpoint.
+```
+
+**6. Save the agent after making changes**
+
+#### Testing if ElevenLabs is calling your endpoint
+
+Check Vercel Runtime Logs for entries containing `[voice/chat/completions]`:
+- If you see these logs, ElevenLabs IS calling your endpoint
+- If you DON'T see these logs, ElevenLabs is NOT calling your endpoint (check steps 1-6 above)
+
+You can also test the endpoint directly with curl:
+```bash
+curl -X POST https://innovaas.co/flowforge/api/voice/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ELEVENLABS_LLM_SECRET" \
+  -d '{"messages":[{"role":"system","content":"session_token: ff_edu_test123\nmodule_id: student_wellbeing\nvertical_key: education"}],"stream":true}'
+```
+- 401 = Auth working but secret doesn't match
+- 200 with SSE stream = Endpoint working correctly
 
 ### "Voice is not available for this interview type"
 - Check `vertical_voice_config` table has `voice_enabled = true`
