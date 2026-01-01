@@ -23,7 +23,8 @@ The voice integration uses a **Hybrid Pattern**:
                                             ▼
                                    ┌───────────────────┐
                                    │  FlowForge API   │
-                                   │  /api/voice/llm  │
+                                   │  /api/voice/     │
+                                   │  chat/completions│
                                    └────────┬─────────┘
                                             │
                                             ▼
@@ -77,8 +78,13 @@ ELEVENLABS_LLM_SECRET=your_secure_random_secret
 
 Under "Advanced" > "Custom LLM":
 
-1. **Server URL**: `https://your-domain.com/api/voice/llm`
-2. **Authorization Header**: `Bearer your_ELEVENLABS_LLM_SECRET`
+1. **Enable Custom LLM**: Toggle ON
+2. **Server URL**: `https://www.innovaas.ai/flowforge/api/voice/chat/completions`
+   - IMPORTANT: Include `/flowforge` basePath for production!
+   - For local dev: `http://localhost:3000/api/voice/chat/completions`
+3. **API Key / Authorization**: Add header `Authorization: Bearer your_ELEVENLABS_LLM_SECRET`
+   - This must match the `ELEVENLABS_LLM_SECRET` in your `.env.local`
+4. **Model**: Leave as default (handled by our endpoint)
 
 ### 4. System Prompt Template
 
@@ -179,7 +185,7 @@ Get a signed URL for connecting to ElevenLabs.
 }
 ```
 
-### POST /api/voice/llm
+### POST /api/voice/chat/completions
 Custom LLM endpoint for ElevenLabs (OpenAI-compatible).
 
 **Headers:**
@@ -188,6 +194,9 @@ Custom LLM endpoint for ElevenLabs (OpenAI-compatible).
 **Body:** OpenAI chat completion format
 
 **Response:** SSE stream with `data:` prefix
+
+**Note:** This endpoint generates the initial greeting when first called (no user message),
+and handles all subsequent conversation turns through the education interview agent.
 
 ### POST /api/voice/usage
 Track voice usage after a session ends.
@@ -218,6 +227,26 @@ function InterviewPage({ sessionToken, moduleId }) {
 ```
 
 ## Troubleshooting
+
+### Voice session connects then immediately disconnects
+This usually means ElevenLabs is NOT calling your Custom LLM. Check:
+
+1. **Custom LLM is enabled** in ElevenLabs dashboard under Agent > Advanced > Custom LLM
+2. **Server URL is correct**: `https://www.innovaas.ai/flowforge/api/voice/chat/completions`
+   - Must include `/flowforge` basePath!
+3. **Authorization header is set**: `Authorization: Bearer <your_ELEVENLABS_LLM_SECRET>`
+   - The secret must match what's in your Vercel environment variables
+4. **First Message is EMPTY** in ElevenLabs dashboard
+   - If you have text in "First Message", ElevenLabs will speak that and not call the LLM
+5. **System Prompt includes dynamic variables** with the correct format:
+   ```
+   session_token: {{session_token}}
+   module_id: {{module_id}}
+   vertical_key: {{vertical_key}}
+   stakeholder_name: {{stakeholder_name}}
+   ```
+
+To test if ElevenLabs is calling your endpoint, check Vercel logs for `[voice/chat/completions]` entries.
 
 ### "Voice is not available for this interview type"
 - Check `vertical_voice_config` table has `voice_enabled = true`
