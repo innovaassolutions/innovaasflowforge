@@ -10,7 +10,7 @@
  * Reference: docs/research-technical-2025-12-31.md (Appendix B.4)
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, supabaseAdmin } from '@/lib/supabase/server'
 import type {
   VoiceAvailability,
   VerticalVoiceConfig,
@@ -161,10 +161,11 @@ export async function getVoiceConfigForSession(
   sessionToken: string,
   userId?: string
 ): Promise<GetVoiceConfigForSessionResult> {
-  const supabase = await createClient()
+  // Use admin client to bypass RLS for anonymous education sessions
+  const supabase = supabaseAdmin
 
   // Get session details including campaign info
-  const { data: session, error: sessionError } = await supabase
+  const { data: sessionData, error: sessionError } = await supabase
     .from('agent_sessions')
     .select(
       `
@@ -175,6 +176,13 @@ export async function getVoiceConfigForSession(
     )
     .eq('session_token', sessionToken)
     .single()
+
+  // Type assertion for session data
+  const session = sessionData as {
+    id: string
+    participant_token_id: string | null
+    education_session_context: Record<string, unknown> | null
+  } | null
 
   if (sessionError || !session) {
     return { available: false, reason: 'Session not found' }
@@ -252,7 +260,8 @@ async function checkVoiceAvailabilityWithoutUser(
   organizationId: string,
   verticalKey: string
 ): Promise<VoiceAvailability> {
-  const supabase = await createClient()
+  // Use admin client to bypass RLS for anonymous sessions
+  const supabase = supabaseAdmin
 
   // 1. Check system-level
   const { data: verticalConfig, error: verticalError } = await supabase
