@@ -42,3 +42,42 @@ export {
   isSupportingDocument,
   isSynthesisSnapshot,
 } from './campaign-reports';
+
+// Voice system types (ElevenLabs integration)
+export type {
+  VerticalVoiceConfig,
+  VerticalVoiceConfigRow,
+  VerticalKey,
+  OrganizationVoiceSettings,
+  OrganizationVoiceSettingsRow,
+  UserVoicePreferences,
+  UserVoicePreferencesRow,
+  SessionMode,
+  VoiceAvailability,
+  VoiceAvailabilityResponse,
+  SignedUrlResponse,
+  DynamicVariables,
+  OpenAIChatMessage,
+  OpenAIChatRequest,
+  OpenAIChatChunk,
+  OpenAIChatCompletion,
+  VoiceConnectionStatus,
+  VoiceAgentStatus,
+  VoiceSessionState,
+  CheckVoiceAvailabilityRequest,
+  GetSignedUrlRequest,
+  UpdateVoicePreferencesRequest,
+  TrackVoiceUsageRequest,
+} from './voice';
+
+// Voice type guards and utilities
+export {
+  DEFAULT_USER_VOICE_PREFERENCES,
+  INITIAL_VOICE_SESSION_STATE,
+  isValidSessionMode,
+  isValidVerticalKey,
+  isVoiceAvailable,
+  toVerticalVoiceConfig,
+  toOrganizationVoiceSettings,
+  toUserVoicePreferences,
+} from './voice';

@@ -13,8 +13,11 @@ import {
   Shield,
   AlertTriangle,
   RefreshCw,
-  Info
+  Info,
+  Mic
 } from 'lucide-react'
+import { VoiceSession } from '@/components/voice'
+import type { SessionMode, VoiceAvailabilityResponse } from '@/lib/types/voice'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -73,6 +76,11 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
   const [availableModules, setAvailableModules] = useState<string[]>([])
   const [completedModules, setCompletedModules] = useState<string[]>([])
 
+  // Voice mode state
+  const [sessionMode, setSessionMode] = useState<SessionMode>('text')
+  const [voiceAvailability, setVoiceAvailability] = useState<VoiceAvailabilityResponse | null>(null)
+  const [checkingVoice, setCheckingVoice] = useState(false)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -127,12 +135,42 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
 
       setConversationState(data.conversationState)
 
+      // Check voice availability after session loads
+      checkVoiceAvailability()
+
     } catch (err) {
       console.error('Session load error:', err)
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function checkVoiceAvailability() {
+    try {
+      setCheckingVoice(true)
+      const response = await fetch(apiUrl(`api/voice/availability?sessionToken=${token}`))
+      const data = await response.json()
+      setVoiceAvailability(data)
+    } catch (err) {
+      console.error('Voice availability check failed:', err)
+      setVoiceAvailability({ available: false, reason: 'Unable to check voice availability' })
+    } finally {
+      setCheckingVoice(false)
+    }
+  }
+
+  function handleModeChange(mode: SessionMode) {
+    setSessionMode(mode)
+    // When switching to text mode, focus the input
+    if (mode === 'text') {
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }
+
+  function handleVoiceSessionComplete() {
+    setIsComplete(true)
+    setSessionMode('text')
   }
 
   async function sendMessage(e: React.FormEvent) {
@@ -435,7 +473,30 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
                 You may now close this window.
               </p>
             </div>
+          ) : sessionMode === 'voice' ? (
+            /* Voice Mode Interface */
+            <div className="space-y-4">
+              <VoiceSession
+                sessionToken={token}
+                moduleId={session.module}
+                onSessionEnd={handleVoiceSessionComplete}
+                onError={(err) => setError(err)}
+              />
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => handleModeChange('text')}
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-2 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Switch to text mode
+                </button>
+                <p className="text-xs text-muted-foreground">
+                  {MODULE_LABELS[session.module] || session.module}
+                </p>
+              </div>
+            </div>
           ) : (
+            /* Text Mode Interface */
             <>
               <form onSubmit={sendMessage} className="flex gap-3">
                 <input
@@ -470,9 +531,21 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
                   <Info className="w-3 h-3" />
                   Share openly - your identity is protected
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {MODULE_LABELS[session.module] || session.module}
-                </p>
+                <div className="flex items-center gap-4">
+                  {/* Voice Mode Toggle */}
+                  {voiceAvailability?.available && !checkingVoice && (
+                    <button
+                      onClick={() => handleModeChange('voice')}
+                      className="text-sm text-brand-teal hover:text-brand-teal/80 flex items-center gap-1.5 transition-colors"
+                    >
+                      <Mic className="w-4 h-4" />
+                      Voice mode
+                    </button>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {MODULE_LABELS[session.module] || session.module}
+                  </p>
+                </div>
               </div>
             </>
           )}
