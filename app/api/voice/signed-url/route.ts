@@ -2,6 +2,30 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { getVoiceConfigForSession } from '@/lib/services/voice-availability'
 
+// CORS headers for cross-origin requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+/**
+ * OPTIONS handler for CORS preflight requests
+ */
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
+/**
+ * GET handler - returns method info for debugging
+ */
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Use POST method to get a signed URL', methods: ['POST'] },
+    { status: 405, headers: corsHeaders }
+  )
+}
+
 /**
  * POST /api/voice/signed-url
  * Get a signed URL for connecting to ElevenLabs Conversational AI
