@@ -154,47 +154,25 @@ export async function checkVoiceAvailability({
 }
 
 /**
- * Get voice configuration for a session by session token.
- * Looks up the session, determines the vertical, and checks availability.
+ * Get voice configuration for a session by participant token.
+ * For education sessions, the token is the participant access token (ff_edu_xxx).
+ * Looks up the organization and checks availability.
  */
 export async function getVoiceConfigForSession(
-  sessionToken: string,
+  participantAccessToken: string,
   userId?: string
 ): Promise<GetVoiceConfigForSessionResult> {
   // Use admin client to bypass RLS for anonymous education sessions
   const supabase = getSupabaseAdmin()
 
-  // Get session details including campaign info
-  const { data: sessionData, error: sessionError } = await supabase
-    .from('agent_sessions')
-    .select(
-      `
-      id,
-      participant_token_id,
-      education_session_context
-    `
-    )
-    .eq('session_token', sessionToken)
-    .single()
-
-  // Type assertion for session data
-  const session = sessionData as {
-    id: string
-    participant_token_id: string | null
-    education_session_context: Record<string, unknown> | null
-  } | null
-
-  if (sessionError || !session) {
-    return { available: false, reason: 'Session not found' }
-  }
-
-  // For education sessions, get the campaign via participant token
-  if (session.participant_token_id) {
+  // For education tokens (ff_edu_xxx), look up the participant token directly
+  if (participantAccessToken.startsWith('ff_edu_')) {
     const { data: participantTokenData, error: ptError } = await supabase
       .from('education_participant_tokens')
       .select(
         `
         id,
+        token,
         school_id,
         schools!inner(
           id,
@@ -202,12 +180,13 @@ export async function getVoiceConfigForSession(
         )
       `
       )
-      .eq('id', session.participant_token_id)
+      .eq('token', participantAccessToken)
       .single()
 
     // Type assertion for joined data
     const participantToken = participantTokenData as {
       id: string
+      token: string
       school_id: string
       schools: { id: string; organization_id: string }
     } | null
