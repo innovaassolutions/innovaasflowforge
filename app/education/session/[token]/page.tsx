@@ -174,9 +174,16 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
     }
   }
 
-  function handleVoiceSessionEnd() {
-    // Voice interview is complete - mark assessment as done
-    setIsComplete(true)
+  function handleVoiceSessionEnd(completed: boolean) {
+    // Only mark assessment as done if the interview was actually completed
+    // (not just disconnected due to error or early termination)
+    if (completed) {
+      setIsComplete(true)
+    } else {
+      // Session ended early - show message and switch to text mode as fallback
+      setError('Voice session ended. You can continue with text if needed.')
+      handleModeChange('text')
+    }
   }
 
   async function sendMessage(e: React.FormEvent) {

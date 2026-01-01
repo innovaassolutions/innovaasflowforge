@@ -30,7 +30,7 @@ import type { SignedUrlResponse } from '@/lib/types/voice'
 interface VoiceSessionProps {
   sessionToken: string
   moduleId?: string
-  onSessionEnd?: () => void
+  onSessionEnd?: (completed: boolean) => void // completed=true means interview finished properly
   onError?: (error: string) => void
   className?: string
 }
@@ -53,28 +53,42 @@ export function VoiceSession({
   const [durationSeconds, setDurationSeconds] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const durationSecondsRef = useRef<number>(0)
+  const hadErrorRef = useRef<boolean>(false)
+  const minDurationForComplete = 30 // Minimum 30 seconds for a valid interview
 
   // ElevenLabs conversation hook
   const conversation = useConversation({
     onConnect: () => {
+      console.log('[VoiceSession] Connected')
       setConnectionStatus('connected')
       setError(null)
+      hadErrorRef.current = false
       startDurationTracking()
     },
     onDisconnect: () => {
+      const finalDuration = durationSecondsRef.current
+      console.log('[VoiceSession] Disconnected - duration:', finalDuration, 'hadError:', hadErrorRef.current)
       setConnectionStatus('disconnected')
       stopDurationTracking()
-      onSessionEnd?.()
+      // Only mark as complete if:
+      // 1. No errors occurred
+      // 2. Session lasted at least 30 seconds (basic sanity check for real interview)
+      const wasCompleted = !hadErrorRef.current && finalDuration >= minDurationForComplete
+      console.log('[VoiceSession] Session end - completed:', wasCompleted)
+      onSessionEnd?.(wasCompleted)
     },
     onError: (err) => {
       const message = typeof err === 'string' ? err : (err as Error)?.message || 'Voice session error'
+      console.error('[VoiceSession] Error:', message)
+      hadErrorRef.current = true
       setError(message)
       setConnectionStatus('error')
       onError?.(message)
     },
     onModeChange: ({ mode }) => {
       // Mode is 'speaking' or 'listening'
-      console.log('Agent mode:', mode)
+      console.log('[VoiceSession] Agent mode:', mode)
     },
   })
 
@@ -157,7 +171,8 @@ export function VoiceSession({
         }).catch(console.error)
       }
 
-      onSessionEnd?.()
+      // User manually ended the session - not a complete interview
+      onSessionEnd?.(false)
     } catch (err) {
       console.error('Error ending voice session:', err)
     }
@@ -172,8 +187,10 @@ export function VoiceSession({
 
   // Duration tracking
   const startDurationTracking = useCallback(() => {
+    durationSecondsRef.current = 0
     durationIntervalRef.current = setInterval(() => {
-      setDurationSeconds((prev) => prev + 1)
+      durationSecondsRef.current += 1
+      setDurationSeconds(durationSecondsRef.current)
     }, 1000)
   }, [])
 
