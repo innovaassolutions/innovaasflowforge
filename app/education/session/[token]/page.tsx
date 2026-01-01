@@ -174,9 +174,12 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
     }
   }
 
-  function handleVoiceSessionComplete() {
-    setIsComplete(true)
+  function handleVoiceSessionEnd() {
+    // When voice session ends, switch back to text mode
+    // Don't mark assessment as complete - that should only happen
+    // when the interview agent signals completion
     setSessionMode('text')
+    setTimeout(() => inputRef.current?.focus(), 100)
   }
 
   async function sendMessage(e: React.FormEvent) {
@@ -485,7 +488,7 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
               <VoiceSession
                 sessionToken={token}
                 moduleId={session.module}
-                onSessionEnd={handleVoiceSessionComplete}
+                onSessionEnd={handleVoiceSessionEnd}
                 onError={(err) => setError(err)}
               />
               <div className="flex items-center justify-between">
