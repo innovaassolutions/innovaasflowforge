@@ -17,11 +17,16 @@ import { getVoiceConfigForSession } from '@/lib/services/voice-availability'
  * - moduleId: string (optional) - The module being interviewed
  */
 export async function POST(request: NextRequest) {
+  console.log('[voice/signed-url] POST request received')
+
   try {
     const body = await request.json()
     const { sessionToken, moduleId } = body
 
+    console.log('[voice/signed-url] Token:', sessionToken?.substring(0, 20) + '...')
+
     if (!sessionToken) {
+      console.log('[voice/signed-url] No session token provided')
       return NextResponse.json(
         { error: 'Session token is required' },
         { status: 400 }
@@ -31,7 +36,9 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Check voice availability and get config
+    console.log('[voice/signed-url] Checking voice availability...')
     const voiceAvailability = await getVoiceConfigForSession(sessionToken)
+    console.log('[voice/signed-url] Voice availability:', voiceAvailability.available, voiceAvailability.reason || '')
 
     if (!voiceAvailability.available) {
       return NextResponse.json(
@@ -101,8 +108,10 @@ export async function POST(request: NextRequest) {
     const agentId =
       config.elevenlabsAgentId || process.env.ELEVENLABS_AGENT_ID
 
+    console.log('[voice/signed-url] Agent ID:', agentId ? agentId.substring(0, 10) + '...' : 'NOT SET')
+
     if (!agentId) {
-      console.error('No ElevenLabs agent ID configured')
+      console.error('[voice/signed-url] No ElevenLabs agent ID configured')
       return NextResponse.json(
         { error: 'Voice agent not configured' },
         { status: 500 }
@@ -112,14 +121,17 @@ export async function POST(request: NextRequest) {
     // Request signed URL from ElevenLabs
     const elevenlabsApiKey = process.env.ELEVENLABS_API_KEY
 
+    console.log('[voice/signed-url] API Key:', elevenlabsApiKey ? 'SET (' + elevenlabsApiKey.length + ' chars)' : 'NOT SET')
+
     if (!elevenlabsApiKey) {
-      console.error('ELEVENLABS_API_KEY not configured')
+      console.error('[voice/signed-url] ELEVENLABS_API_KEY not configured')
       return NextResponse.json(
         { error: 'Voice service not configured' },
         { status: 500 }
       )
     }
 
+    console.log('[voice/signed-url] Requesting signed URL from ElevenLabs...')
     const elevenlabsResponse = await fetch(
       `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${agentId}`,
       {
@@ -130,16 +142,21 @@ export async function POST(request: NextRequest) {
       }
     )
 
+    console.log('[voice/signed-url] ElevenLabs response status:', elevenlabsResponse.status)
+
     if (!elevenlabsResponse.ok) {
       const errorText = await elevenlabsResponse.text()
-      console.error('ElevenLabs signed URL error:', errorText)
+      console.error('[voice/signed-url] ElevenLabs error:', errorText)
       return NextResponse.json(
-        { error: 'Failed to get voice session URL' },
+        { error: `Voice service error: ${elevenlabsResponse.status}` },
         { status: 500 }
       )
     }
 
-    const { signed_url } = await elevenlabsResponse.json()
+    const elevenlabsData = await elevenlabsResponse.json()
+    const { signed_url } = elevenlabsData
+
+    console.log('[voice/signed-url] Got signed URL:', signed_url ? 'YES' : 'NO')
 
     // Return signed URL with dynamic variables
     return NextResponse.json({
@@ -157,9 +174,10 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Voice signed URL error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[voice/signed-url] Error:', errorMessage, error)
     return NextResponse.json(
-      { error: 'Failed to get voice session URL' },
+      { error: `Failed to get voice session URL: ${errorMessage}` },
       { status: 500 }
     )
   }

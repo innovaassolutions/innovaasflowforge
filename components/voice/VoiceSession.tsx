@@ -85,12 +85,26 @@ export function VoiceSession({
       body: JSON.stringify({ sessionToken, moduleId }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || 'Failed to get voice session URL')
+    // Get response text first to handle both JSON and non-JSON responses
+    const responseText = await response.text()
+
+    if (!responseText) {
+      throw new Error('Empty response from voice service')
     }
 
-    return response.json()
+    let data: SignedUrlResponse
+    try {
+      data = JSON.parse(responseText)
+    } catch {
+      console.error('Failed to parse voice response:', responseText)
+      throw new Error('Invalid response from voice service')
+    }
+
+    if (!response.ok) {
+      throw new Error((data as { error?: string }).error || 'Failed to get voice session URL')
+    }
+
+    return data
   }, [sessionToken, moduleId])
 
   // Start the voice session
