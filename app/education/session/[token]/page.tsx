@@ -136,9 +136,8 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
       setConversationState(data.conversationState)
 
       // Check voice availability after session loads
-      // Default to voice mode for new sessions (no existing conversation)
-      const isNewSession = !data.conversationHistory || data.conversationHistory.length === 0
-      checkVoiceAvailability(isNewSession)
+      // Voice mode will be the default when available
+      checkVoiceAvailability()
 
     } catch (err) {
       console.error('Session load error:', err)
@@ -148,15 +147,15 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
     }
   }
 
-  async function checkVoiceAvailability(isNewSession: boolean = false) {
+  async function checkVoiceAvailability() {
     try {
       setCheckingVoice(true)
       const response = await fetch(apiUrl(`api/voice/availability?sessionToken=${token}`))
       const data = await response.json()
       setVoiceAvailability(data)
 
-      // Default to voice mode for new sessions when available
-      if (data.available && isNewSession) {
+      // Always default to voice mode when available
+      if (data.available) {
         setSessionMode('voice')
       }
     } catch (err) {
