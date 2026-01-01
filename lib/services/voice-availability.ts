@@ -10,7 +10,7 @@
  * Reference: docs/research-technical-2025-12-31.md (Appendix B.4)
  */
 
-import { createClient, supabaseAdmin } from '@/lib/supabase/server'
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server'
 import type {
   VoiceAvailability,
   VerticalVoiceConfig,
@@ -162,7 +162,7 @@ export async function getVoiceConfigForSession(
   userId?: string
 ): Promise<GetVoiceConfigForSessionResult> {
   // Use admin client to bypass RLS for anonymous education sessions
-  const supabase = supabaseAdmin
+  const supabase = getSupabaseAdmin()
 
   // Get session details including campaign info
   const { data: sessionData, error: sessionError } = await supabase
@@ -261,7 +261,7 @@ async function checkVoiceAvailabilityWithoutUser(
   verticalKey: string
 ): Promise<VoiceAvailability> {
   // Use admin client to bypass RLS for anonymous sessions
-  const supabase = supabaseAdmin
+  const supabase = getSupabaseAdmin()
 
   // 1. Check system-level
   const { data: verticalConfig, error: verticalError } = await supabase
