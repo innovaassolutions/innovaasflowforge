@@ -71,7 +71,8 @@ export const config = {
      * - public folder
      * - reports/* (public token-based report access)
      * - session/* (public token-based stakeholder sessions)
+     * - api/voice/* (ElevenLabs voice API routes - use their own auth)
      */
-    '/((?!_next/static|_next/image|favicon.ico|reports|session|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|reports|session|api/voice|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import {
   processEducationMessage,
@@ -10,8 +10,22 @@ import {
 } from '@/lib/agents/education-interview-agent'
 import type { OpenAIChatMessage, OpenAIChatRequest } from '@/lib/types/voice'
 
+// CORS headers for ElevenLabs cross-origin requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
 /**
- * POST /api/voice/llm
+ * OPTIONS handler for CORS preflight requests
+ */
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
+/**
+ * POST /api/voice/chat/completions
  * Custom LLM endpoint for ElevenLabs Conversational AI
  *
  * This endpoint receives OpenAI-compatible chat completion requests from ElevenLabs,
@@ -21,27 +35,47 @@ import type { OpenAIChatMessage, OpenAIChatRequest } from '@/lib/types/voice'
  * The session context is extracted from dynamic variables in the system prompt.
  */
 export async function POST(request: NextRequest) {
+  console.log('[voice/chat/completions] POST request received')
+
   try {
     // Validate authorization
     const authHeader = request.headers.get('authorization')
+    console.log('[voice/chat/completions] Auth header present:', !!authHeader)
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('[voice/chat/completions] Missing or invalid auth header')
       return new Response('Unauthorized', { status: 401 })
     }
 
     const apiKey = authHeader.replace('Bearer ', '')
-    if (apiKey !== process.env.ELEVENLABS_LLM_SECRET) {
-      console.error('Invalid LLM secret')
+    const expectedSecret = process.env.ELEVENLABS_LLM_SECRET
+    console.log('[voice/chat/completions] API key length:', apiKey.length, 'Expected length:', expectedSecret?.length)
+
+    if (apiKey !== expectedSecret) {
+      console.error('[voice/chat/completions] Invalid LLM secret - mismatch')
       return new Response('Unauthorized', { status: 401 })
     }
+
+    console.log('[voice/chat/completions] Authorization successful')
 
     const body: OpenAIChatRequest = await request.json()
     const { messages, stream = true } = body
 
+    console.log('[voice/chat/completions] Messages count:', messages.length)
+    console.log('[voice/chat/completions] Message roles:', messages.map((m) => m.role).join(', '))
+
     // Extract session context from system prompt
     const sessionContext = parseSessionContext(messages)
+    console.log('[voice/chat/completions] Session context:', {
+      hasToken: !!sessionContext.sessionToken,
+      tokenPrefix: sessionContext.sessionToken?.substring(0, 10),
+      moduleId: sessionContext.moduleId,
+      verticalKey: sessionContext.verticalKey,
+      stakeholderName: sessionContext.stakeholderName,
+    })
 
     if (!sessionContext.sessionToken) {
-      console.error('No session token found in messages')
+      console.error('[voice/chat/completions] No session token found in messages')
       return streamError('Session context not found')
     }
 
@@ -50,35 +84,45 @@ export async function POST(request: NextRequest) {
       .filter((m) => m.role === 'user')
       .pop()?.content
 
-    if (!userMessage) {
-      return streamError('No user message found')
-    }
+    console.log('[voice/chat/completions] User message:', userMessage ? userMessage.substring(0, 50) + '...' : 'NONE')
 
     // Route to appropriate handler based on vertical
     let response: string
 
-    switch (sessionContext.verticalKey) {
-      case 'education':
-        response = await handleEducationMessage(
-          sessionContext.sessionToken,
-          userMessage,
-          sessionContext.moduleId
-        )
-        break
-      case 'assessment':
-        // TODO: Implement assessment handler
-        response = await handleAssessmentMessage(
-          sessionContext.sessionToken,
-          userMessage
-        )
-        break
-      default:
-        response = await handleEducationMessage(
-          sessionContext.sessionToken,
-          userMessage,
-          sessionContext.moduleId
-        )
+    // Handle initial greeting when no user message (first connection)
+    if (!userMessage) {
+      console.log('[voice/chat/completions] No user message - generating greeting')
+      response = await generateInitialGreeting(
+        sessionContext.sessionToken,
+        sessionContext.stakeholderName,
+        sessionContext.moduleId
+      )
+    } else {
+      switch (sessionContext.verticalKey) {
+        case 'education':
+          response = await handleEducationMessage(
+            sessionContext.sessionToken,
+            userMessage,
+            sessionContext.moduleId
+          )
+          break
+        case 'assessment':
+          // TODO: Implement assessment handler
+          response = await handleAssessmentMessage(
+            sessionContext.sessionToken,
+            userMessage
+          )
+          break
+        default:
+          response = await handleEducationMessage(
+            sessionContext.sessionToken,
+            userMessage,
+            sessionContext.moduleId
+          )
+      }
     }
+
+    console.log('[voice/chat/completions] Response length:', response.length)
 
     // Return response in appropriate format
     if (stream) {
@@ -87,7 +131,7 @@ export async function POST(request: NextRequest) {
       return jsonResponse(response)
     }
   } catch (error) {
-    console.error('Voice LLM Error:', error)
+    console.error('[voice/chat/completions] Error:', error)
     return streamError('An error occurred processing your request')
   }
 }
@@ -414,6 +458,66 @@ async function handleAssessmentMessage(
 }
 
 /**
+ * Generate an initial greeting for the voice session.
+ * This is called when ElevenLabs first connects (no user message yet).
+ */
+async function generateInitialGreeting(
+  sessionToken: string,
+  stakeholderName: string | null,
+  moduleId: string | null
+): Promise<string> {
+  console.log('[voice/chat/completions] Generating initial greeting for:', {
+    sessionToken: sessionToken.substring(0, 15) + '...',
+    stakeholderName,
+    moduleId,
+  })
+
+  // Fetch participant info to personalize the greeting
+  const { data: participantTokenData } = await supabaseAdmin
+    .from('education_participant_tokens')
+    .select(`
+      participant_type,
+      cohort_metadata,
+      schools:school_id(name)
+    `)
+    .eq('token', sessionToken)
+    .single()
+
+  const participantToken = participantTokenData as {
+    participant_type: string
+    cohort_metadata: Record<string, string> | null
+    schools: { name: string } | null
+  } | null
+
+  const participantType = participantToken?.participant_type?.toLowerCase() || stakeholderName?.toLowerCase() || 'student'
+  const schoolName = participantToken?.schools?.name || 'your school'
+
+  // Generate personalized greeting based on participant type
+  let greeting: string
+
+  switch (participantType) {
+    case 'student':
+      greeting = `Hi there! Thanks for taking the time to chat with me today. I'm here to learn a bit about your experience at ${schoolName}. This is a relaxed conversation, and there are no right or wrong answers. I'm just interested in hearing your thoughts. Before we start, I want you to know that everything you share is completely confidential. So, how are you doing today?`
+      break
+    case 'teacher':
+      greeting = `Hello! Thank you for joining me today. I'm here to gather some insights about your professional experience at ${schoolName}. This is an informal conversation, and I'm genuinely interested in your perspective on teaching and working here. Everything we discuss is confidential and will be used to help improve the school environment. How has your day been so far?`
+      break
+    case 'parent':
+      greeting = `Hello! Thank you so much for taking the time to speak with me. I'm here to learn about your experience as a parent with a child at ${schoolName}. This is a relaxed conversation, and your honest feedback is really valuable. Everything you share is confidential. How are you doing today?`
+      break
+    case 'leadership':
+      greeting = `Good day! Thank you for making time in your schedule to speak with me. I'm here to discuss your perspective on ${schoolName} and gather your insights as a school leader. Your feedback is valuable for understanding the broader picture. Everything discussed is confidential. How has your week been going?`
+      break
+    default:
+      greeting = `Hi there! Thanks for joining me today. I'm here to have a friendly conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
+  }
+
+  console.log('[voice/chat/completions] Generated greeting for', participantType, '- length:', greeting.length)
+
+  return greeting
+}
+
+/**
  * Stream a response in SSE format for ElevenLabs
  */
 function streamResponse(content: string): Response {
@@ -469,6 +573,7 @@ function streamResponse(content: string): Response {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
+      ...corsHeaders,
     },
   })
 }
@@ -512,6 +617,7 @@ function streamError(errorMessage: string): Response {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
+      ...corsHeaders,
     },
   })
 }
@@ -520,17 +626,25 @@ function streamError(errorMessage: string): Response {
  * Return a non-streaming JSON response
  */
 function jsonResponse(content: string): Response {
-  return Response.json({
-    id: `chatcmpl-${Date.now()}`,
-    object: 'chat.completion',
-    created: Math.floor(Date.now() / 1000),
-    model: 'flowforge-interview-agent',
-    choices: [
-      {
-        index: 0,
-        message: { role: 'assistant', content },
-        finish_reason: 'stop',
+  return new Response(
+    JSON.stringify({
+      id: `chatcmpl-${Date.now()}`,
+      object: 'chat.completion',
+      created: Math.floor(Date.now() / 1000),
+      model: 'flowforge-interview-agent',
+      choices: [
+        {
+          index: 0,
+          message: { role: 'assistant', content },
+          finish_reason: 'stop',
+        },
+      ],
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders,
       },
-    ],
-  })
+    }
+  )
 }
