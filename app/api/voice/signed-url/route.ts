@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { getVoiceConfigForSession } from '@/lib/services/voice-availability'
 
 /**
@@ -7,18 +7,19 @@ import { getVoiceConfigForSession } from '@/lib/services/voice-availability'
  * Get a signed URL for connecting to ElevenLabs Conversational AI
  *
  * This endpoint:
- * 1. Validates the session token
+ * 1. Validates the session/participant token
  * 2. Checks voice availability for the session
  * 3. Requests a signed URL from ElevenLabs
  * 4. Returns the URL with dynamic variables for session context
  *
  * Body:
- * - sessionToken: string (required) - The session token
+ * - sessionToken: string (required) - The participant access token (ff_edu_xxx) or session token
  * - moduleId: string (optional) - The module being interviewed
  */
 export async function POST(request: NextRequest) {
   try {
-    const { sessionToken, moduleId } = await request.json()
+    const body = await request.json()
+    const { sessionToken, moduleId } = body
 
     if (!sessionToken) {
       return NextResponse.json(
@@ -26,6 +27,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    const supabase = getSupabaseAdmin()
 
     // Check voice availability and get config
     const voiceAvailability = await getVoiceConfigForSession(sessionToken)
@@ -39,38 +42,15 @@ export async function POST(request: NextRequest) {
 
     const config = voiceAvailability.config!
 
-    // Get session details for dynamic variables
-    const { data: sessionData, error: sessionError } = await supabaseAdmin
-      .from('agent_sessions')
-      .select(
-        `
-        id,
-        participant_token_id,
-        education_session_context
-      `
-      )
-      .eq('session_token', sessionToken)
-      .single()
-
-    // Type assertion for session data (columns may not be in generated types)
-    const session = sessionData as {
-      id: string
-      participant_token_id: string | null
-      education_session_context: Record<string, unknown> | null
-    } | null
-
-    if (sessionError || !session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
-    }
-
-    // Get stakeholder name if available (for education sessions)
+    // Get stakeholder context for dynamic variables
     let stakeholderName: string | undefined
 
-    if (session.participant_token_id) {
-      const { data: participantTokenData } = await supabaseAdmin
+    // For education participant tokens (ff_edu_xxx), get context directly from participant token
+    if (sessionToken.startsWith('ff_edu_')) {
+      const { data: participantTokenData } = await supabase
         .from('education_participant_tokens')
         .select('participant_type, cohort_metadata')
-        .eq('id', session.participant_token_id)
+        .eq('token', sessionToken)
         .single()
 
       const participantToken = participantTokenData as {
@@ -79,8 +59,41 @@ export async function POST(request: NextRequest) {
       } | null
 
       if (participantToken) {
-        // Use participant type as a friendly identifier
         stakeholderName = participantToken.participant_type
+      }
+    } else {
+      // For regular session tokens, try to get from agent_sessions
+      const { data: sessionData } = await supabase
+        .from('agent_sessions')
+        .select(`
+          id,
+          participant_token_id,
+          education_session_context
+        `)
+        .eq('session_token', sessionToken)
+        .single()
+
+      const session = sessionData as {
+        id: string
+        participant_token_id: string | null
+        education_session_context: Record<string, unknown> | null
+      } | null
+
+      if (session?.participant_token_id) {
+        const { data: participantTokenData } = await supabase
+          .from('education_participant_tokens')
+          .select('participant_type, cohort_metadata')
+          .eq('id', session.participant_token_id)
+          .single()
+
+        const participantToken = participantTokenData as {
+          participant_type: string
+          cohort_metadata: Record<string, string> | null
+        } | null
+
+        if (participantToken) {
+          stakeholderName = participantToken.participant_type
+        }
       }
     }
 
