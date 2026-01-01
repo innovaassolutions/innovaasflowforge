@@ -20,6 +20,7 @@ import { useConversation } from '@elevenlabs/react'
 import { Button } from '@/components/ui/button'
 import { Mic, MicOff, Phone, PhoneOff, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { apiUrl } from '@/lib/api-url'
 import type { SignedUrlResponse } from '@/lib/types/voice'
 
 // ============================================================================
@@ -79,7 +80,7 @@ export function VoiceSession({
 
   // Fetch signed URL from our API
   const fetchSignedUrl = useCallback(async (): Promise<SignedUrlResponse> => {
-    const response = await fetch('/api/voice/signed-url', {
+    const response = await fetch(apiUrl('api/voice/signed-url'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionToken, moduleId }),
@@ -146,7 +147,7 @@ export function VoiceSession({
 
       // Track voice usage
       if (durationSeconds > 0) {
-        await fetch('/api/voice/usage', {
+        await fetch(apiUrl('api/voice/usage'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
