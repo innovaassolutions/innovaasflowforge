@@ -141,9 +141,18 @@ export function VoiceSession({
         }
       }
 
+      console.log('[VoiceSession] Starting with firstMessage length:', urlData.firstMessage?.length)
+
       await conversation.startSession({
         signedUrl: urlData.signedUrl,
         dynamicVariables: dynamicVars,
+        // Pass personalized greeting as firstMessage override
+        // This overrides any First Message set in ElevenLabs dashboard
+        overrides: {
+          agent: {
+            firstMessage: urlData.firstMessage,
+          },
+        },
       })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start voice session'

@@ -2,6 +2,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/server'
 import { getVoiceConfigForSession } from '@/lib/services/voice-availability'
 
+/**
+ * Generate a personalized greeting based on participant type and school name.
+ * These greetings are passed as firstMessage override to ElevenLabs.
+ */
+function generateGreeting(participantType: string, schoolName?: string): string {
+  const school = schoolName || 'your school'
+  const normalizedType = participantType?.toLowerCase() || 'student'
+
+  switch (normalizedType) {
+    case 'student':
+      return `Hi, I'm Jippity! Thanks for taking the time to chat with me today. I'm here to learn a bit about your experience at ${school}. This is a relaxed conversation, and there are no right or wrong answers. I'm just interested in hearing your thoughts. Before we start, I want you to know that everything you share is completely confidential. So, how are you doing today?`
+
+    case 'teacher':
+      return `Hi, I'm Jippity! Thank you for joining me today. I'm here to gather some insights about your professional experience at ${school}. This is an informal conversation, and I'm genuinely interested in your perspective on teaching and working here. Everything we discuss is confidential and will be used to help improve the school environment. How has your day been so far?`
+
+    case 'parent':
+      return `Hi, I'm Jippity! Thank you so much for taking the time to speak with me. I'm here to learn about your experience as a parent with a child at ${school}. This is a relaxed conversation, and your honest feedback is really valuable. Everything you share is confidential. How are you doing today?`
+
+    case 'leadership':
+      return `Hi, I'm Jippity! Thank you for making time in your schedule to speak with me. I'm here to discuss your perspective on ${school} and gather your insights as a school leader. Your feedback is valuable for understanding the broader picture. Everything discussed is confidential. How has your week been going?`
+
+    default:
+      return `Hi, I'm Jippity! Thanks for joining me today. I'm here to have a friendly conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
+  }
+}
+
 // CORS headers for cross-origin requests
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -73,24 +99,31 @@ export async function POST(request: NextRequest) {
 
     const config = voiceAvailability.config!
 
-    // Get stakeholder context for dynamic variables
+    // Get stakeholder context for dynamic variables and greeting personalization
     let stakeholderName: string | undefined
+    let schoolName: string | undefined
 
     // For education participant tokens (ff_edu_xxx), get context directly from participant token
     if (sessionToken.startsWith('ff_edu_')) {
       const { data: participantTokenData } = await supabase
         .from('education_participant_tokens')
-        .select('participant_type, cohort_metadata')
+        .select(`
+          participant_type,
+          cohort_metadata,
+          schools:school_id(name)
+        `)
         .eq('token', sessionToken)
         .single()
 
       const participantToken = participantTokenData as {
         participant_type: string
         cohort_metadata: Record<string, string> | null
+        schools: { name: string } | null
       } | null
 
       if (participantToken) {
         stakeholderName = participantToken.participant_type
+        schoolName = participantToken.schools?.name
       }
     } else {
       // For regular session tokens, try to get from agent_sessions
@@ -113,20 +146,30 @@ export async function POST(request: NextRequest) {
       if (session?.participant_token_id) {
         const { data: participantTokenData } = await supabase
           .from('education_participant_tokens')
-          .select('participant_type, cohort_metadata')
+          .select(`
+            participant_type,
+            cohort_metadata,
+            schools:school_id(name)
+          `)
           .eq('id', session.participant_token_id)
           .single()
 
         const participantToken = participantTokenData as {
           participant_type: string
           cohort_metadata: Record<string, string> | null
+          schools: { name: string } | null
         } | null
 
         if (participantToken) {
           stakeholderName = participantToken.participant_type
+          schoolName = participantToken.schools?.name
         }
       }
     }
+
+    // Generate personalized greeting for the voice session
+    const firstMessage = generateGreeting(stakeholderName || 'student', schoolName)
+    console.log('[voice/signed-url] Generated greeting for:', stakeholderName, '- length:', firstMessage.length)
 
     // Use vertical-specific agent ID, or fall back to default
     const agentId =
@@ -182,9 +225,10 @@ export async function POST(request: NextRequest) {
 
     console.log('[voice/signed-url] Got signed URL:', signed_url ? 'YES' : 'NO')
 
-    // Return signed URL with dynamic variables
+    // Return signed URL with dynamic variables and personalized greeting
     return NextResponse.json({
       signedUrl: signed_url,
+      firstMessage,
       dynamicVariables: {
         session_token: sessionToken,
         module_id: moduleId || 'default',

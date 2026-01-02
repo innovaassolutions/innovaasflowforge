@@ -11,7 +11,13 @@ FlowForge supports real-time voice interviews using ElevenLabs Conversational AI
 
 The voice integration uses a **Hybrid Pattern**:
 - **ElevenLabs** handles: WebSocket connection, voice-to-text (STT), text-to-speech (TTS), audio streaming
-- **FlowForge** handles: Interview logic via Custom LLM endpoint, session management, safeguarding
+- **FlowForge** handles: Interview logic via Custom LLM endpoint, session management, safeguarding, personalized greeting generation
+
+**How it works:**
+1. FlowForge generates a personalized greeting based on participant type (student/teacher/parent/leadership)
+2. Greeting is passed to ElevenLabs via `firstMessage` override when starting the session
+3. ElevenLabs speaks the greeting
+4. User responds, triggering the Custom LLM endpoint for subsequent conversation turns
 
 ```
 ┌─────────────┐     WebSocket      ┌───────────────────┐
@@ -72,7 +78,7 @@ ELEVENLABS_LLM_SECRET=your_secure_random_secret
 
 - **Voice**: Choose an appropriate interviewer voice
 - **Model**: `flash_v2.5` (recommended for low latency)
-- **First Message**: Leave empty (handled by our Custom LLM)
+- **First Message**: Leave EMPTY (FlowForge sends personalized greeting via override)
 
 ### 3. Configure Custom LLM
 
@@ -178,6 +184,7 @@ Get a signed URL for connecting to ElevenLabs.
 ```json
 {
   "signedUrl": "wss://...",
+  "firstMessage": "Hi there! Thanks for taking the time to chat...",
   "dynamicVariables": {
     "session_token": "ff_edu_xxxxx",
     "module_id": "student_wellbeing",
@@ -254,7 +261,8 @@ https://innovaas.co/flowforge/api/voice/chat/completions
 
 **4. Verify First Message is COMPLETELY EMPTY:**
 - Delete ALL text from the "First Message" field
-- If ANY text exists here, ElevenLabs speaks that instead of calling the LLM
+- FlowForge sends a personalized greeting via `firstMessage` override
+- If you have text in the dashboard, it will conflict with the override
 - The field should be blank/empty
 
 **5. Verify System Prompt includes dynamic variables:**

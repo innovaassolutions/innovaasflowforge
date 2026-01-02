@@ -147,6 +147,7 @@ export interface VoiceAvailabilityResponse {
 export interface SignedUrlResponse {
   signedUrl: string
   dynamicVariables: DynamicVariables
+  firstMessage: string // Personalized greeting to speak when session starts
   config: {
     verticalKey: string
     displayName: string
