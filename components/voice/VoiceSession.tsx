@@ -94,6 +94,10 @@ export function VoiceSession({
       // Mode is 'speaking' or 'listening'
       console.log('[VoiceSession] Agent mode:', mode)
     },
+    onMessage: (message) => {
+      // Log all messages from ElevenLabs for debugging
+      console.log('[VoiceSession] Message:', JSON.stringify(message))
+    },
   })
 
   // Fetch signed URL from our API
