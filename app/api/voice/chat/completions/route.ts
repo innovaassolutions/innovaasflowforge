@@ -120,12 +120,53 @@ export async function POST(request: NextRequest) {
 
     console.log('[voice/chat/completions] User message:', userMessage ? userMessage.substring(0, 50) + '...' : 'NONE')
 
-    // Route to appropriate handler based on vertical
+    // For streaming responses, return immediately and process async
+    // This prevents ElevenLabs timeout while Claude is processing
+    if (stream) {
+      // Create the content promise (don't await yet!)
+      let contentPromise: Promise<string>
+
+      // Handle initial greeting when no user message (first connection)
+      if (!userMessage) {
+        console.log('[voice/chat/completions] No user message - generating greeting')
+        contentPromise = generateInitialGreeting(
+          sessionContext.sessionToken,
+          sessionContext.stakeholderName,
+          sessionContext.moduleId
+        )
+      } else {
+        switch (sessionContext.verticalKey) {
+          case 'education':
+            contentPromise = handleEducationMessage(
+              sessionContext.sessionToken,
+              userMessage,
+              sessionContext.moduleId
+            )
+            break
+          case 'assessment':
+            contentPromise = handleAssessmentMessage(
+              sessionContext.sessionToken,
+              userMessage
+            )
+            break
+          default:
+            contentPromise = handleEducationMessage(
+              sessionContext.sessionToken,
+              userMessage,
+              sessionContext.moduleId
+            )
+        }
+      }
+
+      // Return streaming response IMMEDIATELY - content will be streamed when ready
+      // This keeps the connection alive while Claude processes
+      return streamResponseAsync(contentPromise)
+    }
+
+    // Non-streaming: wait for full response
     let response: string
 
-    // Handle initial greeting when no user message (first connection)
     if (!userMessage) {
-      console.log('[voice/chat/completions] No user message - generating greeting')
       response = await generateInitialGreeting(
         sessionContext.sessionToken,
         sessionContext.stakeholderName,
@@ -141,7 +182,6 @@ export async function POST(request: NextRequest) {
           )
           break
         case 'assessment':
-          // TODO: Implement assessment handler
           response = await handleAssessmentMessage(
             sessionContext.sessionToken,
             userMessage
@@ -157,13 +197,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[voice/chat/completions] Response length:', response.length)
-
-    // Return response in appropriate format
-    if (stream) {
-      return streamResponse(response)
-    } else {
-      return jsonResponse(response)
-    }
+    return jsonResponse(response)
   } catch (error) {
     console.error('[voice/chat/completions] Error:', error)
     return streamError('An error occurred processing your request')
@@ -553,30 +587,27 @@ async function generateInitialGreeting(
 
 /**
  * Stream a response in SSE format for ElevenLabs
+ * Now accepts a Promise to allow immediate streaming while content is being generated
  */
 function streamResponse(content: string): Response {
+  return streamResponseAsync(Promise.resolve(content))
+}
+
+/**
+ * Stream a response with immediate connection, allowing content to be generated async
+ * This prevents ElevenLabs timeout by sending initial chunk immediately
+ */
+function streamResponseAsync(contentPromise: Promise<string>): Response {
   const encoder = new TextEncoder()
-
-  // Split content into chunks for streaming
-  const words = content.split(' ')
-  const chunks: string[] = []
-
-  // Create chunks of ~3-5 words for natural speech rhythm
-  for (let i = 0; i < words.length; i += 4) {
-    chunks.push(words.slice(i, i + 4).join(' '))
-  }
+  const id = `chatcmpl-${Date.now()}`
+  const created = Math.floor(Date.now() / 1000)
 
   const stream = new ReadableStream({
     async start(controller) {
-      const id = `chatcmpl-${Date.now()}`
-      const created = Math.floor(Date.now() / 1000)
-
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i]
-        const isLast = i === chunks.length - 1
-        const chunkContent = isLast ? chunk : chunk + ' '
-
-        const data = JSON.stringify({
+      try {
+        // Send an immediate empty role chunk to keep connection alive
+        // This prevents ElevenLabs from timing out while Claude processes
+        const initialChunk = JSON.stringify({
           id,
           object: 'chat.completion.chunk',
           created,
@@ -584,21 +615,77 @@ function streamResponse(content: string): Response {
           choices: [
             {
               index: 0,
-              delta: { content: chunkContent },
+              delta: { role: 'assistant' },
               logprobs: null,
-              finish_reason: isLast ? 'stop' : null,
+              finish_reason: null,
             },
           ],
         })
+        controller.enqueue(encoder.encode(`data: ${initialChunk}\n\n`))
+        console.log('[streamResponseAsync] Sent initial chunk, waiting for content...')
 
-        controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+        // Now wait for content (Claude API call)
+        const content = await contentPromise
+        console.log('[streamResponseAsync] Content received, length:', content.length)
 
-        // Small delay between chunks for natural pacing
-        await new Promise((resolve) => setTimeout(resolve, 10))
+        // Split content into chunks for streaming
+        const words = content.split(' ')
+        const chunks: string[] = []
+
+        // Create chunks of ~3-5 words for natural speech rhythm
+        for (let i = 0; i < words.length; i += 4) {
+          chunks.push(words.slice(i, i + 4).join(' '))
+        }
+
+        for (let i = 0; i < chunks.length; i++) {
+          const chunk = chunks[i]
+          const isLast = i === chunks.length - 1
+          const chunkContent = isLast ? chunk : chunk + ' '
+
+          const data = JSON.stringify({
+            id,
+            object: 'chat.completion.chunk',
+            created,
+            model: 'flowforge-interview-agent',
+            choices: [
+              {
+                index: 0,
+                delta: { content: chunkContent },
+                logprobs: null,
+                finish_reason: isLast ? 'stop' : null,
+              },
+            ],
+          })
+
+          controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+
+          // Small delay between chunks for natural pacing
+          await new Promise((resolve) => setTimeout(resolve, 10))
+        }
+
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+        controller.close()
+      } catch (error) {
+        console.error('[streamResponseAsync] Error:', error)
+        // Send error as a chunk
+        const errorData = JSON.stringify({
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: 'flowforge-interview-agent',
+          choices: [
+            {
+              index: 0,
+              delta: { content: 'I apologize, but something went wrong. Could you please try again?' },
+              logprobs: null,
+              finish_reason: 'stop',
+            },
+          ],
+        })
+        controller.enqueue(encoder.encode(`data: ${errorData}\n\n`))
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+        controller.close()
       }
-
-      controller.enqueue(encoder.encode('data: [DONE]\n\n'))
-      controller.close()
     },
   })
 
