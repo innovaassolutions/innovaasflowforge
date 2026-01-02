@@ -170,7 +170,7 @@ Check if voice is available for a session.
 ```
 
 ### POST /api/voice/signed-url
-Get a signed URL for connecting to ElevenLabs.
+Get a conversation token for connecting to ElevenLabs via WebRTC.
 
 **Body:**
 ```json
@@ -183,7 +183,7 @@ Get a signed URL for connecting to ElevenLabs.
 **Response:**
 ```json
 {
-  "signedUrl": "wss://...",
+  "conversationToken": "eyJ...",
   "firstMessage": "Hi there! Thanks for taking the time to chat...",
   "dynamicVariables": {
     "session_token": "ff_edu_xxxxx",
@@ -192,6 +192,10 @@ Get a signed URL for connecting to ElevenLabs.
   }
 }
 ```
+
+> **Note:** This endpoint returns a `conversationToken` for WebRTC connections
+> (not a `signedUrl` for WebSocket). WebRTC provides better stability and
+> includes built-in echo cancellation.
 
 ### POST /api/voice/chat/completions
 Custom LLM endpoint for ElevenLabs (OpenAI-compatible).

@@ -143,9 +143,9 @@ export interface VoiceAvailabilityResponse {
 // Types for ElevenLabs Conversational AI integration
 // ============================================================================
 
-// Signed URL response from ElevenLabs
+// Conversation token response from our API (for ElevenLabs WebRTC)
 export interface SignedUrlResponse {
-  signedUrl: string
+  conversationToken: string // WebRTC conversation token from ElevenLabs
   dynamicVariables: DynamicVariables
   firstMessage: string // Personalized greeting to speak when session starts
   config: {

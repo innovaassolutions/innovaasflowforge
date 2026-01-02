@@ -4,8 +4,8 @@
  * VoiceSession Component
  *
  * Manages a hybrid voice + text conversation session with ElevenLabs Conversational AI.
- * Uses the @elevenlabs/react SDK's useConversation hook for WebSocket
- * connection and audio handling, with optional text input for typed messages.
+ * Uses the @elevenlabs/react SDK's useConversation hook with WebRTC connection
+ * for better stability and built-in echo cancellation.
  *
  * Prerequisites:
  * 1. Install the ElevenLabs React SDK: npm install @elevenlabs/react
@@ -147,9 +147,13 @@ export function VoiceSession({
 
       console.log('[VoiceSession] Starting with firstMessage length:', urlData.firstMessage?.length)
 
+      // Use WebRTC connection type for better stability
+      // WebSocket has known issues: https://github.com/elevenlabs/elevenlabs-examples/issues/134
       await conversation.startSession({
-        signedUrl: urlData.signedUrl,
+        conversationToken: urlData.conversationToken,
+        connectionType: 'webrtc',
         dynamicVariables: dynamicVars,
+        clientTools: {},
         // Pass personalized greeting as firstMessage override
         // This overrides any First Message set in ElevenLabs dashboard
         overrides: {

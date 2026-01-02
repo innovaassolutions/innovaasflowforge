@@ -198,9 +198,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('[voice/signed-url] Requesting signed URL from ElevenLabs...')
-    const elevenlabsResponse = await fetch(
-      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${agentId}`,
+    // Request both signed URL (WebSocket fallback) and conversation token (WebRTC)
+    console.log('[voice/signed-url] Requesting credentials from ElevenLabs...')
+
+    // Get conversation token for WebRTC (preferred)
+    const tokenResponse = await fetch(
+      `https://api.elevenlabs.io/v1/convai/conversation/token?agent_id=${agentId}`,
       {
         method: 'GET',
         headers: {
@@ -209,25 +212,26 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    console.log('[voice/signed-url] ElevenLabs response status:', elevenlabsResponse.status)
+    console.log('[voice/signed-url] Token response status:', tokenResponse.status)
 
-    if (!elevenlabsResponse.ok) {
-      const errorText = await elevenlabsResponse.text()
-      console.error('[voice/signed-url] ElevenLabs error:', errorText)
+    if (!tokenResponse.ok) {
+      const errorText = await tokenResponse.text()
+      console.error('[voice/signed-url] ElevenLabs token error:', errorText)
       return NextResponse.json(
-        { error: `Voice service error: ${elevenlabsResponse.status}` },
+        { error: `Voice service error: ${tokenResponse.status}` },
         { status: 500 }
       )
     }
 
-    const elevenlabsData = await elevenlabsResponse.json()
-    const { signed_url } = elevenlabsData
+    const tokenData = await tokenResponse.json()
+    const { token: conversationToken } = tokenData
 
-    console.log('[voice/signed-url] Got signed URL:', signed_url ? 'YES' : 'NO')
+    console.log('[voice/signed-url] Got conversation token:', conversationToken ? 'YES' : 'NO')
 
-    // Return signed URL with dynamic variables and personalized greeting
+    // Return conversation token with dynamic variables and personalized greeting
+    // Using WebRTC mode for better stability (fixes WebSocket disconnection issues)
     return NextResponse.json({
-      signedUrl: signed_url,
+      conversationToken,
       firstMessage,
       dynamicVariables: {
         session_token: sessionToken,
