@@ -155,14 +155,41 @@ supabase/
 - **Type casting**: Use `as any` sparingly, prefer proper typing
 - **Realtime**: Supabase subscriptions for live updates
 
+## Voice Agent Integration (MANDATORY)
+
+**CRITICAL**: When working on voice interviews, ElevenLabs integration, or the Custom LLM endpoint, you MUST reference:
+
+**[ElevenLabs Knowledge Base](docs/elevenlabs-knowledge.md)** - Technical reference for integration
+
+### Key Voice Components
+- **Setup Script**: `scripts/setup-voice-agent.ts` - Programmatic agent configuration
+- **Custom LLM Endpoint**: `app/api/voice/chat/completions/route.ts` - Handles ElevenLabs requests
+- **Signed URL Endpoint**: `app/api/voice/signed-url/route.ts` - Session initialization
+- **Voice Availability**: `lib/services/voice-availability.ts` - Session config
+
+### Protocol Requirements
+1. **Custom LLM Format**: Must be OpenAI chat completions compatible
+2. **SSE Streaming**: `data: {...}\n\n` chunks ending with `data: [DONE]\n\n`
+3. **TTS Model**: Use `eleven_turbo_v2` (quality) or `eleven_flash_v2` (speed) for English
+4. **Dynamic Variables**: Use `{{variable}}` syntax in system prompts
+5. **System Prompt Parsing**: Variable format must match regex in `parseSessionContext()`
+
+### Setup Commands
+```bash
+npm run setup:voice-agent              # Production
+npm run setup:voice-agent:preview      # Preview environment
+npm run setup:voice-agent:local        # Local development
+```
+
 ## Documentation
 
+- **ElevenLabs**: [docs/elevenlabs-knowledge.md](docs/elevenlabs-knowledge.md) - MANDATORY for voice work
 - **UI Design System**: [docs/design-system.md](docs/design-system.md) - MANDATORY for all UI work
-- **UX Color Themes**: [docs/ux-color-themes.html](docs/ux-color-themes.html) - Visual color explorer
+- **UX Color Themes**: [docs/ux-color-themes.html](docs/ux-color-themes.html) - Visual color palette
 - **UX Design Directions**: [docs/ux-design-directions.html](docs/ux-design-directions.html) - Page mockups
 - **PDF Design**: [docs/pdf-design-guidelines.md](docs/pdf-design-guidelines.md)
 - **Report Design**: [docs/report-design-guidelines.md](docs/report-design-guidelines.md)
-- **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Assessment framework reference materials
+- **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Assessment framework reference
 - **Database Schema**: See Supabase migrations
 
 ## Development Workflow
@@ -188,9 +215,15 @@ supabase/
 2. Reference [docs/ux-design-directions.html](docs/ux-design-directions.html) for layout patterns
 3. Verify your changes match the Pearl Vibrant theme exactly
 
+**BEFORE ANY VOICE/ELEVENLABS WORK:**
+1. Read [docs/elevenlabs-knowledge.md](docs/elevenlabs-knowledge.md) for API protocol
+2. Review `scripts/setup-voice-agent.ts` for current agent configuration
+3. Check `app/api/voice/chat/completions/route.ts` for Custom LLM format requirements
+4. Ensure system prompt variable format matches `parseSessionContext()` regex patterns
+
 **General Guidelines:**
 - Prioritize reading relevant documentation before making changes
 - Follow established patterns in the codebase
 - Maintain the professional, data-driven aesthetic
 - Always test changes thoroughly before considering work complete
-- When in doubt, reference the design system files
+- When in doubt, reference the design system files or ElevenLabs docs
