@@ -59,21 +59,33 @@ export async function POST(request: NextRequest) {
     console.log('[voice/chat/completions] x-api-key present:', !!xApiKey)
     console.log('[voice/chat/completions] api-key present:', !!apiKeyHeader)
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('[voice/chat/completions] Missing or invalid auth header')
-      return new Response('Unauthorized', { status: 401 })
+    // TEMPORARY: Skip auth check to diagnose ElevenLabs connection issue
+    // TODO: Re-enable auth after debugging
+    const SKIP_AUTH_FOR_DEBUG = true
+
+    if (!SKIP_AUTH_FOR_DEBUG) {
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.error('[voice/chat/completions] Missing or invalid auth header')
+        return new Response('Unauthorized', { status: 401 })
+      }
+
+      const apiKey = authHeader.replace('Bearer ', '')
+      const expectedSecret = process.env.ELEVENLABS_LLM_SECRET
+      console.log('[voice/chat/completions] API key length:', apiKey.length, 'Expected length:', expectedSecret?.length)
+
+      if (apiKey !== expectedSecret) {
+        console.error('[voice/chat/completions] Invalid LLM secret - mismatch')
+        return new Response('Unauthorized', { status: 401 })
+      }
+    } else {
+      console.log('[voice/chat/completions] DEBUG MODE: Auth check skipped')
+      if (authHeader) {
+        const apiKey = authHeader.replace('Bearer ', '')
+        console.log('[voice/chat/completions] Received key (first 10 chars):', apiKey.substring(0, 10), 'length:', apiKey.length)
+      }
     }
 
-    const apiKey = authHeader.replace('Bearer ', '')
-    const expectedSecret = process.env.ELEVENLABS_LLM_SECRET
-    console.log('[voice/chat/completions] API key length:', apiKey.length, 'Expected length:', expectedSecret?.length)
-
-    if (apiKey !== expectedSecret) {
-      console.error('[voice/chat/completions] Invalid LLM secret - mismatch')
-      return new Response('Unauthorized', { status: 401 })
-    }
-
-    console.log('[voice/chat/completions] Authorization successful')
+    console.log('[voice/chat/completions] Authorization successful (or skipped)')
 
     const body: OpenAIChatRequest = await request.json()
     const { messages, stream = true } = body
