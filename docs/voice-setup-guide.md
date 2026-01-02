@@ -236,15 +236,15 @@ function InterviewPage({ sessionToken, moduleId }) {
 
 ### Hybrid Voice + Text Input
 
-The VoiceSession component supports both voice and text input:
+The VoiceSession component supports simultaneous voice and text input:
 
-1. **Voice Mode**: Speak naturally into your microphone
-2. **Text Mode**: Click the chat icon to reveal a text input field
-   - Type your message and press Enter or click Send
-   - Messages are sent to the agent as if you had spoken them
-   - Useful for complex names, technical terms, or in noisy environments
+- **Voice**: Speak naturally into your microphone at any time
+- **Text**: A text input field is always visible during the session
+  - Type your message and press Enter or click Send
+  - Messages are sent to the agent as if you had spoken them
+  - Useful for complex names, technical terms, or in noisy environments
 
-The text input feature uses ElevenLabs' `sendUserMessage` API, which treats typed messages the same as spoken input.
+Both input methods are available simultaneously - users can speak or type interchangeably without switching modes. The text input uses ElevenLabs' `sendUserMessage` API, which treats typed messages the same as spoken input.
 
 ## Troubleshooting
 

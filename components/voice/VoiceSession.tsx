@@ -19,7 +19,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useConversation } from '@elevenlabs/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Mic, MicOff, Phone, PhoneOff, Loader2, Send, MessageSquare } from 'lucide-react'
+import { Mic, MicOff, Phone, PhoneOff, Loader2, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiUrl } from '@/lib/api-url'
 import type { SignedUrlResponse } from '@/lib/types/voice'
@@ -55,7 +55,6 @@ export function VoiceSession({
   const [isMuted, setIsMuted] = useState(false)
   const [textInput, setTextInput] = useState('')
   const [isSendingText, setIsSendingText] = useState(false)
-  const [showTextInput, setShowTextInput] = useState(false)
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const durationSecondsRef = useRef<number>(0)
   const hadErrorRef = useRef<boolean>(false)
@@ -198,18 +197,6 @@ export function VoiceSession({
     conversation.setVolume({ volume: newMuted ? 0 : 1 })
     setIsMuted(newMuted)
   }, [conversation, isMuted])
-
-  // Toggle text input visibility
-  const toggleTextInput = useCallback(() => {
-    setShowTextInput((prev) => {
-      const newValue = !prev
-      // Focus the input when showing
-      if (newValue) {
-        setTimeout(() => textInputRef.current?.focus(), 100)
-      }
-      return newValue
-    })
-  }, [])
 
   // Send text message
   const sendTextMessage = useCallback(async () => {
@@ -401,16 +388,6 @@ export function VoiceSession({
             </Button>
 
             <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTextInput}
-              className={cn(showTextInput && 'bg-blue-100 border-blue-300')}
-              title="Type a message"
-            >
-              <MessageSquare className={cn('w-5 h-5', showTextInput && 'text-blue-600')} />
-            </Button>
-
-            <Button
               variant="destructive"
               size="lg"
               onClick={endSession}
@@ -430,13 +407,13 @@ export function VoiceSession({
         )}
       </div>
 
-      {/* Text input for hybrid mode */}
-      {connectionStatus === 'connected' && showTextInput && (
+      {/* Text input - always available during voice session */}
+      {connectionStatus === 'connected' && (
         <div className="flex items-center gap-2 w-full max-w-md">
           <Input
             ref={textInputRef}
             type="text"
-            placeholder="Type your message..."
+            placeholder="Or type your response here..."
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             onKeyDown={handleTextKeyDown}
