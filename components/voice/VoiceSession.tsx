@@ -149,18 +149,16 @@ export function VoiceSession({
 
       // Use WebRTC connection type for better stability
       // WebSocket has known issues: https://github.com/elevenlabs/elevenlabs-examples/issues/134
-      // DEBUG: Temporarily disable firstMessage override to test if it's causing disconnect
       await conversation.startSession({
         conversationToken: urlData.conversationToken,
         connectionType: 'webrtc',
         dynamicVariables: dynamicVars,
         clientTools: {},
-        // TEMPORARILY DISABLED to debug disconnect issue:
-        // overrides: {
-        //   agent: {
-        //     firstMessage: urlData.firstMessage,
-        //   },
-        // },
+        overrides: {
+          agent: {
+            firstMessage: urlData.firstMessage,
+          },
+        },
       })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start voice session'
