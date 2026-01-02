@@ -605,9 +605,24 @@ function streamResponseAsync(contentPromise: Promise<string>): Response {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        // Don't send an initial chunk - ElevenLabs may not handle empty role chunks well
-        // Instead, just wait for the content (connection stays open with streaming response)
-        console.log('[streamResponseAsync] Waiting for content (no initial chunk)...')
+        // Send initial role chunk immediately (standard OpenAI format)
+        // This keeps the connection alive while Claude processes
+        const roleChunk = JSON.stringify({
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: 'flowforge-interview-agent',
+          choices: [
+            {
+              index: 0,
+              delta: { role: 'assistant' },
+              logprobs: null,
+              finish_reason: null,
+            },
+          ],
+        })
+        controller.enqueue(encoder.encode(`data: ${roleChunk}\n\n`))
+        console.log('[streamResponseAsync] Sent role chunk, waiting for content...')
 
         // Now wait for content (Claude API call)
         const content = await contentPromise
@@ -622,6 +637,7 @@ function streamResponseAsync(contentPromise: Promise<string>): Response {
           chunks.push(words.slice(i, i + 4).join(' '))
         }
 
+        // Send content chunks (without finish_reason)
         for (let i = 0; i < chunks.length; i++) {
           const chunk = chunks[i]
           const isLast = i === chunks.length - 1
@@ -637,7 +653,7 @@ function streamResponseAsync(contentPromise: Promise<string>): Response {
                 index: 0,
                 delta: { content: chunkContent },
                 logprobs: null,
-                finish_reason: isLast ? 'stop' : null,
+                finish_reason: null, // Don't send finish_reason with content
               },
             ],
           })
@@ -647,6 +663,23 @@ function streamResponseAsync(contentPromise: Promise<string>): Response {
           // Small delay between chunks for natural pacing
           await new Promise((resolve) => setTimeout(resolve, 10))
         }
+
+        // Send final chunk with finish_reason (no content, just finish signal)
+        const finishChunk = JSON.stringify({
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: 'flowforge-interview-agent',
+          choices: [
+            {
+              index: 0,
+              delta: {},
+              logprobs: null,
+              finish_reason: 'stop',
+            },
+          ],
+        })
+        controller.enqueue(encoder.encode(`data: ${finishChunk}\n\n`))
 
         controller.enqueue(encoder.encode('data: [DONE]\n\n'))
         controller.close()
