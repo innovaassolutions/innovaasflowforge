@@ -37,10 +37,27 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   console.log('[voice/chat/completions] POST request received')
 
+  // Debug: Log all headers to see what ElevenLabs sends
+  const headersObj: Record<string, string> = {}
+  request.headers.forEach((value, key) => {
+    // Mask sensitive values but show structure
+    if (key.toLowerCase().includes('auth') || key.toLowerCase().includes('key')) {
+      headersObj[key] = `${value.substring(0, 20)}... (len: ${value.length})`
+    } else {
+      headersObj[key] = value
+    }
+  })
+  console.log('[voice/chat/completions] All headers:', JSON.stringify(headersObj, null, 2))
+
   try {
-    // Validate authorization
+    // Validate authorization - check multiple possible header formats
     const authHeader = request.headers.get('authorization')
+    const xApiKey = request.headers.get('x-api-key')
+    const apiKeyHeader = request.headers.get('api-key')
+
     console.log('[voice/chat/completions] Auth header present:', !!authHeader)
+    console.log('[voice/chat/completions] x-api-key present:', !!xApiKey)
+    console.log('[voice/chat/completions] api-key present:', !!apiKeyHeader)
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.error('[voice/chat/completions] Missing or invalid auth header')
