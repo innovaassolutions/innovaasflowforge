@@ -230,14 +230,15 @@ export async function POST(request: NextRequest) {
 
     // Return conversation token with dynamic variables and personalized greeting
     // Using WebRTC mode for better stability (fixes WebSocket disconnection issues)
+    // IMPORTANT: All dynamic variables must have values (not undefined) for ElevenLabs interpolation
     return NextResponse.json({
       conversationToken,
       firstMessage,
       dynamicVariables: {
         session_token: sessionToken,
         module_id: moduleId || 'default',
-        stakeholder_name: stakeholderName,
-        vertical_key: config.verticalKey,
+        stakeholder_name: stakeholderName || 'participant',
+        vertical_key: config.verticalKey || 'education',
       },
       config: {
         verticalKey: config.verticalKey,
