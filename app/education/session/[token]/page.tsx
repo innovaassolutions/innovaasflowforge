@@ -79,7 +79,8 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
   // Voice mode state
   const [sessionMode, setSessionMode] = useState<SessionMode>('text')
   const [voiceAvailability, setVoiceAvailability] = useState<VoiceAvailabilityResponse | null>(null)
-  const [checkingVoice, setCheckingVoice] = useState(false)
+  const [checkingVoice, setCheckingVoice] = useState(true) // Start true to avoid flash of text content
+  const [isNewVoiceSession, setIsNewVoiceSession] = useState(false) // Track if this is a new voice session
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -124,20 +125,15 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
           timestamp: m.created_at
         })))
         setIsResuming(true)
-      } else if (data.greeting) {
-        // New session with greeting
-        setMessages([{
-          role: 'assistant',
-          content: data.greeting,
-          timestamp: new Date().toISOString()
-        }])
       }
+      // NOTE: Don't add greeting here - wait until we know voice availability
+      // Voice mode should handle its own greeting verbally
 
       setConversationState(data.conversationState)
 
-      // Check voice availability after session loads
+      // Check voice availability FIRST, then decide on greeting
       // Voice mode will be the default when available
-      checkVoiceAvailability()
+      await checkVoiceAvailability(data.greeting)
 
     } catch (err) {
       console.error('Session load error:', err)
@@ -147,20 +143,36 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
     }
   }
 
-  async function checkVoiceAvailability() {
+  async function checkVoiceAvailability(greeting?: string) {
     try {
       setCheckingVoice(true)
       const response = await fetch(apiUrl(`api/voice/availability?sessionToken=${token}`))
       const data = await response.json()
       setVoiceAvailability(data)
 
-      // Always default to voice mode when available
+      // If voice is available, use voice mode and let the voice agent deliver the greeting
       if (data.available) {
         setSessionMode('voice')
+        setIsNewVoiceSession(true) // Mark as new voice session - don't show text messages
+      } else if (greeting) {
+        // Voice not available - show text greeting for text-only mode
+        setMessages([{
+          role: 'assistant',
+          content: greeting,
+          timestamp: new Date().toISOString()
+        }])
       }
     } catch (err) {
       console.error('Voice availability check failed:', err)
       setVoiceAvailability({ available: false, reason: 'Unable to check voice availability' })
+      // On error, fall back to text mode with greeting
+      if (greeting) {
+        setMessages([{
+          role: 'assistant',
+          content: greeting,
+          timestamp: new Date().toISOString()
+        }])
+      }
     } finally {
       setCheckingVoice(false)
     }
@@ -168,8 +180,9 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
 
   function handleModeChange(mode: SessionMode) {
     setSessionMode(mode)
-    // When switching to text mode, focus the input
+    // When switching to text mode, show messages and focus input
     if (mode === 'text') {
+      setIsNewVoiceSession(false) // Allow messages to be shown
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }
@@ -389,7 +402,7 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
         </div>
       )}
 
-      {/* Messages */}
+      {/* Messages - hide for new voice sessions until conversation starts */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 py-6 space-y-4
                         sm:px-6
@@ -402,7 +415,8 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
             </div>
           </div>
 
-          {messages.map((message, index) => (
+          {/* Only show messages if not a new voice session (voice handles greeting verbally) */}
+          {!(isNewVoiceSession && sessionMode === 'voice') && messages.map((message, index) => (
             <div
               key={index}
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
