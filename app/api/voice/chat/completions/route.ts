@@ -605,24 +605,9 @@ function streamResponseAsync(contentPromise: Promise<string>): Response {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        // Send an immediate empty role chunk to keep connection alive
-        // This prevents ElevenLabs from timing out while Claude processes
-        const initialChunk = JSON.stringify({
-          id,
-          object: 'chat.completion.chunk',
-          created,
-          model: 'flowforge-interview-agent',
-          choices: [
-            {
-              index: 0,
-              delta: { role: 'assistant' },
-              logprobs: null,
-              finish_reason: null,
-            },
-          ],
-        })
-        controller.enqueue(encoder.encode(`data: ${initialChunk}\n\n`))
-        console.log('[streamResponseAsync] Sent initial chunk, waiting for content...')
+        // Don't send an initial chunk - ElevenLabs may not handle empty role chunks well
+        // Instead, just wait for the content (connection stays open with streaming response)
+        console.log('[streamResponseAsync] Waiting for content (no initial chunk)...')
 
         // Now wait for content (Claude API call)
         const content = await contentPromise
