@@ -94,6 +94,11 @@ export async function POST(request: NextRequest) {
     console.log('[voice/chat/completions] Message roles:', messages.map((m) => m.role).join(', '))
 
     // Extract session context from system prompt
+    // DEBUG: Print full system prompt to diagnose dynamic variable interpolation
+    const systemMessage = messages.find((m) => m.role === 'system')
+    console.log('[voice/chat/completions] System prompt (first 500 chars):', systemMessage?.content?.substring(0, 500))
+    console.log('[voice/chat/completions] System prompt (last 300 chars):', systemMessage?.content?.slice(-300))
+
     const sessionContext = parseSessionContext(messages)
     console.log('[voice/chat/completions] Session context:', {
       hasToken: !!sessionContext.sessionToken,
