@@ -497,19 +497,19 @@ async function generateInitialGreeting(
 
   switch (participantType) {
     case 'student':
-      greeting = `Hi there! Thanks for taking the time to chat with me today. I'm here to learn a bit about your experience at ${schoolName}. This is a relaxed conversation, and there are no right or wrong answers. I'm just interested in hearing your thoughts. Before we start, I want you to know that everything you share is completely confidential. So, how are you doing today?`
+      greeting = `Hi, I'm Jippity! Thanks for taking the time to chat with me today. I'm here to learn a bit about your experience at ${schoolName}. This is a relaxed conversation, and there are no right or wrong answers. I'm just interested in hearing your thoughts. Before we start, I want you to know that everything you share is completely confidential. So, how are you doing today?`
       break
     case 'teacher':
-      greeting = `Hello! Thank you for joining me today. I'm here to gather some insights about your professional experience at ${schoolName}. This is an informal conversation, and I'm genuinely interested in your perspective on teaching and working here. Everything we discuss is confidential and will be used to help improve the school environment. How has your day been so far?`
+      greeting = `Hi, I'm Jippity! Thank you for joining me today. I'm here to gather some insights about your professional experience at ${schoolName}. This is an informal conversation, and I'm genuinely interested in your perspective on teaching and working here. Everything we discuss is confidential and will be used to help improve the school environment. How has your day been so far?`
       break
     case 'parent':
-      greeting = `Hello! Thank you so much for taking the time to speak with me. I'm here to learn about your experience as a parent with a child at ${schoolName}. This is a relaxed conversation, and your honest feedback is really valuable. Everything you share is confidential. How are you doing today?`
+      greeting = `Hi, I'm Jippity! Thank you so much for taking the time to speak with me. I'm here to learn about your experience as a parent with a child at ${schoolName}. This is a relaxed conversation, and your honest feedback is really valuable. Everything you share is confidential. How are you doing today?`
       break
     case 'leadership':
-      greeting = `Good day! Thank you for making time in your schedule to speak with me. I'm here to discuss your perspective on ${schoolName} and gather your insights as a school leader. Your feedback is valuable for understanding the broader picture. Everything discussed is confidential. How has your week been going?`
+      greeting = `Hi, I'm Jippity! Thank you for making time in your schedule to speak with me. I'm here to discuss your perspective on ${schoolName} and gather your insights as a school leader. Your feedback is valuable for understanding the broader picture. Everything discussed is confidential. How has your week been going?`
       break
     default:
-      greeting = `Hi there! Thanks for joining me today. I'm here to have a friendly conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
+      greeting = `Hi, I'm Jippity! Thanks for joining me today. I'm here to have a friendly conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
   }
 
   console.log('[voice/chat/completions] Generated greeting for', participantType, '- length:', greeting.length)

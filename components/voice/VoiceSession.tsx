@@ -3,9 +3,9 @@
 /**
  * VoiceSession Component
  *
- * Manages a voice conversation session with ElevenLabs Conversational AI.
+ * Manages a hybrid voice + text conversation session with ElevenLabs Conversational AI.
  * Uses the @elevenlabs/react SDK's useConversation hook for WebSocket
- * connection and audio handling.
+ * connection and audio handling, with optional text input for typed messages.
  *
  * Prerequisites:
  * 1. Install the ElevenLabs React SDK: npm install @elevenlabs/react
@@ -18,7 +18,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useConversation } from '@elevenlabs/react'
 import { Button } from '@/components/ui/button'
-import { Mic, MicOff, Phone, PhoneOff, Loader2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Mic, MicOff, Phone, PhoneOff, Loader2, Send, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiUrl } from '@/lib/api-url'
 import type { SignedUrlResponse } from '@/lib/types/voice'
@@ -52,9 +53,13 @@ export function VoiceSession({
   const [error, setError] = useState<string | null>(null)
   const [durationSeconds, setDurationSeconds] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
+  const [textInput, setTextInput] = useState('')
+  const [isSendingText, setIsSendingText] = useState(false)
+  const [showTextInput, setShowTextInput] = useState(false)
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const durationSecondsRef = useRef<number>(0)
   const hadErrorRef = useRef<boolean>(false)
+  const textInputRef = useRef<HTMLInputElement>(null)
   const minDurationForComplete = 30 // Minimum 30 seconds for a valid interview
 
   // ElevenLabs conversation hook
@@ -193,6 +198,49 @@ export function VoiceSession({
     conversation.setVolume({ volume: newMuted ? 0 : 1 })
     setIsMuted(newMuted)
   }, [conversation, isMuted])
+
+  // Toggle text input visibility
+  const toggleTextInput = useCallback(() => {
+    setShowTextInput((prev) => {
+      const newValue = !prev
+      // Focus the input when showing
+      if (newValue) {
+        setTimeout(() => textInputRef.current?.focus(), 100)
+      }
+      return newValue
+    })
+  }, [])
+
+  // Send text message
+  const sendTextMessage = useCallback(async () => {
+    const message = textInput.trim()
+    if (!message || isSendingText || connectionStatus !== 'connected') return
+
+    try {
+      setIsSendingText(true)
+      // Use ElevenLabs SDK to send text message
+      // sendUserMessage sends text as if the user had spoken it
+      await conversation.sendUserMessage(message)
+      setTextInput('')
+      console.log('[VoiceSession] Sent text message:', message.substring(0, 50))
+    } catch (err) {
+      console.error('[VoiceSession] Error sending text:', err)
+      onError?.('Failed to send text message')
+    } finally {
+      setIsSendingText(false)
+    }
+  }, [textInput, isSendingText, connectionStatus, conversation, onError])
+
+  // Handle Enter key in text input
+  const handleTextKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        sendTextMessage()
+      }
+    },
+    [sendTextMessage]
+  )
 
   // Duration tracking
   const startDurationTracking = useCallback(() => {
@@ -343,12 +391,23 @@ export function VoiceSession({
               size="icon"
               onClick={toggleMute}
               className={cn(isMuted && 'bg-red-100 border-red-300')}
+              title={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? (
                 <MicOff className="w-5 h-5 text-red-600" />
               ) : (
                 <Mic className="w-5 h-5" />
               )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTextInput}
+              className={cn(showTextInput && 'bg-blue-100 border-blue-300')}
+              title="Type a message"
+            >
+              <MessageSquare className={cn('w-5 h-5', showTextInput && 'text-blue-600')} />
             </Button>
 
             <Button
@@ -371,6 +430,34 @@ export function VoiceSession({
         )}
       </div>
 
+      {/* Text input for hybrid mode */}
+      {connectionStatus === 'connected' && showTextInput && (
+        <div className="flex items-center gap-2 w-full max-w-md">
+          <Input
+            ref={textInputRef}
+            type="text"
+            placeholder="Type your message..."
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            onKeyDown={handleTextKeyDown}
+            disabled={isSendingText}
+            className="flex-1"
+          />
+          <Button
+            size="icon"
+            onClick={sendTextMessage}
+            disabled={!textInput.trim() || isSendingText}
+            title="Send message"
+          >
+            {isSendingText ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* Error message */}
       {error && connectionStatus === 'error' && (
         <div className="text-sm text-red-600 text-center max-w-sm">
@@ -382,7 +469,8 @@ export function VoiceSession({
       {connectionStatus === 'disconnected' && (
         <div className="text-xs text-muted-foreground text-center max-w-sm">
           Speak naturally with the AI interviewer. Your conversation will be
-          transcribed and processed in real-time.
+          transcribed and processed in real-time. You can also type messages
+          using the chat button if needed.
         </div>
       )}
     </div>
