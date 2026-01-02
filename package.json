@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup:voice-agent": "tsx scripts/setup-voice-agent.ts",
+    "setup:voice-agent:preview": "tsx scripts/setup-voice-agent.ts --env preview",
+    "setup:voice-agent:local": "tsx scripts/setup-voice-agent.ts --env local"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
