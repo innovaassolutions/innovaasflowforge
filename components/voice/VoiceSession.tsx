@@ -305,8 +305,13 @@ export function VoiceSession({
       }
     },
     onStatusChange: (status) => {
-      // Track status changes for debugging
+      // Track status changes for debugging - log full object
       console.log('[VoiceSession] Status changed to:', status)
+      try {
+        console.log('[VoiceSession] Status details:', JSON.stringify(status))
+      } catch {
+        console.log('[VoiceSession] Status (non-serializable):', typeof status)
+      }
     },
     // Track when audio data is received from ElevenLabs
     onAudio: (audio) => {
@@ -359,18 +364,10 @@ export function VoiceSession({
       setConnectionStatus('connecting')
       setError(null)
 
-      // Request microphone permission first
-      // This is required for WebRTC audio to work properly
-      console.log('[VoiceSession] Requesting microphone permission...')
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        // Stop the stream immediately - ElevenLabs SDK will create its own
-        stream.getTracks().forEach(track => track.stop())
-        console.log('[VoiceSession] Microphone permission granted')
-      } catch (micError) {
-        console.error('[VoiceSession] Microphone permission denied:', micError)
-        throw new Error('Microphone access is required for voice sessions. Please allow microphone access and try again.')
-      }
+      // NOTE: We previously requested microphone permission here and stopped the stream.
+      // However, this might interfere with the ElevenLabs SDK's own mic handling.
+      // Let the SDK request microphone access directly during startSession.
+      console.log('[VoiceSession] Letting ElevenLabs SDK handle microphone access...')
 
       // Ensure audio context is resumed (browsers block autoplay)
       // This is a workaround for browser autoplay policies
