@@ -7,9 +7,10 @@ import { NextRequest, NextResponse } from 'next/server'
  * for a test agent to isolate connection issues.
  */
 
-// NEW: Custom LLM agent with 30-second turn timeout (created 2026-01-03)
+// NEW: Production Custom LLM agent with 30s turn timeout and correct URL
+// Previous Preview agent: agent_2301ke131vzmeymam8fyhqgw2wb4
 // Previous minimal test agent: agent_7301ke121bcbea0ayecs8xapafpv
-const TEST_AGENT_ID = 'agent_2301ke131vzmeymam8fyhqgw2wb4'
+const TEST_AGENT_ID = 'agent_0801ke13t7jafa9bnkxe23yf5pr9'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
