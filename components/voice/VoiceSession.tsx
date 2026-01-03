@@ -290,7 +290,7 @@ export function VoiceSession({
       console.log('[VoiceSession] Message received:', JSON.stringify(message))
 
       // Check for specific message types that might indicate issues
-      const msgAny = message as Record<string, unknown>
+      const msgAny = message as unknown as Record<string, unknown>
       if (msgAny.type === 'error' || msgAny.error) {
         console.error('[VoiceSession] ⚠️ Error in message:', msgAny.error || msgAny)
       }
