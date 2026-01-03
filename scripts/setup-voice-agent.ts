@@ -108,7 +108,9 @@ async function createAgent(
     name: agentName,
     conversation_config: {
       agent: {
-        first_message: '', // Empty - we use override from client
+        // Use a placeholder first message - will be overridden by client
+        // Having a non-empty value ensures ElevenLabs knows this is a conversational agent
+        first_message: 'Hello! I am ready to begin our conversation.',
         language: 'en',
         prompt: {
           prompt: SYSTEM_PROMPT,
@@ -123,7 +125,7 @@ async function createAgent(
               Authorization: `Bearer ${llmSecret}`,
             },
           },
-          ignore_default_personality: true,
+          // Removed ignore_default_personality - was causing issues with conversation flow
         },
         // Dynamic variables are simple string placeholders
         dynamic_variables: {
