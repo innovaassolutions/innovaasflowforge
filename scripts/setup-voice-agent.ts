@@ -150,8 +150,8 @@ async function createAgent(
         provider: 'elevenlabs',
       },
       turn: {
-        turn_timeout: 10,
-        turn_eagerness: 'normal',
+        turn_timeout: 30, // Increased from 10 to match working test agent
+        turn_eagerness: 'patient', // Changed from 'normal' for better conversation flow
       },
       conversation: {
         max_duration_seconds: 1800, // 30 minutes max
