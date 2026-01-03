@@ -7,10 +7,11 @@ import { NextRequest, NextResponse } from 'next/server'
  * for a test agent to isolate connection issues.
  */
 
-// NEW: Production Custom LLM agent with 30s turn timeout and correct URL
+// NEW: Custom LLM agent using Vercel direct URL (not custom domain)
+// Previous production domain agent: agent_0801ke13t7jafa9bnkxe23yf5pr9
 // Previous Preview agent: agent_2301ke131vzmeymam8fyhqgw2wb4
 // Previous minimal test agent: agent_7301ke121bcbea0ayecs8xapafpv
-const TEST_AGENT_ID = 'agent_0801ke13t7jafa9bnkxe23yf5pr9'
+const TEST_AGENT_ID = 'agent_5101ke19rtm0fg6s5vfps82bp5m9'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
