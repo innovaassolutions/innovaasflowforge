@@ -63,12 +63,17 @@ export async function POST(request: NextRequest) {
 
     console.log('[voice/test-session] Got conversation token:', tokenData.token ? 'YES' : 'NO')
 
-    // Return minimal response - no dynamic variables, no overrides
+    // Return response with dynamic variables that Custom LLM agent expects
     return NextResponse.json({
       conversationToken: tokenData.token,
       agentId: TEST_AGENT_ID,
-      // No firstMessage - use agent's default
-      // No dynamicVariables - none configured on this agent
+      // Include dynamic variables - Custom LLM agent needs these
+      dynamicVariables: {
+        session_token: 'test-session-token',
+        module_id: 'test-module',
+        vertical_key: 'education',
+        stakeholder_name: 'test-participant',
+      },
     }, { headers: corsHeaders })
 
   } catch (error) {

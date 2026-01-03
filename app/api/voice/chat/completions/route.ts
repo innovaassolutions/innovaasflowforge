@@ -107,7 +107,30 @@ export async function POST(request: NextRequest) {
       moduleId: sessionContext.moduleId,
       verticalKey: sessionContext.verticalKey,
       stakeholderName: sessionContext.stakeholderName,
+      isTestMode: sessionContext.isTestMode,
     })
+
+    // Handle test mode - return simple responses without database access
+    if (sessionContext.isTestMode) {
+      console.log('[voice/chat/completions] TEST MODE - returning simple response')
+      const userMessage = messages.filter((m) => m.role === 'user').pop()?.content
+
+      if (!userMessage) {
+        // Initial greeting for test mode
+        const testGreeting = `Hi there! I'm Jippity, your AI interviewer. This is a test session to verify the voice connection is working properly. Everything sounds great! How are you doing today?`
+        if (stream) {
+          return streamResponseAsync(Promise.resolve(testGreeting))
+        }
+        return jsonResponse(testGreeting)
+      }
+
+      // Simple response to user input in test mode
+      const testResponse = `Thank you for saying that! I heard you clearly. The voice connection is working well. Is there anything specific you'd like to test?`
+      if (stream) {
+        return streamResponseAsync(Promise.resolve(testResponse))
+      }
+      return jsonResponse(testResponse)
+    }
 
     if (!sessionContext.sessionToken) {
       console.error('[voice/chat/completions] No session token found in messages')
@@ -214,6 +237,7 @@ function parseSessionContext(messages: OpenAIChatMessage[]): {
   moduleId: string | null
   verticalKey: string
   stakeholderName: string | null
+  isTestMode: boolean
 } {
   const systemPrompt = messages.find((m) => m.role === 'system')?.content || ''
 
@@ -222,24 +246,28 @@ function parseSessionContext(messages: OpenAIChatMessage[]): {
   const tokenMatch = systemPrompt.match(/session_token:\s*(ff_[a-z]+_[a-zA-Z0-9]+)/)
   const sessionToken = tokenMatch ? tokenMatch[1] : null
 
+  // Check for test mode - detect test token patterns
+  const testTokenMatch = systemPrompt.match(/session_token:\s*(test[-_][\w-]+)/)
+  const isTestMode = !!testTokenMatch
+
   // Extract module_id
-  const moduleMatch = systemPrompt.match(/module_id:\s*(\w+)/)
+  const moduleMatch = systemPrompt.match(/module_id:\s*(\w+[-]?\w*)/)
   const moduleId = moduleMatch ? moduleMatch[1] : null
 
   // Extract vertical_key
   const verticalMatch = systemPrompt.match(/vertical_key:\s*(\w+)/)
   const verticalKey = verticalMatch ? verticalMatch[1] : 'education'
 
-  // Extract stakeholder_name
-  const nameMatch = systemPrompt.match(/stakeholder_name:\s*(\w+)/)
+  // Extract stakeholder_name (note: may be "participant" or placeholder for token-based access)
+  const nameMatch = systemPrompt.match(/stakeholder_name:\s*([\w-]+)/)
   const stakeholderName = nameMatch ? nameMatch[1] : null
 
-  // Also check 'user' field in request for context
   return {
     sessionToken,
     moduleId,
     verticalKey,
     stakeholderName,
+    isTestMode,
   }
 }
 
