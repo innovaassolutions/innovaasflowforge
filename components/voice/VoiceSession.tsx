@@ -404,20 +404,27 @@ export function VoiceSession({
 
       // Use WebRTC connection type for better stability
       // WebSocket has known issues: https://github.com/elevenlabs/elevenlabs-examples/issues/134
-      // IMPORTANT: We MUST pass firstMessage override to prevent ElevenLabs from calling
-      // the Custom LLM immediately. If we don't, ElevenLabs calls the LLM with un-interpolated
-      // dynamic variables ({{session_token}} literal), causing our endpoint to fail.
-      await conversation.startSession({
+      // NOTE: Only send firstMessage override if we have one - agents without override
+      // permissions enabled will fail if we send an override they don't support
+      const sessionConfig: Parameters<typeof conversation.startSession>[0] = {
         conversationToken: urlData.conversationToken,
         connectionType: 'webrtc',
         dynamicVariables: dynamicVars,
         clientTools: {},
-        overrides: {
-          agent: {
-            firstMessage: urlData.firstMessage,
-          },
-        },
-      })
+      }
+
+      // Only add firstMessage override if provided (agents must have override permission)
+      // For testing: temporarily disabled to isolate the issue
+      // if (urlData.firstMessage) {
+      //   sessionConfig.overrides = {
+      //     agent: {
+      //       firstMessage: urlData.firstMessage,
+      //     },
+      //   }
+      // }
+      console.log('[VoiceSession] Starting WITHOUT firstMessage override (testing)')
+
+      await conversation.startSession(sessionConfig)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start voice session'
       setError(message)
