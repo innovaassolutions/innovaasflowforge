@@ -12,6 +12,7 @@
 import { useState, useCallback } from 'react'
 import { useConversation } from '@elevenlabs/react'
 import { Button } from '@/components/ui/button'
+import { apiUrl } from '@/lib/api-url'
 
 export default function VoiceTestPage() {
   const [status, setStatus] = useState<string>('idle')
@@ -157,7 +158,7 @@ export default function VoiceTestPage() {
 
       // Get test session token
       addLog('Fetching test session token...')
-      const response = await fetch('/api/voice/test-session', {
+      const response = await fetch(apiUrl('api/voice/test-session'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
