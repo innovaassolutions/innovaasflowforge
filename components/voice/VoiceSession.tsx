@@ -63,11 +63,14 @@ export function VoiceSession({
   const audioReceivedRef = useRef<boolean>(false)
   const minDurationForComplete = 30 // Minimum 30 seconds for a valid interview
 
-  // Helper: Check for audio elements in the DOM
-  const debugAudioElements = useCallback(() => {
+  // Helper: Check for audio elements in the DOM and attempt to play if paused
+  const debugAudioElements = useCallback((attemptPlay = false) => {
     const audioElements = document.querySelectorAll('audio')
     console.log('[VoiceSession] Audio elements in DOM:', audioElements.length)
     audioElements.forEach((el, i) => {
+      const mediaStream = el.srcObject as MediaStream | null
+      const tracks = mediaStream?.getTracks?.() || []
+
       console.log(`[VoiceSession] Audio[${i}]:`, {
         src: el.src?.substring(0, 50) || '(no src)',
         srcObject: el.srcObject ? 'MediaStream present' : '(no srcObject)',
@@ -78,8 +81,35 @@ export function VoiceSession({
         currentTime: el.currentTime,
         duration: el.duration,
         error: el.error?.message,
+        autoplay: el.autoplay,
+        tracks: tracks.map(t => ({ kind: t.kind, enabled: t.enabled, readyState: t.readyState })),
       })
+
+      // If audio is paused and we should attempt to play, try to play it
+      if (attemptPlay && el.paused && el.srcObject) {
+        console.log(`[VoiceSession] Attempting to play paused Audio[${i}]...`)
+        el.play()
+          .then(() => console.log(`[VoiceSession] Audio[${i}] play() succeeded`))
+          .catch((err) => console.error(`[VoiceSession] Audio[${i}] play() failed:`, err.message))
+      }
     })
+  }, [])
+
+  // Helper: Set up audio element monitoring with event listeners
+  const setupAudioMonitoring = useCallback(() => {
+    const audioElements = document.querySelectorAll('audio')
+    audioElements.forEach((el, i) => {
+      // Add event listeners to track audio lifecycle
+      el.addEventListener('play', () => console.log(`[VoiceSession] Audio[${i}] EVENT: play`))
+      el.addEventListener('pause', () => console.log(`[VoiceSession] Audio[${i}] EVENT: pause`))
+      el.addEventListener('ended', () => console.log(`[VoiceSession] Audio[${i}] EVENT: ended`))
+      el.addEventListener('error', (e) => console.error(`[VoiceSession] Audio[${i}] EVENT: error`, e))
+      el.addEventListener('stalled', () => console.warn(`[VoiceSession] Audio[${i}] EVENT: stalled`))
+      el.addEventListener('waiting', () => console.log(`[VoiceSession] Audio[${i}] EVENT: waiting`))
+      el.addEventListener('playing', () => console.log(`[VoiceSession] Audio[${i}] EVENT: playing`))
+      el.addEventListener('suspend', () => console.log(`[VoiceSession] Audio[${i}] EVENT: suspend`))
+    })
+    console.log(`[VoiceSession] Set up monitoring for ${audioElements.length} audio elements`)
   }, [])
 
   // Helper: Start monitoring audio output levels
@@ -118,6 +148,9 @@ export function VoiceSession({
 
       // Debug: Check audio elements in DOM
       debugAudioElements()
+
+      // Set up event listeners on audio elements
+      setupAudioMonitoring()
 
       // Start monitoring audio output levels (pass methods to avoid stale closure)
       startAudioMonitoring(
@@ -171,10 +204,14 @@ export function VoiceSession({
       // Mode is 'speaking' or 'listening'
       console.log('[VoiceSession] Agent mode:', mode, '- isSpeaking:', conversation.isSpeaking)
 
-      // When agent starts speaking, check audio setup
+      // When agent starts speaking, check audio setup and attempt to play
       if (mode === 'speaking') {
-        console.log('[VoiceSession] Agent started speaking - checking audio elements...')
-        debugAudioElements()
+        console.log('[VoiceSession] Agent started speaking - checking audio elements and attempting play...')
+        // Attempt to play any paused audio elements
+        debugAudioElements(true)
+
+        // Set up monitoring for any new audio elements
+        setupAudioMonitoring()
 
         // Try to get output volume
         try {
@@ -199,8 +236,11 @@ export function VoiceSession({
         console.log('[VoiceSession] First audio data received! Type:', typeof audio, 'Size:', audio?.length || 'unknown')
         audioReceivedRef.current = true
 
-        // Check audio elements when first audio arrives
-        debugAudioElements()
+        // Check audio elements when first audio arrives and attempt to play if paused
+        debugAudioElements(true)
+
+        // Set up event listeners for any new audio elements
+        setupAudioMonitoring()
       }
     },
   })
