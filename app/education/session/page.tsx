@@ -42,6 +42,10 @@ function EducationSessionContent() {
   // Get school code from URL (e.g., /education/session?school=SAIS)
   const schoolCode = searchParams.get('school')
 
+  // Dev mode bypass - only in development
+  const isDev = process.env.NODE_ENV === 'development'
+  const devTestToken = process.env.NEXT_PUBLIC_DEV_TEST_TOKEN
+
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -248,6 +252,23 @@ function EducationSessionContent() {
           <p className="text-center text-xs text-muted-foreground mt-6">
             Can't find your code? Contact your school administrator for assistance.
           </p>
+
+          {/* Dev Mode Bypass - Only shows in development with test token configured */}
+          {isDev && devTestToken && (
+            <div className="mt-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+              <p className="text-xs text-yellow-700 dark:text-yellow-400 text-center mb-3 font-medium">
+                Development Mode
+              </p>
+              <button
+                onClick={() => router.push(`/education/session/${devTestToken}`)}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2.5 px-4 rounded-lg
+                           flex items-center justify-center gap-2 transition-colors text-sm"
+              >
+                Skip to Test Session
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </main>
 

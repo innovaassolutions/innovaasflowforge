@@ -59,20 +59,97 @@ export function VoiceSession({
   const durationSecondsRef = useRef<number>(0)
   const hadErrorRef = useRef<boolean>(false)
   const textInputRef = useRef<HTMLInputElement>(null)
+  const audioMonitorRef = useRef<NodeJS.Timeout | null>(null)
+  const audioReceivedRef = useRef<boolean>(false)
   const minDurationForComplete = 30 // Minimum 30 seconds for a valid interview
+
+  // Helper: Check for audio elements in the DOM
+  const debugAudioElements = useCallback(() => {
+    const audioElements = document.querySelectorAll('audio')
+    console.log('[VoiceSession] Audio elements in DOM:', audioElements.length)
+    audioElements.forEach((el, i) => {
+      console.log(`[VoiceSession] Audio[${i}]:`, {
+        src: el.src?.substring(0, 50) || '(no src)',
+        srcObject: el.srcObject ? 'MediaStream present' : '(no srcObject)',
+        paused: el.paused,
+        muted: el.muted,
+        volume: el.volume,
+        readyState: el.readyState,
+        currentTime: el.currentTime,
+        duration: el.duration,
+        error: el.error?.message,
+      })
+    })
+  }, [])
+
+  // Helper: Start monitoring audio output levels
+  // Note: We pass conversation methods as arguments to avoid stale closure issues
+  const startAudioMonitoring = useCallback((getOutputVolumeFn?: () => number, getInputVolumeFn?: () => number) => {
+    if (audioMonitorRef.current) return
+
+    console.log('[VoiceSession] Starting audio output monitoring...')
+    audioMonitorRef.current = setInterval(() => {
+      try {
+        const outputVol = getOutputVolumeFn?.()
+        const inputVol = getInputVolumeFn?.()
+        if (outputVol !== undefined || inputVol !== undefined) {
+          console.log('[VoiceSession] Audio levels - output:', outputVol?.toFixed(3), 'input:', inputVol?.toFixed(3))
+        }
+      } catch {
+        // getOutputVolume may not be available
+      }
+    }, 1000)
+  }, [])
+
+  // Helper: Stop audio monitoring
+  const stopAudioMonitoring = useCallback(() => {
+    if (audioMonitorRef.current) {
+      clearInterval(audioMonitorRef.current)
+      audioMonitorRef.current = null
+    }
+  }, [])
 
   // ElevenLabs conversation hook
   const conversation = useConversation({
     onConnect: () => {
       console.log('[VoiceSession] Connected')
+      console.log('[VoiceSession] Status after connect:', conversation.status)
+      console.log('[VoiceSession] isSpeaking:', conversation.isSpeaking)
+
+      // Debug: Check audio elements in DOM
+      debugAudioElements()
+
+      // Start monitoring audio output levels (pass methods to avoid stale closure)
+      startAudioMonitoring(
+        conversation.getOutputVolume?.bind(conversation),
+        conversation.getInputVolume?.bind(conversation)
+      )
+
+      // Ensure volume is set to max on connect
+      try {
+        conversation.setVolume({ volume: 1 })
+        console.log('[VoiceSession] Volume set to 1')
+      } catch (volErr) {
+        console.warn('[VoiceSession] Could not set volume:', volErr)
+      }
       setConnectionStatus('connected')
       setError(null)
       hadErrorRef.current = false
+      audioReceivedRef.current = false
       startDurationTracking()
     },
     onDisconnect: () => {
       const finalDuration = durationSecondsRef.current
       console.log('[VoiceSession] Disconnected - duration:', finalDuration, 'hadError:', hadErrorRef.current)
+      console.log('[VoiceSession] Final status:', conversation.status)
+      console.log('[VoiceSession] Audio was received:', audioReceivedRef.current)
+
+      // Stop audio monitoring
+      stopAudioMonitoring()
+
+      // Debug: Final check of audio elements
+      debugAudioElements()
+
       setConnectionStatus('disconnected')
       stopDurationTracking()
       // Only mark as complete if:
@@ -84,7 +161,7 @@ export function VoiceSession({
     },
     onError: (err) => {
       const message = typeof err === 'string' ? err : (err as Error)?.message || 'Voice session error'
-      console.error('[VoiceSession] Error:', message)
+      console.error('[VoiceSession] Error:', message, err)
       hadErrorRef.current = true
       setError(message)
       setConnectionStatus('error')
@@ -92,11 +169,39 @@ export function VoiceSession({
     },
     onModeChange: ({ mode }) => {
       // Mode is 'speaking' or 'listening'
-      console.log('[VoiceSession] Agent mode:', mode)
+      console.log('[VoiceSession] Agent mode:', mode, '- isSpeaking:', conversation.isSpeaking)
+
+      // When agent starts speaking, check audio setup
+      if (mode === 'speaking') {
+        console.log('[VoiceSession] Agent started speaking - checking audio elements...')
+        debugAudioElements()
+
+        // Try to get output volume
+        try {
+          const outputVol = conversation.getOutputVolume?.()
+          console.log('[VoiceSession] Current output volume:', outputVol)
+        } catch {
+          console.log('[VoiceSession] getOutputVolume not available')
+        }
+      }
     },
     onMessage: (message) => {
       // Log all messages from ElevenLabs for debugging
-      console.log('[VoiceSession] Message:', JSON.stringify(message))
+      console.log('[VoiceSession] Message received:', JSON.stringify(message))
+    },
+    onStatusChange: (status) => {
+      // Track status changes for debugging
+      console.log('[VoiceSession] Status changed to:', status)
+    },
+    // Track when audio data is received from ElevenLabs
+    onAudio: (audio) => {
+      if (!audioReceivedRef.current) {
+        console.log('[VoiceSession] First audio data received! Type:', typeof audio, 'Size:', audio?.length || 'unknown')
+        audioReceivedRef.current = true
+
+        // Check audio elements when first audio arrives
+        debugAudioElements()
+      }
     },
   })
 
@@ -135,6 +240,36 @@ export function VoiceSession({
     try {
       setConnectionStatus('connecting')
       setError(null)
+
+      // Request microphone permission first
+      // This is required for WebRTC audio to work properly
+      console.log('[VoiceSession] Requesting microphone permission...')
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        // Stop the stream immediately - ElevenLabs SDK will create its own
+        stream.getTracks().forEach(track => track.stop())
+        console.log('[VoiceSession] Microphone permission granted')
+      } catch (micError) {
+        console.error('[VoiceSession] Microphone permission denied:', micError)
+        throw new Error('Microphone access is required for voice sessions. Please allow microphone access and try again.')
+      }
+
+      // Ensure audio context is resumed (browsers block autoplay)
+      // This is a workaround for browser autoplay policies
+      try {
+        const AudioContext = window.AudioContext || (window as unknown as { webkitAudioContext: typeof window.AudioContext }).webkitAudioContext
+        if (AudioContext) {
+          const audioCtx = new AudioContext()
+          if (audioCtx.state === 'suspended') {
+            await audioCtx.resume()
+            console.log('[VoiceSession] Audio context resumed')
+          }
+          // Close this context - ElevenLabs SDK will create its own
+          await audioCtx.close()
+        }
+      } catch (audioErr) {
+        console.warn('[VoiceSession] Could not initialize audio context:', audioErr)
+      }
 
       // Get signed URL
       const urlData = await fetchSignedUrl()
@@ -259,11 +394,12 @@ export function VoiceSession({
   useEffect(() => {
     return () => {
       stopDurationTracking()
+      stopAudioMonitoring()
       if (conversation.status === 'connected') {
         conversation.endSession().catch(console.error)
       }
     }
-  }, [stopDurationTracking, conversation])
+  }, [stopDurationTracking, stopAudioMonitoring, conversation])
 
   // Format duration for display
   const formatDuration = (seconds: number): string => {
