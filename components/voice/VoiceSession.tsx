@@ -150,16 +150,23 @@ export function VoiceSession({
       }
 
       console.log('[VoiceSession] Starting with firstMessage length:', urlData.firstMessage?.length)
+      console.log('[VoiceSession] Dynamic variables:', JSON.stringify(dynamicVars))
 
       // Use WebRTC connection type for better stability
       // WebSocket has known issues: https://github.com/elevenlabs/elevenlabs-examples/issues/134
-      // NOTE: Not passing firstMessage override - let ElevenLabs agent use its configured first message
-      // The dynamic variables (session_token, etc.) will be interpolated into the agent's system prompt
+      // IMPORTANT: We MUST pass firstMessage override to prevent ElevenLabs from calling
+      // the Custom LLM immediately. If we don't, ElevenLabs calls the LLM with un-interpolated
+      // dynamic variables ({{session_token}} literal), causing our endpoint to fail.
       await conversation.startSession({
         conversationToken: urlData.conversationToken,
         connectionType: 'webrtc',
         dynamicVariables: dynamicVars,
         clientTools: {},
+        overrides: {
+          agent: {
+            firstMessage: urlData.firstMessage,
+          },
+        },
       })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to start voice session'
