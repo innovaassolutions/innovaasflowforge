@@ -171,15 +171,15 @@ export default function VoiceTestPage() {
 
       const data = await response.json()
       addLog(`Got token for agent: ${data.agentId}`)
+      addLog(`Dynamic variables: ${JSON.stringify(data.dynamicVariables)}`)
 
-      // Start with MINIMAL config - just token and connection type
+      // Start with dynamic variables for Custom LLM
       addLog('Starting conversation with WebRTC...')
       await conversation.startSession({
         conversationToken: data.conversationToken,
         connectionType: 'webrtc',
-        // No dynamic variables
-        // No overrides
-        // No client tools
+        // Pass dynamic variables so ElevenLabs can interpolate them into system prompt
+        dynamicVariables: data.dynamicVariables,
       })
 
       addLog('startSession() completed')
