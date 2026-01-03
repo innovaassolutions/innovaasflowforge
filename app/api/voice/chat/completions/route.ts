@@ -35,7 +35,8 @@ export async function OPTIONS() {
  * The session context is extracted from dynamic variables in the system prompt.
  */
 export async function POST(request: NextRequest) {
-  console.log('[voice/chat/completions] POST request received')
+  const timestamp = new Date().toISOString()
+  console.log(`[voice/chat/completions] ========== POST request received at ${timestamp} ==========`)
 
   // Debug: Log all headers to see what ElevenLabs sends
   const headersObj: Record<string, string> = {}

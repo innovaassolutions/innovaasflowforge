@@ -117,16 +117,36 @@ export function VoiceSession({
   const startAudioMonitoring = useCallback((getOutputVolumeFn?: () => number, getInputVolumeFn?: () => number) => {
     if (audioMonitorRef.current) return
 
-    console.log('[VoiceSession] Starting audio output monitoring...')
+    console.log('[VoiceSession] Starting audio monitoring with input tracking...')
+    let inputNeverDetected = true
+    let monitorCount = 0
+
     audioMonitorRef.current = setInterval(() => {
       try {
+        monitorCount++
         const outputVol = getOutputVolumeFn?.()
         const inputVol = getInputVolumeFn?.()
-        if (outputVol !== undefined || inputVol !== undefined) {
-          console.log('[VoiceSession] Audio levels - output:', outputVol?.toFixed(3), 'input:', inputVol?.toFixed(3))
+
+        // Always log for debugging
+        console.log(`[VoiceSession] Audio levels [${monitorCount}] - output:`, outputVol, 'input:', inputVol)
+
+        // Track if we ever get input
+        if (inputVol !== undefined && inputVol > 0) {
+          if (inputNeverDetected) {
+            console.log('[VoiceSession] ✓ MICROPHONE INPUT DETECTED for first time!')
+            inputNeverDetected = false
+          }
+        } else if (monitorCount > 3 && inputNeverDetected) {
+          console.warn('[VoiceSession] ⚠️ WARNING: No microphone input detected after', monitorCount, 'seconds')
         }
-      } catch {
-        // getOutputVolume may not be available
+
+        // Check for RTCPeerConnection state
+        const peerConnections = (window as unknown as { RTCPeerConnection?: unknown }).RTCPeerConnection
+        if (peerConnections && monitorCount === 1) {
+          console.log('[VoiceSession] RTCPeerConnection available:', !!peerConnections)
+        }
+      } catch (err) {
+        console.error('[VoiceSession] Audio monitoring error:', err)
       }
     }, 1000)
   }, [])
@@ -142,9 +162,30 @@ export function VoiceSession({
   // ElevenLabs conversation hook
   const conversation = useConversation({
     onConnect: () => {
-      console.log('[VoiceSession] Connected')
+      console.log('[VoiceSession] ============ CONNECTED ============')
       console.log('[VoiceSession] Status after connect:', conversation.status)
       console.log('[VoiceSession] isSpeaking:', conversation.isSpeaking)
+      console.log('[VoiceSession] Timestamp:', new Date().toISOString())
+
+      // Debug: Inspect the conversation object for any connection info
+      try {
+        const convAny = conversation as Record<string, unknown>
+        console.log('[VoiceSession] Conversation object keys:', Object.keys(convAny))
+        if (convAny.conversationId) console.log('[VoiceSession] Conversation ID:', convAny.conversationId)
+        if (convAny.sessionId) console.log('[VoiceSession] Session ID:', convAny.sessionId)
+      } catch (e) {
+        console.log('[VoiceSession] Could not inspect conversation object')
+      }
+
+      // Debug: Check WebRTC peer connections in the browser
+      try {
+        // @ts-ignore - accessing browser internals for debugging
+        if (typeof window !== 'undefined' && window.RTCPeerConnection) {
+          console.log('[VoiceSession] RTCPeerConnection is available')
+        }
+      } catch (e) {
+        console.log('[VoiceSession] RTCPeerConnection check failed')
+      }
 
       // Debug: Check audio elements in DOM
       debugAudioElements()
@@ -173,9 +214,30 @@ export function VoiceSession({
     },
     onDisconnect: () => {
       const finalDuration = durationSecondsRef.current
-      console.log('[VoiceSession] Disconnected - duration:', finalDuration, 'hadError:', hadErrorRef.current)
-      console.log('[VoiceSession] Final status:', conversation.status)
+      console.log('[VoiceSession] ============ DISCONNECTED ============')
+      console.log('[VoiceSession] Duration:', finalDuration, 'seconds')
+      console.log('[VoiceSession] Had error:', hadErrorRef.current)
       console.log('[VoiceSession] Audio was received:', audioReceivedRef.current)
+      console.log('[VoiceSession] Final conversation status:', conversation.status)
+      console.log('[VoiceSession] Final isSpeaking:', conversation.isSpeaking)
+
+      // Try to get any available diagnostic info from conversation object
+      try {
+        console.log('[VoiceSession] Conversation object keys:', Object.keys(conversation))
+        // Check if there's any error or reason property
+        const convAny = conversation as Record<string, unknown>
+        if (convAny.error) console.log('[VoiceSession] Conversation error:', convAny.error)
+        if (convAny.disconnectReason) console.log('[VoiceSession] Disconnect reason:', convAny.disconnectReason)
+        if (convAny.connectionState) console.log('[VoiceSession] Connection state:', convAny.connectionState)
+      } catch (e) {
+        console.log('[VoiceSession] Could not inspect conversation object')
+      }
+
+      // Check if it was a premature disconnect (less than 5 seconds = likely an issue)
+      if (finalDuration < 5 && audioReceivedRef.current) {
+        console.error('[VoiceSession] ⚠️ PREMATURE DISCONNECT: Audio was playing but session ended after only', finalDuration, 'seconds')
+        console.error('[VoiceSession] This suggests the server closed the connection, possibly due to no microphone input being received')
+      }
 
       // Stop audio monitoring
       stopAudioMonitoring()
@@ -190,6 +252,7 @@ export function VoiceSession({
       // 2. Session lasted at least 30 seconds (basic sanity check for real interview)
       const wasCompleted = !hadErrorRef.current && finalDuration >= minDurationForComplete
       console.log('[VoiceSession] Session end - completed:', wasCompleted)
+      console.log('[VoiceSession] =====================================')
       onSessionEnd?.(wasCompleted)
     },
     onError: (err) => {
@@ -225,6 +288,21 @@ export function VoiceSession({
     onMessage: (message) => {
       // Log all messages from ElevenLabs for debugging
       console.log('[VoiceSession] Message received:', JSON.stringify(message))
+
+      // Check for specific message types that might indicate issues
+      const msgAny = message as Record<string, unknown>
+      if (msgAny.type === 'error' || msgAny.error) {
+        console.error('[VoiceSession] ⚠️ Error in message:', msgAny.error || msgAny)
+      }
+      if (msgAny.type === 'audio_event') {
+        console.log('[VoiceSession] Audio event:', msgAny)
+      }
+      if (msgAny.type === 'conversation_ended' || msgAny.type === 'session_ended') {
+        console.log('[VoiceSession] Session end message received:', msgAny)
+      }
+      if (msgAny.type === 'user_transcript' || msgAny.transcript) {
+        console.log('[VoiceSession] User transcript:', msgAny.transcript || msgAny)
+      }
     },
     onStatusChange: (status) => {
       // Track status changes for debugging
