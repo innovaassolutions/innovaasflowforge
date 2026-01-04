@@ -21,33 +21,16 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
+  const startTime = Date.now()
   const timestamp = new Date().toISOString()
   console.log(`[edge-llm] ========== REQUEST at ${timestamp} ==========`)
 
-  // Log all request headers for debugging
-  const headerObj: Record<string, string> = {}
-  request.headers.forEach((value, key) => {
-    headerObj[key] = key.includes('auth') ? value.substring(0, 20) + '...' : value
-  })
-  console.log('[edge-llm] Request headers:', JSON.stringify(headerObj))
-
   try {
-    const bodyText = await request.text()
-    console.log('[edge-llm] Raw body length:', bodyText.length)
-    console.log('[edge-llm] Raw body preview:', bodyText.substring(0, 500))
+    // Parse body first - minimal logging to reduce latency
+    const body = await request.json()
+    const stream = body.stream ?? true
 
-    const body = JSON.parse(bodyText)
-    const stream = body.stream ?? true // Default to streaming
-    console.log('[edge-llm] Messages count:', body.messages?.length)
-    console.log('[edge-llm] Stream requested:', stream)
-    console.log('[edge-llm] Body keys:', Object.keys(body))
-
-    // Log each message role and content preview
-    if (body.messages) {
-      body.messages.forEach((m: { role: string; content?: string }, i: number) => {
-        console.log(`[edge-llm] Message ${i}: role=${m.role}, content=${m.content?.substring(0, 100) || 'empty'}`)
-      })
-    }
+    console.log(`[edge-llm] Parsed in ${Date.now() - startTime}ms, messages: ${body.messages?.length}, stream: ${stream}`)
 
     // Check for user message
     const userMessage = body.messages?.filter((m: { role: string }) => m.role === 'user').pop()
