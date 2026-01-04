@@ -7,11 +7,10 @@ import { NextRequest, NextResponse } from 'next/server'
  * for a test agent to isolate connection issues.
  */
 
-// Edge Runtime Custom LLM agent - testing if Edge handles SSE better
+// Node.js Runtime Custom LLM agent - testing if Node.js handles SSE differently
+// Previous Edge agent: agent_9001ke3b1hvmes4bm44m086t1p7r
 // Previous debug agent: agent_9201ke1anbvbe5rtkf1df8djahcg
-// Previous Vercel URL agent: agent_5101ke19rtm0fg6s5vfps82bp5m9
-// Previous production domain agent: agent_0801ke13t7jafa9bnkxe23yf5pr9
-const TEST_AGENT_ID = 'agent_9001ke3b1hvmes4bm44m086t1p7r'
+const TEST_AGENT_ID = 'agent_0101ke3mvmqfehmtzzsxr78v7rs7'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
