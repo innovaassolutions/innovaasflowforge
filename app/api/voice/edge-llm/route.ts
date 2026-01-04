@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     const encoder = new TextEncoder()
     const words = responseText.split(' ')
 
-    const stream = new ReadableStream({
+    const responseStream = new ReadableStream({
       async start(controller) {
         console.log('[edge-llm] Stream started, sending chunks...')
 
@@ -146,7 +146,7 @@ export async function POST(request: Request) {
       },
     })
 
-    return new Response(stream, {
+    return new Response(responseStream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
