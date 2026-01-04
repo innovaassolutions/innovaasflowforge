@@ -132,10 +132,10 @@ export async function POST(request: Request) {
 
     chunks.push('data: [DONE]\n\n')
 
-    const body = chunks.join('')
-    console.log('[edge-llm] SSE body length:', body.length)
+    const sseBody = chunks.join('')
+    console.log('[edge-llm] SSE body length:', sseBody.length)
 
-    return new Response(body, {
+    return new Response(sseBody, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
