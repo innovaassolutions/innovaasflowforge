@@ -76,78 +76,66 @@ export async function POST(request: Request) {
       })
     }
 
-    // Streaming response
-    console.log('[edge-llm] Returning streaming response')
-    const encoder = new TextEncoder()
+    // Streaming response - build complete SSE body synchronously
+    console.log('[edge-llm] Building streaming response synchronously')
 
-    // Use TransformStream for proper async streaming
-    const { readable, writable } = new TransformStream()
-    const writer = writable.getWriter()
+    // Build complete SSE response as a single string
+    const chunks: string[] = []
 
-    // Stream chunks asynchronously
-    ;(async () => {
-      try {
-        // Role chunk - OpenAI includes content:"" with role
-        const roleChunk = {
-          id,
-          object: 'chat.completion.chunk',
-          created,
-          model: 'edge-llm',
-          system_fingerprint: systemFingerprint,
-          choices: [{
-            index: 0,
-            delta: { role: 'assistant', content: '' },
-            logprobs: null,
-            finish_reason: null
-          }],
-        }
-        await writer.write(encoder.encode(`data: ${JSON.stringify(roleChunk)}\n\n`))
+    // Role chunk
+    chunks.push(`data: ${JSON.stringify({
+      id,
+      object: 'chat.completion.chunk',
+      created,
+      model: 'edge-llm',
+      system_fingerprint: systemFingerprint,
+      choices: [{
+        index: 0,
+        delta: { role: 'assistant', content: '' },
+        logprobs: null,
+        finish_reason: null
+      }],
+    })}\n\n`)
 
-        // Content chunks - send word by word for natural streaming
-        const words = responseText.split(' ')
-        for (const word of words) {
-          const contentChunk = {
-            id,
-            object: 'chat.completion.chunk',
-            created,
-            model: 'edge-llm',
-            system_fingerprint: systemFingerprint,
-            choices: [{
-              index: 0,
-              delta: { content: word + ' ' },
-              logprobs: null,
-              finish_reason: null
-            }],
-          }
-          await writer.write(encoder.encode(`data: ${JSON.stringify(contentChunk)}\n\n`))
-        }
+    // Content chunks - send word by word
+    const words = responseText.split(' ')
+    for (const word of words) {
+      chunks.push(`data: ${JSON.stringify({
+        id,
+        object: 'chat.completion.chunk',
+        created,
+        model: 'edge-llm',
+        system_fingerprint: systemFingerprint,
+        choices: [{
+          index: 0,
+          delta: { content: word + ' ' },
+          logprobs: null,
+          finish_reason: null
+        }],
+      })}\n\n`)
+    }
 
-        // Finish chunk
-        const finishChunk = {
-          id,
-          object: 'chat.completion.chunk',
-          created,
-          model: 'edge-llm',
-          system_fingerprint: systemFingerprint,
-          choices: [{
-            index: 0,
-            delta: {},
-            logprobs: null,
-            finish_reason: 'stop'
-          }],
-        }
-        await writer.write(encoder.encode(`data: ${JSON.stringify(finishChunk)}\n\n`))
-        await writer.write(encoder.encode('data: [DONE]\n\n'))
+    // Finish chunk
+    chunks.push(`data: ${JSON.stringify({
+      id,
+      object: 'chat.completion.chunk',
+      created,
+      model: 'edge-llm',
+      system_fingerprint: systemFingerprint,
+      choices: [{
+        index: 0,
+        delta: {},
+        logprobs: null,
+        finish_reason: 'stop'
+      }],
+    })}\n\n`)
 
-        console.log('[edge-llm] Stream completed successfully')
-      } catch (err) {
-        console.error('[edge-llm] Stream error:', err)
-      } finally {
-        await writer.close()
-      }
-    })()
+    chunks.push('data: [DONE]\n\n')
 
-    return new Response(readable, {
+    const body = chunks.join('')
+    console.log('[edge-llm] SSE body length:', body.length)
+
+    return new Response(body, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
