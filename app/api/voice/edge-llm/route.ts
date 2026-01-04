@@ -22,14 +22,32 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
   const timestamp = new Date().toISOString()
-  console.log(`[edge-llm] REQUEST at ${timestamp}`)
+  console.log(`[edge-llm] ========== REQUEST at ${timestamp} ==========`)
+
+  // Log all request headers for debugging
+  const headerObj: Record<string, string> = {}
+  request.headers.forEach((value, key) => {
+    headerObj[key] = key.includes('auth') ? value.substring(0, 20) + '...' : value
+  })
+  console.log('[edge-llm] Request headers:', JSON.stringify(headerObj))
 
   try {
-    const body = await request.json()
+    const bodyText = await request.text()
+    console.log('[edge-llm] Raw body length:', bodyText.length)
+    console.log('[edge-llm] Raw body preview:', bodyText.substring(0, 500))
+
+    const body = JSON.parse(bodyText)
     const stream = body.stream ?? true // Default to streaming
-    console.log('[edge-llm] Messages:', body.messages?.length)
-    console.log('[edge-llm] Stream:', stream)
-    console.log('[edge-llm] Full request body keys:', Object.keys(body))
+    console.log('[edge-llm] Messages count:', body.messages?.length)
+    console.log('[edge-llm] Stream requested:', stream)
+    console.log('[edge-llm] Body keys:', Object.keys(body))
+
+    // Log each message role and content preview
+    if (body.messages) {
+      body.messages.forEach((m: { role: string; content?: string }, i: number) => {
+        console.log(`[edge-llm] Message ${i}: role=${m.role}, content=${m.content?.substring(0, 100) || 'empty'}`)
+      })
+    }
 
     // Check for user message
     const userMessage = body.messages?.filter((m: { role: string }) => m.role === 'user').pop()
@@ -76,83 +94,68 @@ export async function POST(request: Request) {
       })
     }
 
-    // Streaming response - use actual async streaming with TransformStream
-    console.log('[edge-llm] Creating async streaming response')
+    // Streaming response - synchronous SSE body for reliability
+    console.log('[edge-llm] Creating SSE response...')
 
-    const encoder = new TextEncoder()
-    const words = responseText.split(' ')
+    // Build SSE response as a single string (more reliable for ElevenLabs)
+    const chunks: string[] = []
 
-    const responseStream = new ReadableStream({
-      async start(controller) {
-        console.log('[edge-llm] Stream started, sending chunks...')
+    // Role chunk with empty content
+    chunks.push(`data: ${JSON.stringify({
+      id,
+      object: 'chat.completion.chunk',
+      created,
+      model: 'edge-llm',
+      system_fingerprint: systemFingerprint,
+      choices: [{
+        index: 0,
+        delta: { role: 'assistant', content: '' },
+        logprobs: null,
+        finish_reason: null
+      }],
+    })}\n\n`)
 
-        // Role chunk - sent immediately
-        const roleChunk = `data: ${JSON.stringify({
-          id,
-          object: 'chat.completion.chunk',
-          created,
-          model: 'edge-llm',
-          system_fingerprint: systemFingerprint,
-          choices: [{
-            index: 0,
-            delta: { role: 'assistant', content: '' },
-            logprobs: null,
-            finish_reason: null
-          }],
-        })}\n\n`
-        controller.enqueue(encoder.encode(roleChunk))
+    // Content chunk - send as single chunk instead of word-by-word
+    chunks.push(`data: ${JSON.stringify({
+      id,
+      object: 'chat.completion.chunk',
+      created,
+      model: 'edge-llm',
+      system_fingerprint: systemFingerprint,
+      choices: [{
+        index: 0,
+        delta: { content: responseText },
+        logprobs: null,
+        finish_reason: null
+      }],
+    })}\n\n`)
 
-        // Content chunks - send word by word with small delay
-        for (const word of words) {
-          const contentChunk = `data: ${JSON.stringify({
-            id,
-            object: 'chat.completion.chunk',
-            created,
-            model: 'edge-llm',
-            system_fingerprint: systemFingerprint,
-            choices: [{
-              index: 0,
-              delta: { content: word + ' ' },
-              logprobs: null,
-              finish_reason: null
-            }],
-          })}\n\n`
-          controller.enqueue(encoder.encode(contentChunk))
-          // Small delay between chunks to ensure proper streaming
-          await new Promise(resolve => setTimeout(resolve, 10))
-        }
+    // Finish chunk
+    chunks.push(`data: ${JSON.stringify({
+      id,
+      object: 'chat.completion.chunk',
+      created,
+      model: 'edge-llm',
+      system_fingerprint: systemFingerprint,
+      choices: [{
+        index: 0,
+        delta: {},
+        logprobs: null,
+        finish_reason: 'stop'
+      }],
+    })}\n\n`)
 
-        // Finish chunk
-        const finishChunk = `data: ${JSON.stringify({
-          id,
-          object: 'chat.completion.chunk',
-          created,
-          model: 'edge-llm',
-          system_fingerprint: systemFingerprint,
-          choices: [{
-            index: 0,
-            delta: {},
-            logprobs: null,
-            finish_reason: 'stop'
-          }],
-        })}\n\n`
-        controller.enqueue(encoder.encode(finishChunk))
+    chunks.push('data: [DONE]\n\n')
 
-        // Done marker
-        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+    const sseBody = chunks.join('')
+    console.log('[edge-llm] SSE response length:', sseBody.length)
+    console.log('[edge-llm] SSE preview:', sseBody.substring(0, 300))
 
-        console.log('[edge-llm] Stream completed successfully')
-        controller.close()
-      },
-    })
-
-    return new Response(responseStream, {
+    return new Response(sseBody, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-        'X-Accel-Buffering': 'no',
-        'Transfer-Encoding': 'chunked',
         ...corsHeaders,
       },
     })
