@@ -76,71 +76,83 @@ export async function POST(request: Request) {
       })
     }
 
-    // Streaming response - build complete SSE body synchronously
-    console.log('[edge-llm] Building streaming response synchronously')
+    // Streaming response - use actual async streaming with TransformStream
+    console.log('[edge-llm] Creating async streaming response')
 
-    // Build complete SSE response as a single string
-    const chunks: string[] = []
-
-    // Role chunk
-    chunks.push(`data: ${JSON.stringify({
-      id,
-      object: 'chat.completion.chunk',
-      created,
-      model: 'edge-llm',
-      system_fingerprint: systemFingerprint,
-      choices: [{
-        index: 0,
-        delta: { role: 'assistant', content: '' },
-        logprobs: null,
-        finish_reason: null
-      }],
-    })}\n\n`)
-
-    // Content chunks - send word by word
+    const encoder = new TextEncoder()
     const words = responseText.split(' ')
-    for (const word of words) {
-      chunks.push(`data: ${JSON.stringify({
-        id,
-        object: 'chat.completion.chunk',
-        created,
-        model: 'edge-llm',
-        system_fingerprint: systemFingerprint,
-        choices: [{
-          index: 0,
-          delta: { content: word + ' ' },
-          logprobs: null,
-          finish_reason: null
-        }],
-      })}\n\n`)
-    }
 
-    // Finish chunk
-    chunks.push(`data: ${JSON.stringify({
-      id,
-      object: 'chat.completion.chunk',
-      created,
-      model: 'edge-llm',
-      system_fingerprint: systemFingerprint,
-      choices: [{
-        index: 0,
-        delta: {},
-        logprobs: null,
-        finish_reason: 'stop'
-      }],
-    })}\n\n`)
+    const stream = new ReadableStream({
+      async start(controller) {
+        console.log('[edge-llm] Stream started, sending chunks...')
 
-    chunks.push('data: [DONE]\n\n')
+        // Role chunk - sent immediately
+        const roleChunk = `data: ${JSON.stringify({
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: 'edge-llm',
+          system_fingerprint: systemFingerprint,
+          choices: [{
+            index: 0,
+            delta: { role: 'assistant', content: '' },
+            logprobs: null,
+            finish_reason: null
+          }],
+        })}\n\n`
+        controller.enqueue(encoder.encode(roleChunk))
 
-    const sseBody = chunks.join('')
-    console.log('[edge-llm] SSE body length:', sseBody.length)
+        // Content chunks - send word by word with small delay
+        for (const word of words) {
+          const contentChunk = `data: ${JSON.stringify({
+            id,
+            object: 'chat.completion.chunk',
+            created,
+            model: 'edge-llm',
+            system_fingerprint: systemFingerprint,
+            choices: [{
+              index: 0,
+              delta: { content: word + ' ' },
+              logprobs: null,
+              finish_reason: null
+            }],
+          })}\n\n`
+          controller.enqueue(encoder.encode(contentChunk))
+          // Small delay between chunks to ensure proper streaming
+          await new Promise(resolve => setTimeout(resolve, 10))
+        }
 
-    return new Response(sseBody, {
+        // Finish chunk
+        const finishChunk = `data: ${JSON.stringify({
+          id,
+          object: 'chat.completion.chunk',
+          created,
+          model: 'edge-llm',
+          system_fingerprint: systemFingerprint,
+          choices: [{
+            index: 0,
+            delta: {},
+            logprobs: null,
+            finish_reason: 'stop'
+          }],
+        })}\n\n`
+        controller.enqueue(encoder.encode(finishChunk))
+
+        // Done marker
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+
+        console.log('[edge-llm] Stream completed successfully')
+        controller.close()
+      },
+    })
+
+    return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
         'X-Accel-Buffering': 'no',
+        'Transfer-Encoding': 'chunked',
         ...corsHeaders,
       },
     })
