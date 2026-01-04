@@ -26,8 +26,10 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
+    const stream = body.stream ?? true // Default to streaming
     console.log('[edge-llm] Messages:', body.messages?.length)
-    console.log('[edge-llm] Stream:', body.stream)
+    console.log('[edge-llm] Stream:', stream)
+    console.log('[edge-llm] Full request body keys:', Object.keys(body))
 
     // Check for user message
     const userMessage = body.messages?.filter((m: { role: string }) => m.role === 'user').pop()
@@ -41,11 +43,42 @@ export async function POST(request: Request) {
       responseText = "Hello from Edge Runtime! This is the initial greeting from the Custom LLM endpoint."
     }
 
-    // Create SSE stream matching OpenAI's exact format
-    const encoder = new TextEncoder()
     const id = `chatcmpl-${Date.now()}`
     const created = Math.floor(Date.now() / 1000)
     const systemFingerprint = `fp_${Date.now().toString(36)}`
+
+    // Handle non-streaming response
+    if (!stream) {
+      console.log('[edge-llm] Returning non-streaming response')
+      const response = {
+        id,
+        object: 'chat.completion',
+        created,
+        model: 'edge-llm',
+        system_fingerprint: systemFingerprint,
+        choices: [{
+          index: 0,
+          message: { role: 'assistant', content: responseText },
+          logprobs: null,
+          finish_reason: 'stop'
+        }],
+        usage: {
+          prompt_tokens: 100,
+          completion_tokens: responseText.split(' ').length,
+          total_tokens: 100 + responseText.split(' ').length
+        }
+      }
+      return new Response(JSON.stringify(response), {
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
+      })
+    }
+
+    // Streaming response
+    console.log('[edge-llm] Returning streaming response')
+    const encoder = new TextEncoder()
 
     // Use TransformStream for proper async streaming
     const { readable, writable } = new TransformStream()
