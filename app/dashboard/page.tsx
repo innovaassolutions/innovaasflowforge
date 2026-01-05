@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2 } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail } from 'lucide-react'
 import { apiUrl } from '@/lib/api-url'
 import { Button } from '@/components/ui/button'
 
@@ -22,37 +22,110 @@ interface Campaign {
   created_at: string
 }
 
+interface CoachingSession {
+  id: string
+  stakeholder_name: string
+  stakeholder_email: string
+  client_status: 'registered' | 'started' | 'completed' | 'contacted' | 'converted' | 'archived' | null
+  status: 'invited' | 'in_progress' | 'completed' | 'abandoned' | null
+  created_at: string
+  started_at: string | null
+  completed_at: string | null
+  access_token: string
+}
+
+interface UserProfile {
+  user_type: 'consultant' | 'company' | 'admin' | 'coach' | null
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [tenantId, setTenantId] = useState<string | null>(null)
+  const [tenantSlug, setTenantSlug] = useState<string | null>(null)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [coachingSessions, setCoachingSessions] = useState<CoachingSession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deletingCampaignId, setDeletingCampaignId] = useState<string | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [companiesCount, setCompaniesCount] = useState(0)
 
+  const isCoach = userProfile?.user_type === 'coach'
+
   useEffect(() => {
     const client = createClient()
     setSupabase(client)
-    checkUser(client)
-    fetchCampaigns(client)
-    fetchCompaniesCount(client)
+    initializeDashboard(client)
   }, [])
 
-  async function checkUser(client: SupabaseClient<Database>) {
+  async function initializeDashboard(client: SupabaseClient<Database>) {
     const { data: { user } } = await client.auth.getUser()
 
     if (!user) {
       router.push('/auth/login')
       return
     }
+
+    // Fetch user profile to determine user type
+    const { data: profile } = await client
+      .from('user_profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      const userProfile = profile as UserProfile
+      setUserProfile(userProfile)
+
+      // If coach, fetch tenant info and coaching sessions
+      if (userProfile.user_type === 'coach') {
+        const { data: tenant } = await (client
+          .from('tenant_profiles') as any)
+          .select('id, slug')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .single() as { data: { id: string; slug: string } | null }
+
+        if (tenant) {
+          setTenantId(tenant.id)
+          setTenantSlug(tenant.slug)
+          await fetchCoachingSessions(client, tenant.id)
+        }
+      } else {
+        // Consultant/Admin - fetch campaigns
+        await fetchCampaigns(client)
+        await fetchCompaniesCount(client)
+      }
+    }
+
+    setLoading(false)
+  }
+
+  async function fetchCoachingSessions(client: SupabaseClient<Database>, tenantIdParam: string) {
+    try {
+      const { data: sessions, error: fetchError } = await (client
+        .from('participant_sessions') as any)
+        .select('id, stakeholder_name, stakeholder_email, client_status, status, created_at, started_at, completed_at, access_token')
+        .eq('tenant_id', tenantIdParam)
+        .order('created_at', { ascending: false }) as { data: CoachingSession[] | null; error: any }
+
+      if (fetchError) {
+        console.error('Error fetching coaching sessions:', fetchError)
+        setError('Failed to load coaching sessions')
+        return
+      }
+
+      setCoachingSessions(sessions || [])
+    } catch (err) {
+      console.error('Error fetching coaching sessions:', err)
+      setError('Failed to load coaching sessions')
+    }
   }
 
   async function fetchCampaigns(client?: SupabaseClient<Database>) {
     try {
-      setLoading(true)
-
       const supabaseClient = client || supabase
 
       if (!supabaseClient) {
@@ -60,7 +133,6 @@ export default function DashboardPage() {
         return
       }
 
-      // Get the session token
       const { data: { session } } = await supabaseClient.auth.getSession()
 
       if (!session) {
@@ -69,7 +141,6 @@ export default function DashboardPage() {
         return
       }
 
-      // Fetch campaigns with authentication
       const response = await fetch(apiUrl('api/campaigns'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
@@ -87,7 +158,6 @@ export default function DashboardPage() {
       } else {
         setError(data.error || 'Failed to load campaigns')
 
-        // If unauthorized, redirect to login
         if (response.status === 401) {
           router.push('/auth/login')
         }
@@ -95,8 +165,6 @@ export default function DashboardPage() {
     } catch (err) {
       setError('Error loading campaigns')
       console.error(err)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -147,7 +215,6 @@ export default function DashboardPage() {
       const data = await response.json()
 
       if (response.ok && data.success) {
-        // Remove campaign from list
         setCampaigns(campaigns.filter(c => c.id !== campaignId))
         setShowDeleteConfirm(false)
         setDeletingCampaignId(null)
@@ -165,6 +232,182 @@ export default function DashboardPage() {
     setShowDeleteConfirm(true)
   }
 
+  // Calculate coach stats - check both client_status (new) and status (legacy) fields
+  const clientsCount = coachingSessions.length
+  const completedCount = coachingSessions.filter(s =>
+    s.client_status === 'completed' || s.status === 'completed'
+  ).length
+  const inProgressCount = coachingSessions.filter(s =>
+    s.client_status === 'started' || s.status === 'in_progress'
+  ).length
+
+  // Render Coach Dashboard
+  if (isCoach) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Page Header */}
+        <div className="bg-card border-b border-border px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Manage your coaching clients and sessions
+              </p>
+            </div>
+            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Link href="/dashboard/coaching/clients">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Client
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <main className="px-8 py-8">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Link
+              href="/dashboard/coaching/clients"
+              className="bg-card border border-border rounded-xl p-6 hover:border-emerald-500/50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <UserCircle className="w-10 h-10 text-emerald-600" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Total Clients</p>
+                  <h3 className="text-4xl font-bold text-foreground">{clientsCount}</h3>
+                </div>
+              </div>
+            </Link>
+
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <CheckCircle className="w-10 h-10 text-success" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Completed</p>
+                  <h3 className="text-4xl font-bold text-success">{completedCount}</h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <Clock className="w-10 h-10 text-brand-teal" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">In Progress</p>
+                  <h3 className="text-4xl font-bold text-brand-teal">{inProgressCount}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Clients List */}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-r-transparent"></div>
+              <p className="text-muted-foreground mt-4">Loading clients...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-card border border-destructive/20 rounded-lg p-8 text-center">
+              <p className="text-destructive">{error}</p>
+            </div>
+          ) : coachingSessions.length === 0 ? (
+            <div className="bg-card border border-border rounded-lg p-12 text-center">
+              <UserCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold text-foreground">
+                No clients yet
+              </h3>
+              <p className="mt-2 text-muted-foreground">
+                Get started by adding your first coaching client.
+              </p>
+              <div className="mt-6">
+                <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                  <Link href="/dashboard/coaching/clients">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Your First Client
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Recent Clients
+                </h2>
+                <Link href="/dashboard/coaching/clients" className="text-sm text-emerald-600 hover:text-emerald-700">
+                  View all clients
+                </Link>
+              </div>
+              {coachingSessions.slice(0, 5).map((session) => {
+                // Determine effective status from both legacy and new status fields
+                const isCompleted = session.client_status === 'completed' || session.status === 'completed'
+                const isInProgress = session.client_status === 'started' || session.status === 'in_progress'
+                const displayStatus = isCompleted ? 'Completed' : isInProgress ? 'In Progress' : session.client_status || session.status || 'Pending'
+
+                return (
+                  <div
+                    key={session.id}
+                    className="bg-card border border-border rounded-lg p-6 transition-colors hover:border-emerald-500/30">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {session.stakeholder_name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 text-muted-foreground">
+                          <Mail className="w-4 h-4" />
+                          <span className="text-sm">{session.stakeholder_email}</span>
+                        </div>
+                        <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                          <span suppressHydrationWarning>
+                            Added {new Date(session.created_at).toLocaleDateString()}
+                          </span>
+                          {session.completed_at && (
+                            <>
+                              <span>•</span>
+                              <span suppressHydrationWarning>
+                                Completed {new Date(session.completed_at).toLocaleDateString()}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            isCompleted
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : isInProgress
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-amber-100 text-amber-700'
+                          }`}>
+                          {displayStatus}
+                        </span>
+                        {tenantSlug && session.access_token && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                          >
+                            <Link href={`/coach/${tenantSlug}/session/${session.access_token}`} target="_blank">
+                              View Session
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </main>
+      </div>
+    )
+  }
+
+  // Render Consultant/Admin Dashboard (original)
   return (
     <div className="min-h-screen bg-background">
       {/* Delete Confirmation Modal */}

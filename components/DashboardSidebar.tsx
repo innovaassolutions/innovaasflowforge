@@ -23,7 +23,7 @@ interface UserProfile {
   full_name: string
   email: string
   role: string
-  user_type: 'consultant' | 'company' | 'admin' | null
+  user_type: 'consultant' | 'company' | 'admin' | 'coach' | null
   permissions?: {
     education?: {
       view_schools?: boolean
@@ -63,16 +63,25 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   }, [showUserMenu])
 
+  // Check user types for role-specific navigation
+  const isCoach = userProfile?.user_type === 'coach'
+  const isSchool = userProfile?.user_type === 'company'
+  const isConsultantOrAdmin = userProfile?.user_type === 'consultant' || userProfile?.user_type === 'admin'
+
   // Check if user has access to specific verticals
-  // Admin users see everything; otherwise check verticals array
-  // If no verticals set, default to showing industry (legacy behavior)
-  const hasIndustryAccess = userProfile?.user_type === 'admin' ||
+  // Admin users see everything; consultants check verticals array
+  // If no verticals set, default to showing industry (legacy behavior for consultants)
+  const hasIndustryAccess = isConsultantOrAdmin && (
+    userProfile?.user_type === 'admin' ||
     userProfile?.verticals?.includes('industry') ||
     (!userProfile?.verticals || userProfile?.verticals.length === 0)
+  )
 
-  const hasEducationAccess = userProfile?.user_type === 'admin' ||
+  const hasEducationAccess = isConsultantOrAdmin && (
+    userProfile?.user_type === 'admin' ||
     userProfile?.verticals?.includes('education') ||
     userProfile?.permissions?.education?.view_schools
+  )
 
   // Base nav items everyone sees
   const baseNavItems = [
@@ -84,7 +93,33 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ]
 
-  // Industry vertical items - Companies only
+  // Coach-specific navigation
+  const coachNavItems = isCoach ? [
+    {
+      name: 'Clients',
+      href: '/dashboard/coaching/clients',
+      icon: UserCircle,
+      matchPaths: ['/dashboard/coaching/clients']
+    }
+  ] : []
+
+  // School-specific navigation (user_type === 'company')
+  const schoolNavItems = isSchool ? [
+    {
+      name: 'My School',
+      href: '/dashboard/education/schools',
+      icon: GraduationCap,
+      matchPaths: ['/dashboard/education/schools']
+    },
+    {
+      name: 'Access Codes',
+      href: '/dashboard/education/access-codes',
+      icon: Users,
+      matchPaths: ['/dashboard/education/access-codes']
+    }
+  ] : []
+
+  // Industry vertical items - Companies only (consultants)
   const industryNavItems = hasIndustryAccess ? [
     {
       name: 'Companies',
@@ -94,7 +129,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  // Education vertical items
+  // Education vertical items (for consultants/admin who manage schools)
   const educationNavItems = hasEducationAccess ? [
     {
       name: 'Schools',
@@ -104,7 +139,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  // Campaigns - shown after Schools
+  // Campaigns - shown after Schools (consultants only)
   const campaignNavItems = hasIndustryAccess ? [
     {
       name: 'Campaigns',
@@ -114,17 +149,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  // Coaching nav items - shown only for coaches (users with tenant_slug)
-  const coachingNavItems = userProfile?.tenant_slug ? [
-    {
-      name: 'Clients',
-      href: '/dashboard/coaching/clients',
-      icon: UserCircle,
-      matchPaths: ['/dashboard/coaching']
-    }
-  ] : []
-
-  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...coachingNavItems]
+  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
