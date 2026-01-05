@@ -63,7 +63,7 @@ export default function DashboardLayout({
       .eq('id', user.id)
       .single()
 
-    if (profile) {
+    if (profile && typeof profile === 'object') {
       // Check if user is a coach (has a tenant profile)
       const { data: tenant } = await client
         .from('tenant_profiles')
@@ -72,10 +72,19 @@ export default function DashboardLayout({
         .eq('is_active', true)
         .single()
 
+      const profileData = profile as {
+        full_name: string
+        email: string
+        role: string
+        user_type: 'consultant' | 'company' | 'admin' | null
+        permissions?: UserProfile['permissions']
+        verticals?: ('industry' | 'education')[]
+      }
+
       setUserProfile({
-        ...profile,
+        ...profileData,
         tenant_slug: tenant?.slug || undefined
-      } as UserProfile)
+      })
     }
 
     setLoading(false)
