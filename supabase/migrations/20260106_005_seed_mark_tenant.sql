@@ -31,27 +31,27 @@ SELECT
   'coach',
   '{
     "logo": {
-      "url": "https://leadingwithmeaning.com/logo.png",
+      "url": "/brand/lwm_logo.png",
       "alt": "Leading with Meaning",
       "width": 180
     },
     "colors": {
-      "primary": "#2C5530",
-      "primaryHover": "#234428",
-      "secondary": "#C4A35A",
-      "background": "#FDFCF9",
-      "backgroundSubtle": "#F7F5F0",
-      "text": "#1A1A1A",
+      "primary": "#1a1a2e",
+      "primaryHover": "#2d3436",
+      "secondary": "#4a5568",
+      "background": "#ffffff",
+      "backgroundSubtle": "#f8f9fa",
+      "text": "#333333",
       "textMuted": "#666666",
-      "border": "#E5E2D9"
+      "border": "#e2e8f0"
     },
     "fonts": {
-      "heading": "Playfair Display",
-      "body": "Lato"
+      "heading": "Inter",
+      "body": "Inter"
     },
-    "tagline": "Discover Your Leadership Archetype",
-    "welcomeMessage": "Welcome to your Leadership Archetype Assessment. This conversation will help you discover your authentic leadership style and how it shows up under pressure.",
-    "completionMessage": "Thank you for completing your Leadership Archetype Assessment. Your results reveal important insights about your leadership approach.",
+    "tagline": "Leadership Coaching",
+    "welcomeMessage": "Lead with clarity. Manage with confidence. Do your best work without losing yourself.",
+    "completionMessage": "Thank you for completing your Leadership Archetype Assessment. Your insights have been recorded and will help guide our coaching conversation.",
     "showPoweredBy": true
   }'::jsonb,
   '{
