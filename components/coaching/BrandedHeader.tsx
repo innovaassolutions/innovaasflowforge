@@ -51,9 +51,12 @@ export function BrandedHeader({ minimal = false, className = '' }: BrandedHeader
               src={logo.url}
               alt={logo.alt || tenant.display_name}
               width={logo.width || 200}
-              height={60}
-              className="h-12 sm:h-16 w-auto object-contain"
-              style={{ maxWidth: logo.width ? `${logo.width}px` : '200px' }}
+              height={logo.width || 200}
+              className="w-auto object-contain"
+              style={{
+                width: logo.width ? `${logo.width}px` : '200px',
+                height: 'auto'
+              }}
               unoptimized
             />
           ) : (
