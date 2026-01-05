@@ -29,6 +29,7 @@ import {
   Check,
   Send,
   Loader2,
+  FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -238,6 +239,11 @@ export default function CoachingClientsPage() {
   function getSessionUrl(accessToken: string) {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
     return `${baseUrl}/flowforge/coach/${tenant?.slug}/session/${accessToken}`
+  }
+
+  function getReportUrl(accessToken: string) {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+    return `${baseUrl}/flowforge/reports/coaching/${accessToken}`
   }
 
   function copySessionLink(accessToken: string) {
@@ -494,6 +500,20 @@ export default function CoachingClientsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* View Report - only show for completed clients */}
+                    {client.client_status === 'completed' && (
+                      <a
+                        href={getReportUrl(client.access_token)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+                        title="View report"
+                      >
+                        <FileText className="w-4 h-4" />
+                        View Report
+                      </a>
+                    )}
+
                     {/* Send Invite Email - only show for clients who haven't completed */}
                     {client.client_status !== 'completed' && (
                       <button
