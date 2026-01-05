@@ -459,20 +459,7 @@ export default function DashboardPage() {
                           }`}>
                           {displayStatus}
                         </span>
-                        {session.access_token && isCompleted && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            asChild
-                            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                          >
-                            <Link href={`/reports/coaching/${session.access_token}`} target="_blank">
-                              <FileText className="w-4 h-4 mr-1.5" />
-                              View Report
-                            </Link>
-                          </Button>
-                        )}
-                        {tenantSlug && session.access_token && !isCompleted && (
+                        {tenantSlug && session.access_token && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -481,6 +468,18 @@ export default function DashboardPage() {
                           >
                             <Link href={`/coach/${tenantSlug}/session/${session.access_token}`} target="_blank">
                               View Session
+                            </Link>
+                          </Button>
+                        )}
+                        {session.access_token && isCompleted && (
+                          <Button
+                            size="sm"
+                            asChild
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                          >
+                            <Link href={`/reports/coaching/${session.access_token}`} target="_blank">
+                              <FileText className="w-4 h-4 mr-1.5" />
+                              View Report
                             </Link>
                           </Button>
                         )}
