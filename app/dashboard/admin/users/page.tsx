@@ -672,9 +672,9 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </div>
-                {editFormData.userType === 'coach' && (
-                  <p className="text-xs text-amber-600 mt-2">
-                    Note: Coach profile settings are managed separately in the coach dashboard.
+                {editFormData.userType !== 'admin' && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Note: Profile settings (display name, branding) are managed in the {editFormData.userType === 'company' ? 'school' : editFormData.userType} dashboard.
                   </p>
                 )}
               </div>
