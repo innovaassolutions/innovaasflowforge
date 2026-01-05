@@ -38,12 +38,12 @@ SELECT
     "colors": {
       "primary": "#1e3a5f",
       "primaryHover": "#153050",
-      "secondary": "#2d4a6f",
-      "background": "#ffffff",
-      "backgroundSubtle": "#f7fafc",
-      "text": "#1a202c",
-      "textMuted": "#4a5568",
-      "border": "#e2e8f0"
+      "secondary": "#c4776a",
+      "background": "#f5f3ef",
+      "backgroundSubtle": "#ebe8e3",
+      "text": "#1e3a5f",
+      "textMuted": "#5a6a7a",
+      "border": "#e0dcd5"
     },
     "fonts": {
       "heading": "Inter",

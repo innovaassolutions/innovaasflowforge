@@ -35,43 +35,43 @@ Leadership coaching for emerging leaders who are:
 
 ## 3. Color Palette
 
-### Primary Colors (From Logo)
+### Primary Colors (From Website)
 
-The Leading with Meaning logo uses a **deep navy blue** as the primary brand color:
+The Leading with Meaning brand uses **deep navy blue** as the primary color with **warm coral** accents:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| **Brand Navy** | `#1e3a5f` | Logo, primary buttons, headings |
+| **Brand Navy** | `#1e3a5f` | Logo, primary buttons, headings, body text |
 | **Brand Navy Hover** | `#153050` | Button hover states |
-| **Text Dark** | `#1a202c` | Primary body text |
-| **Text Muted** | `#4a5568` | Secondary text, captions |
-| **Background** | `#ffffff` | Page backgrounds |
-| **Background Subtle** | `#f7fafc` | Cards, input fields, sections |
-| **Border** | `#e2e8f0` | Borders, dividers |
+| **Coral Accent** | `#c4776a` | Highlights, accent text, decorative elements |
+| **Text Muted** | `#5a6a7a` | Secondary text, captions |
+| **Background** | `#f5f3ef` | Warm beige page backgrounds |
+| **Background Subtle** | `#ebe8e3` | Cards, input fields, sections |
+| **Border** | `#e0dcd5` | Borders, dividers |
 
 ### FlowForge Theme Configuration
 
 ```css
 :root {
-  /* Brand Colors - matched to logo */
+  /* Brand Colors - matched to leadingwithmeaning.com */
   --brand-primary: #1e3a5f;        /* Deep navy from logo */
   --brand-primary-hover: #153050;  /* Darker navy for hover */
-  --brand-secondary: #2d4a6f;      /* Lighter navy accent */
-  --brand-bg: #ffffff;             /* White background */
-  --brand-bg-subtle: #f7fafc;      /* Light gray for cards */
-  --brand-text: #1a202c;           /* Dark text */
-  --brand-text-muted: #4a5568;     /* Muted gray text */
-  --brand-border: #e2e8f0;         /* Light border */
+  --brand-secondary: #c4776a;      /* Coral accent color */
+  --brand-bg: #f5f3ef;             /* Warm beige background */
+  --brand-bg-subtle: #ebe8e3;      /* Slightly darker beige for cards */
+  --brand-text: #1e3a5f;           /* Navy text (matches brand) */
+  --brand-text-muted: #5a6a7a;     /* Muted blue-gray text */
+  --brand-border: #e0dcd5;         /* Warm gray border */
 }
 ```
 
 ### Color Notes
 
-- Primary brand color is **deep navy blue** (#1e3a5f) - derived directly from the logo
-- The website uses a **clean, professional palette** with navy as the anchor
-- White backgrounds with navy accents create a trustworthy, calm aesthetic
-- Avoids bright or saturated colors - professional coaching positioning
-- The calm, minimal aesthetic reflects the coaching philosophy
+- Primary brand color is **deep navy blue** (#1e3a5f) - used for logo, text, and buttons
+- Secondary **coral accent** (#c4776a) - used for highlights and decorative elements
+- **Warm beige backgrounds** (#f5f3ef) - creates an inviting, calm aesthetic
+- The color palette reflects the coaching philosophy: grounded, warm, professional
+- Navy text on beige backgrounds provides excellent readability
 
 ---
 
@@ -276,19 +276,19 @@ The Leading with Meaning logo uses a **deep navy blue** as the primary brand col
 ```json
 {
   "logo": {
-    "url": "/brand/lwm_logo.png",
+    "url": "/flowforge/brand/lwm_logo.png",
     "alt": "Leading with Meaning",
-    "width": 180
+    "width": 360
   },
   "colors": {
     "primary": "#1e3a5f",
     "primaryHover": "#153050",
-    "secondary": "#2d4a6f",
-    "background": "#ffffff",
-    "backgroundSubtle": "#f7fafc",
-    "text": "#1a202c",
-    "textMuted": "#4a5568",
-    "border": "#e2e8f0"
+    "secondary": "#c4776a",
+    "background": "#f5f3ef",
+    "backgroundSubtle": "#ebe8e3",
+    "text": "#1e3a5f",
+    "textMuted": "#5a6a7a",
+    "border": "#e0dcd5"
   },
   "fonts": {
     "heading": "Inter",

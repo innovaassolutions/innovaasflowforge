@@ -83,25 +83,6 @@ export function BrandedHeader({ minimal = false, className = '' }: BrandedHeader
           )}
         </div>
       </div>
-
-      {/* Powered by FlowForge - optional */}
-      {showPoweredBy && !minimal && (
-        <div className="border-t border-[var(--brand-border)] bg-[var(--brand-bg-subtle)]">
-          <div className="max-w-4xl mx-auto px-4 py-2">
-            <p className="text-xs text-center text-[var(--brand-text-muted)]">
-              Powered by{' '}
-              <a
-                href="https://www.innovaas.co/flowforge"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--brand-primary)] hover:underline"
-              >
-                FlowForge
-              </a>
-            </p>
-          </div>
-        </div>
-      )}
     </header>
   )
 }
