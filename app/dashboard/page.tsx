@@ -96,17 +96,22 @@ export default function DashboardPage() {
 
       // If coach, fetch tenant info and coaching sessions
       if (userProfile.user_type === 'coach') {
-        const { data: tenant } = await (client
+        const { data: tenant, error: tenantError } = await (client
           .from('tenant_profiles') as any)
           .select('id, slug')
           .eq('user_id', user.id)
           .eq('is_active', true)
-          .single() as { data: { id: string; slug: string } | null }
+          .single() as { data: { id: string; slug: string } | null; error: any }
 
-        if (tenant) {
+        if (tenantError) {
+          console.error('Error fetching tenant:', tenantError)
+          setError(`Failed to load tenant profile: ${tenantError.message || tenantError.code}`)
+        } else if (tenant) {
           setTenantId(tenant.id)
           setTenantSlug(tenant.slug)
           await fetchCoachingSessions(client, tenant.id)
+        } else {
+          setError('No tenant profile found for this coach')
         }
       } else if (userProfile.user_type === 'company') {
         // School user - fetch school info and access code stats
@@ -131,7 +136,7 @@ export default function DashboardPage() {
 
       if (fetchError) {
         console.error('Error fetching coaching sessions:', fetchError)
-        setError('Failed to load coaching sessions')
+        setError(`Failed to load coaching sessions: ${fetchError.message || fetchError.code || 'Unknown error'}`)
         return
       }
 
