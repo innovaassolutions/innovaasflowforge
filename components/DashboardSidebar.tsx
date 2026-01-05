@@ -14,7 +14,8 @@ import {
   X,
   Shield,
   UserCog,
-  GraduationCap
+  GraduationCap,
+  UserCircle
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -32,6 +33,8 @@ interface UserProfile {
   }
   // Verticals this user has access to
   verticals?: ('industry' | 'education')[]
+  // Coach tenant info (if user is a coach)
+  tenant_slug?: string
 }
 
 interface DashboardSidebarProps {
@@ -111,7 +114,17 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems]
+  // Coaching nav items - shown only for coaches (users with tenant_slug)
+  const coachingNavItems = userProfile?.tenant_slug ? [
+    {
+      name: 'Clients',
+      href: '/dashboard/coaching/clients',
+      icon: UserCircle,
+      matchPaths: ['/dashboard/coaching']
+    }
+  ] : []
+
+  const navItems = [...baseNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...coachingNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [

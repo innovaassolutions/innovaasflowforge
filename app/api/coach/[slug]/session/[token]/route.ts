@@ -60,11 +60,11 @@ export async function GET(
       )
     }
 
-    // Check for existing agent session
+    // Check for existing agent session (using coaching_session_id for coaching module)
     const { data: agentSession } = await supabase
       .from('agent_sessions')
       .select('id, conversation_history, session_context')
-      .eq('stakeholder_session_id', session.id)
+      .eq('coaching_session_id', session.id)
       .eq('agent_type', 'archetype_interview')
       .order('created_at', { ascending: false })
       .limit(1)

@@ -22,6 +22,7 @@ interface UserProfile {
     }
   }
   verticals?: ('industry' | 'education')[]
+  tenant_slug?: string
 }
 
 export default function DashboardLayout({
@@ -63,7 +64,18 @@ export default function DashboardLayout({
       .single()
 
     if (profile) {
-      setUserProfile(profile as UserProfile)
+      // Check if user is a coach (has a tenant profile)
+      const { data: tenant } = await client
+        .from('tenant_profiles')
+        .select('slug')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      setUserProfile({
+        ...profile,
+        tenant_slug: tenant?.slug || undefined
+      } as UserProfile)
     }
 
     setLoading(false)

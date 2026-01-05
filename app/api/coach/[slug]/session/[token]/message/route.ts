@@ -179,13 +179,13 @@ export async function POST(
 
 async function getOrCreateAgentSession(
   supabase: ReturnType<typeof getServiceClient>,
-  participantSessionId: string
+  coachingSessionId: string
 ) {
-  // Check for existing agent session
+  // Check for existing agent session (using coaching_session_id for coaching module)
   const { data: existing } = await supabase
     .from('agent_sessions')
     .select('*')
-    .eq('stakeholder_session_id', participantSessionId)
+    .eq('coaching_session_id', coachingSessionId)
     .eq('agent_type', 'archetype_interview')
     .order('created_at', { ascending: false })
     .limit(1)
@@ -195,11 +195,11 @@ async function getOrCreateAgentSession(
     return existing
   }
 
-  // Create new agent session
+  // Create new agent session (using coaching_session_id for coaching module)
   const { data: newSession, error } = await supabase
     .from('agent_sessions')
     .insert({
-      stakeholder_session_id: participantSessionId,
+      coaching_session_id: coachingSessionId,
       agent_type: 'archetype_interview',
       agent_model: 'claude-sonnet-4-20250514',
       conversation_history: [],

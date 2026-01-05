@@ -110,24 +110,40 @@ export default function RegisterPage() {
               border: '1px solid var(--brand-border)',
             }}
           >
-            {/* Success Icon */}
-            <div
-              className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-6"
-              style={{ backgroundColor: 'var(--brand-primary)', opacity: 0.1 }}
-            >
+            {/* Success Illustration */}
+            <div className="mb-6">
               <svg
-                className="w-8 h-8"
-                style={{ color: 'var(--brand-primary)' }}
+                className="mx-auto w-32 h-32"
+                viewBox="0 0 128 128"
                 fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
               >
+                {/* Background circles for depth */}
+                <circle cx="64" cy="64" r="56" fill="var(--brand-primary)" fillOpacity="0.08" />
+                <circle cx="64" cy="64" r="44" fill="var(--brand-primary)" fillOpacity="0.12" />
+
+                {/* Main circle with gradient effect */}
+                <circle cx="64" cy="64" r="32" fill="var(--brand-primary)" fillOpacity="0.15" />
+                <circle cx="64" cy="64" r="28" fill="var(--brand-primary)" />
+
+                {/* Checkmark */}
                 <path
+                  d="M52 64L60 72L76 56"
+                  stroke="white"
+                  strokeWidth="4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
                 />
+
+                {/* Decorative sparkles */}
+                <circle cx="100" cy="40" r="3" fill="var(--brand-primary)" fillOpacity="0.6" />
+                <circle cx="28" cy="48" r="2" fill="var(--brand-primary)" fillOpacity="0.5" />
+                <circle cx="36" cy="88" r="2.5" fill="var(--brand-primary)" fillOpacity="0.4" />
+                <circle cx="92" cy="80" r="2" fill="var(--brand-primary)" fillOpacity="0.5" />
+
+                {/* Small accent stars */}
+                <path d="M108 60L110 64L114 62L110 66L108 70L106 66L102 62L106 64L108 60Z" fill="var(--brand-primary)" fillOpacity="0.4" />
+                <path d="M20 68L22 72L26 70L22 74L20 78L18 74L14 70L18 72L20 68Z" fill="var(--brand-primary)" fillOpacity="0.3" />
               </svg>
             </div>
 
