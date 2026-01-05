@@ -88,20 +88,23 @@ export async function POST(request: NextRequest) {
     console.log('[debug-llm] Has user message:', hasUserMessage)
 
     // Log to Supabase for verification (fire and forget)
-    supabase.from('debug_logs').insert({
-      endpoint: 'debug-llm',
-      call_number: callNumber,
-      timestamp: timestamp,
-      has_user_message: hasUserMessage,
-      message_count: messages?.length || 0,
-      body_length: bodyText.length,
-      headers: JSON.stringify(headers),
-      body_preview: bodyText.substring(0, 1000),
-    }).then(() => {
-      console.log('[debug-llm] Logged to Supabase')
-    }).catch((err) => {
-      console.error('[debug-llm] Supabase log error:', err)
-    })
+    ;(async () => {
+      try {
+        await supabase.from('debug_logs').insert({
+          endpoint: 'debug-llm',
+          call_number: callNumber,
+          timestamp: timestamp,
+          has_user_message: hasUserMessage,
+          message_count: messages?.length || 0,
+          body_length: bodyText.length,
+          headers: JSON.stringify(headers),
+          body_preview: bodyText.substring(0, 1000),
+        })
+        console.log('[debug-llm] Logged to Supabase')
+      } catch (err) {
+        console.error('[debug-llm] Supabase log error:', err)
+      }
+    })()
 
     // Build response
     const responseText = hasUserMessage
