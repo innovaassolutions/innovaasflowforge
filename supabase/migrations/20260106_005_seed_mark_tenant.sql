@@ -33,7 +33,7 @@ SELECT
     "logo": {
       "url": "/flowforge/brand/lwm_logo.png",
       "alt": "Leading with Meaning",
-      "width": 180
+      "width": 360
     },
     "colors": {
       "primary": "#1e3a5f",
