@@ -64,7 +64,7 @@ export default function SessionPage() {
   async function loadSession() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/coach/${slug}/session/${token}`)
+      const response = await fetch(`/flowforge/api/coach/${slug}/session/${token}`)
       const data = await response.json()
 
       if (data.success) {
@@ -116,7 +116,7 @@ export default function SessionPage() {
         setInputMessage('')
       }
 
-      const response = await fetch(`/api/coach/${slug}/session/${token}/message`, {
+      const response = await fetch(`/flowforge/api/coach/${slug}/session/${token}/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message }),
