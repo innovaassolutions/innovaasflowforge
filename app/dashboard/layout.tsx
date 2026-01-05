@@ -70,7 +70,7 @@ export default function DashboardLayout({
         .select('slug')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single()
+        .single() as { data: { slug: string } | null }
 
       const profileData = profile as {
         full_name: string
