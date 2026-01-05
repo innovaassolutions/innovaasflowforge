@@ -7,8 +7,11 @@ import { randomBytes } from 'crypto'
 interface CreateUserInput {
   email: string
   fullName: string
-  userType: 'consultant' | 'company'
+  userType: 'consultant' | 'company' | 'admin' | 'coach'
   sendWelcomeEmail?: boolean
+  // Tenant profile fields (for consultant, coach, company)
+  displayName?: string
+  slug?: string
 }
 
 /**
@@ -75,6 +78,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if this is a tenant type (needs profile setup)
+    const isTenantType = ['consultant', 'coach', 'company'].includes(body.userType)
+
+    // Validate tenant profile fields for consultant, coach, and company
+    if (isTenantType) {
+      const typeLabel = body.userType === 'company' ? 'schools' : `${body.userType}s`
+
+      if (!body.displayName?.trim()) {
+        return NextResponse.json(
+          { error: `Display name is required for ${typeLabel}` },
+          { status: 400 }
+        )
+      }
+      if (!body.slug?.trim()) {
+        return NextResponse.json(
+          { error: `URL slug is required for ${typeLabel}` },
+          { status: 400 }
+        )
+      }
+
+      // Validate slug format (lowercase, alphanumeric with hyphens)
+      const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+      if (!slugRegex.test(body.slug)) {
+        return NextResponse.json(
+          { error: 'Slug must be lowercase letters, numbers, and hyphens only' },
+          { status: 400 }
+        )
+      }
+
+      // Check if slug is already taken
+      const { data: existingTenant } = await supabaseAdmin
+        .from('tenant_profiles')
+        .select('id')
+        .eq('slug', body.slug)
+        .single()
+
+      if (existingTenant) {
+        return NextResponse.json(
+          { error: 'This URL slug is already taken. Please choose a different one.' },
+          { status: 400 }
+        )
+      }
+    }
+
     // Generate temporary password
     const temporaryPassword = generateTemporaryPassword()
 
@@ -109,6 +156,44 @@ export async function POST(request: NextRequest) {
     if (profileUpdateError) {
       console.error('Profile update error:', profileUpdateError)
       // Don't fail - user was created, just log the error
+    }
+
+    // Create tenant_profile for consultant, coach, and company/school
+    let tenantId: string | null = null
+    if (isTenantType) {
+      const { data: tenant, error: tenantError } = await (supabaseAdmin
+        .from('tenant_profiles') as any)
+        .insert({
+          user_id: newUser.user.id,
+          slug: body.slug,
+          display_name: body.displayName,
+          is_active: true,
+          brand_config: {
+            colors: {
+              primary: '#F25C05',
+              secondary: '#1D9BA3',
+              background: '#FFFEFB',
+              text: '#171614',
+              textMuted: '#71706B',
+              border: '#E6E2D6',
+              bgSubtle: '#FAF8F3'
+            },
+            fonts: {
+              heading: 'Inter, sans-serif',
+              body: 'Inter, sans-serif'
+            }
+          }
+        })
+        .select('id')
+        .single()
+
+      if (tenantError) {
+        console.error('Tenant creation error:', tenantError)
+        // Log but don't fail - user was created
+      } else if (tenant) {
+        tenantId = tenant.id
+        console.log(`✅ Tenant profile created for ${body.userType}: ${body.slug}`)
+      }
     }
 
     // Send welcome email with credentials
@@ -209,6 +294,11 @@ export async function POST(request: NextRequest) {
         email: newUser.user.email,
         fullName: body.fullName,
         userType: body.userType || 'consultant',
+        ...(isTenantType && {
+          tenantId,
+          slug: body.slug,
+          displayName: body.displayName,
+        }),
       },
       emailSent: body.sendWelcomeEmail !== false,
     })
@@ -254,10 +344,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all users from user_profiles
-    const { data: users, error: fetchError } = await supabaseAdmin
-      .from('user_profiles')
+    const { data: users, error: fetchError } = await (supabaseAdmin
+      .from('user_profiles') as any)
       .select('id, email, full_name, role, user_type, created_at, last_seen_at')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as { data: Array<{
+        id: string
+        email: string
+        full_name: string
+        role: string
+        user_type: string | null
+        created_at: string
+        last_seen_at: string | null
+      }> | null, error: any }
 
     if (fetchError) {
       console.error('Fetch users error:', fetchError)
@@ -267,9 +365,41 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Fetch tenant profiles for consultant, coach, and company users
+    const tenantUserIds = (users || [])
+      .filter(u => ['consultant', 'coach', 'company'].includes(u.user_type || ''))
+      .map(u => u.id)
+
+    let tenantMap: Record<string, { slug: string; display_name: string }> = {}
+
+    if (tenantUserIds.length > 0) {
+      const { data: tenants } = await (supabaseAdmin
+        .from('tenant_profiles') as any)
+        .select('user_id, slug, display_name')
+        .in('user_id', tenantUserIds) as { data: Array<{
+          user_id: string
+          slug: string
+          display_name: string
+        }> | null }
+
+      if (tenants) {
+        tenantMap = tenants.reduce((acc, t) => {
+          acc[t.user_id] = { slug: t.slug, display_name: t.display_name }
+          return acc
+        }, {} as Record<string, { slug: string; display_name: string }>)
+      }
+    }
+
+    // Merge tenant info into users
+    const usersWithTenant = (users || []).map(user => ({
+      ...user,
+      tenant_slug: tenantMap[user.id]?.slug || null,
+      tenant_display_name: tenantMap[user.id]?.display_name || null,
+    }))
+
     return NextResponse.json({
       success: true,
-      users: users || [],
+      users: usersWithTenant,
     })
 
   } catch (error) {
