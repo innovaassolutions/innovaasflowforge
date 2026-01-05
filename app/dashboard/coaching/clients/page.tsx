@@ -27,6 +27,8 @@ import {
   AlertCircle,
   Copy,
   Check,
+  Send,
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -61,6 +63,8 @@ export default function CoachingClientsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null)
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
+  const [sendingInvite, setSendingInvite] = useState<string | null>(null)
+  const [inviteSent, setInviteSent] = useState<string | null>(null)
 
   // New client form state
   const [newClientName, setNewClientName] = useState('')
@@ -100,9 +104,9 @@ export default function CoachingClientsPage() {
 
       setTenant(tenantData)
 
-      // Fetch coaching clients
-      const { data: clientsData, error: clientsError } = await client
-        .from('coaching_sessions')
+      // Fetch coaching clients (type assertion needed as coaching_sessions not in generated types yet)
+      const { data: clientsData, error: clientsError } = await (client
+        .from('coaching_sessions') as any)
         .select('id, client_name, client_email, client_status, access_token, created_at, started_at, completed_at, last_activity_at')
         .eq('tenant_id', tenantData.id)
         .order('created_at', { ascending: false })
@@ -132,8 +136,9 @@ export default function CoachingClientsPage() {
       // Generate unique session token
       const sessionToken = crypto.randomUUID().replace(/-/g, '')
 
-      const { data, error } = await supabase
-        .from('coaching_sessions')
+      // Type assertion needed as coaching_sessions not in generated types yet
+      const { data, error } = await (supabase
+        .from('coaching_sessions') as any)
         .insert({
           tenant_id: tenant.id,
           client_name: newClientName.trim(),
@@ -174,8 +179,8 @@ export default function CoachingClientsPage() {
     if (!supabase) return
 
     try {
-      const { error } = await supabase
-        .from('coaching_sessions')
+      const { error } = await (supabase
+        .from('coaching_sessions') as any)
         .delete()
         .eq('id', clientId)
 
@@ -190,6 +195,43 @@ export default function CoachingClientsPage() {
     } catch (err) {
       setError('Error deleting client')
       console.error(err)
+    }
+  }
+
+  async function handleSendInvite(client: CoachingClient) {
+    if (!supabase || !tenant) return
+
+    setSendingInvite(client.id)
+    setError(null)
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setError('Not authenticated')
+        return
+      }
+
+      const response = await fetch(`/flowforge/api/coach/${tenant.slug}/session/${client.access_token}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setInviteSent(client.id)
+        setTimeout(() => setInviteSent(null), 3000)
+      } else {
+        setError(data.error || 'Failed to send invite')
+      }
+    } catch (err) {
+      setError('Error sending invite')
+      console.error(err)
+    } finally {
+      setSendingInvite(null)
     }
   }
 
@@ -452,6 +494,24 @@ export default function CoachingClientsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* Send Invite Email - only show for clients who haven't completed */}
+                    {client.client_status !== 'completed' && (
+                      <button
+                        onClick={() => handleSendInvite(client)}
+                        disabled={sendingInvite === client.id}
+                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:opacity-50"
+                        title={inviteSent === client.id ? 'Invite sent!' : 'Send invite email'}
+                      >
+                        {sendingInvite === client.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : inviteSent === client.id ? (
+                          <Check className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                      </button>
+                    )}
+
                     {/* Copy Session Link */}
                     <button
                       onClick={() => copySessionLink(client.access_token)}
