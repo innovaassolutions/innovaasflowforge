@@ -7,10 +7,11 @@ import { NextRequest, NextResponse } from 'next/server'
  * for a test agent to isolate connection issues.
  */
 
-// Node.js Runtime Custom LLM agent - testing if Node.js handles SSE differently
-// Previous Edge agent: agent_9001ke3b1hvmes4bm44m086t1p7r
-// Previous debug agent: agent_9201ke1anbvbe5rtkf1df8djahcg
-const TEST_AGENT_ID = 'agent_0101ke3mvmqfehmtzzsxr78v7rs7'
+// Debug LLM agent - logs all requests to Supabase for analysis
+// Previous agents:
+//   - Edge: agent_9001ke3b1hvmes4bm44m086t1p7r
+//   - Node.js: agent_0101ke3mvmqfehmtzzsxr78v7rs7
+const TEST_AGENT_ID = 'agent_8401ke60x5j4f3av281her96xtn4'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
