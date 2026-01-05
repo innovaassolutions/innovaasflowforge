@@ -12,6 +12,155 @@ We are experiencing a consistent issue where ElevenLabs Conversational AI agents
 
 ---
 
+## What We're Building & Why Custom LLM is Required
+
+### Product Overview
+
+**FlowForge** is an enterprise platform for conducting **AI-facilitated stakeholder interviews** across industries. Our first use case is **Digital Transformation Readiness Assessments** in education, where we conduct voice interviews with students, teachers, parents, and school leadership.
+
+### Why We Need Custom LLM (Not Hosted LLM)
+
+We require Custom LLM integration because our interview system has **stateful, adaptive conversation logic** that cannot be replicated with a static hosted LLM prompt:
+
+#### 1. Real-Time Safeguarding Detection (Critical for Student Safety)
+
+```typescript
+// We intercept EVERY user message to detect safety concerns
+const SAFEGUARDING_PATTERNS = [
+  { pattern: /\b(hurt(ing)? myself|harm(ing)? myself)\b/i, type: 'self_harm' },
+  { pattern: /\b(suicid|kill myself)\b/i, type: 'self_harm' },
+  { pattern: /\b(hit(s)? me|beat(s)? me|abuse)\b/i, type: 'abuse_disclosure' },
+  // ... 15+ patterns for student safety
+]
+
+// If detected, we immediately:
+// - Flag the conversation in our database
+// - Modify the AI response to provide support resources
+// - Alert school safeguarding officers
+```
+
+**This cannot run on a hosted LLM** - we need to intercept and process each message server-side before generating a response.
+
+#### 2. Stateful Conversation Tracking
+
+Our interviews track **domain exploration** across multiple assessment areas:
+
+```typescript
+interface ConversationState {
+  phase: 'opening' | 'rapport' | 'core_exploration' | 'closing'
+  domains_explored: {
+    domain_id: string
+    explored: boolean
+    depth: 0 | 1 | 2 | 3  // 0=not touched, 3=deep-dived
+  }[]
+  domain_coverage_percent: number  // Must reach 70%+ before closing
+  safeguarding_flags: SafeguardingFlag[]
+}
+```
+
+Each turn, we:
+1. Update domain coverage in our database
+2. Determine which areas still need exploration
+3. Generate a **dynamic system prompt** based on current state
+4. Guide the conversation toward unexplored domains
+
+#### 3. Dynamic Prompt Generation
+
+The system prompt changes **every turn** based on conversation state:
+
+```typescript
+// Simplified example - actual prompt is 2000+ tokens
+function generatePrompt(state: ConversationState, participant: Participant) {
+  const unexploredDomains = getUnexploredDomains(state)
+  const currentPhase = state.phase
+
+  return `
+    You are interviewing ${participant.name}, a ${participant.type}.
+
+    CURRENT PHASE: ${currentPhase}
+    DOMAINS TO EXPLORE: ${unexploredDomains.map(d => d.name).join(', ')}
+    COVERAGE: ${state.domain_coverage_percent}% (target: 70%)
+
+    ${currentPhase === 'core_exploration' ?
+      `Focus on: ${unexploredDomains[0].name}` :
+      `Transition to closing soon.`
+    }
+  `
+}
+```
+
+#### 4. Database Integration Per Turn
+
+Every conversation turn triggers database operations:
+
+```typescript
+// On each user message:
+await supabase.from('interview_sessions').update({
+  conversation_state: newState,
+  domains_explored: updatedDomains,
+  last_interaction: new Date(),
+  safeguarding_flags: detectedFlags
+}).eq('token', sessionToken)
+
+// On conversation end:
+await supabase.from('interview_transcripts').insert({
+  session_id: sessionId,
+  messages: conversationHistory,
+  final_coverage: coveragePercent
+})
+```
+
+### Why Hosted LLM Cannot Meet These Requirements
+
+| Requirement | Custom LLM | Hosted LLM |
+|-------------|------------|------------|
+| Intercept messages for safeguarding | ✅ Process before LLM | ❌ No server-side hook |
+| Update database per turn | ✅ Full DB access | ❌ Stateless |
+| Dynamic prompts based on state | ✅ Regenerate each turn | ❌ Fixed prompt |
+| Track domain exploration | ✅ Persistent state | ❌ No state access |
+| Alert on safety concerns | ✅ Real-time webhooks | ❌ Post-hoc only |
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FlowForge Platform                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
+│  │   Frontend   │───▶│  ElevenLabs  │───▶│ Custom LLM   │       │
+│  │  (Next.js)   │    │   WebRTC     │    │  Endpoint    │       │
+│  └──────────────┘    └──────────────┘    └──────┬───────┘       │
+│                                                  │               │
+│                                                  ▼               │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                   Custom LLM Handler                      │   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────────────┐  │   │
+│  │  │ Safeguard  │  │   State    │  │  Dynamic Prompt    │  │   │
+│  │  │ Detection  │  │  Manager   │  │    Generator       │  │   │
+│  │  └─────┬──────┘  └─────┬──────┘  └─────────┬──────────┘  │   │
+│  │        │               │                    │             │   │
+│  │        ▼               ▼                    ▼             │   │
+│  │  ┌─────────────────────────────────────────────────────┐ │   │
+│  │  │              Supabase (PostgreSQL)                  │ │   │
+│  │  │  - Session state    - Transcripts    - Alerts       │ │   │
+│  │  └─────────────────────────────────────────────────────┘ │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Business Impact
+
+This Custom LLM integration is **critical** to our product. Without it:
+- We cannot conduct voice interviews (core product functionality)
+- We cannot ensure student safety (legal/ethical requirement)
+- We cannot provide adaptive, high-quality assessments
+
+We have invested significant development effort into this integration and need it to work reliably.
+
+---
+
 ## Environment
 
 - **Hosting:** Vercel (Next.js 15)
