@@ -55,3 +55,12 @@ development_status:
   2-3-report-landing-page-visualizations: done  # story-education-reports-3.md
   2-4-longitudinal-safeguarding-notifications: done  # story-education-reports-4.md
   epic-2-retrospective: optional
+
+  # Epic 3: Coaching Module (Leading with Meaning)
+  epic-3: contexted
+  3-1-database-foundation: review  # story-coaching-module-1.md
+  3-2-branding-infrastructure: review  # story-coaching-module-2.md
+  3-3-registration-sessions: backlog  # story-coaching-module-3.md
+  3-4-dashboard-pipeline: backlog  # story-coaching-module-4.md
+  3-5-results-custom-domain: backlog  # story-coaching-module-5.md
+  epic-3-retrospective: optional

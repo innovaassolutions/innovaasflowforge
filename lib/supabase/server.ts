@@ -79,3 +79,133 @@ export const supabaseAdmin = new Proxy({} as ReturnType<typeof createSupabaseCli
     return (getSupabaseAdmin() as any)[prop]
   }
 })
+
+// ============================================================================
+// TENANT PROFILE QUERIES
+// ============================================================================
+
+export interface TenantProfile {
+  id: string
+  user_id: string
+  slug: string
+  display_name: string
+  tenant_type: 'coach' | 'consultant' | 'school'
+  brand_config: {
+    logo?: { url: string; alt: string; width?: number }
+    colors: {
+      primary: string
+      primaryHover: string
+      secondary: string
+      background: string
+      backgroundSubtle: string
+      text: string
+      textMuted: string
+      border: string
+    }
+    fonts: {
+      heading: string
+      body: string
+    }
+    tagline?: string
+    welcomeMessage?: string
+    completionMessage?: string
+    showPoweredBy: boolean
+  }
+  email_config: {
+    replyTo?: string
+    senderName?: string
+    emailFooter?: string
+  }
+  enabled_assessments: string[]
+  subscription_tier: 'starter' | 'professional' | 'enterprise'
+  is_active: boolean
+  custom_domain?: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Get a tenant profile by its URL slug
+ * Used for loading branding on public pages like /coach/[slug]/
+ */
+export async function getTenantBySlug(slug: string): Promise<TenantProfile | null> {
+  const supabase = getSupabaseAdmin()
+
+  const { data, error } = await supabase
+    .from('tenant_profiles')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .single()
+
+  if (error || !data) {
+    console.error('Error fetching tenant by slug:', error?.message)
+    return null
+  }
+
+  return data as unknown as TenantProfile
+}
+
+/**
+ * Get a tenant profile by its custom domain
+ * Used in middleware for custom domain routing
+ */
+export async function getTenantByDomain(domain: string): Promise<TenantProfile | null> {
+  const supabase = getSupabaseAdmin()
+
+  const { data, error } = await supabase
+    .from('tenant_profiles')
+    .select('*')
+    .eq('custom_domain', domain)
+    .eq('is_active', true)
+    .single()
+
+  if (error || !data) {
+    // This is expected for non-custom-domain requests
+    return null
+  }
+
+  return data as unknown as TenantProfile
+}
+
+/**
+ * Get a tenant profile by its ID
+ * Used for internal operations where ID is known
+ */
+export async function getTenantById(id: string): Promise<TenantProfile | null> {
+  const supabase = getSupabaseAdmin()
+
+  const { data, error } = await supabase
+    .from('tenant_profiles')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error || !data) {
+    console.error('Error fetching tenant by ID:', error?.message)
+    return null
+  }
+
+  return data as unknown as TenantProfile
+}
+
+/**
+ * Get the tenant profile for the current authenticated user
+ * Used in dashboard to show coach's own tenant
+ */
+export async function getTenantForUser(userId: string): Promise<TenantProfile | null> {
+  const supabase = getSupabaseAdmin()
+
+  const { data, error } = await supabase
+    .from('tenant_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single()
+
+  if (error || !data) {
+    // User may not have a tenant profile (e.g., regular consultant)
+    return null
+  }
+
+  return data as unknown as TenantProfile
+}

@@ -54,6 +54,21 @@ const config: Config = {
           "teal-dark": "#14737A",
         },
 
+        /* ------------------------------------------------
+           Dynamic Brand Colors (CSS Variables)
+           Used by /coach/[slug]/ pages for white-label theming.
+           Values are injected at runtime from tenant_profiles.brand_config
+           Story: 3-2-branding-infrastructure
+           ------------------------------------------------ */
+        "brand-primary": "var(--brand-primary)",
+        "brand-primary-hover": "var(--brand-primary-hover)",
+        "brand-secondary": "var(--brand-secondary)",
+        "brand-bg": "var(--brand-bg)",
+        "brand-bg-subtle": "var(--brand-bg-subtle)",
+        "brand-text": "var(--brand-text)",
+        "brand-text-muted": "var(--brand-text-muted)",
+        "brand-border": "var(--brand-border)",
+
         /* shadcn/ui CSS Variable Colors */
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -159,6 +174,9 @@ const config: Config = {
          ============================================ */
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        /* Dynamic brand fonts for white-label theming (Story: 3-2) */
+        "brand-heading": "var(--brand-font-heading)",
+        "brand-body": "var(--brand-font-body)",
       },
 
       /* ============================================

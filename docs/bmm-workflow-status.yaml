@@ -57,3 +57,30 @@ active_epics:
         title: "Longitudinal & Safeguarding Notifications"
         status: TODO
         points: 2
+
+  coaching-module:
+    tech-spec: docs/tech-spec-coaching-module.md
+    epic: docs/sprint-artifacts/epic-coaching-module.md
+    story_count: 5
+    total_points: 15
+    stories:
+      - story: story-coaching-module-1.md
+        title: "Database Foundation"
+        status: TODO
+        points: 3
+      - story: story-coaching-module-2.md
+        title: "Branding Infrastructure"
+        status: TODO
+        points: 2
+      - story: story-coaching-module-3.md
+        title: "Registration & Sessions"
+        status: TODO
+        points: 4
+      - story: story-coaching-module-4.md
+        title: "Dashboard & Pipeline"
+        status: TODO
+        points: 4
+      - story: story-coaching-module-5.md
+        title: "Results & Custom Domain"
+        status: TODO
+        points: 2
