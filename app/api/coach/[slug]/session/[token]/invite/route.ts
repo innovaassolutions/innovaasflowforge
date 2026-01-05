@@ -134,7 +134,11 @@ export async function POST(
     // Send the invitation email
     try {
       const senderName = emailConfig?.senderName || tenant.display_name
-      const fromAddress = `${senderName} <onboarding@resend.dev>`
+      // Use verified domain email if configured, otherwise fall back to Resend test domain
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+      const fromAddress = `${senderName} <${fromEmail}>`
+
+      console.log(`📧 Sending invite email from: ${fromAddress} to: ${session.client_email}`)
 
       const result = await resend.emails.send({
         from: fromAddress,
@@ -166,9 +170,16 @@ export async function POST(
 
       if (result.error) {
         console.error('Email send error:', result.error)
+        // Provide helpful error message for common Resend issues
+        let errorMessage = 'Failed to send email'
+        const errorDetails = result.error as any
+        if (errorDetails?.message?.includes('can only send to') ||
+            errorDetails?.message?.includes('not verified')) {
+          errorMessage = 'Email domain not verified. Using test mode (onboarding@resend.dev) only allows sending to the Resend account owner email. Configure RESEND_FROM_EMAIL with a verified domain for production use.'
+        }
         return NextResponse.json({
           success: false,
-          error: 'Failed to send email',
+          error: errorMessage,
           details: result.error,
         }, { status: 500 })
       }
@@ -184,9 +195,16 @@ export async function POST(
 
     } catch (emailError: any) {
       console.error('Email send exception:', emailError)
+      let errorMessage = 'Failed to send email'
+      if (emailError?.message?.includes('can only send to') ||
+          emailError?.message?.includes('not verified')) {
+        errorMessage = 'Email domain not verified. Configure RESEND_FROM_EMAIL with a verified domain.'
+      } else if (emailError?.message?.includes('API key')) {
+        errorMessage = 'Invalid Resend API key. Check RESEND_API_KEY environment variable.'
+      }
       return NextResponse.json({
         success: false,
-        error: 'Failed to send email',
+        error: errorMessage,
         details: emailError.message,
       }, { status: 500 })
     }

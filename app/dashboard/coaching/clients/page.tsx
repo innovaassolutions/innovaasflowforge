@@ -163,10 +163,36 @@ export default function CoachingClientsPage() {
         }
         console.error(error)
       } else if (data) {
-        setClients([data as CoachingClient, ...clients])
+        const newClient = data as CoachingClient
+        setClients([newClient, ...clients])
         setShowAddModal(false)
         setNewClientName('')
         setNewClientEmail('')
+
+        // Auto-send invite email after creating client
+        try {
+          const { data: { session: authSession } } = await supabase.auth.getSession()
+          if (authSession) {
+            const response = await fetch(`/flowforge/api/coach/${tenant.slug}/session/${newClient.access_token}/invite`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authSession.access_token}`,
+              },
+            })
+            const inviteData = await response.json()
+            if (response.ok && inviteData.success) {
+              setInviteSent(newClient.id)
+              setTimeout(() => setInviteSent(null), 3000)
+            } else {
+              console.error('Auto-send invite failed:', inviteData)
+              // Don't show error - client was created successfully, email just didn't send
+            }
+          }
+        } catch (inviteErr) {
+          console.error('Auto-send invite error:', inviteErr)
+          // Don't show error - client was created successfully
+        }
       }
     } catch (err) {
       setAddError('An error occurred. Please try again.')
