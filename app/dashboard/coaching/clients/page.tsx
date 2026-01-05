@@ -113,8 +113,8 @@ export default function CoachingClientsPage() {
         .order('created_at', { ascending: false })
 
       if (clientsError) {
-        setError('Failed to load clients')
-        console.error(clientsError)
+        setError(`Failed to load clients: ${clientsError.message || clientsError.code}`)
+        console.error('Clients error:', clientsError)
       } else {
         setClients(clientsData || [])
       }
@@ -226,7 +226,8 @@ export default function CoachingClientsPage() {
         setInviteSent(client.id)
         setTimeout(() => setInviteSent(null), 3000)
       } else {
-        setError(data.error || 'Failed to send invite')
+        console.error('Send invite response:', data)
+        setError(data.error || data.details || 'Failed to send invite')
       }
     } catch (err) {
       setError('Error sending invite')
