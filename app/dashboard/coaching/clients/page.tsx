@@ -90,7 +90,7 @@ export default function CoachingClientsPage() {
         .select('id, slug, display_name')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single()
+        .single() as { data: TenantProfile | null; error: Error | null }
 
       if (tenantError || !tenantData) {
         setError('You do not have an active coaching profile.')
