@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail, GraduationCap, Key } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail, GraduationCap, Key, FileText } from 'lucide-react'
 import { apiUrl } from '@/lib/api-url'
 import { Button } from '@/components/ui/button'
 
@@ -24,8 +24,8 @@ interface Campaign {
 
 interface CoachingSession {
   id: string
-  stakeholder_name: string
-  stakeholder_email: string
+  client_name: string
+  client_email: string
   client_status: 'registered' | 'started' | 'completed' | 'contacted' | 'converted' | 'archived' | null
   status: 'invited' | 'in_progress' | 'completed' | 'abandoned' | null
   created_at: string
@@ -124,8 +124,8 @@ export default function DashboardPage() {
   async function fetchCoachingSessions(client: SupabaseClient<Database>, tenantIdParam: string) {
     try {
       const { data: sessions, error: fetchError } = await (client
-        .from('participant_sessions') as any)
-        .select('id, stakeholder_name, stakeholder_email, client_status, status, created_at, started_at, completed_at, access_token')
+        .from('coaching_sessions') as any)
+        .select('id, client_name, client_email, client_status, status, created_at, started_at, completed_at, access_token')
         .eq('tenant_id', tenantIdParam)
         .order('created_at', { ascending: false }) as { data: CoachingSession[] | null; error: any }
 
@@ -428,11 +428,11 @@ export default function DashboardPage() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-foreground">
-                          {session.stakeholder_name}
+                          {session.client_name}
                         </h3>
                         <div className="flex items-center gap-2 mt-1 text-muted-foreground">
                           <Mail className="w-4 h-4" />
-                          <span className="text-sm">{session.stakeholder_email}</span>
+                          <span className="text-sm">{session.client_email}</span>
                         </div>
                         <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                           <span suppressHydrationWarning>
@@ -459,7 +459,20 @@ export default function DashboardPage() {
                           }`}>
                           {displayStatus}
                         </span>
-                        {tenantSlug && session.access_token && (
+                        {session.access_token && isCompleted && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                          >
+                            <Link href={`/reports/coaching/${session.access_token}`} target="_blank">
+                              <FileText className="w-4 h-4 mr-1.5" />
+                              View Report
+                            </Link>
+                          </Button>
+                        )}
+                        {tenantSlug && session.access_token && !isCompleted && (
                           <Button
                             variant="outline"
                             size="sm"
