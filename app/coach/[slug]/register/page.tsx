@@ -66,7 +66,7 @@ export default function RegisterPage() {
     setErrors({})
 
     try {
-      const response = await fetch(`/api/coach/${slug}/register`, {
+      const response = await fetch(`/flowforge/api/coach/${slug}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
