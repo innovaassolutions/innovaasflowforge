@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail, GraduationCap, Key } from 'lucide-react'
 import { apiUrl } from '@/lib/api-url'
 import { Button } from '@/components/ui/button'
 
@@ -38,6 +38,18 @@ interface UserProfile {
   user_type: 'consultant' | 'company' | 'admin' | 'coach' | null
 }
 
+interface SchoolInfo {
+  id: string
+  name: string
+  code: string
+}
+
+interface AccessCodeStats {
+  total: number
+  active: number
+  redeemed: number
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
@@ -51,8 +63,11 @@ export default function DashboardPage() {
   const [deletingCampaignId, setDeletingCampaignId] = useState<string | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [companiesCount, setCompaniesCount] = useState(0)
+  const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null)
+  const [accessCodeStats, setAccessCodeStats] = useState<AccessCodeStats>({ total: 0, active: 0, redeemed: 0 })
 
   const isCoach = userProfile?.user_type === 'coach'
+  const isSchool = userProfile?.user_type === 'company'
 
   useEffect(() => {
     const client = createClient()
@@ -93,6 +108,9 @@ export default function DashboardPage() {
           setTenantSlug(tenant.slug)
           await fetchCoachingSessions(client, tenant.id)
         }
+      } else if (userProfile.user_type === 'company') {
+        // School user - fetch school info and access code stats
+        await fetchSchoolInfo(client, user.id)
       } else {
         // Consultant/Admin - fetch campaigns
         await fetchCampaigns(client)
@@ -121,6 +139,64 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Error fetching coaching sessions:', err)
       setError('Failed to load coaching sessions')
+    }
+  }
+
+  async function fetchSchoolInfo(client: SupabaseClient<Database>, userId: string) {
+    try {
+      const { data: { session } } = await client.auth.getSession()
+      if (!session) return
+
+      // Fetch school info via API
+      const response = await fetch(apiUrl('api/education/schools'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.schools?.length > 0) {
+        // For school users, they typically have access to one school
+        const school = data.schools[0]
+        setSchoolInfo({
+          id: school.id,
+          name: school.name,
+          code: school.code
+        })
+
+        // Fetch access code stats for this school
+        await fetchAccessCodeStats(client, school.id)
+      }
+    } catch (err) {
+      console.error('Error fetching school info:', err)
+    }
+  }
+
+  async function fetchAccessCodeStats(client: SupabaseClient<Database>, schoolId: string) {
+    try {
+      const { data: { session } } = await client.auth.getSession()
+      if (!session) return
+
+      // Fetch access codes for this school
+      const response = await fetch(apiUrl(`api/education/access-codes?school_id=${schoolId}`), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.codes) {
+        const codes = data.codes
+        setAccessCodeStats({
+          total: codes.length,
+          active: codes.filter((c: any) => c.status === 'active').length,
+          redeemed: codes.filter((c: any) => c.status === 'redeemed').length
+        })
+      }
+    } catch (err) {
+      console.error('Error fetching access code stats:', err)
     }
   }
 
@@ -400,6 +476,121 @@ export default function DashboardPage() {
                   </div>
                 )
               })}
+            </div>
+          )}
+        </main>
+      </div>
+    )
+  }
+
+  // Render School Dashboard
+  if (isSchool) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Page Header */}
+        <div className="bg-card border-b border-border px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {schoolInfo?.name || 'Your school dashboard'}
+              </p>
+            </div>
+            <Button asChild className="bg-primary hover:bg-primary/90">
+              <Link href="/dashboard/education/access-codes">
+                <Key className="w-4 h-4 mr-2" />
+                Manage Access Codes
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <main className="px-8 py-8">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Link
+              href="/dashboard/education/schools"
+              className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <GraduationCap className="w-10 h-10 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">My School</p>
+                  <h3 className="text-lg font-bold text-foreground truncate">
+                    {schoolInfo?.name || 'Loading...'}
+                  </h3>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard/education/access-codes"
+              className="bg-card border border-border rounded-xl p-6 hover:border-success/50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <Key className="w-10 h-10 text-success" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Active Codes</p>
+                  <h3 className="text-4xl font-bold text-success">{accessCodeStats.active}</h3>
+                </div>
+              </div>
+            </Link>
+
+            <div className="bg-card border border-border rounded-xl p-6">
+              <div className="flex items-center gap-4">
+                <CheckCircle className="w-10 h-10 text-brand-teal" />
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium mb-1">Completed Assessments</p>
+                  <h3 className="text-4xl font-bold text-brand-teal">{accessCodeStats.redeemed}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+              <p className="text-muted-foreground mt-4">Loading...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-card border border-destructive/20 rounded-lg p-8 text-center">
+              <p className="text-destructive">{error}</p>
+            </div>
+          ) : (
+            <div className="bg-card border border-border rounded-lg p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Quick Actions
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Link
+                  href="/dashboard/education/schools"
+                  className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted transition-colors"
+                >
+                  <GraduationCap className="w-8 h-8 text-primary" />
+                  <div>
+                    <h3 className="font-medium text-foreground">View School Details</h3>
+                    <p className="text-sm text-muted-foreground">See school information and settings</p>
+                  </div>
+                </Link>
+                <Link
+                  href="/dashboard/education/access-codes"
+                  className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-muted transition-colors"
+                >
+                  <Key className="w-8 h-8 text-success" />
+                  <div>
+                    <h3 className="font-medium text-foreground">Manage Access Codes</h3>
+                    <p className="text-sm text-muted-foreground">Generate and track student codes</p>
+                  </div>
+                </Link>
+              </div>
+              {schoolInfo?.code && (
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">School Code</p>
+                  <p className="text-lg font-mono font-semibold text-foreground">{schoolInfo.code}</p>
+                </div>
+              )}
             </div>
           )}
         </main>
