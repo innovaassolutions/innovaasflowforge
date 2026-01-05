@@ -52,10 +52,10 @@ export async function POST(
       )
     }
 
-    // Find participant session by token
+    // Find coaching session by token
     const { data: session, error: sessionError } = await supabase
-      .from('participant_sessions')
-      .select('id, stakeholder_name, stakeholder_email, status, client_status, started_at')
+      .from('coaching_sessions')
+      .select('id, client_name, client_email, client_status, started_at')
       .eq('access_token', token)
       .eq('tenant_id', tenant.id)
       .single()
@@ -99,7 +99,7 @@ export async function POST(
       currentState,
       conversationHistory,
       tenantContext,
-      session.stakeholder_name
+      session.client_name
     )
 
     // Build updated conversation history
@@ -135,15 +135,13 @@ export async function POST(
     // Mark as started if first message
     if (!session.started_at) {
       updates.started_at = new Date().toISOString()
-      updates.client_status = 'started'
-      updates.status = 'in_progress'
+      updates.client_status = 'in_progress'
     }
 
     // Mark as completed if interview is done
     if (agentResponse.isComplete) {
       updates.completed_at = new Date().toISOString()
       updates.client_status = 'completed'
-      updates.status = 'completed'
       updates.metadata = {
         archetype_results: {
           default_archetype: agentResponse.sessionState.default_archetype,
@@ -156,7 +154,7 @@ export async function POST(
     }
 
     await supabase
-      .from('participant_sessions')
+      .from('coaching_sessions')
       .update(updates)
       .eq('id', session.id)
 

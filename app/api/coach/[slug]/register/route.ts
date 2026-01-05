@@ -1,7 +1,7 @@
 /**
  * Coach Registration API
  *
- * Creates a participant_session for a new client registration.
+ * Creates a coaching_session for a new client registration.
  * Generates a unique session token for assessment access.
  *
  * Story: 3-3-registration-sessions
@@ -75,12 +75,12 @@ export async function POST(
       )
     }
 
-    // Check if participant already exists for this tenant
+    // Check if client already exists for this tenant
     const { data: existingSession } = await supabase
-      .from('participant_sessions')
-      .select('id, access_token, status')
+      .from('coaching_sessions')
+      .select('id, access_token, client_status')
       .eq('tenant_id', tenant.id)
-      .eq('stakeholder_email', email)
+      .eq('client_email', email)
       .single()
 
     if (existingSession) {
@@ -96,15 +96,13 @@ export async function POST(
     // Generate unique session token
     const sessionToken = randomBytes(32).toString('base64url')
 
-    // Create new participant session
+    // Create new coaching session
     const { data: session, error: sessionError } = await supabase
-      .from('participant_sessions')
+      .from('coaching_sessions')
       .insert({
         tenant_id: tenant.id,
-        stakeholder_name: name,
-        stakeholder_email: email,
-        stakeholder_role: 'client', // Default role for coaching clients
-        status: 'invited',
+        client_name: name,
+        client_email: email,
         client_status: 'registered',
         access_token: sessionToken,
         access_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
@@ -118,7 +116,7 @@ export async function POST(
       .single()
 
     if (sessionError) {
-      console.error('Error creating participant session:', sessionError)
+      console.error('Error creating coaching session:', sessionError)
       return NextResponse.json(
         { success: false, error: 'Failed to create session' },
         { status: 500 }

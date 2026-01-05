@@ -45,10 +45,10 @@ export async function GET(
       )
     }
 
-    // Find participant session by token
+    // Find coaching session by token
     const { data: session, error: sessionError } = await supabase
-      .from('participant_sessions')
-      .select('id, stakeholder_name, stakeholder_email, status, client_status, metadata, started_at')
+      .from('coaching_sessions')
+      .select('id, client_name, client_email, client_status, metadata, started_at')
       .eq('access_token', token)
       .eq('tenant_id', tenant.id)
       .single()
@@ -90,9 +90,9 @@ export async function GET(
       success: true,
       session: {
         id: session.id,
-        stakeholder_name: session.stakeholder_name,
-        stakeholder_email: session.stakeholder_email,
-        status: session.status,
+        stakeholder_name: session.client_name,
+        stakeholder_email: session.client_email,
+        status: session.client_status,
         client_status: session.client_status,
       },
       isResuming,
