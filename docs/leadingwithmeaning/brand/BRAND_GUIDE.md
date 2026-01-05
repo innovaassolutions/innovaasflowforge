@@ -1,7 +1,7 @@
 # Leading with Meaning - Brand Guide
 
 > Brand reference documentation for FlowForge integration
-> Last Updated: 2025-12-31
+> Last Updated: 2026-01-05
 
 ---
 
@@ -35,56 +35,42 @@ Leadership coaching for emerging leaders who are:
 
 ## 3. Color Palette
 
-### Primary Colors (Inferred from Website)
+### Primary Colors (From Logo)
 
-Based on the website analysis, Leading with Meaning uses a **minimalist, professional palette**:
+The Leading with Meaning logo uses a **deep navy blue** as the primary brand color:
 
-| Color | Hex (Estimated) | Usage |
-|-------|-----------------|-------|
-| **Primary Dark** | `#1a1a2e` | Headlines, primary text |
-| **Primary Text** | `#333333` | Body text |
+| Color | Hex | Usage |
+|-------|-----|-------|
+| **Brand Navy** | `#1e3a5f` | Logo, primary buttons, headings |
+| **Brand Navy Hover** | `#153050` | Button hover states |
+| **Text Dark** | `#1a202c` | Primary body text |
+| **Text Muted** | `#4a5568` | Secondary text, captions |
 | **Background** | `#ffffff` | Page backgrounds |
-| **Background Alt** | `#f8f8f8` | Section backgrounds |
-| **Accent** | `#2d3436` | Buttons, borders |
-| **Accent Hover** | `#1a1a2e` | Button hover states |
+| **Background Subtle** | `#f7fafc` | Cards, input fields, sections |
+| **Border** | `#e2e8f0` | Borders, dividers |
 
-### Recommended FlowForge Theme
-
-For the archetype assessment, BMad Master recommends:
+### FlowForge Theme Configuration
 
 ```css
 :root {
-  /* Primary palette */
-  --lwm-primary: #1a1a2e;        /* Deep navy - professional, trustworthy */
-  --lwm-primary-light: #2d3436;  /* Lighter navy for hover states */
-  --lwm-text: #333333;           /* Dark gray for body text */
-  --lwm-text-muted: #666666;     /* Muted text for secondary content */
-
-  /* Backgrounds */
-  --lwm-bg: #ffffff;             /* White - clean, minimal */
-  --lwm-bg-subtle: #f8f9fa;      /* Light gray for cards/sections */
-  --lwm-bg-muted: #f0f0f0;       /* Slightly darker for hover states */
-
-  /* Accent (for CTAs, progress, active states) */
-  --lwm-accent: #4a5568;         /* Slate gray - professional accent */
-  --lwm-accent-hover: #2d3748;   /* Darker slate for hover */
-
-  /* Borders */
-  --lwm-border: #e2e8f0;         /* Light border */
-  --lwm-border-dark: #cbd5e0;    /* Darker border for emphasis */
-
-  /* Status colors */
-  --lwm-success: #48bb78;        /* Green for completion */
-  --lwm-warning: #ed8936;        /* Orange for attention */
+  /* Brand Colors - matched to logo */
+  --brand-primary: #1e3a5f;        /* Deep navy from logo */
+  --brand-primary-hover: #153050;  /* Darker navy for hover */
+  --brand-secondary: #2d4a6f;      /* Lighter navy accent */
+  --brand-bg: #ffffff;             /* White background */
+  --brand-bg-subtle: #f7fafc;      /* Light gray for cards */
+  --brand-text: #1a202c;           /* Dark text */
+  --brand-text-muted: #4a5568;     /* Muted gray text */
+  --brand-border: #e2e8f0;         /* Light border */
 }
 ```
 
 ### Color Notes
 
-- The website uses a **restrained, professional palette**
-- Avoids bright or saturated colors
-- Relies on **typography and whitespace** rather than color for hierarchy
-- **No orange or bold accent colors** - this is intentional brand positioning
+- Primary brand color is **deep navy blue** (#1e3a5f) - derived directly from the logo
+- The website uses a **clean, professional palette** with navy as the anchor
+- White backgrounds with navy accents create a trustworthy, calm aesthetic
+- Avoids bright or saturated colors - professional coaching positioning
 - The calm, minimal aesthetic reflects the coaching philosophy
 
 ---
@@ -92,8 +78,6 @@ For the archetype assessment, BMad Master recommends:
 ## 4. Typography
 
 ### Font Families
-
-The website appears to use Squarespace's default modern sans-serif stack. For FlowForge, recommend:
 
 **Primary Font:** Inter (already in FlowForge)
 **Fallback:** -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
@@ -121,31 +105,35 @@ The website appears to use Squarespace's default modern sans-serif stack. For Fl
 ## 5. Logo
 
 ### Logo Description
-- Simple, professional wordmark
-- "Clear background" version available (transparent PNG)
-- Minimal design without complex graphics
-- Works on both light and dark backgrounds
+- **Design:** Square frame containing stylized "LWM" letters with compass/directional element
+- **Text:** "LEADING WITH MEANING" with "COACHING" below
+- **Color:** Deep navy blue (#1e3a5f) on transparent/white background
+- **Style:** Professional, geometric, balanced
+
+### Logo Files
+- **Primary:** `lwm_logo.png` (transparent background, navy on white)
+- **Location:** `/docs/leadingwithmeaning/brand/lwm_logo.png`
+- **Also copied to:** `/public/brand/lwm_logo.png` for web access
 
 ### Logo Usage
-- Header: ~143px height (desktop), max 30px (mobile)
-- Centered or left-aligned in header
-- Adequate clear space around logo
+- Header: 120-180px width, maintain aspect ratio
+- Centered in branded pages
+- Adequate clear space around logo (minimum 20px)
+- Use on white or light backgrounds
 
-### Logo Assets Needed from Mark
-- [ ] Logo SVG (vector format)
-- [ ] Logo PNG (high-res, transparent background)
-- [ ] Logo PNG (dark version for light backgrounds)
-- [ ] Logo PNG (light version for dark backgrounds)
-- [ ] Favicon/icon version
+### Logo Assets
+- [x] Logo PNG (transparent background) - `lwm_logo.png`
+- [ ] Logo SVG (vector format) - request from Mark
+- [ ] Favicon/icon version - request from Mark
 
 ---
 
 ## 6. Visual Style
 
 ### Layout Principles
-- **Grid-based:** 8 columns (mobile), 24 columns (desktop)
-- **Generous padding:** 6vw (mobile), 4vw (desktop)
-- **Consistent gaps:** ~11px between elements
+- **Grid-based:** Responsive design
+- **Generous padding:** 24-40px on mobile, 40-60px on desktop
+- **Consistent spacing:** 16/24/32/48px scale
 - **Breathing room:** Ample whitespace between sections
 
 ### Component Styling
@@ -153,7 +141,7 @@ The website appears to use Squarespace's default modern sans-serif stack. For Fl
 **Buttons:**
 ```css
 .btn-primary {
-  background: var(--lwm-primary);
+  background: #1e3a5f;
   color: white;
   border-radius: 8px;
   padding: 12px 24px;
@@ -163,15 +151,15 @@ The website appears to use Squarespace's default modern sans-serif stack. For Fl
 }
 
 .btn-primary:hover {
-  background: var(--lwm-primary-light);
+  background: #153050;
 }
 ```
 
 **Cards:**
 ```css
 .card {
-  background: var(--lwm-bg);
-  border: 1px solid var(--lwm-border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 24px;
   box-shadow: none; /* Flat design, no shadows */
@@ -181,15 +169,15 @@ The website appears to use Squarespace's default modern sans-serif stack. For Fl
 **Input Fields:**
 ```css
 .input {
-  background: var(--lwm-bg-subtle);
-  border: 1px solid var(--lwm-border);
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 16px;
 }
 
 .input:focus {
-  border-color: var(--lwm-primary);
+  border-color: #1e3a5f;
   outline: none;
 }
 ```
@@ -260,45 +248,76 @@ The website appears to use Squarespace's default modern sans-serif stack. For Fl
 
 ### Session Interface
 - Clean, distraction-free design
-- LWM logo in header
-- Progress indicator in subtle accent color
+- **LWM logo prominently displayed in header**
+- Progress indicator in brand navy color
 - Generous whitespace around questions
 - Professional, calm aesthetic
 
 ### Report Design
 - Cover page with LWM branding
-- Section headers in primary dark color
-- Body text in standard text color
+- Section headers in brand navy (#1e3a5f)
+- Body text in dark gray (#1a202c)
 - Accent used sparingly for scores/highlights
 - Footer: "Prepared by Leading with Meaning"
 
 ### Email Communications
 - Simple, text-focused design
 - LWM logo in header
+- Brand navy for CTA buttons
 - Minimal graphics
 - Clear call-to-action buttons
 
 ---
 
-## 10. Assets Checklist
+## 10. Database Configuration
 
-### Needed from Mark
+### Tenant Profile brand_config
 
-- [ ] **Logo files** (SVG, PNG in multiple sizes)
-- [ ] **Color confirmation** (exact hex values if available)
-- [ ] **Font preference** (confirm Inter or specify alternative)
-- [ ] **Headshot** (high-res for reports)
-- [ ] **Brand guidelines** (if existing documentation exists)
-- [ ] **Favicon** (small icon for browser tab)
-
-### To Create
-
-- [ ] FlowForge theme configuration
-- [ ] Report PDF template
-- [ ] Email templates
-- [ ] Session UI mockups
+```json
+{
+  "logo": {
+    "url": "/brand/lwm_logo.png",
+    "alt": "Leading with Meaning",
+    "width": 180
+  },
+  "colors": {
+    "primary": "#1e3a5f",
+    "primaryHover": "#153050",
+    "secondary": "#2d4a6f",
+    "background": "#ffffff",
+    "backgroundSubtle": "#f7fafc",
+    "text": "#1a202c",
+    "textMuted": "#4a5568",
+    "border": "#e2e8f0"
+  },
+  "fonts": {
+    "heading": "Inter",
+    "body": "Inter"
+  },
+  "tagline": "Leadership Coaching",
+  "welcomeMessage": "Lead with clarity. Manage with confidence. Do your best work without losing yourself.",
+  "completionMessage": "Thank you for completing your Leadership Archetype Assessment. Your insights have been recorded and will help guide our coaching conversation.",
+  "showPoweredBy": true
+}
+```
 
 ---
 
-*Document prepared by BMad Master for FlowForge integration*
-*Version 1.0 | December 31, 2025*
+## 11. Assets Checklist
+
+### Available
+- [x] Logo PNG (transparent background)
+- [x] Brand colors (derived from logo)
+- [x] Typography specifications
+- [x] Component styling guide
+
+### Needed from Mark
+- [ ] Logo SVG (vector format for crisp scaling)
+- [ ] Favicon (small icon for browser tab)
+- [ ] Headshot (high-res for reports)
+- [ ] Confirmation of any color preferences
+
+---
+
+*Document prepared for FlowForge integration*
+*Version 2.0 | January 5, 2026*

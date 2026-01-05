@@ -36,13 +36,13 @@ SELECT
       "width": 180
     },
     "colors": {
-      "primary": "#1a1a2e",
-      "primaryHover": "#2d3436",
-      "secondary": "#4a5568",
+      "primary": "#1e3a5f",
+      "primaryHover": "#153050",
+      "secondary": "#2d4a6f",
       "background": "#ffffff",
-      "backgroundSubtle": "#f8f9fa",
-      "text": "#333333",
-      "textMuted": "#666666",
+      "backgroundSubtle": "#f7fafc",
+      "text": "#1a202c",
+      "textMuted": "#4a5568",
       "border": "#e2e8f0"
     },
     "fonts": {

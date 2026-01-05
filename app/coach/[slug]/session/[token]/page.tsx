@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { BrandedHeader } from '@/components/coaching/BrandedHeader'
+import Image from 'next/image'
 import { useTenant } from '@/lib/contexts/tenant-context'
 
 interface Message {
@@ -237,25 +237,34 @@ export default function SessionPage() {
       <header
         className="flex-shrink-0 border-b"
         style={{
-          backgroundColor: 'var(--brand-bg-subtle)',
+          backgroundColor: 'var(--brand-bg)',
           borderColor: 'var(--brand-border)',
         }}
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1
-                className="text-xl font-bold"
-                style={{
-                  color: 'var(--brand-text)',
-                  fontFamily: 'var(--brand-font-heading)',
-                }}
-              >
-                Leadership Archetype Discovery
-              </h1>
-              <p style={{ color: 'var(--brand-text-muted)' }}>
-                with {tenant.display_name}
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Logo */}
+              {tenant.brand_config.logo?.url ? (
+                <Image
+                  src={tenant.brand_config.logo.url}
+                  alt={tenant.brand_config.logo.alt || tenant.display_name}
+                  width={tenant.brand_config.logo.width || 140}
+                  height={50}
+                  className="h-10 sm:h-12 w-auto object-contain"
+                  unoptimized
+                />
+              ) : (
+                <h1
+                  className="text-xl font-bold"
+                  style={{
+                    color: 'var(--brand-primary)',
+                    fontFamily: 'var(--brand-font-heading)',
+                  }}
+                >
+                  {tenant.display_name}
+                </h1>
+              )}
             </div>
             {sessionState && !isComplete && (
               <div className="text-right">
