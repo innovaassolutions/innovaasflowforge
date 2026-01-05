@@ -27,7 +27,6 @@ interface CoachingSession {
   client_name: string
   client_email: string
   client_status: 'registered' | 'started' | 'completed' | 'contacted' | 'converted' | 'archived' | null
-  status: 'invited' | 'in_progress' | 'completed' | 'abandoned' | null
   created_at: string
   started_at: string | null
   completed_at: string | null
@@ -130,7 +129,7 @@ export default function DashboardPage() {
     try {
       const { data: sessions, error: fetchError } = await (client
         .from('coaching_sessions') as any)
-        .select('id, client_name, client_email, client_status, status, created_at, started_at, completed_at, access_token')
+        .select('id, client_name, client_email, client_status, created_at, started_at, completed_at, access_token')
         .eq('tenant_id', tenantIdParam)
         .order('created_at', { ascending: false }) as { data: CoachingSession[] | null; error: any }
 
@@ -313,13 +312,13 @@ export default function DashboardPage() {
     setShowDeleteConfirm(true)
   }
 
-  // Calculate coach stats - check both client_status (new) and status (legacy) fields
+  // Calculate coach stats
   const clientsCount = coachingSessions.length
   const completedCount = coachingSessions.filter(s =>
-    s.client_status === 'completed' || s.status === 'completed'
+    s.client_status === 'completed'
   ).length
   const inProgressCount = coachingSessions.filter(s =>
-    s.client_status === 'started' || s.status === 'in_progress'
+    s.client_status === 'started'
   ).length
 
   // Render Coach Dashboard
@@ -422,9 +421,9 @@ export default function DashboardPage() {
               </div>
               {coachingSessions.slice(0, 5).map((session) => {
                 // Determine effective status from both legacy and new status fields
-                const isCompleted = session.client_status === 'completed' || session.status === 'completed'
-                const isInProgress = session.client_status === 'started' || session.status === 'in_progress'
-                const displayStatus = isCompleted ? 'Completed' : isInProgress ? 'In Progress' : session.client_status || session.status || 'Pending'
+                const isCompleted = session.client_status === 'completed'
+                const isInProgress = session.client_status === 'started'
+                const displayStatus = isCompleted ? 'Completed' : isInProgress ? 'In Progress' : session.client_status || 'Pending'
 
                 return (
                   <div
