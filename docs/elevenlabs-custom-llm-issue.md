@@ -186,17 +186,53 @@ curl -s "https://innovaasflowforge.vercel.app/flowforge/api/voice/edge-llm" \
 
 ---
 
+## CRITICAL FINDING: ElevenLabs Never Reaches Our Endpoint
+
+We deployed a debug endpoint that logs ALL incoming requests to a Supabase database table. This provides definitive proof of the issue:
+
+### Debug Test Results (Jan 5, 2026 at 02:56 AM UTC)
+
+| Test | Time | User Agent | Logged to Supabase |
+|------|------|------------|-------------------|
+| curl test | 02:54:51 | `curl/8.7.1` | ✅ YES |
+| ElevenLabs conversation | 02:56:44-02:56:58 | Expected: ElevenLabs | ❌ NO |
+
+### What This Proves
+
+**ElevenLabs is NOT successfully connecting to our endpoint.** The request fails at the network level before reaching our server code.
+
+- Our endpoint logs every request to Supabase BEFORE processing
+- The curl test at 02:54:51 logged successfully
+- The ElevenLabs conversation at 02:56:44 produced ZERO log entries
+- The ElevenLabs dashboard shows "custom_llm generation failed" with 0 output tokens
+
+### Debug Endpoint Details
+
+- **Agent ID:** `agent_8401ke60x5j4f3av281her96xtn4`
+- **URL:** `https://innovaasflowforge.vercel.app/flowforge/api/voice/debug-llm`
+- **Logging:** Supabase `debug_logs` table (timestamps, headers, body preview)
+
+### Conclusion
+
+This is a **connectivity issue between ElevenLabs infrastructure and Vercel**, not a response format issue. Our endpoint:
+1. Is publicly accessible (curl works)
+2. Returns valid SSE responses
+3. Logs all requests to database
+4. Never receives requests from ElevenLabs during Custom LLM calls
+
+---
+
 ## Questions for ElevenLabs Support
 
-1. Is ElevenLabs actually calling our Custom LLM endpoint for the second turn? The conversation shows 787 input tokens but 0 output, suggesting a connection or parsing issue.
+1. **Why is ElevenLabs not reaching our endpoint?** Our Supabase logs prove that requests from ElevenLabs never arrive at our server, while curl requests from the same region work fine.
 
-2. Are there any specific requirements for Custom LLM endpoints hosted on Vercel that we should be aware of?
+2. **Is there a network/firewall issue between ElevenLabs infrastructure and Vercel?** Our endpoint is publicly accessible and returns valid responses to direct HTTP requests.
 
-3. Is there a way to see detailed logs of what ElevenLabs sends to our Custom LLM and what response it receives?
+3. **Can you provide detailed request logs?** We need to see what ElevenLabs is actually sending and what error occurs. The "787 input tokens, 0 output tokens" suggests a connection failure, not a response parsing issue.
 
-4. Are there timeout requirements for the first byte of the response that might differ from standard HTTP timeouts?
+4. **Are there specific requirements for Vercel-hosted endpoints?** Other hosting providers? IP allowlisting? Specific TLS requirements?
 
-5. Does ElevenLabs use any specific HTTP client or have any requirements around chunked transfer encoding for SSE responses?
+5. **Can you test our endpoint from your infrastructure?** URL: `https://innovaasflowforge.vercel.app/flowforge/api/voice/debug-llm`
 
 ---
 
