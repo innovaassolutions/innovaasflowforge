@@ -93,7 +93,7 @@ export default function DashboardPage() {
       const userProfile = profile as UserProfile
       setUserProfile(userProfile)
 
-      // If coach, fetch tenant info and coaching sessions
+      // If coach, fetch tenant info, coaching sessions, AND campaigns
       if (userProfile.user_type === 'coach') {
         const { data: tenant, error: tenantError } = await (client
           .from('tenant_profiles') as any)
@@ -112,9 +112,13 @@ export default function DashboardPage() {
         } else {
           setError('No tenant profile found for this coach')
         }
+        // Also fetch campaigns for coaches
+        await fetchCampaigns(client)
       } else if (userProfile.user_type === 'company') {
-        // School user - fetch school info and access code stats
+        // School user - fetch school info, access code stats, AND campaigns
         await fetchSchoolInfo(client, user.id)
+        // Also fetch campaigns for schools/institutions
+        await fetchCampaigns(client)
       } else {
         // Consultant/Admin - fetch campaigns
         await fetchCampaigns(client)
@@ -494,6 +498,73 @@ export default function DashboardPage() {
               })}
             </div>
           )}
+
+          {/* Campaigns Section for Coaches */}
+          {campaigns.length > 0 && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Your Campaigns
+                </h2>
+                <Link href="/dashboard/campaigns/new" className="text-sm text-emerald-600 hover:text-emerald-700">
+                  Create new campaign
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {campaigns.slice(0, 5).map((campaign) => (
+                  <Link
+                    key={campaign.id}
+                    href={`/dashboard/campaigns/${campaign.id}`}
+                    className="block bg-card border border-border rounded-lg p-6 transition-colors hover:border-emerald-500/30"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {campaign.name}
+                        </h3>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                          <span suppressHydrationWarning>
+                            Created {new Date(campaign.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          campaign.status === 'active'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : campaign.status === 'completed'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}>
+                        {campaign.status}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state for campaigns */}
+          {campaigns.length === 0 && !loading && (
+            <div className="mt-8 bg-card border border-border rounded-lg p-8 text-center">
+              <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-3 text-md font-semibold text-foreground">
+                No campaigns yet
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Create a campaign to send assessment invites to participants.
+              </p>
+              <div className="mt-4">
+                <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+                  <Link href="/dashboard/campaigns/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Campaign
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     )
@@ -607,6 +678,73 @@ export default function DashboardPage() {
                   <p className="text-lg font-mono font-semibold text-foreground">{schoolInfo.code}</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Campaigns Section for Schools */}
+          {campaigns.length > 0 && (
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Your Campaigns
+                </h2>
+                <Link href="/dashboard/campaigns/new" className="text-sm text-primary hover:text-primary/80">
+                  Create new campaign
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {campaigns.slice(0, 5).map((campaign) => (
+                  <Link
+                    key={campaign.id}
+                    href={`/dashboard/campaigns/${campaign.id}`}
+                    className="block bg-card border border-border rounded-lg p-6 transition-colors hover:border-primary/50"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {campaign.name}
+                        </h3>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                          <span suppressHydrationWarning>
+                            Created {new Date(campaign.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          campaign.status === 'active'
+                            ? 'bg-[hsl(var(--accent-subtle))] text-primary'
+                            : campaign.status === 'completed'
+                            ? 'bg-[hsl(var(--success-subtle))] text-[hsl(var(--success))]'
+                            : 'bg-muted text-muted-foreground'
+                        }`}>
+                        {campaign.status}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state for campaigns */}
+          {campaigns.length === 0 && !loading && (
+            <div className="mt-8 bg-card border border-border rounded-lg p-8 text-center">
+              <BarChart3 className="mx-auto h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-3 text-md font-semibold text-foreground">
+                No campaigns yet
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Create a campaign to send assessment invites to students.
+              </p>
+              <div className="mt-4">
+                <Button asChild>
+                  <Link href="/dashboard/campaigns/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Campaign
+                  </Link>
+                </Button>
+              </div>
             </div>
           )}
         </main>

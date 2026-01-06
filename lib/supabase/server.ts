@@ -209,3 +209,39 @@ export async function getTenantForUser(userId: string): Promise<TenantProfile | 
 
   return data as unknown as TenantProfile
 }
+
+/**
+ * Get the tenant profile for a session by its access token
+ * Looks up: session → campaign → tenant_id → tenant_profile
+ * Used for applying branding to session pages
+ */
+export async function getTenantBySessionToken(accessToken: string): Promise<TenantProfile | null> {
+  const supabase = getSupabaseAdmin()
+
+  // First, get the campaign assignment by access token
+  const { data: assignment, error: assignmentError } = (await supabase
+    .from('campaign_assignments')
+    .select('campaign_id')
+    .eq('access_token', accessToken)
+    .single()) as { data: { campaign_id: string } | null, error: any }
+
+  if (assignmentError || !assignment) {
+    console.error('Error fetching assignment by token:', assignmentError?.message)
+    return null
+  }
+
+  // Get the campaign with tenant_id
+  const { data: campaign, error: campaignError } = (await supabase
+    .from('campaigns')
+    .select('tenant_id')
+    .eq('id', assignment.campaign_id)
+    .single()) as { data: { tenant_id: string | null } | null, error: any }
+
+  if (campaignError || !campaign || !campaign.tenant_id) {
+    // Campaign may not have a tenant (legacy campaigns)
+    return null
+  }
+
+  // Fetch the tenant profile
+  return getTenantById(campaign.tenant_id)
+}

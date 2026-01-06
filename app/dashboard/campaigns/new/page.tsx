@@ -34,6 +34,40 @@ interface StakeholderSelection {
 interface UserProfile {
   full_name: string | null
   email: string | null
+  user_type: string | null
+}
+
+interface TenantProfile {
+  id: string
+  tenant_type: 'coach' | 'consultant' | 'school'
+  enabled_assessments: string[]
+}
+
+interface SimpleParticipant {
+  name: string
+  email: string
+}
+
+// Assessment types and their labels
+const ASSESSMENT_TYPES = {
+  industry4: { label: 'Industry 4.0 Readiness', description: 'Digital transformation assessment for companies' },
+  archetype: { label: 'Leadership Archetype', description: 'Individual leadership style assessment' },
+  education: { label: 'Education Assessment', description: 'Learning and development assessment' },
+  custom: { label: 'Custom Assessment', description: 'Custom configured assessment' }
+}
+
+// Map tenant type to available assessment types
+function getAssessmentTypesForTenant(tenantType: string | null): string[] {
+  switch (tenantType) {
+    case 'coach':
+      return ['archetype', 'custom']
+    case 'consultant':
+      return ['industry4', 'custom']
+    case 'school':
+      return ['education', 'custom']
+    default:
+      return ['industry4'] // Default for legacy users
+  }
 }
 
 const ROLE_TYPES = [
@@ -73,6 +107,13 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
   const [selectedStakeholders, setSelectedStakeholders] = useState<StakeholderSelection[]>([])
   const [showNewStakeholderForm, setShowNewStakeholderForm] = useState(false)
 
+  // New state for unified campaign system
+  const [tenantProfile, setTenantProfile] = useState<TenantProfile | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [assessmentType, setAssessmentType] = useState<string>('')
+  const [simpleParticipants, setSimpleParticipants] = useState<SimpleParticipant[]>([])
+  const [newParticipant, setNewParticipant] = useState({ name: '', email: '' })
+
   const [formData, setFormData] = useState({
     campaignName: '',
     companyProfileId: initialCompanyId || '',
@@ -80,6 +121,9 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
     facilitatorEmail: '',
     description: ''
   })
+
+  // Check if current assessment type requires company selection
+  const requiresCompany = assessmentType === 'industry4'
 
   const [newStakeholder, setNewStakeholder] = useState({
     fullName: '',
@@ -109,6 +153,40 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
+      // Fetch user profile (includes user_type)
+      const { data: profile } = (await supabase
+        .from('user_profiles')
+        .select('full_name, email, user_type')
+        .eq('id', session.user.id)
+        .single()) as { data: UserProfile | null, error: any }
+
+      if (profile) {
+        setUserProfile(profile)
+        setFormData(prev => ({
+          ...prev,
+          facilitatorName: profile.full_name || '',
+          facilitatorEmail: profile.email || ''
+        }))
+      }
+
+      // Fetch tenant profile for assessment type filtering
+      const { data: tenant } = (await supabase
+        .from('tenant_profiles')
+        .select('id, tenant_type, enabled_assessments')
+        .eq('user_id', session.user.id)
+        .single()) as { data: TenantProfile | null, error: any }
+
+      if (tenant) {
+        setTenantProfile(tenant)
+        // Set default assessment type based on tenant type
+        const availableTypes = getAssessmentTypesForTenant(tenant.tenant_type)
+        setAssessmentType(availableTypes[0] || 'industry4')
+      } else {
+        // Legacy user - default to industry4
+        setAssessmentType('industry4')
+      }
+
+      // Fetch companies (only needed for industry4 assessments, but load anyway for flexibility)
       const response = await fetch(apiUrl('api/company-profiles'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
@@ -117,23 +195,6 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
 
       const data = await response.json()
       setCompanies(data.companies || [])
-
-      // If we have an initial company ID from URL, load user profile to pre-fill facilitator fields
-      if (initialCompanyId) {
-        const { data: profile } = (await supabase
-          .from('user_profiles')
-          .select('full_name, email')
-          .eq('id', session.user.id)
-          .single()) as { data: UserProfile | null, error: any }
-
-        if (profile) {
-          setFormData(prev => ({
-            ...prev,
-            facilitatorName: profile.full_name || '',
-            facilitatorEmail: profile.email || ''
-          }))
-        }
-      }
     } catch (err) {
       console.error('Error loading companies:', err)
       setError('Failed to load companies')
@@ -221,17 +282,46 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
     setSelectedStakeholders(selectedStakeholders.filter((_, i) => i !== index))
   }
 
+  // Simple participant functions (for non-company campaigns)
+  function addSimpleParticipant() {
+    if (!newParticipant.name || !newParticipant.email) {
+      setError('Please fill in participant name and email')
+      return
+    }
+    setSimpleParticipants([...simpleParticipants, { ...newParticipant }])
+    setNewParticipant({ name: '', email: '' })
+    setError(null)
+  }
+
+  function removeSimpleParticipant(index: number) {
+    setSimpleParticipants(simpleParticipants.filter((_, i) => i !== index))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    if (!formData.campaignName || !formData.companyProfileId) {
-      setError('Please fill in all required fields')
+    if (!formData.campaignName) {
+      setError('Please enter a campaign name')
       return
     }
 
-    if (selectedStakeholders.length === 0) {
-      setError('Please select or add at least one stakeholder')
+    // Company required only for industry4 assessments
+    if (requiresCompany && !formData.companyProfileId) {
+      setError('Please select a company for Industry 4.0 assessments')
       return
+    }
+
+    // Check for participants based on assessment type
+    if (requiresCompany) {
+      if (selectedStakeholders.length === 0) {
+        setError('Please select or add at least one stakeholder')
+        return
+      }
+    } else {
+      if (simpleParticipants.length === 0) {
+        setError('Please add at least one participant')
+        return
+      }
     }
 
     setSubmitting(true)
@@ -246,20 +336,31 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
         return
       }
 
+      // Build request body based on assessment type
+      const requestBody: Record<string, any> = {
+        name: formData.campaignName,
+        assessmentType: assessmentType,
+        facilitatorName: formData.facilitatorName,
+        facilitatorEmail: formData.facilitatorEmail,
+        description: formData.description,
+      }
+
+      if (requiresCompany) {
+        // Industry 4.0 assessment - needs company and stakeholders
+        requestBody.companyProfileId = formData.companyProfileId
+        requestBody.stakeholders = selectedStakeholders
+      } else {
+        // Non-company campaigns - use simple participants
+        requestBody.participants = simpleParticipants
+      }
+
       const response = await fetch(apiUrl('api/campaigns'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`
         },
-        body: JSON.stringify({
-          name: formData.campaignName,
-          companyProfileId: formData.companyProfileId,
-          facilitatorName: formData.facilitatorName,
-          facilitatorEmail: formData.facilitatorEmail,
-          description: formData.description,
-          stakeholders: selectedStakeholders
-        })
+        body: JSON.stringify(requestBody)
       })
 
       const data = await response.json()
@@ -270,7 +371,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
 
       // Store campaign data and show success modal with access links
       setCreatedCampaignId(data.campaign.id)
-      setStakeholderLinks(data.stakeholderAssignments || [])
+      setStakeholderLinks(data.participantAssignments || [])
       setSuccess(true)
     } catch (err) {
       console.error('Error creating campaign:', err)
@@ -317,24 +418,65 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
             <h2 className="text-lg font-semibold text-foreground mb-4">Campaign Details</h2>
 
             <div className="space-y-4">
+              {/* Assessment Type Selector */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Company <span className="text-destructive">*</span>
+                  Assessment Type <span className="text-destructive">*</span>
                 </label>
-                <select
-                  value={formData.companyProfileId}
-                  onChange={(e) => updateField('companyProfileId', e.target.value)}
-                  required
-                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="">Select a company...</option>
-                  {companies.map(company => (
-                    <option key={company.id} value={company.id}>
-                      {company.company_name}
-                    </option>
-                  ))}
-                </select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {getAssessmentTypesForTenant(tenantProfile?.tenant_type || null).map(type => {
+                    const typeInfo = ASSESSMENT_TYPES[type as keyof typeof ASSESSMENT_TYPES]
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => {
+                          setAssessmentType(type)
+                          // Clear company selection when switching away from industry4
+                          if (type !== 'industry4') {
+                            updateField('companyProfileId', '')
+                          }
+                        }}
+                        className={`p-4 rounded-lg border-2 text-left transition-colors ${
+                          assessmentType === type
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-background hover:border-muted hover:bg-muted'
+                        }`}
+                      >
+                        <div className="font-medium text-foreground">{typeInfo?.label || type}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{typeInfo?.description || ''}</div>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
+
+              {/* Company selector - only for industry4 assessments */}
+              {requiresCompany && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Company <span className="text-destructive">*</span>
+                  </label>
+                  <select
+                    value={formData.companyProfileId}
+                    onChange={(e) => updateField('companyProfileId', e.target.value)}
+                    required={requiresCompany}
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">Select a company...</option>
+                    {companies.map(company => (
+                      <option key={company.id} value={company.id}>
+                        {company.company_name}
+                      </option>
+                    ))}
+                  </select>
+                  {companies.length === 0 && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      No companies found. <Link href="/dashboard/companies/new" className="text-primary hover:underline">Add a company</Link> first.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
@@ -393,8 +535,75 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
             </div>
           </div>
 
-          {/* Stakeholder Selection */}
-          {formData.companyProfileId && (
+          {/* Simple Participants - for non-company campaigns (coaches, institutions) */}
+          {!requiresCompany && (
+            <div className="bg-card rounded-lg p-6 border border-border">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
+                Add Participants <span className="text-destructive">*</span>
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Add the people who will complete this assessment. They will receive a unique access link.
+              </p>
+
+              {/* Add Participant Form */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <input
+                  type="text"
+                  value={newParticipant.name}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, name: e.target.value })}
+                  placeholder="Participant Name"
+                  className="flex-1 px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+                <input
+                  type="email"
+                  value={newParticipant.email}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, email: e.target.value })}
+                  placeholder="Email Address"
+                  className="flex-1 px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+                <button
+                  type="button"
+                  onClick={addSimpleParticipant}
+                  className="px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-[hsl(var(--accent-hover))] transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+
+              {/* Participants List */}
+              {simpleParticipants.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-foreground mb-3">
+                    Participants ({simpleParticipants.length}):
+                  </h3>
+                  <div className="space-y-2">
+                    {simpleParticipants.map((participant, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-background border border-border rounded-lg"
+                      >
+                        <div>
+                          <div className="font-medium text-foreground">{participant.name}</div>
+                          <div className="text-xs text-muted-foreground">{participant.email}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeSimpleParticipant(index)}
+                          className="text-destructive hover:text-destructive/80 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Stakeholder Selection - for company-based campaigns (industry4) */}
+          {requiresCompany && formData.companyProfileId && (
             <div className="bg-card rounded-lg p-6 border border-border">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 Assign Stakeholders <span className="text-destructive">*</span>
@@ -567,7 +776,7 @@ function NewCampaignForm({ initialCompanyId }: { initialCompanyId: string | null
             </Link>
             <button
               type="submit"
-              disabled={submitting || selectedStakeholders.length === 0}
+              disabled={submitting || (requiresCompany ? selectedStakeholders.length === 0 : simpleParticipants.length === 0)}
               className="px-6 py-2 bg-primary hover:bg-[hsl(var(--accent-hover))] rounded-lg text-primary-foreground font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Creating Campaign...' : 'Create Campaign'}

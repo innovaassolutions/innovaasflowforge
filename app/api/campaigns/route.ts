@@ -17,11 +17,17 @@ interface StakeholderInput {
 
 interface CreateCampaignRequest {
   name: string
-  companyProfileId: string // Required: which company is this campaign for
+  companyProfileId?: string // Optional: only required for industry4 assessment type
+  assessmentType?: 'industry4' | 'archetype' | 'education' | 'custom' // Assessment type
   facilitatorName: string
   facilitatorEmail: string
   description?: string
   stakeholders: StakeholderInput[]
+  // For non-company campaigns (coaches/institutions), simple participants
+  participants?: Array<{
+    name: string
+    email: string
+  }>
 }
 
 /**
@@ -39,17 +45,32 @@ export async function POST(request: NextRequest) {
   try {
     const body: CreateCampaignRequest = await request.json()
 
+    // Determine assessment type (default to industry4 for backward compatibility)
+    const assessmentType = body.assessmentType || 'industry4'
+
     // Validate required fields
-    if (!body.name || !body.companyProfileId || !body.facilitatorName || !body.facilitatorEmail) {
+    if (!body.name || !body.facilitatorName || !body.facilitatorEmail) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, companyProfileId, facilitatorName, facilitatorEmail' },
+        { error: 'Missing required fields: name, facilitatorName, facilitatorEmail' },
         { status: 400 }
       )
     }
 
-    if (!body.stakeholders || body.stakeholders.length === 0) {
+    // Company is only required for industry4 assessment type
+    if (assessmentType === 'industry4' && !body.companyProfileId) {
       return NextResponse.json(
-        { error: 'At least one stakeholder is required' },
+        { error: 'Company profile is required for Industry 4.0 assessments' },
+        { status: 400 }
+      )
+    }
+
+    // Validate participants - either stakeholders (company-based) or participants (simple)
+    const hasStakeholders = body.stakeholders && body.stakeholders.length > 0
+    const hasParticipants = body.participants && body.participants.length > 0
+
+    if (!hasStakeholders && !hasParticipants) {
+      return NextResponse.json(
+        { error: 'At least one participant or stakeholder is required' },
         { status: 400 }
       )
     }
@@ -102,46 +123,71 @@ export async function POST(request: NextRequest) {
       email: user.email
     })
 
-    // Verify user has access to this company profile
-    const { data: companyProfile, error: companyError } = await supabase
-      .from('company_profiles')
-      .select('*')
-      .eq('id', body.companyProfileId)
-      .single()
+    // Fetch user's tenant_id from their tenant_profile
+    const { data: tenantProfile } = (await supabaseAdmin
+      .from('tenant_profiles')
+      .select('id, display_name')
+      .eq('user_id', user.id)
+      .single()) as any
 
-    if (companyError || !companyProfile) {
-      console.error('❌ Company profile error:', {
-        error: companyError,
-        companyProfileId: body.companyProfileId
+    // tenant_id is optional - some legacy users may not have tenant profiles
+    const tenantId = tenantProfile?.id || null
+    console.log('📋 Tenant profile:', tenantId ? `Found (${tenantProfile?.display_name})` : 'Not found (legacy user)')
+
+    // Company profile validation - only required for industry4 assessment type
+    let companyProfile: { id: string; company_name: string } | null = null
+
+    if (assessmentType === 'industry4') {
+      // Verify user has access to this company profile
+      const { data: company, error: companyError } = await supabase
+        .from('company_profiles')
+        .select('*')
+        .eq('id', body.companyProfileId)
+        .single()
+
+      if (companyError || !company) {
+        console.error('❌ Company profile error:', {
+          error: companyError,
+          companyProfileId: body.companyProfileId
+        })
+        return NextResponse.json(
+          {
+            error: 'Company profile not found or you do not have access to it',
+            details: companyError?.message
+          },
+          { status: 404 }
+        )
+      }
+
+      companyProfile = { id: company.id, company_name: company.company_name }
+      console.log('✅ Company profile found:', {
+        companyId: companyProfile!.id,
+        companyName: companyProfile!.company_name
       })
-      return NextResponse.json(
-        {
-          error: 'Company profile not found or you do not have access to it',
-          details: companyError?.message
-        },
-        { status: 404 }
-      )
     }
 
-    console.log('✅ Company profile found:', {
-      companyId: companyProfile.id,
-      companyName: companyProfile.company_name
-    })
+    // Create campaign with tenant association
+    const campaignData: Record<string, any> = {
+      name: body.name,
+      campaign_type: 'industry_4_0_readiness', // Legacy field
+      assessment_type: assessmentType,
+      facilitator_name: body.facilitatorName,
+      facilitator_email: body.facilitatorEmail,
+      description: body.description,
+      status: 'active',
+      created_by: user.id,
+      tenant_id: tenantId, // Link to tenant for branding and filtering
+    }
 
-    // Create campaign linked to company profile
+    // Add company fields only for industry4 assessments
+    if (companyProfile) {
+      campaignData.company_name = companyProfile.company_name // Backward compatibility
+      campaignData.company_profile_id = body.companyProfileId
+    }
+
     const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
-      .insert({
-        name: body.name,
-        campaign_type: 'industry_4_0_readiness',
-        company_name: companyProfile.company_name, // Keep for backward compatibility
-        company_profile_id: body.companyProfileId,
-        facilitator_name: body.facilitatorName,
-        facilitator_email: body.facilitatorEmail,
-        description: body.description,
-        status: 'active',
-        created_by: user.id
-      } as any)
+      .insert(campaignData)
       .select()
       .single() as any
 
@@ -153,13 +199,65 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Process stakeholders: create profiles if needed, then create assignments
-    const stakeholderAssignments: Array<{
+    // Process participants: either stakeholders (company-based) or simple participants
+    const participantAssignments: Array<{
       stakeholder_name: string
       stakeholder_email: string
       access_token: string
       access_link: string
     }> = []
+
+    // Helper to generate access link
+    const generateAccessLink = (token: string) => {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+      return `${baseUrl}${basePath}/session/${token}`
+    }
+
+    // Process simple participants (non-company campaigns: coaches, institutions)
+    if (hasParticipants && body.participants) {
+      console.log(`📋 Processing ${body.participants.length} simple participants`)
+
+      for (const participant of body.participants) {
+        if (!participant.name || !participant.email) {
+          console.error('Missing participant data:', participant)
+          continue
+        }
+
+        const accessToken = generateAccessToken()
+
+        // Create campaign assignment without stakeholder profile
+        const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
+          .from('campaign_assignments')
+          .insert({
+            campaign_id: campaign.id,
+            stakeholder_name: participant.name,
+            stakeholder_email: participant.email,
+            access_token: accessToken,
+            status: 'invited'
+          } as any)
+          .select()
+          .single()) as any
+
+        if (assignmentError) {
+          console.error(`❌ Assignment creation FAILED for ${participant.email}:`, assignmentError)
+          continue
+        }
+
+        participantAssignments.push({
+          stakeholder_name: participant.name,
+          stakeholder_email: participant.email,
+          access_token: accessToken,
+          access_link: generateAccessLink(accessToken)
+        })
+
+        console.log(`✅ Created assignment for ${participant.name} (${participant.email})`)
+      }
+    }
+
+    // Process stakeholders (company-based campaigns: industry4)
+    if (hasStakeholders && body.stakeholders) {
+      console.log(`📋 Processing ${body.stakeholders.length} stakeholders`)
 
     for (const stakeholder of body.stakeholders) {
       let stakeholderProfileId = stakeholder.stakeholderProfileId
@@ -274,26 +372,22 @@ export async function POST(request: NextRequest) {
 
       console.log(`✅ Assignment created successfully:`, assignmentData.id)
 
-      // Generate access link (include basePath for FlowForge proxy)
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
-      const accessLink = `${baseUrl}${basePath}/session/${accessToken}`
-
       // Store assignment info for response (no email sending)
-      stakeholderAssignments.push({
+      participantAssignments.push({
         stakeholder_name: stakeholderName,
         stakeholder_email: stakeholderEmail,
         access_token: accessToken,
-        access_link: accessLink
+        access_link: generateAccessLink(accessToken)
       })
 
       console.log(`✅ Created assignment for ${stakeholderName} (${stakeholderEmail})`)
     }
+    } // End stakeholder processing block
 
     return NextResponse.json({
       success: true,
       campaign,
-      stakeholderAssignments
+      participantAssignments
     }, { status: 201 })
 
   } catch (error) {
