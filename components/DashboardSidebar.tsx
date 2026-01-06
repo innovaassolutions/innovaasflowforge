@@ -140,8 +140,8 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  // Campaigns - shown after Schools (consultants only)
-  const campaignNavItems = hasIndustryAccess ? [
+  // Campaigns - shown for all tenant types (coaches, consultants, institutions)
+  const campaignNavItems = (isCoach || isSchool || hasIndustryAccess) ? [
     {
       name: 'Campaigns',
       href: '/dashboard/campaigns',
