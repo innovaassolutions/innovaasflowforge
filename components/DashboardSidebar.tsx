@@ -15,7 +15,8 @@ import {
   Shield,
   UserCog,
   GraduationCap,
-  UserCircle
+  UserCircle,
+  Palette
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -149,7 +150,17 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems]
+  // Branding settings - shown for all tenant users (coaches, consultants, schools)
+  const brandingNavItems = (isCoach || isSchool || isConsultantOrAdmin) && userProfile?.user_type !== 'admin' ? [
+    {
+      name: 'Branding',
+      href: '/dashboard/settings/branding',
+      icon: Palette,
+      matchPaths: ['/dashboard/settings/branding']
+    }
+  ] : []
+
+  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...brandingNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
