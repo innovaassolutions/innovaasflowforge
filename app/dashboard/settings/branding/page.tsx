@@ -304,7 +304,7 @@ export default function BrandingSettingsPage() {
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('public')
+        .from('tenant-assets')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true,
@@ -318,7 +318,7 @@ export default function BrandingSettingsPage() {
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('public')
+        .from('tenant-assets')
         .getPublicUrl(filePath)
 
       // Update form state
