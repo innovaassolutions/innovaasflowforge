@@ -1,104 +1,23 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ShieldAlert } from 'lucide-react'
-
-// Disable static generation for auth pages
-export const dynamic = 'force-dynamic'
-
-/**
- * SIGNUP DISABLED
- *
- * Self-registration is currently disabled. New users must be created by an administrator.
- * The original signup functionality is preserved below (commented out) for future reference.
- */
-export default function SignupPage() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
-        <div className="bg-card rounded-xl p-8 shadow-lg border border-border
-                        md:p-12">
-          <div className="flex flex-col items-center gap-8
-                          md:flex-row md:items-center md:gap-12">
-            {/* Message Content */}
-            <div className="flex-1 flex flex-col items-center text-center
-                            md:items-start md:text-left">
-              {/* Icon */}
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                <ShieldAlert className="w-8 h-8 text-muted-foreground" />
-              </div>
-
-              {/* Message */}
-              <h1 className="text-2xl font-bold text-foreground mb-3">
-                Registration by Invitation Only
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                New accounts are created by your organization administrator.
-                If you need access, please contact your administrator.
-              </p>
-
-              {/* Divider */}
-              <div className="w-full border-t border-border my-6"></div>
-
-              {/* Already have account */}
-              <p className="text-muted-foreground text-sm mb-4">
-                Already have an account?
-              </p>
-              <Link
-                href="/auth/login"
-                className="w-full bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors text-center block
-                           md:w-auto">
-                Sign In
-              </Link>
-            </div>
-
-            {/* Illustration */}
-            <div className="hidden md:flex flex-shrink-0 items-center justify-center">
-              <Image
-                src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
-                alt="Welcome"
-                width={280}
-                height={280}
-                className="object-contain"
-                priority
-                unoptimized
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* =============================================================================
- * ORIGINAL SIGNUP FUNCTIONALITY (PRESERVED FOR FUTURE REFERENCE)
- * =============================================================================
- *
- * To re-enable self-registration:
- * 1. Uncomment the code below
- * 2. Replace the current SignupPage component with SignupPageOriginal
- * 3. Remove or comment out the disabled version above
- *
-
 'use client'
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import SocialAuthButtons from '@/components/social-auth-buttons'
-import { Building2, Users } from 'lucide-react'
 
-function SignupPageOriginal() {
+// Disable static generation for auth pages
+export const dynamic = 'force-dynamic'
+
+export default function SignupPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    userType: 'consultant' as 'consultant' | 'company',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -135,7 +54,7 @@ function SignupPageOriginal() {
         options: {
           data: {
             full_name: formData.fullName,
-            user_type: formData.userType,
+            user_type: 'coach',
           },
         },
       })
@@ -161,14 +80,177 @@ function SignupPageOriginal() {
     })
   }
 
-  function setUserType(type: 'consultant' | 'company') {
-    setFormData({
-      ...formData,
-      userType: type,
-    })
+  if (success) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
+            <div className="flex flex-col md:flex-row md:items-center md:gap-8">
+              <div className="flex-1 text-center md:text-left">
+                <h1 className="text-3xl font-bold text-foreground mb-4">
+                  Check Your Email
+                </h1>
+                <p className="text-muted-foreground mb-6">
+                  We've sent a confirmation link to <strong>{formData.email}</strong>.
+                  Please check your inbox and click the link to activate your account.
+                </p>
+                <p className="text-muted-foreground text-sm mb-6">
+                  Didn't receive the email? Check your spam folder or try signing up again.
+                </p>
+                <Link
+                  href="/auth/login"
+                  className="inline-block bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors">
+                  Go to Sign In
+                </Link>
+              </div>
+              <div className="hidden md:flex md:items-center md:justify-center">
+                <Image
+                  src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
+                  alt="Welcome"
+                  width={280}
+                  height={280}
+                  className="object-contain"
+                  priority
+                  unoptimized
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  // ... rest of original component JSX
-}
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        <div className="bg-card rounded-lg p-8 shadow-lg border border-border">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-8">
+            {/* Left side - Form content */}
+            <div className="flex-1">
+              <div className="text-center md:text-left mb-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  Create Account
+                </h1>
+                <p className="text-muted-foreground">
+                  Join Innovaas FlowForge as a coach
+                </p>
+              </div>
 
-*/
+              {error && (
+                <div className="mb-6 bg-destructive/10 border border-destructive/50 rounded-lg p-4">
+                  <p className="text-destructive text-sm">{error}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSignup} className="space-y-5">
+                <div>
+                  <label
+                    htmlFor="fullName"
+                    className="block text-sm font-medium text-foreground mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="Your full name"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-foreground mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-foreground mb-2">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="At least 8 characters"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium text-foreground mb-2">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    placeholder="Confirm your password"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50">
+                  {loading ? 'Creating Account...' : 'Create Account'}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-muted-foreground text-sm">
+                  Already have an account?{' '}
+                  <Link
+                    href="/auth/login"
+                    className="text-primary hover:underline font-medium">
+                    Sign In
+                  </Link>
+                </p>
+              </div>
+            </div>
+
+            {/* Right side - Illustration */}
+            <div className="hidden md:flex md:items-center md:justify-center">
+              <Image
+                src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
+                alt="Welcome"
+                width={280}
+                height={280}
+                className="object-contain"
+                priority
+                unoptimized
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
