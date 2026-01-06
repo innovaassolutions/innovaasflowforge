@@ -115,8 +115,8 @@ export default function BrandingSettingsPage() {
         .eq('user_id', user.id)
         .single() as { data: TenantProfile | null; error: any }
 
-      if (tenantError) {
-        if (tenantError.code === 'PGRST116') {
+      if (tenantError || !tenantData) {
+        if (tenantError?.code === 'PGRST116' || !tenantData) {
           // No tenant profile found
           setError('No branding profile found. Please contact support.')
         } else {
