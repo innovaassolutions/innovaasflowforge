@@ -227,3 +227,67 @@ npm run setup:voice-agent:local        # Local development
 - Maintain the professional, data-driven aesthetic
 - Always test changes thoroughly before considering work complete
 - When in doubt, reference the design system files or ElevenLabs docs
+
+---
+
+## System Changelog
+
+**IMPORTANT**: Document all significant changes here so future Claude sessions understand system state.
+
+### 2026-01-06
+
+#### Database Changes Applied to Production Supabase
+
+1. **Migration: `20260106_007_auto_create_tenant_profile.sql`**
+   - Updated `handle_new_user()` trigger function
+   - Auto-creates `tenant_profile` when users sign up as coach/consultant/company
+   - Sets default Pearl Vibrant branding colors
+   - Maps user types: coach→archetype, consultant→industry4, company(school)→education
+
+#### Manual Database Fixes
+
+1. **Fixed user `dev@innovaas.co`**:
+   - Set `user_type = 'coach'` in `user_profiles` (was NULL)
+   - Created `tenant_profile` with slug `dev-coach`, tenant_type `coach`
+   - This user signed up BEFORE the migration was applied
+
+#### Code Fixes (Committed & Pushed)
+
+1. **`app/dashboard/settings/branding/page.tsx`**:
+   - Added null guard for `tenantData` (line 118) - TypeScript fix
+   - Added `as any` type assertion for tenant_profiles update query (line 224-225) - TypeScript fix
+
+#### Known Issues Identified
+
+1. **RLS Policy "Public access to campaign via report"**: Makes campaigns with active education reports visible to ALL users. May need restriction.
+2. **Supabase Site URL**: Was set to `localhost:3000` - user needs to update to production URL in Supabase Dashboard > Auth > URL Configuration
+
+### Multi-Tenant Architecture Notes
+
+The system supports multiple tenant types:
+- **Consultants**: Industry 4.0 readiness assessments via campaigns
+- **Coaches**: Archetype assessments via coaching sessions (tenant_profiles)
+- **Schools (Companies)**: Education assessments via access codes
+
+Each tenant type has different:
+- Dashboard views (`app/dashboard/page.tsx` routes based on `user_type`)
+- Data isolation (RLS policies filter by organization/tenant)
+- Assessment types (enabled_assessments in tenant_profiles)
+
+### Database Tables Reference
+
+| Table | Purpose | Key Fields |
+|-------|---------|------------|
+| `user_profiles` | User accounts | `user_type`, `organization_id`, `company_profile_id` |
+| `tenant_profiles` | Coach/consultant branding | `user_id`, `slug`, `tenant_type`, `brand_config` |
+| `organizations` | Company/org grouping | `slug`, `plan` |
+| `campaigns` | Assessment campaigns | `company_profile_id`, `created_by` |
+| `coaching_sessions` | Coach client sessions | `tenant_id`, `client_name`, `access_token` |
+
+---
+
+**When making changes, UPDATE THIS CHANGELOG with:**
+- Date
+- What was changed (code, database, config)
+- Why it was changed
+- Any follow-up actions needed
