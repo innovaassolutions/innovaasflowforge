@@ -91,7 +91,7 @@ export interface TenantProfile {
   display_name: string
   tenant_type: 'coach' | 'consultant' | 'school'
   brand_config: {
-    logo?: { url: string; alt: string; width?: number }
+    logo?: { url: string; alt?: string; position?: 'left' | 'center' | 'right' }
     colors: {
       primary: string
       primaryHover: string

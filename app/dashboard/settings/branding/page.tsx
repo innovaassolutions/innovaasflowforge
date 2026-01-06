@@ -23,7 +23,9 @@ import {
   AlertCircle,
   ExternalLink,
   Copy,
-  Check
+  Check,
+  Upload,
+  Trash2
 } from 'lucide-react'
 
 interface TenantProfile {
@@ -32,7 +34,7 @@ interface TenantProfile {
   display_name: string
   tenant_type: 'coach' | 'consultant' | 'school'
   brand_config: {
-    logo?: { url: string; alt?: string }
+    logo?: { url: string; alt?: string; position?: 'left' | 'center' | 'right' }
     colors: {
       primary: string
       primaryHover?: string
@@ -79,6 +81,7 @@ export default function BrandingSettingsPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [tenant, setTenant] = useState<TenantProfile | null>(null)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -92,6 +95,9 @@ export default function BrandingSettingsPage() {
     replyTo: '',
     senderName: '',
     emailFooter: '',
+    logoUrl: '',
+    logoAlt: '',
+    logoPosition: 'left' as 'left' | 'center' | 'right',
   })
 
   useEffect(() => {
@@ -152,6 +158,9 @@ export default function BrandingSettingsPage() {
         replyTo: emailConfig.replyTo || '',
         senderName: emailConfig.senderName || '',
         emailFooter: emailConfig.emailFooter || '',
+        logoUrl: brandConfig.logo?.url || '',
+        logoAlt: brandConfig.logo?.alt || '',
+        logoPosition: brandConfig.logo?.position || 'left',
       })
     } catch (err) {
       console.error('Error loading tenant:', err)
@@ -211,6 +220,11 @@ export default function BrandingSettingsPage() {
         welcomeMessage: formData.welcomeMessage || null,
         completionMessage: formData.completionMessage || null,
         showPoweredBy: formData.showPoweredBy,
+        logo: formData.logoUrl ? {
+          url: formData.logoUrl,
+          alt: formData.logoAlt || formData.displayName,
+          position: formData.logoPosition,
+        } : null,
       }
 
       // Build updated email_config
@@ -258,6 +272,77 @@ export default function BrandingSettingsPage() {
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !tenant) return
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
+    if (!validTypes.includes(file.type)) {
+      setError('Please upload a PNG, JPEG, WebP, or SVG image')
+      return
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Logo must be smaller than 2MB')
+      return
+    }
+
+    setUploadingLogo(true)
+    setError(null)
+
+    try {
+      const supabase = createClient()
+
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${tenant.id}-logo-${Date.now()}.${fileExt}`
+      const filePath = `tenant-logos/${fileName}`
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('public')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        setError('Failed to upload logo. Please try again.')
+        return
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('public')
+        .getPublicUrl(filePath)
+
+      // Update form state
+      setFormData({
+        ...formData,
+        logoUrl: publicUrl,
+        logoAlt: formData.displayName || 'Logo',
+      })
+
+      setSuccess('Logo uploaded! Save changes to apply.')
+    } catch (err) {
+      console.error('Logo upload error:', err)
+      setError('Failed to upload logo')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  function handleLogoRemove() {
+    setFormData({
+      ...formData,
+      logoUrl: '',
+      logoAlt: '',
+    })
   }
 
   if (loading) {
@@ -406,6 +491,128 @@ export default function BrandingSettingsPage() {
                 Lowercase letters, numbers, and hyphens only
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Logo Section */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <ImageIcon className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Logo</h2>
+              <p className="text-sm text-muted-foreground">Upload your logo for the landing page header</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Logo Preview and Upload */}
+            <div className="flex flex-col sm:flex-row gap-6">
+              {/* Preview Area */}
+              <div className="flex-shrink-0">
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Preview
+                </label>
+                <div className="w-40 h-24 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/30 overflow-hidden">
+                  {formData.logoUrl ? (
+                    <img
+                      src={formData.logoUrl}
+                      alt={formData.logoAlt || 'Logo preview'}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      <ImageIcon className="w-8 h-8 mx-auto mb-1 opacity-50" />
+                      <span className="text-xs">No logo</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Upload Controls */}
+              <div className="flex-1 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Upload Logo
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 border border-border rounded-lg cursor-pointer transition-colors">
+                      {uploadingLogo ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                      <span className="text-sm">
+                        {uploadingLogo ? 'Uploading...' : 'Choose File'}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                        onChange={handleLogoUpload}
+                        disabled={uploadingLogo}
+                        className="sr-only"
+                      />
+                    </label>
+                    {formData.logoUrl && (
+                      <button
+                        type="button"
+                        onClick={handleLogoRemove}
+                        className="inline-flex items-center gap-2 px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="text-sm">Remove</span>
+                      </button>
+                    )}
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    PNG, JPEG, WebP, or SVG. Max 2MB. Recommended: 200x60px
+                  </p>
+                </div>
+
+                {/* Logo Position */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Header Position
+                  </label>
+                  <div className="flex gap-2">
+                    {(['left', 'center', 'right'] as const).map((position) => (
+                      <button
+                        key={position}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, logoPosition: position })}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
+                          formData.logoPosition === position
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted hover:bg-muted/80 text-foreground'
+                        }`}
+                      >
+                        {position}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Logo Alt Text */}
+            {formData.logoUrl && (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Alt Text
+                </label>
+                <input
+                  type="text"
+                  value={formData.logoAlt}
+                  onChange={(e) => setFormData({ ...formData, logoAlt: e.target.value })}
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Describe your logo for accessibility"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Helps screen readers describe your logo
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

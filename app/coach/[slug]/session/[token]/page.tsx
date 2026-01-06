@@ -249,7 +249,7 @@ export default function SessionPage() {
                 <Image
                   src={tenant.brand_config.logo.url}
                   alt={tenant.brand_config.logo.alt || tenant.display_name}
-                  width={tenant.brand_config.logo.width || 240}
+                  width={240}
                   height={96}
                   className="h-20 sm:h-24 w-auto object-contain"
                   unoptimized

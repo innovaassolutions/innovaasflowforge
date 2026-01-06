@@ -39,24 +39,28 @@ export function BrandedHeader({ minimal = false, className = '' }: BrandedHeader
   const tagline = brand_config.tagline
   const showPoweredBy = brand_config.showPoweredBy ?? true
 
+  // Determine logo alignment
+  const logoPosition = logo?.position || 'center'
+  const alignmentClasses = {
+    left: 'items-start text-left',
+    center: 'items-center text-center',
+    right: 'items-end text-right',
+  }
+
   return (
     <header
       className={`w-full bg-[var(--brand-bg)] border-b border-[var(--brand-border)] ${className}`}
     >
       <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
-        <div className="flex flex-col items-center gap-2">
+        <div className={`flex flex-col gap-2 ${alignmentClasses[logoPosition]}`}>
           {/* Logo */}
           {logo?.url ? (
             <Image
               src={logo.url}
               alt={logo.alt || tenant.display_name}
-              width={logo.width || 200}
-              height={logo.width || 200}
-              className="w-auto object-contain"
-              style={{
-                width: logo.width ? `${logo.width}px` : '200px',
-                height: 'auto'
-              }}
+              width={200}
+              height={80}
+              className="w-auto max-h-16 sm:max-h-20 object-contain"
               unoptimized
             />
           ) : (
@@ -75,7 +79,7 @@ export function BrandedHeader({ minimal = false, className = '' }: BrandedHeader
           {/* Tagline */}
           {!minimal && tagline && (
             <p
-              className="text-sm sm:text-base text-center max-w-md"
+              className="text-sm sm:text-base max-w-md"
               style={{
                 color: 'var(--brand-text-muted)',
                 fontFamily: 'var(--brand-font-body)',
