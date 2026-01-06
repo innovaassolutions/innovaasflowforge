@@ -251,9 +251,10 @@ export default function BrandingSettingsPage() {
 
   function copyLandingPageUrl() {
     if (!tenant) return
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co/flowforge'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.innovaas.co'
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/flowforge'
     const tenantType = tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type
-    const url = `${baseUrl}/${tenantType}/${tenant.slug}`
+    const url = `${baseUrl}${basePath}/${tenantType}/${tenant.slug}`
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -288,7 +289,9 @@ export default function BrandingSettingsPage() {
     )
   }
 
-  const landingPageUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co/flowforge'}/${tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type}/${formData.slug}`
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.innovaas.co'
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/flowforge'
+  const landingPageUrl = `${baseUrl}${basePath}/${tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type}/${formData.slug}`
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
