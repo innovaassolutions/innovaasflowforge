@@ -466,17 +466,47 @@ export async function GET(request: NextRequest) {
 
     const isAdmin = userProfile.user_type === 'admin'
 
+    // Get user's tenant_id for filtering
+    const { data: tenantProfile } = (await supabaseAdmin
+      .from('tenant_profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()) as any
+
+    const tenantId = tenantProfile?.id || null
+
     // Admins can see ALL campaigns (bypass RLS)
-    // Regular users see campaigns based on RLS policies
-    const { data: campaigns, error } = isAdmin
-      ? await supabaseAdmin
-          .from('campaigns')
-          .select('*')
-          .order('created_at', { ascending: false })
-      : await supabase
-          .from('campaigns')
-          .select('*')
-          .order('created_at', { ascending: false })
+    // Regular users see only their tenant's campaigns
+    let campaigns
+    let error
+
+    if (isAdmin) {
+      // Admin: see all campaigns
+      const result = await supabaseAdmin
+        .from('campaigns')
+        .select('*')
+        .order('created_at', { ascending: false })
+      campaigns = result.data
+      error = result.error
+    } else if (tenantId) {
+      // User with tenant: see only their tenant's campaigns
+      const result = await supabaseAdmin
+        .from('campaigns')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false })
+      campaigns = result.data
+      error = result.error
+    } else {
+      // Legacy user without tenant: see campaigns they created
+      const result = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false })
+      campaigns = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('Error fetching campaigns:', error)
