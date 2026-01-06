@@ -221,8 +221,8 @@ export default function BrandingSettingsPage() {
       }
 
       // Update tenant profile
-      const { error: updateError } = await supabase
-        .from('tenant_profiles')
+      const { error: updateError } = await (supabase
+        .from('tenant_profiles') as any)
         .update({
           display_name: formData.displayName,
           slug: formData.slug,
