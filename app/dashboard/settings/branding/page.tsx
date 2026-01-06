@@ -109,11 +109,11 @@ export default function BrandingSettingsPage() {
       }
 
       // Fetch tenant profile
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenant_profiles')
+      const { data: tenantData, error: tenantError } = await (supabase
+        .from('tenant_profiles') as any)
         .select('*')
         .eq('user_id', user.id)
-        .single()
+        .single() as { data: TenantProfile | null; error: any }
 
       if (tenantError) {
         if (tenantError.code === 'PGRST116') {
