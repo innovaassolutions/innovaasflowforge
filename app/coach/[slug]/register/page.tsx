@@ -36,7 +36,7 @@ export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [sessionToken, setSessionToken] = useState<string | null>(null)
 
-  const slug = params.slug as string
+  const slug = params?.slug as string
 
   function validateForm(): boolean {
     const newErrors: FormErrors = {}

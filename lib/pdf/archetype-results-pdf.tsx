@@ -18,7 +18,7 @@ import {
   Svg,
   Path,
   Circle
-} from '@joshuajaco/react-pdf-renderer-bundled'
+} from '@react-pdf/renderer'
 import type { TenantProfile } from '@/lib/supabase/server'
 import type { ResultsResponse } from '@/app/api/coach/[slug]/results/[token]/route'
 

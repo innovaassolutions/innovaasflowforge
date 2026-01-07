@@ -56,7 +56,7 @@ const DIVISIONS = [
 // Component that uses useSearchParams - wrapped in Suspense
 function CampaignFormWrapper() {
   const searchParams = useSearchParams()
-  const schoolIdFromUrl = searchParams.get('schoolId')
+  const schoolIdFromUrl = searchParams?.get('schoolId') ?? null
 
   return <NewEducationCampaignForm initialSchoolId={schoolIdFromUrl} />
 }

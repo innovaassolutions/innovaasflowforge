@@ -23,8 +23,8 @@ export default function ResultsPage() {
   const params = useParams()
   const { tenant } = useTenant()
 
-  const slug = params.slug as string
-  const token = params.token as string
+  const slug = params?.slug as string
+  const token = params?.token as string
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

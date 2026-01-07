@@ -9,9 +9,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { renderToBuffer } from '@joshuajaco/react-pdf-renderer-bundled'
 import { resend } from '@/lib/resend'
-import { ArchetypeResultsPDF, type ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
+import type { ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
 import { ArchetypeResultsEmail } from '@/lib/email/templates/archetype-results-email'
 import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
 import type { TenantProfile } from '@/lib/supabase/server'
@@ -273,9 +272,35 @@ export async function POST(
       validatedLogoUrl: pdfData.validatedLogoUrl
     })
 
+    // Generate PDF using Pages Router API (works better with react-pdf on Vercel)
+    // See: https://github.com/diegomura/react-pdf/issues/2460
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     let pdfBuffer: Buffer
     try {
-      pdfBuffer = await renderToBuffer(ArchetypeResultsPDF({ data: pdfData }))
+      const pdfApiUrl = `${baseUrl}/flowforge/api/generate-archetype-pdf`
+
+      console.log('📤 Calling Pages Router PDF API at:', pdfApiUrl)
+
+      const pdfResponse = await fetch(pdfApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pdfData),
+      })
+
+      if (!pdfResponse.ok) {
+        const errorData = await pdfResponse.json().catch(() => ({}))
+        throw new Error(errorData.error || `PDF API returned ${pdfResponse.status}`)
+      }
+
+      const pdfResult = await pdfResponse.json()
+
+      if (!pdfResult.success || !pdfResult.pdfBase64) {
+        throw new Error(pdfResult.error || 'PDF API returned invalid response')
+      }
+
+      pdfBuffer = Buffer.from(pdfResult.pdfBase64, 'base64')
       console.log('✅ PDF generated successfully, size:', pdfBuffer.length, 'bytes')
     } catch (pdfError: any) {
       console.error('❌ PDF generation error:', {
@@ -291,8 +316,7 @@ export async function POST(
       )
     }
 
-    // Build results URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Build results URL (baseUrl already defined in PDF generation section above)
     const resultsUrl = `${baseUrl}/flowforge/coach/${slug}/results/${token}`
 
     // Get coach email from tenant config

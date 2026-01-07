@@ -150,7 +150,7 @@ function StoryQuote({ story, archetypes }: {
 
 export default function CoachingReportPage() {
   const params = useParams()
-  const token = params.token as string
+  const token = params?.token as string
 
   const [report, setReport] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)

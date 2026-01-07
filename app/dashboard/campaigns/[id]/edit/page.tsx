@@ -27,7 +27,7 @@ interface Campaign {
 export default function EditCampaignPage() {
   const router = useRouter()
   const params = useParams()
-  const campaignId = params.id as string
+  const campaignId = params?.id as string
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [campaign, setCampaign] = useState<Campaign | null>(null)

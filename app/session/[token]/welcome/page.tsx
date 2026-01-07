@@ -41,12 +41,12 @@ export default function StakeholderWelcomePage() {
 
   useEffect(() => {
     loadSession()
-  }, [params.token])
+  }, [params?.token])
 
   async function loadSession() {
     try {
       setLoading(true)
-      const response = await fetch(apiUrl(`api/sessions/${params.token}`))
+      const response = await fetch(apiUrl(`api/sessions/${params?.token}`))
       const data = await response.json()
 
       if (data.success) {
@@ -67,7 +67,7 @@ export default function StakeholderWelcomePage() {
 
   async function loadUploadedDocuments() {
     try {
-      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`))
+      const response = await fetch(apiUrl(`api/sessions/${params?.token}/documents`))
       const data = await response.json()
 
       if (data.success && data.documents) {
@@ -91,7 +91,7 @@ export default function StakeholderWelcomePage() {
 
         setUploadProgress(prev => ({ ...prev, [file.name]: 0 }))
 
-        const response = await fetch(apiUrl(`api/sessions/${params.token}/documents`), {
+        const response = await fetch(apiUrl(`api/sessions/${params?.token}/documents`), {
           method: 'POST',
           body: formData
         })
@@ -124,7 +124,7 @@ export default function StakeholderWelcomePage() {
 
   async function handleRemoveDocument(documentId: string) {
     try {
-      const response = await fetch(apiUrl(`api/sessions/${params.token}/documents/${documentId}`), {
+      const response = await fetch(apiUrl(`api/sessions/${params?.token}/documents/${documentId}`), {
         method: 'DELETE'
       })
 
@@ -142,7 +142,7 @@ export default function StakeholderWelcomePage() {
   }
 
   function handleContinueToInterview() {
-    router.push(`/session/${params.token}`)
+    router.push(`/session/${params?.token}`)
   }
 
   function formatFileSize(bytes: number): string {

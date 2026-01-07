@@ -1,5 +1,5 @@
 import React from 'react'
-import { Svg, Path, Line, Circle, Text as SvgText, G, Rect } from '@joshuajaco/react-pdf-renderer-bundled'
+import { Svg, Path, Line, Circle, Text as SvgText, G, Rect } from '@react-pdf/renderer'
 import {
   generateRadarChartPath,
   generateRadarGrid,

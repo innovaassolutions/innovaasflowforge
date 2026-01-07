@@ -94,12 +94,12 @@ export default function CampaignDetailPage() {
     // Poll for updates every 10 seconds
     const interval = setInterval(fetchCampaign, 10000)
     return () => clearInterval(interval)
-  }, [params.id])
+  }, [params?.id])
 
   async function fetchCampaign() {
     try {
       setLoading(true)
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}`))
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}`))
       const data = await response.json()
 
       if (data.success) {
@@ -123,7 +123,7 @@ export default function CampaignDetailPage() {
 
   async function checkForExistingReport() {
     try {
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}/report`))
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}/report`))
       const data = await response.json()
 
       if (data.success && data.report) {
@@ -139,7 +139,7 @@ export default function CampaignDetailPage() {
 
   async function fetchAccessCodeSummary() {
     try {
-      const response = await fetch(apiUrl(`api/education/access-codes?campaign_id=${params.id}`))
+      const response = await fetch(apiUrl(`api/education/access-codes?campaign_id=${params?.id}`))
       const data = await response.json()
 
       if (data.summary) {
@@ -158,7 +158,7 @@ export default function CampaignDetailPage() {
 
   async function fetchEducationReport() {
     try {
-      const response = await fetch(apiUrl(`api/education/reports?campaign_id=${params.id}`))
+      const response = await fetch(apiUrl(`api/education/reports?campaign_id=${params?.id}`))
       const data = await response.json()
 
       if (data.success && data.reports && data.reports.length > 0) {
@@ -190,7 +190,7 @@ export default function CampaignDetailPage() {
 
     try {
       setDeleting(true)
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}`), {
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}`), {
         method: 'DELETE'
       })
       const data = await response.json()
@@ -211,7 +211,7 @@ export default function CampaignDetailPage() {
 
   async function handleSaveEdit() {
     try {
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}`), {
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
@@ -298,7 +298,7 @@ export default function CampaignDetailPage() {
 
     try {
       setCompletingSession(sessionId)
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}/sessions/${sessionId}/complete`), {
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}/sessions/${sessionId}/complete`), {
         method: 'POST'
       })
       const data = await response.json()
@@ -332,7 +332,7 @@ export default function CampaignDetailPage() {
     try {
       setGeneratingReport(true)
 
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}/synthesize`), {
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}/synthesize`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ format: 'markdown' })
@@ -386,7 +386,7 @@ export default function CampaignDetailPage() {
     try {
       setGeneratingPDF(true)
 
-      const response = await fetch(apiUrl(`api/campaigns/${params.id}/generate-pdf`), {
+      const response = await fetch(apiUrl(`api/campaigns/${params?.id}/generate-pdf`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })

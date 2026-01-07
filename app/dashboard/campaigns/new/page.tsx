@@ -82,7 +82,7 @@ const ROLE_TYPES = [
 // Component that uses useSearchParams - wrapped in Suspense
 function CampaignFormWrapper() {
   const searchParams = useSearchParams()
-  const companyIdFromUrl = searchParams.get('companyId')
+  const companyIdFromUrl = searchParams?.get('companyId') ?? null
 
   return <NewCampaignForm initialCompanyId={companyIdFromUrl} />
 }

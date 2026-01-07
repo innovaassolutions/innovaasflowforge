@@ -32,8 +32,8 @@ export default function ReflectPage() {
   const router = useRouter()
   const { tenant } = useTenant()
 
-  const slug = params.slug as string
-  const token = params.token as string
+  const slug = params?.slug as string
+  const token = params?.token as string
 
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')

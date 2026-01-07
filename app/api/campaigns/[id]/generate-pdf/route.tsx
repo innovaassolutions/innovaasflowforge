@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { renderToBuffer } from '@joshuajaco/react-pdf-renderer-bundled'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { AssessmentPDFDocument } from '@/lib/pdf-document'
 import { ReportMetadata } from '@/lib/report-generator'
 import { ReadinessAssessment } from '@/lib/agents/synthesis-agent'

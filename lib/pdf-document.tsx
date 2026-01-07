@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from '@joshuajaco/react-pdf-renderer-bundled'
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 import { ReadinessAssessment } from './agents/synthesis-agent'
 import {
   INNOVAAS_BRANDING,

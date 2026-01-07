@@ -40,7 +40,7 @@ function EducationSessionContent() {
   const searchParams = useSearchParams()
 
   // Get school code from URL (e.g., /education/session?school=SAIS)
-  const schoolCode = searchParams.get('school')
+  const schoolCode = searchParams?.get('school') ?? null
 
   // Dev mode bypass - only in development
   const isDev = process.env.NODE_ENV === 'development'

@@ -99,7 +99,7 @@ const PARTICIPANT_ICONS: Record<string, typeof Users> = {
 
 export default function SafeguardingDashboardPage() {
   const searchParams = useSearchParams()
-  const initialSchoolId = searchParams.get('school_id')
+  const initialSchoolId = searchParams?.get('school_id') ?? null
 
   const [alerts, setAlerts] = useState<SafeguardingAlert[]>([])
   const [schools, setSchools] = useState<School[]>([])

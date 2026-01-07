@@ -39,8 +39,8 @@ export default function SessionPage() {
   const router = useRouter()
   const { tenant } = useTenant()
 
-  const slug = params.slug as string
-  const token = params.token as string
+  const slug = params?.slug as string
+  const token = params?.token as string
 
   const [session, setSession] = useState<SessionData | null>(null)
   const [messages, setMessages] = useState<Message[]>([])

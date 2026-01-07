@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
   Font
-} from '@joshuajaco/react-pdf-renderer-bundled'
+} from '@react-pdf/renderer'
 import { PDFReportData, INNOVAAS_BRANDING, getScoreColor, getPriorityColor, getConfidenceColor } from './report-generator'
 
 // ============================================================================

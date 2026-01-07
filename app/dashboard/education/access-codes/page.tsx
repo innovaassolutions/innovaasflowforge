@@ -87,8 +87,8 @@ const TEACHER_ROLES = ['classroom_teacher', 'department_head', 'specialist', 'co
 
 export default function AccessCodesPage() {
   const searchParams = useSearchParams()
-  const initialSchoolId = searchParams.get('school_id')
-  const initialCampaignId = searchParams.get('campaign_id')
+  const initialSchoolId = searchParams?.get('school_id') ?? null
+  const initialCampaignId = searchParams?.get('campaign_id') ?? null
 
   const [codes, setCodes] = useState<AccessCode[]>([])
   const [schools, setSchools] = useState<School[]>([])
