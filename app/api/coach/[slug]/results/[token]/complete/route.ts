@@ -140,6 +140,37 @@ export async function POST(
       )
     }
 
+    // Debug: Log archetype results
+    console.log('📊 Archetype results:', {
+      default_archetype: archetypeResults.default_archetype,
+      authentic_archetype: archetypeResults.authentic_archetype,
+      is_aligned: archetypeResults.is_aligned,
+      has_scores: !!archetypeResults.scores
+    })
+
+    // Debug: Log tenant brand config
+    console.log('🎨 Tenant brand config:', {
+      has_brand_config: !!tenantProfile.brand_config,
+      has_colors: !!tenantProfile.brand_config?.colors,
+      colors: tenantProfile.brand_config?.colors
+    })
+
+    // Validate archetype keys exist in ARCHETYPES
+    if (!ARCHETYPES[archetypeResults.default_archetype]) {
+      console.error('❌ Invalid default_archetype key:', archetypeResults.default_archetype)
+      return NextResponse.json(
+        { success: false, error: `Invalid archetype: ${archetypeResults.default_archetype}` },
+        { status: 400 }
+      )
+    }
+    if (!ARCHETYPES[archetypeResults.authentic_archetype]) {
+      console.error('❌ Invalid authentic_archetype key:', archetypeResults.authentic_archetype)
+      return NextResponse.json(
+        { success: false, error: `Invalid archetype: ${archetypeResults.authentic_archetype}` },
+        { status: 400 }
+      )
+    }
+
     // Build enriched results
     const primaryArchetypeData = ARCHETYPES[archetypeResults.default_archetype]
     const authenticArchetypeData = ARCHETYPES[archetypeResults.authentic_archetype]
@@ -204,6 +235,44 @@ export async function POST(
 
     // Generate PDF buffer
     console.log('📄 Generating PDF for:', session.client_name)
+    console.log('📋 PDF Data structure:', {
+      session: {
+        id: pdfData.session.id,
+        client_name: pdfData.session.client_name,
+        client_email: pdfData.session.client_email,
+        client_status: pdfData.session.client_status,
+        reflection_status: pdfData.session.reflection_status
+      },
+      results: {
+        primary_archetype: {
+          name: pdfData.results.primary_archetype?.name,
+          key: pdfData.results.primary_archetype?.key,
+          has_core_traits: !!pdfData.results.primary_archetype?.core_traits?.length,
+          has_when_grounded: !!pdfData.results.primary_archetype?.when_grounded,
+          has_under_pressure: !!pdfData.results.primary_archetype?.under_pressure,
+          has_overuse_signals: !!pdfData.results.primary_archetype?.overuse_signals?.length
+        },
+        authentic_archetype: {
+          name: pdfData.results.authentic_archetype?.name,
+          key: pdfData.results.authentic_archetype?.key,
+          has_core_traits: !!pdfData.results.authentic_archetype?.core_traits?.length
+        },
+        tension_pattern: {
+          has_tension: pdfData.results.tension_pattern?.has_tension,
+          has_description: !!pdfData.results.tension_pattern?.description,
+          has_triggers: !!pdfData.results.tension_pattern?.triggers?.length
+        }
+      },
+      tenant: {
+        display_name: pdfData.tenant?.display_name,
+        has_brand_config: !!pdfData.tenant?.brand_config,
+        has_colors: !!pdfData.tenant?.brand_config?.colors
+      },
+      hasReflectionMessages: !!pdfData.reflectionMessages?.length,
+      generatedDate: pdfData.generatedDate,
+      validatedLogoUrl: pdfData.validatedLogoUrl
+    })
+
     let pdfBuffer: Buffer
     try {
       pdfBuffer = await renderToBuffer(ArchetypeResultsPDF({ data: pdfData }))
