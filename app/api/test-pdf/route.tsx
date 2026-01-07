@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server'
-import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
   page: {
@@ -21,33 +21,29 @@ const styles = StyleSheet.create({
   },
 })
 
+// Simple inline document for v3 compatibility
+const TestDocument = (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View>
+        <Text style={styles.title}>Test PDF</Text>
+        <Text style={styles.text}>If you can see this, PDF generation works!</Text>
+        <Text style={styles.text}>react-pdf v3.4.5</Text>
+      </View>
+    </Page>
+  </Document>
+)
+
 export async function GET() {
   try {
-    console.log('🧪 Test PDF: Starting generation...')
+    console.log('🧪 Test PDF: Starting generation with react-pdf v3...')
 
-    const timestamp = new Date().toISOString()
+    // renderToBuffer works correctly in v3
+    const pdfBuffer = await renderToBuffer(TestDocument)
 
-    // Create Document directly to satisfy pdf() type requirements
-    const pdfDocument = (
-      <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <Text style={styles.title}>Test PDF</Text>
-            <Text style={styles.text}>If you can see this, PDF generation works!</Text>
-            <Text style={styles.text}>Generated at: {timestamp}</Text>
-          </View>
-        </Page>
-      </Document>
-    )
+    console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
 
-    const pdfDoc = pdf(pdfDocument)
-    // toBlob() returns a Blob which we can convert to ArrayBuffer
-    const pdfBlob = await pdfDoc.toBlob()
-    const pdfArrayBuffer = await pdfBlob.arrayBuffer()
-
-    console.log('✅ Test PDF: Generated successfully, size:', pdfArrayBuffer.byteLength, 'bytes')
-
-    return new NextResponse(pdfArrayBuffer, {
+    return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename="test.pdf"',
