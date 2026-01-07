@@ -2,6 +2,7 @@
  * TensionPatternCard Component
  *
  * Displays tension pattern information when primary and authentic archetypes differ.
+ * Supports personalized insights from reflection enhancement.
  *
  * CRITICAL STYLING REQUIREMENT (per Mark's feedback):
  * - Use sand-colored/neutral background (--brand-bg-muted)
@@ -10,6 +11,7 @@
  * - Present tension as a pattern to explore, not a problem to fix
  *
  * Story: 1.1 Results Page Foundation
+ * Enhanced: Reflection Integration Enhancement
  */
 
 interface TensionPatternData {
@@ -22,12 +24,15 @@ interface TensionPatternCardProps {
   tensionPattern: TensionPatternData
   primaryArchetype: string
   authenticArchetype: string
+  /** Personalized tension insights from reflection enhancement */
+  personalizedInsights?: string | null
 }
 
 export function TensionPatternCard({
   tensionPattern,
   primaryArchetype,
   authenticArchetype,
+  personalizedInsights,
 }: TensionPatternCardProps) {
   if (!tensionPattern.has_tension) return null
 
@@ -103,6 +108,30 @@ export function TensionPatternCard({
           >
             <p className="leading-relaxed">
               {tensionPattern.description}
+            </p>
+          </div>
+        )}
+
+        {/* Personalized Insights (if enhanced) */}
+        {personalizedInsights && (
+          <div
+            className="p-4 rounded-lg border-l-4"
+            style={{
+              backgroundColor: 'var(--brand-bg)',
+              borderLeftColor: 'var(--brand-secondary, var(--brand-primary))',
+            }}
+          >
+            <h3
+              className="text-sm font-semibold mb-2"
+              style={{ color: 'var(--brand-secondary, var(--brand-primary))' }}
+            >
+              Your Personal Pattern
+            </h3>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: 'var(--brand-text)' }}
+            >
+              {personalizedInsights}
             </p>
           </div>
         )}

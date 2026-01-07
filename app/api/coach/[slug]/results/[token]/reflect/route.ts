@@ -17,6 +17,7 @@ import {
   type ReflectionMessage,
   type ArchetypeResultsContext,
 } from '@/lib/agents/reflection-agent'
+import { processEnhancement, type EnhancedResults } from '@/lib/agents/enhancement-agent'
 import { type Archetype } from '@/lib/agents/archetype-constitution'
 
 function getServiceClient() {
@@ -47,6 +48,7 @@ interface ReflectResponse {
   state?: ReflectionState
   conversationHistory?: ReflectionMessage[]
   isComplete?: boolean
+  isEnhanced?: boolean
   error?: string
 }
 
@@ -185,13 +187,46 @@ export async function POST(
       newReflectionStatus = 'completed'
     }
 
-    // Update session with new messages and status
+    // If reflection is complete, trigger enhancement synthesis
+    let enhancedResults: EnhancedResults | null = null
+    let isEnhanced = false
+
+    if (agentResponse.isComplete) {
+      console.log('Reflection complete, triggering enhancement synthesis...')
+
+      const enhancementResponse = await processEnhancement({
+        originalResults: archetypeResults as ArchetypeResultsContext,
+        reflectionMessages: updatedMessages,
+        participantName: session.client_name,
+        tenant: {
+          display_name: tenant.display_name,
+          brand_config: tenant.brand_config as { welcomeMessage?: string; completionMessage?: string },
+        },
+      })
+
+      if (enhancementResponse.success && enhancementResponse.enhanced) {
+        enhancedResults = enhancementResponse.enhanced
+        isEnhanced = true
+        console.log('Enhancement synthesis successful')
+      } else {
+        // Log error but don't fail the request - reflection is still valid
+        console.error('Enhancement synthesis failed:', enhancementResponse.error)
+      }
+    }
+
+    // Update session with new messages, status, and enhanced results
+    const updateData: Record<string, unknown> = {
+      reflection_messages: updatedMessages,
+      reflection_status: newReflectionStatus,
+    }
+
+    if (enhancedResults) {
+      updateData.enhanced_results = enhancedResults
+    }
+
     const { error: updateError } = await supabase
       .from('coaching_sessions')
-      .update({
-        reflection_messages: updatedMessages,
-        reflection_status: newReflectionStatus,
-      })
+      .update(updateData)
       .eq('id', session.id)
 
     if (updateError) {
@@ -208,6 +243,7 @@ export async function POST(
       state: agentResponse.state,
       conversationHistory: updatedMessages,
       isComplete: agentResponse.isComplete,
+      isEnhanced,
     })
   } catch (error) {
     console.error('Reflection message error:', error)

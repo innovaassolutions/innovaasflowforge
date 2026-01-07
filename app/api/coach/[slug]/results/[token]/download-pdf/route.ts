@@ -58,7 +58,7 @@ export async function GET(
     // Get coaching session
     const { data: session, error: sessionError } = await supabase
       .from('coaching_sessions')
-      .select('id, client_name, client_email, client_status, reflection_status, reflection_messages, completed_at, metadata')
+      .select('id, client_name, client_email, client_status, reflection_status, reflection_messages, enhanced_results, completed_at, metadata')
       .eq('access_token', token)
       .eq('tenant_id', tenant.id)
       .single()
@@ -153,8 +153,9 @@ export async function GET(
       },
       tenant: tenantProfile,
       reflectionMessages: session.reflection_messages as Array<{ role: 'user' | 'assistant'; content: string }> | undefined,
+      enhancedResults: session.enhanced_results as ArchetypeResultsPDFData['enhancedResults'],
       generatedDate,
-      validatedLogoUrl: null // Skip logo for now
+      validatedLogoUrl: (tenantProfile.brand_config as { logo?: { url?: string } })?.logo?.url || null
     }
 
     // Generate PDF using Pages Router API

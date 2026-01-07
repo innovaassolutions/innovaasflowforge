@@ -3,8 +3,10 @@
  *
  * Displays a leadership archetype with its traits, descriptions, and insights.
  * Uses tenant branding via CSS custom properties.
+ * Supports personalized narratives from reflection enhancement.
  *
  * Story: 1.1 Results Page Foundation
+ * Enhanced: Reflection Integration Enhancement
  */
 
 import type { Archetype } from '@/lib/agents/archetype-constitution'
@@ -22,9 +24,11 @@ interface ArchetypeResultsProps {
   archetype: ArchetypeData
   label: string
   description: string
+  /** Personalized narrative from reflection enhancement */
+  personalizedNarrative?: string
 }
 
-export function ArchetypeResults({ archetype, label, description }: ArchetypeResultsProps) {
+export function ArchetypeResults({ archetype, label, description, personalizedNarrative }: ArchetypeResultsProps) {
   return (
     <section
       className="rounded-xl overflow-hidden"
@@ -58,6 +62,30 @@ export function ArchetypeResults({ archetype, label, description }: ArchetypeRes
         >
           {description}
         </p>
+
+        {/* Personalized Narrative (if enhanced) */}
+        {personalizedNarrative && (
+          <div
+            className="p-4 rounded-lg border-l-4"
+            style={{
+              backgroundColor: 'var(--brand-bg)',
+              borderLeftColor: 'var(--brand-primary)',
+            }}
+          >
+            <h3
+              className="text-sm font-semibold mb-2"
+              style={{ color: 'var(--brand-primary)' }}
+            >
+              Your Personal Insight
+            </h3>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: 'var(--brand-text)' }}
+            >
+              {personalizedNarrative}
+            </p>
+          </div>
+        )}
 
         {/* Core Traits */}
         <div>

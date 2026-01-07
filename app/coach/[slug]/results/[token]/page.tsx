@@ -6,8 +6,10 @@
  * Displays leadership archetype results after assessment completion.
  * Includes primary archetype, tension pattern (if any), and moving forward sections.
  * Uses tenant branding via CSS custom properties.
+ * Shows personalized content when enhanced results are available from reflection.
  *
  * Story: 1.1 Results Page Foundation
+ * Enhanced: Reflection Integration Enhancement
  */
 
 import { useState, useEffect } from 'react'
@@ -18,6 +20,7 @@ import { ArchetypeResults } from '@/components/coaching/ArchetypeResults'
 import { TensionPatternCard } from '@/components/coaching/TensionPatternCard'
 import { ReflectionChoice } from '@/components/coaching/ReflectionChoice'
 import type { ResultsResponse } from '@/app/api/coach/[slug]/results/[token]/route'
+import type { EnhancedResults } from '@/lib/agents/enhancement-agent'
 
 export default function ResultsPage() {
   const params = useParams()
@@ -120,7 +123,8 @@ export default function ResultsPage() {
 
   if (!data?.results || !data?.session) return null
 
-  const { results, session } = data
+  const { results, session, enhancedResults } = data
+  const isEnhanced = !!enhancedResults
 
   return (
     <div
@@ -192,15 +196,51 @@ export default function ResultsPage() {
             className="text-lg max-w-2xl mx-auto"
             style={{ color: 'var(--brand-text-muted)' }}
           >
-            Based on your responses, here&apos;s what we discovered about your natural leadership patterns.
+            {isEnhanced
+              ? 'Personalized insights based on your assessment and reflection conversation.'
+              : 'Based on your responses, here\'s what we discovered about your natural leadership patterns.'}
           </p>
         </div>
+
+        {/* Reflection Themes (if enhanced) */}
+        {isEnhanced && enhancedResults.reflectionThemes && enhancedResults.reflectionThemes.length > 0 && (
+          <div
+            className="rounded-xl p-6"
+            style={{
+              backgroundColor: 'var(--brand-bg-subtle)',
+              border: '1px solid var(--brand-border)',
+            }}
+          >
+            <h3
+              className="text-sm font-medium mb-3"
+              style={{ color: 'var(--brand-text-muted)' }}
+            >
+              Key Themes from Your Reflection
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {enhancedResults.reflectionThemes.map((theme, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: 'var(--brand-primary)',
+                    color: 'white',
+                    opacity: 0.9,
+                  }}
+                >
+                  {theme}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Primary Archetype */}
         <ArchetypeResults
           archetype={results.primary_archetype}
           label="Your Primary Archetype"
           description="This is how you naturally respond when pressure is high and things feel messy."
+          personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
         />
 
         {/* Tension Pattern (if exists) */}
@@ -209,6 +249,7 @@ export default function ResultsPage() {
             tensionPattern={results.tension_pattern}
             primaryArchetype={results.primary_archetype.name}
             authenticArchetype={results.authentic_archetype.name}
+            personalizedInsights={enhancedResults?.personalizedTensionInsights}
           />
         )}
 
@@ -218,6 +259,7 @@ export default function ResultsPage() {
             archetype={results.authentic_archetype}
             label="Your Authentic Archetype"
             description="This is the leadership style that feels most sustainable and energizing when you're at your best."
+            personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
           />
         )}
 
@@ -239,9 +281,24 @@ export default function ResultsPage() {
             Moving Forward
           </h2>
           <div className="space-y-4" style={{ color: 'var(--brand-text)' }}>
-            <p>
-              Understanding your leadership archetype is the first step toward leading with greater intention and sustainability.
-            </p>
+            {/* Personalized Guidance (if enhanced) */}
+            {isEnhanced && enhancedResults.personalizedGuidance ? (
+              <div
+                className="p-4 rounded-lg border-l-4"
+                style={{
+                  backgroundColor: 'var(--brand-bg)',
+                  borderLeftColor: 'var(--brand-primary)',
+                }}
+              >
+                <p className="leading-relaxed">
+                  {enhancedResults.personalizedGuidance}
+                </p>
+              </div>
+            ) : (
+              <p>
+                Understanding your leadership archetype is the first step toward leading with greater intention and sustainability.
+              </p>
+            )}
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <div

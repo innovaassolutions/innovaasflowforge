@@ -26,6 +26,19 @@ import type { ResultsResponse } from '@/app/api/coach/[slug]/results/[token]/rou
 // TYPES
 // ============================================================================
 
+export interface EnhancedResultsData {
+  personalizedDefaultNarrative: string
+  personalizedAuthenticNarrative: string
+  personalizedTensionInsights: string | null
+  reflectionThemes: string[]
+  personalizedGuidance: string
+  meaningfulQuotes: Array<{
+    quote: string
+    context: string
+  }>
+  enhancedAt: string
+}
+
 export interface ArchetypeResultsPDFData {
   session: NonNullable<ResultsResponse['session']>
   results: NonNullable<ResultsResponse['results']>
@@ -34,6 +47,7 @@ export interface ArchetypeResultsPDFData {
     role: 'user' | 'assistant'
     content: string
   }>
+  enhancedResults?: EnhancedResultsData
   generatedDate: string
   /** Pre-validated logo URL - pass null to skip logo rendering */
   validatedLogoUrl?: string | null
@@ -383,7 +397,7 @@ function createStyles(colors: BrandColors) {
       lineHeight: 1.4
     },
 
-    // Reflection Section
+    // Reflection Section (legacy - for non-enhanced)
     reflectionSection: {
       marginBottom: 20
     },
@@ -412,6 +426,62 @@ function createStyles(colors: BrandColors) {
       paddingLeft: 12,
       borderLeftWidth: 2,
       borderLeftColor: colors.secondary
+    },
+
+    // Enhanced Results - Quote Callout
+    quoteCallout: {
+      backgroundColor: colors.backgroundSubtle,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.secondary,
+      padding: 12,
+      marginVertical: 12,
+      borderRadius: 4
+    },
+    quoteText: {
+      fontSize: 11,
+      fontStyle: 'italic',
+      color: colors.text,
+      lineHeight: 1.5,
+      marginBottom: 6
+    },
+    quoteContext: {
+      fontSize: 9,
+      color: colors.textMuted
+    },
+
+    // Enhanced Results - Themes
+    themesContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginTop: 12,
+      marginBottom: 16
+    },
+    themeTag: {
+      backgroundColor: colors.secondary,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+      fontSize: 9,
+      color: '#FFFFFF'
+    },
+
+    // Enhanced Results - Personalized Section
+    personalizedSection: {
+      marginBottom: 20
+    },
+    personalizedLabel: {
+      fontSize: 9,
+      color: colors.secondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 8
+    },
+    personalizedNarrative: {
+      fontSize: 11,
+      color: colors.text,
+      lineHeight: 1.6,
+      marginBottom: 12
     },
 
     // Footer
@@ -503,11 +573,12 @@ interface ArchetypeCardProps {
   archetype: NonNullable<ResultsResponse['results']>['primary_archetype']
   label: string
   description: string
+  personalizedNarrative?: string
   styles: ReturnType<typeof createStyles>
   colors: BrandColors
 }
 
-function ArchetypeCard({ archetype, label, description, styles, colors }: ArchetypeCardProps) {
+function ArchetypeCard({ archetype, label, description, personalizedNarrative, styles, colors }: ArchetypeCardProps) {
   return (
     <View style={styles.archetypeCard}>
       {/* Header */}
@@ -518,7 +589,15 @@ function ArchetypeCard({ archetype, label, description, styles, colors }: Archet
 
       {/* Content */}
       <View style={styles.archetypeContent}>
-        <Text style={styles.archetypeDescription}>{description}</Text>
+        {/* Use personalized narrative if available, otherwise use generic description */}
+        {personalizedNarrative ? (
+          <View style={styles.personalizedSection}>
+            <Text style={styles.personalizedLabel}>Your Personalized Insight</Text>
+            <Text style={styles.personalizedNarrative}>{personalizedNarrative}</Text>
+          </View>
+        ) : (
+          <Text style={styles.archetypeDescription}>{description}</Text>
+        )}
 
         {/* Core Traits */}
         <View style={styles.traitsSection}>
@@ -660,6 +739,7 @@ interface MovingForwardSectionProps {
   authenticArchetype: string
   hasTension: boolean
   tenantName: string
+  personalizedGuidance?: string
   styles: ReturnType<typeof createStyles>
 }
 
@@ -668,14 +748,24 @@ function MovingForwardSection({
   authenticArchetype,
   hasTension,
   tenantName,
+  personalizedGuidance,
   styles
 }: MovingForwardSectionProps) {
   return (
     <View style={styles.movingForwardCard}>
       <Text style={styles.movingForwardTitle}>Moving Forward</Text>
-      <Text style={styles.movingForwardIntro}>
-        Understanding your leadership archetype is the first step toward leading with greater intention and sustainability.
-      </Text>
+
+      {/* Use personalized guidance if available */}
+      {personalizedGuidance ? (
+        <View style={styles.personalizedSection}>
+          <Text style={styles.personalizedLabel}>Personalized Guidance</Text>
+          <Text style={styles.personalizedNarrative}>{personalizedGuidance}</Text>
+        </View>
+      ) : (
+        <Text style={styles.movingForwardIntro}>
+          Understanding your leadership archetype is the first step toward leading with greater intention and sustainability.
+        </Text>
+      )}
 
       {/* Step 1 */}
       <View style={styles.stepItem}>
@@ -763,17 +853,60 @@ function ReflectionSection({ messages, styles }: ReflectionSectionProps) {
 }
 
 // ============================================================================
+// COMPONENT: QuoteCallout (Enhanced Results)
+// ============================================================================
+
+interface QuoteCalloutProps {
+  quote: string
+  context: string
+  styles: ReturnType<typeof createStyles>
+}
+
+function QuoteCallout({ quote, context, styles }: QuoteCalloutProps) {
+  return (
+    <View style={styles.quoteCallout}>
+      <Text style={styles.quoteText}>"{quote}"</Text>
+      <Text style={styles.quoteContext}>{context}</Text>
+    </View>
+  )
+}
+
+// ============================================================================
+// COMPONENT: ReflectionThemes (Enhanced Results)
+// ============================================================================
+
+interface ReflectionThemesProps {
+  themes: string[]
+  styles: ReturnType<typeof createStyles>
+}
+
+function ReflectionThemes({ themes, styles }: ReflectionThemesProps) {
+  if (!themes || themes.length === 0) return null
+
+  return (
+    <View style={styles.themesContainer}>
+      {themes.map((theme, index) => (
+        <Text key={index} style={styles.themeTag}>{theme}</Text>
+      ))}
+    </View>
+  )
+}
+
+// ============================================================================
 // MAIN DOCUMENT COMPONENT
 // ============================================================================
 
 export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData }) {
-  const { session, results, tenant, reflectionMessages, generatedDate, validatedLogoUrl } = data
+  const { session, results, tenant, reflectionMessages, enhancedResults, generatedDate, validatedLogoUrl } = data
   const colors = getBrandColors(tenant)
   const styles = createStyles(colors)
 
   const primaryArchetypeName = results.primary_archetype.name
   const authenticArchetypeName = results.authentic_archetype.name
   const hasTension = results.tension_pattern.has_tension
+
+  // Check if we have enhanced results
+  const isEnhanced = !!enhancedResults
 
   return (
     <Document>
@@ -785,18 +918,36 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
         <View style={styles.heroSection}>
           <Text style={styles.heroTitle}>Your Leadership Archetype</Text>
           <Text style={styles.heroSubtitle}>
-            Based on your responses, here's what we discovered about your natural leadership patterns.
+            {isEnhanced
+              ? 'Your personalized leadership insights, enriched by your reflections.'
+              : 'Based on your responses, here\'s what we discovered about your natural leadership patterns.'
+            }
           </Text>
         </View>
 
-        {/* Primary Archetype */}
+        {/* Reflection Themes (if enhanced) */}
+        {isEnhanced && enhancedResults.reflectionThemes && (
+          <ReflectionThemes themes={enhancedResults.reflectionThemes} styles={styles} />
+        )}
+
+        {/* Primary Archetype - with personalized narrative if enhanced */}
         <ArchetypeCard
           archetype={results.primary_archetype}
           label="Your Primary Archetype"
           description="This is how you naturally respond when pressure is high and things feel messy."
+          personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
           styles={styles}
           colors={colors}
         />
+
+        {/* Quote Callout (first quote on page 1 if enhanced) */}
+        {isEnhanced && enhancedResults.meaningfulQuotes?.[0] && (
+          <QuoteCallout
+            quote={enhancedResults.meaningfulQuotes[0].quote}
+            context={enhancedResults.meaningfulQuotes[0].context}
+            styles={styles}
+          />
+        )}
 
         <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} />
       </Page>
@@ -815,34 +966,53 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
             colors={colors}
           />
 
-          {/* Authentic Archetype */}
+          {/* Personalized Tension Insights (if enhanced) */}
+          {isEnhanced && enhancedResults.personalizedTensionInsights && (
+            <View style={styles.personalizedSection}>
+              <Text style={styles.personalizedLabel}>Your Personalized Tension Insight</Text>
+              <Text style={styles.personalizedNarrative}>{enhancedResults.personalizedTensionInsights}</Text>
+            </View>
+          )}
+
+          {/* Authentic Archetype - with personalized narrative if enhanced */}
           <ArchetypeCard
             archetype={results.authentic_archetype}
             label="Your Authentic Archetype"
             description="This is the leadership style that feels most sustainable and energizing when you're at your best."
+            personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
             styles={styles}
             colors={colors}
           />
+
+          {/* Quote Callout (second quote on page 2 if enhanced) */}
+          {isEnhanced && enhancedResults.meaningfulQuotes?.[1] && (
+            <QuoteCallout
+              quote={enhancedResults.meaningfulQuotes[1].quote}
+              context={enhancedResults.meaningfulQuotes[1].context}
+              styles={styles}
+            />
+          )}
 
           <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} />
         </Page>
       )}
 
-      {/* Page 3 (or 2 if no tension): Moving Forward + Reflections */}
+      {/* Page 3 (or 2 if no tension): Moving Forward */}
       <Page size="A4" style={styles.page}>
         <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 
-        {/* Moving Forward */}
+        {/* Moving Forward - with personalized guidance if enhanced */}
         <MovingForwardSection
           primaryArchetype={primaryArchetypeName}
           authenticArchetype={authenticArchetypeName}
           hasTension={hasTension}
           tenantName={tenant.display_name}
+          personalizedGuidance={enhancedResults?.personalizedGuidance}
           styles={styles}
         />
 
-        {/* Reflections (if completed) */}
-        {reflectionMessages && reflectionMessages.length > 0 && (
+        {/* Legacy Reflections - ONLY show if NOT enhanced (fallback for old sessions) */}
+        {!isEnhanced && reflectionMessages && reflectionMessages.length > 0 && (
           <ReflectionSection messages={reflectionMessages} styles={styles} />
         )}
 

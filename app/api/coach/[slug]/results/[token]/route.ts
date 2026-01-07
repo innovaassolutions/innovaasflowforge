@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
+import type { EnhancedResults } from '@/lib/agents/enhancement-agent'
 
 function getServiceClient() {
   return createClient(
@@ -64,6 +65,7 @@ export interface ResultsResponse {
     }
     scores: ArchetypeResultsData['scores']
   }
+  enhancedResults?: EnhancedResults | null
   tenant?: {
     id: string
     display_name: string
@@ -105,7 +107,7 @@ export async function GET(
     // Find coaching session by token
     const { data: session, error: sessionError } = await supabase
       .from('coaching_sessions')
-      .select('id, client_name, client_email, client_status, reflection_status, completed_at, metadata')
+      .select('id, client_name, client_email, client_status, reflection_status, completed_at, metadata, enhanced_results')
       .eq('access_token', token)
       .eq('tenant_id', tenant.id)
       .single()
@@ -183,6 +185,7 @@ export async function GET(
         tension_pattern: tensionPattern,
         scores: archetypeResults.scores
       },
+      enhancedResults: session.enhanced_results as EnhancedResults | null,
       tenant: {
         id: tenant.id,
         display_name: tenant.display_name,
