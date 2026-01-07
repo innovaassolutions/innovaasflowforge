@@ -17,8 +17,8 @@ import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
 import type { TenantProfile } from '@/lib/supabase/server'
 
 /**
- * Validates that a logo URL is accessible and returns it, or null if invalid.
- * This prevents PDF generation failures due to unreachable logo URLs.
+ * Validates that a logo URL is accessible and compatible with react-pdf.
+ * react-pdf does NOT support SVG - only PNG, JPG, and base64.
  */
 async function validateLogoUrl(logoUrl: string | undefined): Promise<string | null> {
   if (!logoUrl) return null
@@ -35,11 +35,18 @@ async function validateLogoUrl(logoUrl: string | undefined): Promise<string | nu
       return null
     }
 
-    // Check content type is an image
+    // Check content type is a supported image format (NOT SVG)
     const contentType = response.headers.get('content-type')
-    if (contentType && !contentType.startsWith('image/')) {
-      console.warn(`Logo URL is not an image (${contentType}): ${logoUrl}`)
-      return null
+    if (contentType) {
+      // react-pdf supports PNG, JPEG - NOT SVG
+      if (contentType.includes('svg')) {
+        console.warn(`Logo is SVG (not supported by react-pdf): ${logoUrl}`)
+        return null
+      }
+      if (!contentType.startsWith('image/')) {
+        console.warn(`Logo URL is not an image (${contentType}): ${logoUrl}`)
+        return null
+      }
     }
 
     return logoUrl
@@ -197,13 +204,14 @@ export async function POST(
     // Cast tenant to TenantProfile type
     const tenantProfile = tenant as unknown as TenantProfile
 
-    // Validate logo URL before PDF generation to prevent failures
-    // TEMPORARY: Skip logo entirely to debug PDF generation issue
+    // Validate logo URL before PDF generation
+    // react-pdf doesn't support SVG - will fall back to text if logo is invalid
     const logoUrl = tenantProfile.brand_config?.logo?.url
     console.log('🔍 Logo URL from tenant:', logoUrl || 'none')
-    // Force null to skip logo and use text fallback - debugging PDF generation
-    const validatedLogoUrl: string | null = null
-    console.log('⚠️ Logo skipped for debugging - using text fallback')
+    const validatedLogoUrl = await validateLogoUrl(logoUrl)
+    if (logoUrl && !validatedLogoUrl) {
+      console.log('⚠️ Logo validation failed, falling back to text:', logoUrl)
+    }
 
     // Prepare PDF data
     const pdfData: ArchetypeResultsPDFData = {

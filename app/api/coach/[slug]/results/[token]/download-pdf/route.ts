@@ -13,6 +13,46 @@ import type { ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
 import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
 import type { TenantProfile } from '@/lib/supabase/server'
 
+/**
+ * Validates that a logo URL is accessible and compatible with react-pdf.
+ * react-pdf does NOT support SVG - only PNG, JPG, and base64.
+ */
+async function validateLogoUrl(logoUrl: string | undefined): Promise<string | null> {
+  if (!logoUrl) return null
+
+  try {
+    // Check if URL is valid and accessible with a HEAD request
+    const response = await fetch(logoUrl, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    })
+
+    if (!response.ok) {
+      console.warn(`Logo URL returned ${response.status}: ${logoUrl}`)
+      return null
+    }
+
+    // Check content type is a supported image format (NOT SVG)
+    const contentType = response.headers.get('content-type')
+    if (contentType) {
+      // react-pdf supports PNG, JPEG - NOT SVG
+      if (contentType.includes('svg')) {
+        console.warn(`Logo is SVG (not supported by react-pdf): ${logoUrl}`)
+        return null
+      }
+      if (!contentType.startsWith('image/')) {
+        console.warn(`Logo URL is not an image (${contentType}): ${logoUrl}`)
+        return null
+      }
+    }
+
+    return logoUrl
+  } catch (error) {
+    console.warn(`Failed to validate logo URL: ${logoUrl}`, error)
+    return null
+  }
+}
+
 function getServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -129,6 +169,14 @@ export async function GET(
     // Cast tenant to TenantProfile type
     const tenantProfile = tenant as unknown as TenantProfile
 
+    // Validate logo URL before PDF generation
+    // react-pdf doesn't support SVG - will fall back to text if logo is invalid
+    const logoUrl = (tenantProfile.brand_config as { logo?: { url?: string } })?.logo?.url
+    const validatedLogoUrl = await validateLogoUrl(logoUrl)
+    if (logoUrl && !validatedLogoUrl) {
+      console.log('⚠️ Logo validation failed, falling back to text:', logoUrl)
+    }
+
     // Prepare PDF data
     const pdfData: ArchetypeResultsPDFData = {
       session: {
@@ -155,7 +203,7 @@ export async function GET(
       reflectionMessages: session.reflection_messages as Array<{ role: 'user' | 'assistant'; content: string }> | undefined,
       enhancedResults: session.enhanced_results as ArchetypeResultsPDFData['enhancedResults'],
       generatedDate,
-      validatedLogoUrl: (tenantProfile.brand_config as { logo?: { url?: string } })?.logo?.url || null
+      validatedLogoUrl
     }
 
     // Generate PDF using Pages Router API
