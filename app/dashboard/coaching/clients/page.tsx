@@ -270,7 +270,7 @@ export default function CoachingClientsPage() {
 
   function getReportUrl(accessToken: string) {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-    return `${baseUrl}/flowforge/reports/coaching/${accessToken}`
+    return `${baseUrl}/flowforge/coach/${tenant?.slug}/results/${accessToken}`
   }
 
   function copySessionLink(accessToken: string) {

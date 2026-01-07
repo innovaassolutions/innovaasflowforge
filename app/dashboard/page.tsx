@@ -485,7 +485,7 @@ export default function DashboardPage() {
                             asChild
                             className="bg-emerald-600 hover:bg-emerald-700 text-white"
                           >
-                            <Link href={`/reports/coaching/${session.access_token}`} target="_blank">
+                            <Link href={`/coach/${tenantSlug}/results/${session.access_token}`} target="_blank">
                               <FileText className="w-4 h-4 mr-1.5" />
                               View Report
                             </Link>
