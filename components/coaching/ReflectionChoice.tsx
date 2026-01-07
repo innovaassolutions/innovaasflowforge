@@ -49,7 +49,7 @@ export function ReflectionChoice({
     router.push(`/coach/${slug}/results/${token}/thank-you`)
   }
 
-  // If reflection is already completed, show completion message
+  // If reflection is already completed, show completion message with PDF download
   if (reflectionStatus === 'completed') {
     return (
       <section
@@ -85,7 +85,7 @@ export function ReflectionChoice({
           </h2>
         </div>
         <p style={{ color: 'var(--brand-text)' }}>
-          Thank you for taking the time to reflect on your results. Your insights have been saved.
+          Thank you for taking the time to reflect on your results. Your personalized insights are now ready.
         </p>
         <Link
           href={`/coach/${slug}/results/${token}/reflect`}
@@ -95,25 +95,24 @@ export function ReflectionChoice({
           View reflection conversation
         </Link>
 
-        {/* Booking CTA */}
-        {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && (
-          <div
-            className="mt-6 p-4 rounded-lg text-center"
-            style={{
-              backgroundColor: 'var(--brand-bg)',
-              border: '1px solid var(--brand-border)',
-            }}
-          >
-            <p className="mb-3 font-medium" style={{ color: 'var(--brand-text)' }}>
-              Ready to explore your results further?
-            </p>
-            <a
-              href={bookingConfig.url}
-              target="_blank"
-              rel="noopener noreferrer"
+        {/* Action Buttons: PDF Download + Booking */}
+        <div
+          className="mt-6 p-4 rounded-lg"
+          style={{
+            backgroundColor: 'var(--brand-bg)',
+            border: '1px solid var(--brand-border)',
+          }}
+        >
+          <p className="mb-4 font-medium text-center" style={{ color: 'var(--brand-text)' }}>
+            Your personalized results are ready
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {/* PDF Download Button */}
+            <Link
+              href={`/coach/${slug}/results/${token}/thank-you`}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
               style={{
-                backgroundColor: 'var(--brand-secondary, var(--brand-primary))',
+                backgroundColor: 'var(--brand-primary)',
                 color: 'white',
               }}
             >
@@ -127,13 +126,42 @@ export function ReflectionChoice({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              {bookingConfig.buttonText || 'Book a Session'}
-            </a>
+              Download PDF
+            </Link>
+
+            {/* Booking CTA */}
+            {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && (
+              <a
+                href={bookingConfig.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+                style={{
+                  backgroundColor: 'var(--brand-secondary, var(--brand-primary))',
+                  color: 'white',
+                }}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                {bookingConfig.buttonText || 'Book a Session'}
+              </a>
+            )}
           </div>
-        )}
+        </div>
       </section>
     )
   }
