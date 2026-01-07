@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { resend } from '@/lib/resend'
+import { render } from '@react-email/render'
 import type { ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
 import { ArchetypeResultsEmail } from '@/lib/email/templates/archetype-results-email'
 import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
@@ -354,6 +355,37 @@ export async function POST(
       const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
       const fromAddress = `${senderName} <${fromEmail}>`
 
+      // Pre-render email to HTML to avoid bundling issues on Vercel
+      // (similar to react-pdf bundling issues)
+      const emailHtml = await render(ArchetypeResultsEmail({
+        participantName: session.client_name,
+        coachName: tenantProfile.display_name,
+        coachEmail: coachEmail,
+        resultsUrl: resultsUrl,
+        archetypeName: primaryArchetypeData.name,
+        hasTension: hasTension,
+        brandConfig: {
+          logo: brandConfig.logo,
+          colors: {
+            primary: brandConfig.colors?.primary,
+            secondary: brandConfig.colors?.secondary,
+            background: brandConfig.colors?.background,
+            text: brandConfig.colors?.text,
+            textMuted: brandConfig.colors?.textMuted,
+          },
+          tagline: brandConfig.tagline,
+          completionMessage: brandConfig.completionMessage,
+        },
+        emailConfig: {
+          senderName: emailConfig?.senderName,
+          emailFooter: emailConfig?.emailFooter,
+        },
+        // TODO: Add booking config when that feature is implemented
+        bookingConfig: undefined
+      }))
+
+      console.log('📧 Email HTML rendered, length:', emailHtml.length)
+
       const emailResult = await resend.emails.send({
         from: fromAddress,
         to: session.client_email,
@@ -365,32 +397,7 @@ export async function POST(
             content: pdfBuffer
           }
         ],
-        react: ArchetypeResultsEmail({
-          participantName: session.client_name,
-          coachName: tenantProfile.display_name,
-          coachEmail: coachEmail,
-          resultsUrl: resultsUrl,
-          archetypeName: primaryArchetypeData.name,
-          hasTension: hasTension,
-          brandConfig: {
-            logo: brandConfig.logo,
-            colors: {
-              primary: brandConfig.colors?.primary,
-              secondary: brandConfig.colors?.secondary,
-              background: brandConfig.colors?.background,
-              text: brandConfig.colors?.text,
-              textMuted: brandConfig.colors?.textMuted,
-            },
-            tagline: brandConfig.tagline,
-            completionMessage: brandConfig.completionMessage,
-          },
-          emailConfig: {
-            senderName: emailConfig?.senderName,
-            emailFooter: emailConfig?.emailFooter,
-          },
-          // TODO: Add booking config when that feature is implemented
-          bookingConfig: undefined
-        })
+        html: emailHtml
       })
 
       if (emailResult.error) {
