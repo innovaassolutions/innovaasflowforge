@@ -4,7 +4,10 @@
  */
 
 import { NextResponse } from 'next/server'
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import React from 'react'
+import ReactPDF from '@react-pdf/renderer'
+
+const { Document, Page, Text, View, StyleSheet, renderToBuffer } = ReactPDF
 
 const styles = StyleSheet.create({
   page: {
@@ -21,25 +24,20 @@ const styles = StyleSheet.create({
   },
 })
 
-// Simple inline document for v3 compatibility
-const TestDocument = (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View>
-        <Text style={styles.title}>Test PDF</Text>
-        <Text style={styles.text}>If you can see this, PDF generation works!</Text>
-        <Text style={styles.text}>react-pdf v3.4.5</Text>
-      </View>
-    </Page>
-  </Document>
-)
-
 export async function GET() {
   try {
-    console.log('🧪 Test PDF: Starting generation with react-pdf v3...')
+    console.log('🧪 Test PDF: Starting generation...')
 
-    // renderToBuffer works correctly in v3
-    const pdfBuffer = await renderToBuffer(TestDocument)
+    // Create elements using React.createElement to avoid JSX transpilation issues
+    const textTitle = React.createElement(Text, { style: styles.title }, 'Test PDF')
+    const textBody = React.createElement(Text, { style: styles.text }, 'If you can see this, PDF generation works!')
+    const textVersion = React.createElement(Text, { style: styles.text }, 'react-pdf v3.4.5')
+
+    const view = React.createElement(View, null, textTitle, textBody, textVersion)
+    const page = React.createElement(Page, { size: 'A4', style: styles.page }, view)
+    const doc = React.createElement(Document, null, page)
+
+    const pdfBuffer = await renderToBuffer(doc)
 
     console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
 
