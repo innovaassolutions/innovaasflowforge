@@ -12,9 +12,16 @@ import Anthropic from '@anthropic-ai/sdk'
 import { ARCHETYPES, type Archetype } from './archetype-constitution'
 import type { ReflectionMessage, ArchetypeResultsContext, ReflectionTenantContext } from './reflection-agent'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+// Lazy initialization to support scripts that load env vars after import
+let anthropicClient: Anthropic | null = null
+function getAnthropicClient(): Anthropic {
+  if (!anthropicClient) {
+    anthropicClient = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY!,
+    })
+  }
+  return anthropicClient
+}
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -91,7 +98,7 @@ export async function processEnhancement(
   const reflectionTranscript = formatReflectionTranscript(reflectionMessages)
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await getAnthropicClient().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
       system: systemPrompt,
