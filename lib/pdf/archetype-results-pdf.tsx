@@ -56,7 +56,8 @@ interface BrandColors {
 // ============================================================================
 
 function getBrandColors(tenant: TenantProfile): BrandColors {
-  const colors = tenant.brand_config.colors
+  // Defensive: Handle missing brand_config or colors
+  const colors = tenant?.brand_config?.colors || {}
   return {
     primary: colors.primary || '#F25C05',
     primaryHover: colors.primaryHover || '#DC5204',
@@ -523,7 +524,7 @@ function ArchetypeCard({ archetype, label, description, styles, colors }: Archet
         <View style={styles.traitsSection}>
           <Text style={styles.sectionLabel}>Core Traits</Text>
           <View style={styles.traitsContainer}>
-            {archetype.core_traits.map((trait, index) => (
+            {(archetype.core_traits || []).map((trait, index) => (
               <Text key={index} style={styles.trait}>{trait}</Text>
             ))}
           </View>
@@ -544,7 +545,7 @@ function ArchetypeCard({ archetype, label, description, styles, colors }: Archet
         {/* Watch For (Overuse Signals) */}
         <View style={styles.watchForSection}>
           <Text style={styles.sectionLabel}>Watch For (Signs of Overuse)</Text>
-          {archetype.overuse_signals.map((signal, index) => (
+          {(archetype.overuse_signals || []).map((signal, index) => (
             <View key={index} style={styles.bulletItem}>
               <View style={styles.bulletDot} />
               <Text style={styles.bulletText}>{signal}</Text>
@@ -619,7 +620,7 @@ function TensionPatternCard({
         </View>
 
         {/* Triggers */}
-        {tensionPattern.triggers && tensionPattern.triggers.length > 0 && (
+        {tensionPattern.triggers && Array.isArray(tensionPattern.triggers) && tensionPattern.triggers.length > 0 && (
           <View style={{ marginBottom: 12 }}>
             <Text style={{ ...styles.sectionLabel, color: colors.secondary }}>Common Triggers</Text>
             {tensionPattern.triggers.map((trigger, index) => (
