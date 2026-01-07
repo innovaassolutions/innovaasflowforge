@@ -274,10 +274,13 @@ export async function POST(
 
     // Generate PDF using Pages Router API (works better with react-pdf on Vercel)
     // See: https://github.com/diegomura/react-pdf/issues/2460
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // On Vercel, use VERCEL_URL for internal calls. NEXT_PUBLIC_APP_URL is for external URLs.
+    const internalBaseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     let pdfBuffer: Buffer
     try {
-      const pdfApiUrl = `${baseUrl}/flowforge/api/generate-archetype-pdf`
+      const pdfApiUrl = `${internalBaseUrl}/flowforge/api/generate-archetype-pdf`
 
       console.log('📤 Calling Pages Router PDF API at:', pdfApiUrl)
 
@@ -316,8 +319,9 @@ export async function POST(
       )
     }
 
-    // Build results URL (baseUrl already defined in PDF generation section above)
-    const resultsUrl = `${baseUrl}/flowforge/coach/${slug}/results/${token}`
+    // Build results URL using the public-facing URL (not internal Vercel URL)
+    const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
+    const resultsUrl = `${publicBaseUrl}/flowforge/coach/${slug}/results/${token}`
 
     // Get coach email from tenant config
     const emailConfig = tenantProfile.email_config as {
