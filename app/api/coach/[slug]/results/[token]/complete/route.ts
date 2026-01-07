@@ -274,10 +274,9 @@ export async function POST(
 
     // Generate PDF using Pages Router API (works better with react-pdf on Vercel)
     // See: https://github.com/diegomura/react-pdf/issues/2460
-    // On Vercel, use VERCEL_URL for internal calls. NEXT_PUBLIC_APP_URL is for external URLs.
-    const internalBaseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Note: We MUST use the public URL (not VERCEL_URL) because Vercel Authentication
+    // blocks direct deployment URL access. The public domain bypasses SSO protection.
+    const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
     let pdfBuffer: Buffer
     try {
       const pdfApiUrl = `${internalBaseUrl}/flowforge/api/generate-archetype-pdf`
@@ -294,6 +293,7 @@ export async function POST(
           'Content-Type': 'application/json',
         },
         body: pdfDataJson,
+        signal: AbortSignal.timeout(30000), // 30 second timeout for PDF generation
       })
 
       console.log('📥 PDF API response status:', pdfResponse.status)
