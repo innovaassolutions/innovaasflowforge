@@ -284,17 +284,24 @@ export async function POST(
 
       console.log('📤 Calling Pages Router PDF API at:', pdfApiUrl)
 
+      // Log pdfData size to check for issues
+      const pdfDataJson = JSON.stringify(pdfData)
+      console.log('📊 PDF data size:', pdfDataJson.length, 'bytes')
+
       const pdfResponse = await fetch(pdfApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(pdfData),
+        body: pdfDataJson,
       })
 
+      console.log('📥 PDF API response status:', pdfResponse.status)
+
       if (!pdfResponse.ok) {
-        const errorData = await pdfResponse.json().catch(() => ({}))
-        throw new Error(errorData.error || `PDF API returned ${pdfResponse.status}`)
+        const errorText = await pdfResponse.text().catch(() => 'Failed to read response')
+        console.error('❌ PDF API error response:', errorText.substring(0, 500))
+        throw new Error(`PDF API returned ${pdfResponse.status}: ${errorText.substring(0, 200)}`)
       }
 
       const pdfResult = await pdfResponse.json()
