@@ -41,11 +41,13 @@ export async function GET() {
     )
 
     const pdfDoc = pdf(pdfDocument)
-    const pdfBuffer = await pdfDoc.toBuffer()
+    // toBlob() returns a Blob which we can convert to ArrayBuffer
+    const pdfBlob = await pdfDoc.toBlob()
+    const pdfArrayBuffer = await pdfBlob.arrayBuffer()
 
-    console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
+    console.log('✅ Test PDF: Generated successfully, size:', pdfArrayBuffer.byteLength, 'bytes')
 
-    return new NextResponse(new Uint8Array(pdfBuffer), {
+    return new NextResponse(pdfArrayBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename="test.pdf"',
