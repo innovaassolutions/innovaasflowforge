@@ -8,7 +8,7 @@ import {
   Svg,
   Path,
   Circle
-} from '@react-pdf/renderer'
+} from '@joshuajaco/react-pdf-renderer-bundled'
 import { ARCHETYPES, Archetype } from './agents/archetype-constitution'
 
 // ============================================================================

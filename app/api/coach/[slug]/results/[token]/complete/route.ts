@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { renderToBuffer } from '@react-pdf/renderer'
+import { renderToBuffer } from '@joshuajaco/react-pdf-renderer-bundled'
 import { resend } from '@/lib/resend'
 import { ArchetypeResultsPDF, type ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
 import { ArchetypeResultsEmail } from '@/lib/email/templates/archetype-results-email'

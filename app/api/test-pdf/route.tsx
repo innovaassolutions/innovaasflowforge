@@ -40,7 +40,10 @@ export async function GET() {
 
     console.log('✅ Test PDF: Generated successfully, size:', buffer.length, 'bytes')
 
-    return new NextResponse(buffer, {
+    // Convert Buffer to Uint8Array for NextResponse compatibility
+    const uint8Array = new Uint8Array(buffer)
+
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename="test.pdf"',

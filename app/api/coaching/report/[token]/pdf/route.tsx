@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { renderToBuffer } from '@react-pdf/renderer'
+import { renderToBuffer } from '@joshuajaco/react-pdf-renderer-bundled'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { CoachingReportDocument, CoachingReportData } from '@/lib/pdf-coaching-report'
 import { Archetype } from '@/lib/agents/archetype-constitution'

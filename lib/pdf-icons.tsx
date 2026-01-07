@@ -1,5 +1,5 @@
 import React from 'react'
-import { Svg, Path, Circle, Rect, G } from '@react-pdf/renderer'
+import { Svg, Path, Circle, Rect, G } from '@joshuajaco/react-pdf-renderer-bundled'
 import { INNOVAAS_BRANDING } from './report-generator'
 
 interface IconProps {
