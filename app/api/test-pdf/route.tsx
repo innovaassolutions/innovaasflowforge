@@ -22,14 +22,14 @@ const styles = StyleSheet.create({
   },
 })
 
-function MinimalPDF() {
+function MinimalPDF({ timestamp }: { timestamp: string }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View>
           <Text style={styles.title}>Test PDF</Text>
           <Text style={styles.text}>If you can see this, PDF generation works!</Text>
-          <Text style={styles.text}>Generated at: {new Date().toISOString()}</Text>
+          <Text style={styles.text}>Generated at: {timestamp}</Text>
         </View>
       </Page>
     </Document>
@@ -40,7 +40,8 @@ export async function GET() {
   try {
     console.log('🧪 Test PDF: Starting generation...')
 
-    const pdfBuffer = await renderToBuffer(<MinimalPDF />)
+    const timestamp = new Date().toISOString()
+    const pdfBuffer = await renderToBuffer(<MinimalPDF timestamp={timestamp} />)
 
     console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
 
