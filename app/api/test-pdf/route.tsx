@@ -5,7 +5,6 @@
 
 import { NextResponse } from 'next/server'
 import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer'
-import React from 'react'
 
 const styles = StyleSheet.create({
   page: {
@@ -22,28 +21,26 @@ const styles = StyleSheet.create({
   },
 })
 
-function MinimalPDF({ timestamp }: { timestamp: string }) {
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View>
-          <Text style={styles.title}>Test PDF</Text>
-          <Text style={styles.text}>If you can see this, PDF generation works!</Text>
-          <Text style={styles.text}>Generated at: {timestamp}</Text>
-        </View>
-      </Page>
-    </Document>
-  )
-}
-
 export async function GET() {
   try {
     console.log('🧪 Test PDF: Starting generation...')
 
     const timestamp = new Date().toISOString()
 
-    // Use pdf().toBuffer() instead of renderToBuffer for better serverless compatibility
-    const pdfDoc = pdf(React.createElement(MinimalPDF, { timestamp }))
+    // Create Document directly to satisfy pdf() type requirements
+    const pdfDocument = (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View>
+            <Text style={styles.title}>Test PDF</Text>
+            <Text style={styles.text}>If you can see this, PDF generation works!</Text>
+            <Text style={styles.text}>Generated at: {timestamp}</Text>
+          </View>
+        </Page>
+      </Document>
+    )
+
+    const pdfDoc = pdf(pdfDocument)
     const pdfBuffer = await pdfDoc.toBuffer()
 
     console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
