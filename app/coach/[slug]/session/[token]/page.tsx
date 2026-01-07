@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useTenant } from '@/lib/contexts/tenant-context'
 
@@ -36,6 +36,7 @@ interface SessionState {
 
 export default function SessionPage() {
   const params = useParams()
+  const router = useRouter()
   const { tenant } = useTenant()
 
   const slug = params.slug as string
@@ -70,10 +71,9 @@ export default function SessionPage() {
       if (data.success) {
         setSession(data.session)
 
-        // If session is completed, show results message
+        // If session is completed, redirect to results page
         if (data.session.client_status === 'completed') {
-          setIsComplete(true)
-          setMessages(data.conversationHistory || [])
+          router.push(`/coach/${slug}/results/${token}`)
           return
         }
 
@@ -134,8 +134,12 @@ export default function SessionPage() {
         setMessages((prev) => [...prev, assistantMessage])
         setSessionState(data.sessionState)
 
-        // Check if interview is complete
+        // Check if interview is complete - redirect to results page
         if (data.isComplete) {
+          // Short delay to show the final AI message before redirecting
+          setTimeout(() => {
+            router.push(`/coach/${slug}/results/${token}`)
+          }, 2000)
           setIsComplete(true)
         }
       } else {
@@ -411,20 +415,10 @@ export default function SessionPage() {
               }}
             >
               <div className="flex items-center justify-center gap-3 mb-3">
-                <svg
-                  className="w-8 h-8"
-                  style={{ color: 'var(--brand-primary)' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <div
+                  className="inline-block h-6 w-6 animate-spin rounded-full border-3 border-r-transparent"
+                  style={{ borderColor: 'var(--brand-primary)', borderRightColor: 'transparent' }}
+                />
                 <h3
                   className="text-2xl font-bold"
                   style={{
@@ -436,11 +430,7 @@ export default function SessionPage() {
                 </h3>
               </div>
               <p style={{ color: 'var(--brand-text)' }}>
-                {tenant.brand_config.completionMessage ||
-                  `Thank you for completing your Leadership Archetype Assessment, ${session.stakeholder_name}. Your insights have been recorded.`}
-              </p>
-              <p className="mt-4" style={{ color: 'var(--brand-text-muted)' }}>
-                {tenant.display_name} will be in touch to discuss your results.
+                Taking you to your results...
               </p>
             </div>
           ) : (

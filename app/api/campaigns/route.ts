@@ -226,15 +226,16 @@ export async function POST(request: NextRequest) {
 
         const accessToken = generateAccessToken()
 
-        // Create campaign assignment without stakeholder profile
+        // Create participant session (use participant_sessions table, not the view)
         const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
-          .from('campaign_assignments')
+          .from('participant_sessions')
           .insert({
             campaign_id: campaign.id,
             stakeholder_name: participant.name,
             stakeholder_email: participant.email,
             access_token: accessToken,
-            status: 'invited'
+            status: 'invited',
+            tenant_id: tenantId // Link to tenant for coaching campaigns
           } as any)
           .select()
           .single()) as any
@@ -339,7 +340,7 @@ export async function POST(request: NextRequest) {
       })
 
       const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
-        .from('campaign_assignments')
+        .from('participant_sessions')
         .insert({
           campaign_id: campaign.id,
           stakeholder_profile_id: stakeholderProfileId,
@@ -349,7 +350,8 @@ export async function POST(request: NextRequest) {
           stakeholder_role: stakeholderRole,
           stakeholder_title: stakeholderTitle,
           access_token: accessToken,
-          status: 'invited'
+          status: 'invited',
+          tenant_id: tenantId // Link to tenant
         } as any)
         .select()
         .single()) as any
