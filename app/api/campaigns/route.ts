@@ -226,9 +226,9 @@ export async function POST(request: NextRequest) {
 
         const accessToken = generateAccessToken()
 
-        // Create participant session (use participant_sessions table, not the view)
+        // Create campaign assignment for participant
         const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
-          .from('participant_sessions')
+          .from('campaign_assignments')
           .insert({
             campaign_id: campaign.id,
             stakeholder_name: participant.name,
@@ -340,7 +340,7 @@ export async function POST(request: NextRequest) {
       })
 
       const { data: assignmentData, error: assignmentError } = (await supabaseAdmin
-        .from('participant_sessions')
+        .from('campaign_assignments')
         .insert({
           campaign_id: campaign.id,
           stakeholder_profile_id: stakeholderProfileId,
