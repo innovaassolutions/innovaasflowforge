@@ -394,13 +394,20 @@ export async function POST(
       })
 
       if (emailResult.error) {
-        console.error('Email send error:', emailResult.error)
+        console.error('Email send error:', JSON.stringify(emailResult.error, null, 2))
         // Provide helpful error message for common Resend issues
         let errorMessage = 'Failed to send email'
         const errorDetails = emailResult.error as any
-        if (errorDetails?.message?.includes('can only send to') ||
-            errorDetails?.message?.includes('not verified')) {
+        const errorMsg = errorDetails?.message || ''
+        console.error('Email error message:', errorMsg)
+
+        if (errorMsg.includes('can only send to') || errorMsg.includes('not verified')) {
           errorMessage = 'Email domain not verified. Configure RESEND_FROM_EMAIL with a verified domain.'
+        } else if (errorMsg.includes('API key')) {
+          errorMessage = 'Invalid Resend API key.'
+        } else if (errorMsg) {
+          // Include actual error in response for debugging
+          errorMessage = `Email error: ${errorMsg}`
         }
         return NextResponse.json({
           success: false,
@@ -434,13 +441,17 @@ export async function POST(
       })
 
     } catch (emailError: any) {
-      console.error('Email send exception:', emailError)
+      console.error('Email send exception:', emailError?.message || emailError)
+      console.error('Email error stack:', emailError?.stack)
       let errorMessage = 'Failed to send email'
-      if (emailError?.message?.includes('can only send to') ||
-          emailError?.message?.includes('not verified')) {
+      const errMsg = emailError?.message || ''
+      if (errMsg.includes('can only send to') || errMsg.includes('not verified')) {
         errorMessage = 'Email domain not verified. Configure RESEND_FROM_EMAIL with a verified domain.'
-      } else if (emailError?.message?.includes('API key')) {
+      } else if (errMsg.includes('API key')) {
         errorMessage = 'Invalid Resend API key. Check RESEND_API_KEY environment variable.'
+      } else if (errMsg) {
+        // Include actual error for debugging
+        errorMessage = `Email exception: ${errMsg}`
       }
       return NextResponse.json({
         success: false,
