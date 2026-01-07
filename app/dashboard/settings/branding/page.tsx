@@ -25,7 +25,8 @@ import {
   Copy,
   Check,
   Upload,
-  Trash2
+  Trash2,
+  Calendar
 } from 'lucide-react'
 
 interface TenantProfile {
@@ -53,6 +54,11 @@ interface TenantProfile {
     welcomeMessage?: string
     completionMessage?: string
     showPoweredBy?: boolean
+    booking?: {
+      enabled: boolean
+      url: string
+      buttonText?: string
+    }
   }
   email_config: {
     replyTo?: string
@@ -98,6 +104,9 @@ export default function BrandingSettingsPage() {
     logoUrl: '',
     logoAlt: '',
     logoPosition: 'left' as 'left' | 'center' | 'right',
+    bookingEnabled: false,
+    bookingUrl: '',
+    bookingButtonText: '',
   })
 
   useEffect(() => {
@@ -161,6 +170,9 @@ export default function BrandingSettingsPage() {
         logoUrl: brandConfig.logo?.url || '',
         logoAlt: brandConfig.logo?.alt || '',
         logoPosition: brandConfig.logo?.position || 'left',
+        bookingEnabled: brandConfig.booking?.enabled || false,
+        bookingUrl: brandConfig.booking?.url || '',
+        bookingButtonText: brandConfig.booking?.buttonText || '',
       })
     } catch (err) {
       console.error('Error loading tenant:', err)
@@ -225,6 +237,11 @@ export default function BrandingSettingsPage() {
           alt: formData.logoAlt || formData.displayName,
           position: formData.logoPosition,
         } : null,
+        booking: {
+          enabled: formData.bookingEnabled,
+          url: formData.bookingUrl || '',
+          buttonText: formData.bookingButtonText || null,
+        },
       }
 
       // Build updated email_config
@@ -851,6 +868,76 @@ export default function BrandingSettingsPage() {
               placeholder="Your Business | Contact Info"
             />
           </div>
+        </div>
+
+        {/* Booking Button Section */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Calendar className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Booking Button</h2>
+              <p className="text-sm text-muted-foreground">Add a scheduling link to your results page</p>
+            </div>
+          </div>
+
+          {/* Enable Toggle */}
+          <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
+            <div>
+              <h3 className="font-medium text-foreground">Show Booking Button</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Display a "Book a Session" button on your results page
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.bookingEnabled}
+                onChange={(e) => setFormData({ ...formData, bookingEnabled: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          {/* Booking URL and Button Text (only show when enabled) */}
+          {formData.bookingEnabled && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Booking URL <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={formData.bookingUrl}
+                  onChange={(e) => setFormData({ ...formData, bookingUrl: e.target.value })}
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="https://your-scheduler.com/book"
+                  required={formData.bookingEnabled}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Your Acuity, Calendly, or other scheduling link
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Button Text
+                </label>
+                <input
+                  type="text"
+                  value={formData.bookingButtonText}
+                  onChange={(e) => setFormData({ ...formData, bookingButtonText: e.target.value })}
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Book a Session"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Leave blank to use default: "Book a Session"
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Powered By Toggle */}

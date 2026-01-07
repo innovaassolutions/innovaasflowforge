@@ -2,7 +2,7 @@
 
 **Meeting Date:** January 6, 2026
 **Participants:** Todd Abraham, Mark Nickerson
-**Last Updated:** January 7, 2026 (task status review)
+**Last Updated:** January 7, 2026 (booking button feature completed)
 
 ---
 
@@ -133,7 +133,7 @@ Mark will build the landing page on Squarespace. Todd to provide:
 | Cosmetic changes (colors, terminology) | Todd | **COMPLETED** | ✅ TensionPatternCard uses sand/neutral bg with blue/teal text. "Misaligned" renamed to "Tension Pattern" |
 | PDF generation & email delivery | Todd | **COMPLETED** | ✅ PDF generated via @react-pdf/renderer, emailed via Resend with attachment to participant |
 | Reorder long-form questions | Todd | **COMPLETED** | ✅ Moved to "Reflection" flow shown AFTER results page (not during quiz) |
-| Booking button integration | Todd | **PARTIAL** | ✅ UI components ready. ⏳ Awaiting Acuity link from Mark + dashboard config UI needed |
+| Booking button integration | Todd | **COMPLETED** | ✅ Dashboard branding page has "Booking Button" section with toggle + URL field. Results page shows button when enabled. |
 | Create Acuity "Archetype Review" meeting type | Mark | **PENDING** | ~1 hour to complete. Required for booking integration |
 | Build landing page | Mark | **PENDING** | On Squarespace |
 | Provide screenshot graphics for landing page | Todd | **PENDING** | Assessment preview images |
@@ -156,11 +156,15 @@ Mark will build the landing page on Squarespace. Todd to provide:
 - [reflect/page.tsx](app/coach/[slug]/results/[token]/reflect/page.tsx) - Guided reflection conversation
 - Keeps "19 question promise" intact during initial quiz
 
-**Booking Button (Partial)**
-- Data model supports booking config in `TenantProfile.brand_config.booking`
+**Booking Button (Completed)**
+- Dashboard branding page (`app/dashboard/settings/branding/page.tsx`) has "Booking Button" section
+- Toggle to enable/disable booking button on results page
+- URL field for Acuity/Calendly/scheduler link
+- Optional custom button text field
+- `TenantProfile.brand_config.booking` stores the configuration
 - ReflectionChoice component displays booking button when enabled
-- Email template supports booking CTA
-- **Missing**: Dashboard settings UI for coaches to configure booking URL
+- Thank-you page also shows booking CTA when enabled
+- **Ready**: Just needs Mark to paste his Acuity link in the dashboard
 
 ---
 
@@ -189,8 +193,7 @@ Mark mentioned a potential referral:
 1. ~~Cosmetic/visual adjustments~~ ✅ **DONE**
 2. ~~Reorder long-form questions (move to after results)~~ ✅ **DONE**
 3. ~~PDF generation and email delivery~~ ✅ **DONE**
-4. Booking button integration - UI ready, needs Mark's Acuity link + dashboard config
+4. ~~Booking button integration~~ ✅ **DONE** - Dashboard config UI complete, Mark just needs to add his Acuity link
 5. Landing page creation - Mark building on Squarespace
 6. Screenshot graphics for landing page - Todd to provide
-7. **NEW**: Add coach notification email when assessment completed
-8. **NEW**: Add booking config UI to dashboard settings page
+7. Add coach notification email when assessment completed (nice-to-have)
