@@ -35,6 +35,8 @@ export interface ArchetypeResultsPDFData {
     content: string
   }>
   generatedDate: string
+  /** Pre-validated logo URL - pass null to skip logo rendering */
+  validatedLogoUrl?: string | null
 }
 
 interface BrandColors {
@@ -448,15 +450,16 @@ interface PageHeaderProps {
   tenant: TenantProfile
   clientName: string
   styles: ReturnType<typeof createStyles>
+  logoUrl?: string | null // Pre-validated logo URL
 }
 
-function PageHeader({ tenant, clientName, styles }: PageHeaderProps) {
+function PageHeader({ tenant, clientName, styles, logoUrl }: PageHeaderProps) {
   return (
     <View style={styles.header}>
       <View>
-        {tenant.brand_config.logo?.url ? (
+        {logoUrl ? (
           <Image
-            src={tenant.brand_config.logo.url}
+            src={logoUrl}
             style={styles.headerLogo}
           />
         ) : (
@@ -763,7 +766,7 @@ function ReflectionSection({ messages, styles }: ReflectionSectionProps) {
 // ============================================================================
 
 export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData }) {
-  const { session, results, tenant, reflectionMessages, generatedDate } = data
+  const { session, results, tenant, reflectionMessages, generatedDate, validatedLogoUrl } = data
   const colors = getBrandColors(tenant)
   const styles = createStyles(colors)
 
@@ -775,7 +778,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
     <Document>
       {/* Page 1: Main Results */}
       <Page size="A4" style={styles.page}>
-        <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} />
+        <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 
         {/* Hero Section */}
         <View style={styles.heroSection}>
@@ -800,7 +803,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
       {/* Page 2: Tension Pattern (if exists) + Authentic Archetype */}
       {hasTension && (
         <Page size="A4" style={styles.page}>
-          <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} />
+          <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 
           {/* Tension Pattern */}
           <TensionPatternCard
@@ -826,7 +829,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
 
       {/* Page 3 (or 2 if no tension): Moving Forward + Reflections */}
       <Page size="A4" style={styles.page}>
-        <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} />
+        <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 
         {/* Moving Forward */}
         <MovingForwardSection

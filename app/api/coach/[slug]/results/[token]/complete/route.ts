@@ -16,6 +16,39 @@ import { ArchetypeResultsEmail } from '@/lib/email/templates/archetype-results-e
 import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
 import type { TenantProfile } from '@/lib/supabase/server'
 
+/**
+ * Validates that a logo URL is accessible and returns it, or null if invalid.
+ * This prevents PDF generation failures due to unreachable logo URLs.
+ */
+async function validateLogoUrl(logoUrl: string | undefined): Promise<string | null> {
+  if (!logoUrl) return null
+
+  try {
+    // Check if URL is valid and accessible with a HEAD request
+    const response = await fetch(logoUrl, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    })
+
+    if (!response.ok) {
+      console.warn(`Logo URL returned ${response.status}: ${logoUrl}`)
+      return null
+    }
+
+    // Check content type is an image
+    const contentType = response.headers.get('content-type')
+    if (contentType && !contentType.startsWith('image/')) {
+      console.warn(`Logo URL is not an image (${contentType}): ${logoUrl}`)
+      return null
+    }
+
+    return logoUrl
+  } catch (error) {
+    console.warn(`Failed to validate logo URL: ${logoUrl}`, error)
+    return null
+  }
+}
+
 function getServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -133,6 +166,12 @@ export async function POST(
     // Cast tenant to TenantProfile type
     const tenantProfile = tenant as unknown as TenantProfile
 
+    // Validate logo URL before PDF generation to prevent failures
+    const logoUrl = tenantProfile.brand_config?.logo?.url
+    console.log('🔍 Validating logo URL:', logoUrl || 'none')
+    const validatedLogoUrl = await validateLogoUrl(logoUrl)
+    console.log('✅ Validated logo URL:', validatedLogoUrl || 'none (will use text fallback)')
+
     // Prepare PDF data
     const pdfData: ArchetypeResultsPDFData = {
       session: {
@@ -157,7 +196,8 @@ export async function POST(
       },
       tenant: tenantProfile,
       reflectionMessages: session.reflection_messages as Array<{ role: 'user' | 'assistant'; content: string }> | undefined,
-      generatedDate
+      generatedDate,
+      validatedLogoUrl
     }
 
     // Generate PDF buffer
@@ -166,8 +206,14 @@ export async function POST(
     try {
       pdfBuffer = await renderToBuffer(ArchetypeResultsPDF({ data: pdfData }))
       console.log('✅ PDF generated successfully, size:', pdfBuffer.length, 'bytes')
-    } catch (pdfError) {
-      console.error('PDF generation error:', pdfError)
+    } catch (pdfError: any) {
+      console.error('❌ PDF generation error:', {
+        message: pdfError?.message || 'Unknown error',
+        stack: pdfError?.stack,
+        name: pdfError?.name,
+        logoUrl: validatedLogoUrl,
+        clientName: session.client_name
+      })
       return NextResponse.json(
         { success: false, error: 'Failed to generate PDF' },
         { status: 500 }
