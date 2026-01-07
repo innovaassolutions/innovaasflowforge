@@ -10,6 +10,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface BookingConfig {
@@ -37,133 +38,15 @@ export function ReflectionChoice({
   bookingConfig,
   onStatusChange
 }: ReflectionChoiceProps) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [justDeclined, setJustDeclined] = useState(false)
 
-  // Handle "No thanks" graceful exit
-  async function handleDecline() {
+  // Handle "No thanks" graceful exit - redirect to thank you page
+  function handleDecline() {
     setIsLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/flowforge/api/coach/${slug}/results/${token}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        setJustDeclined(true)
-        onStatusChange?.('declined')
-      } else {
-        setError(result.error || 'Failed to send results email')
-      }
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-      console.error('Decline error:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Show thank you message after declining (just happened in this session)
-  if (justDeclined) {
-    return (
-      <section
-        className="rounded-xl p-6 sm:p-8"
-        style={{
-          backgroundColor: 'var(--brand-bg-muted)',
-          border: '1px solid var(--brand-border)',
-        }}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <svg
-            className="w-6 h-6"
-            style={{ color: 'var(--brand-secondary, var(--brand-primary))' }}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
-          <h2
-            className="text-xl font-bold"
-            style={{
-              color: 'var(--brand-secondary, var(--brand-text))',
-              fontFamily: 'var(--brand-font-heading)',
-            }}
-          >
-            Your Results Are On The Way
-          </h2>
-        </div>
-        <p className="mb-4" style={{ color: 'var(--brand-text)' }}>
-          We've sent a PDF copy of your results to your email. You can also return to this page
-          anytime using the same link.
-        </p>
-
-        {/* Booking CTA */}
-        {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && (
-          <div
-            className="mt-6 p-4 rounded-lg text-center"
-            style={{
-              backgroundColor: 'var(--brand-bg)',
-              border: '1px solid var(--brand-border)',
-            }}
-          >
-            <p className="mb-3 font-medium" style={{ color: 'var(--brand-text)' }}>
-              Ready to explore your results further?
-            </p>
-            <a
-              href={bookingConfig.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
-              style={{
-                backgroundColor: 'var(--brand-secondary, var(--brand-primary))',
-                color: 'white',
-              }}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {bookingConfig.buttonText || 'Book a Session'}
-            </a>
-          </div>
-        )}
-
-        {/* Option to add reflection later */}
-        <p
-          className="mt-4 text-sm text-center"
-          style={{ color: 'var(--brand-text-muted)' }}
-        >
-          Changed your mind?{' '}
-          <Link
-            href={`/coach/${slug}/results/${token}/reflect`}
-            className="underline hover:no-underline"
-            style={{ color: 'var(--brand-primary)' }}
-          >
-            Add a reflection now
-          </Link>
-        </p>
-      </section>
-    )
+    // Navigate to thank you page which handles PDF download and booking CTA
+    router.push(`/coach/${slug}/results/${token}/thank-you`)
   }
 
   // If reflection is already completed, show completion message
@@ -255,7 +138,7 @@ export function ReflectionChoice({
     )
   }
 
-  // If user previously declined, show option to add reflection
+  // If user previously declined, show options for PDF download and reflection
   if (reflectionStatus === 'declined') {
     return (
       <section
@@ -287,35 +170,61 @@ export function ReflectionChoice({
               fontFamily: 'var(--brand-font-heading)',
             }}
           >
-            Results Delivered
+            Assessment Complete
           </h2>
         </div>
         <p className="mb-4" style={{ color: 'var(--brand-text)' }}>
-          Your results were sent to your email. You can still go deeper if you'd like.
+          Your results are available to download or you can still go deeper if you&apos;d like.
         </p>
-        <Link
-          href={`/coach/${slug}/results/${token}/reflect`}
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
-          style={{
-            backgroundColor: 'var(--brand-primary)',
-            color: 'white',
-          }}
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            href={`/coach/${slug}/results/${token}/thank-you`}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: 'var(--brand-bg)',
+              color: 'var(--brand-text)',
+              border: '1px solid var(--brand-border)',
+            }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-          Add a reflection now
-        </Link>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Download PDF
+          </Link>
+          <Link
+            href={`/coach/${slug}/results/${token}/reflect`}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: 'var(--brand-primary)',
+              color: 'white',
+            }}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            Add a reflection
+          </Link>
+        </div>
 
         {/* Booking CTA */}
         {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && (

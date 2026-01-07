@@ -30,6 +30,7 @@ import {
   Send,
   Loader2,
   FileText,
+  Download,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -66,6 +67,7 @@ export default function CoachingClientsPage() {
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
   const [sendingInvite, setSendingInvite] = useState<string | null>(null)
   const [inviteSent, setInviteSent] = useState<string | null>(null)
+  const [downloadingPdf, setDownloadingPdf] = useState<string | null>(null)
 
   // New client form state
   const [newClientName, setNewClientName] = useState('')
@@ -277,6 +279,34 @@ export default function CoachingClientsPage() {
     navigator.clipboard.writeText(getSessionUrl(accessToken))
     setCopiedToken(accessToken)
     setTimeout(() => setCopiedToken(null), 2000)
+  }
+
+  async function handleDownloadPdf(client: CoachingClient) {
+    if (!tenant) return
+
+    setDownloadingPdf(client.id)
+    try {
+      const response = await fetch(`/flowforge/api/coach/${tenant.slug}/results/${client.access_token}/download-pdf`)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${client.client_name.replace(/[^a-zA-Z0-9]/g, '-')}-leadership-archetype-results.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Download error:', err)
+      setError('Failed to download PDF. Please try again.')
+    } finally {
+      setDownloadingPdf(null)
+    }
   }
 
   function getStatusIcon(status: string) {
@@ -527,18 +557,33 @@ export default function CoachingClientsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* View Report - only show for completed clients */}
+                    {/* View Report and Download PDF - only show for completed clients */}
                     {client.client_status === 'completed' && (
-                      <a
-                        href={getReportUrl(client.access_token)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors"
-                        title="View report"
-                      >
-                        <FileText className="w-4 h-4" />
-                        View Report
-                      </a>
+                      <>
+                        <a
+                          href={getReportUrl(client.access_token)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors"
+                          title="View report"
+                        >
+                          <FileText className="w-4 h-4" />
+                          View Report
+                        </a>
+                        <button
+                          onClick={() => handleDownloadPdf(client)}
+                          disabled={downloadingPdf === client.id}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors disabled:opacity-50"
+                          title="Download PDF"
+                        >
+                          {downloadingPdf === client.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4" />
+                          )}
+                          {downloadingPdf === client.id ? 'Generating...' : 'PDF'}
+                        </button>
+                      </>
                     )}
 
                     {/* Send Invite Email - only show for clients who haven't completed */}
