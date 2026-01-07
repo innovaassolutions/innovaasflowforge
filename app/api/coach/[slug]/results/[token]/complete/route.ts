@@ -167,10 +167,12 @@ export async function POST(
     const tenantProfile = tenant as unknown as TenantProfile
 
     // Validate logo URL before PDF generation to prevent failures
+    // TEMPORARY: Skip logo entirely to debug PDF generation issue
     const logoUrl = tenantProfile.brand_config?.logo?.url
-    console.log('🔍 Validating logo URL:', logoUrl || 'none')
-    const validatedLogoUrl = await validateLogoUrl(logoUrl)
-    console.log('✅ Validated logo URL:', validatedLogoUrl || 'none (will use text fallback)')
+    console.log('🔍 Logo URL from tenant:', logoUrl || 'none')
+    // Force null to skip logo and use text fallback - debugging PDF generation
+    const validatedLogoUrl: string | null = null
+    console.log('⚠️ Logo skipped for debugging - using text fallback')
 
     // Prepare PDF data
     const pdfData: ArchetypeResultsPDFData = {
