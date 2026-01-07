@@ -1,13 +1,11 @@
 /**
  * Test PDF endpoint to diagnose PDF generation issues
- * This creates a minimal PDF to verify react-pdf works on Vercel
+ * Uses @joshuajaco/react-pdf-renderer-bundled which works with Next.js App Router
+ * See: https://github.com/diegomura/react-pdf/issues/2350
  */
 
 import { NextResponse } from 'next/server'
-import React from 'react'
-import ReactPDF from '@react-pdf/renderer'
-
-const { Document, Page, Text, View, StyleSheet, renderToBuffer } = ReactPDF
+import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@joshuajaco/react-pdf-renderer-bundled'
 
 const styles = StyleSheet.create({
   page: {
@@ -26,22 +24,23 @@ const styles = StyleSheet.create({
 
 export async function GET() {
   try {
-    console.log('🧪 Test PDF: Starting generation...')
+    console.log('🧪 Test PDF: Starting generation with bundled react-pdf...')
 
-    // Create elements using React.createElement to avoid JSX transpilation issues
-    const textTitle = React.createElement(Text, { style: styles.title }, 'Test PDF')
-    const textBody = React.createElement(Text, { style: styles.text }, 'If you can see this, PDF generation works!')
-    const textVersion = React.createElement(Text, { style: styles.text }, 'react-pdf v3.4.5')
+    const buffer = await renderToBuffer(
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View>
+            <Text style={styles.title}>Test PDF</Text>
+            <Text style={styles.text}>If you can see this, PDF generation works!</Text>
+            <Text style={styles.text}>Using @joshuajaco/react-pdf-renderer-bundled</Text>
+          </View>
+        </Page>
+      </Document>
+    )
 
-    const view = React.createElement(View, null, textTitle, textBody, textVersion)
-    const page = React.createElement(Page, { size: 'A4', style: styles.page }, view)
-    const doc = React.createElement(Document, null, page)
+    console.log('✅ Test PDF: Generated successfully, size:', buffer.length, 'bytes')
 
-    const pdfBuffer = await renderToBuffer(doc)
-
-    console.log('✅ Test PDF: Generated successfully, size:', pdfBuffer.length, 'bytes')
-
-    return new NextResponse(new Uint8Array(pdfBuffer), {
+    return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': 'inline; filename="test.pdf"',
