@@ -148,11 +148,11 @@ export async function POST(
       has_scores: !!archetypeResults.scores
     })
 
-    // Debug: Log tenant brand config
+    // Debug: Log tenant brand config (using 'tenant' before it's cast to TenantProfile)
     console.log('🎨 Tenant brand config:', {
-      has_brand_config: !!tenantProfile.brand_config,
-      has_colors: !!tenantProfile.brand_config?.colors,
-      colors: tenantProfile.brand_config?.colors
+      has_brand_config: !!(tenant as any).brand_config,
+      has_colors: !!(tenant as any).brand_config?.colors,
+      colors: (tenant as any).brand_config?.colors
     })
 
     // Validate archetype keys exist in ARCHETYPES
