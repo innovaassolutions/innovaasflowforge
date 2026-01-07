@@ -1,0 +1,200 @@
+/**
+ * Coach Results API
+ *
+ * Fetches archetype results for a completed coaching session.
+ * Returns session data, archetype results, and tenant branding.
+ *
+ * Story: 1.1 Results Page Foundation
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { ARCHETYPES, type Archetype } from '@/lib/agents/archetype-constitution'
+
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
+export interface ArchetypeResultsData {
+  default_archetype: Archetype
+  authentic_archetype: Archetype
+  is_aligned: boolean
+  scores: {
+    default: Record<Archetype, number>
+    authentic: Record<Archetype, number>
+    friction: Record<Archetype, number>
+  }
+  completed_at: string
+}
+
+export interface ResultsResponse {
+  success: boolean
+  session?: {
+    id: string
+    client_name: string
+    client_email: string
+    client_status: string
+    reflection_status: string
+    completed_at: string
+  }
+  results?: {
+    primary_archetype: {
+      key: Archetype
+      name: string
+      core_traits: string[]
+      under_pressure: string
+      when_grounded: string
+      overuse_signals: string[]
+    }
+    authentic_archetype: {
+      key: Archetype
+      name: string
+      core_traits: string[]
+      under_pressure: string
+      when_grounded: string
+      overuse_signals: string[]
+    }
+    tension_pattern: {
+      has_tension: boolean
+      description?: string
+      triggers?: string[]
+    }
+    scores: ArchetypeResultsData['scores']
+  }
+  tenant?: {
+    id: string
+    display_name: string
+    slug: string
+    brand_config: Record<string, unknown>
+  }
+  error?: string
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string; token: string }> }
+): Promise<NextResponse<ResultsResponse>> {
+  try {
+    const { slug, token } = await params
+    const supabase = getServiceClient()
+
+    // Verify tenant exists and is active
+    const { data: tenant, error: tenantError } = await supabase
+      .from('tenant_profiles')
+      .select('id, display_name, slug, is_active, brand_config')
+      .eq('slug', slug)
+      .single()
+
+    if (tenantError || !tenant) {
+      return NextResponse.json(
+        { success: false, error: 'Coach not found' },
+        { status: 404 }
+      )
+    }
+
+    if (!tenant.is_active) {
+      return NextResponse.json(
+        { success: false, error: 'This coach is not currently active' },
+        { status: 403 }
+      )
+    }
+
+    // Find coaching session by token
+    const { data: session, error: sessionError } = await supabase
+      .from('coaching_sessions')
+      .select('id, client_name, client_email, client_status, reflection_status, completed_at, metadata')
+      .eq('access_token', token)
+      .eq('tenant_id', tenant.id)
+      .single()
+
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired session link' },
+        { status: 404 }
+      )
+    }
+
+    // Check if session is completed
+    if (session.client_status !== 'completed') {
+      return NextResponse.json(
+        { success: false, error: 'Assessment not yet completed' },
+        { status: 400 }
+      )
+    }
+
+    // Extract archetype results from metadata
+    const metadata = session.metadata as { archetype_results?: ArchetypeResultsData } | null
+    const archetypeResults = metadata?.archetype_results
+
+    if (!archetypeResults) {
+      return NextResponse.json(
+        { success: false, error: 'Results not yet processed' },
+        { status: 400 }
+      )
+    }
+
+    // Build enriched results with archetype details
+    const primaryArchetypeData = ARCHETYPES[archetypeResults.default_archetype]
+    const authenticArchetypeData = ARCHETYPES[archetypeResults.authentic_archetype]
+
+    // Determine if there's a tension pattern (misalignment)
+    const hasTension = !archetypeResults.is_aligned
+    const tensionPattern = hasTension ? {
+      has_tension: true,
+      description: `Your default response under pressure (${primaryArchetypeData.name}) differs from what energizes you when grounded (${authenticArchetypeData.name}). This tension is common and often reflects adaptive strategies you've developed.`,
+      triggers: [
+        ...primaryArchetypeData.overuse_signals.slice(0, 2),
+        'When stressed, you may over-rely on familiar patterns that don\'t serve your deeper needs'
+      ]
+    } : {
+      has_tension: false
+    }
+
+    // Update reflection_status to 'pending' if still 'none' (first time viewing results)
+    if (session.reflection_status === 'none' || !session.reflection_status) {
+      await supabase
+        .from('coaching_sessions')
+        .update({ reflection_status: 'pending' })
+        .eq('id', session.id)
+    }
+
+    return NextResponse.json({
+      success: true,
+      session: {
+        id: session.id,
+        client_name: session.client_name,
+        client_email: session.client_email,
+        client_status: session.client_status,
+        reflection_status: session.reflection_status || 'pending',
+        completed_at: session.completed_at,
+      },
+      results: {
+        primary_archetype: {
+          ...primaryArchetypeData,
+          key: archetypeResults.default_archetype
+        },
+        authentic_archetype: {
+          ...authenticArchetypeData,
+          key: archetypeResults.authentic_archetype
+        },
+        tension_pattern: tensionPattern,
+        scores: archetypeResults.scores
+      },
+      tenant: {
+        id: tenant.id,
+        display_name: tenant.display_name,
+        slug: tenant.slug,
+        brand_config: tenant.brand_config as Record<string, unknown>
+      }
+    })
+  } catch (error) {
+    console.error('Results fetch error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch results' },
+      { status: 500 }
+    )
+  }
+}

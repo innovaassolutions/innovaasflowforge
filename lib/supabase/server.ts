@@ -110,6 +110,13 @@ export interface TenantProfile {
     welcomeMessage?: string
     completionMessage?: string
     showPoweredBy: boolean
+    booking?: {
+      enabled: boolean
+      url: string
+      buttonText?: string
+      showOnResults?: boolean
+      showInEmail?: boolean
+    }
   }
   email_config: {
     replyTo?: string
