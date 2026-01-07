@@ -26,8 +26,30 @@ import {
   Check,
   Upload,
   Trash2,
-  Calendar
+  Calendar,
+  Globe,
+  RefreshCw,
+  Clock,
+  XCircle
 } from 'lucide-react'
+
+interface DomainStatus {
+  configured: boolean
+  domain: string | null
+  status: 'pending' | 'verified' | 'failed' | null
+  url?: string
+  started_at?: string
+  error?: string
+  cloudflare_status?: string
+  ssl_status?: string
+  dns_instructions?: {
+    record_type: string
+    host: string
+    target: string
+    apex_domain: string
+    message: string
+  }
+}
 
 interface TenantProfile {
   id: string
@@ -88,6 +110,15 @@ export default function BrandingSettingsPage() {
   const [copied, setCopied] = useState(false)
   const [tenant, setTenant] = useState<TenantProfile | null>(null)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+
+  // Custom domain state
+  const [domainStatus, setDomainStatus] = useState<DomainStatus | null>(null)
+  const [domainInput, setDomainInput] = useState('')
+  const [configuringDomain, setConfiguringDomain] = useState(false)
+  const [removingDomain, setRemovingDomain] = useState(false)
+  const [checkingDomainStatus, setCheckingDomainStatus] = useState(false)
+  const [domainError, setDomainError] = useState<string | null>(null)
+  const [domainCopied, setDomainCopied] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -361,6 +392,118 @@ export default function BrandingSettingsPage() {
       logoAlt: '',
     })
   }
+
+  // ============================================================================
+  // CUSTOM DOMAIN FUNCTIONS
+  // ============================================================================
+
+  async function loadDomainStatus() {
+    try {
+      const response = await fetch('/api/tenant/domain')
+      if (response.ok) {
+        const data = await response.json()
+        setDomainStatus(data)
+      }
+    } catch (err) {
+      console.error('Error loading domain status:', err)
+    }
+  }
+
+  async function handleConfigureDomain(e: React.FormEvent) {
+    e.preventDefault()
+    if (!domainInput.trim()) return
+
+    setDomainError(null)
+    setConfiguringDomain(true)
+
+    try {
+      const response = await fetch('/api/tenant/domain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: domainInput.trim() }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        setDomainError(data.message || 'Failed to configure domain')
+        return
+      }
+
+      // Reload domain status
+      await loadDomainStatus()
+      setDomainInput('')
+      setSuccess('Domain configured! Follow the DNS instructions below.')
+    } catch (err) {
+      console.error('Error configuring domain:', err)
+      setDomainError('Failed to configure domain. Please try again.')
+    } finally {
+      setConfiguringDomain(false)
+    }
+  }
+
+  async function handleRemoveDomain() {
+    if (!confirm('Are you sure you want to remove your custom domain?')) return
+
+    setDomainError(null)
+    setRemovingDomain(true)
+
+    try {
+      const response = await fetch('/api/tenant/domain', {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        setDomainError(data.message || 'Failed to remove domain')
+        return
+      }
+
+      // Reload domain status
+      await loadDomainStatus()
+      setSuccess('Custom domain removed successfully.')
+    } catch (err) {
+      console.error('Error removing domain:', err)
+      setDomainError('Failed to remove domain. Please try again.')
+    } finally {
+      setRemovingDomain(false)
+    }
+  }
+
+  async function handleCheckDomainStatus() {
+    setCheckingDomainStatus(true)
+
+    try {
+      const response = await fetch('/api/tenant/domain/status')
+      if (response.ok) {
+        const data = await response.json()
+        setDomainStatus(data)
+
+        if (data.status === 'verified') {
+          setSuccess('Your custom domain is now verified and active!')
+        }
+      }
+    } catch (err) {
+      console.error('Error checking domain status:', err)
+    } finally {
+      setCheckingDomainStatus(false)
+    }
+  }
+
+  function copyDnsTarget() {
+    if (!domainStatus?.dns_instructions?.target) return
+    navigator.clipboard.writeText(domainStatus.dns_instructions.target)
+    setDomainCopied(true)
+    setTimeout(() => setDomainCopied(false), 2000)
+  }
+
+  // Load domain status on mount
+  useEffect(() => {
+    if (tenant) {
+      loadDomainStatus()
+    }
+  }, [tenant])
 
   if (loading) {
     return (
@@ -935,6 +1078,206 @@ export default function BrandingSettingsPage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   Leave blank to use default: "Book a Session"
                 </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Custom Domain Section */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Globe className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Custom Domain</h2>
+              <p className="text-sm text-muted-foreground">Use your own subdomain for a white-label experience</p>
+            </div>
+          </div>
+
+          {/* Domain Error Message */}
+          {domainError && (
+            <div className="mb-4 bg-destructive/10 border border-destructive rounded-lg p-3 flex items-start gap-2">
+              <XCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+              <p className="text-destructive text-sm">{domainError}</p>
+            </div>
+          )}
+
+          {/* No domain configured - show input form */}
+          {(!domainStatus || !domainStatus.configured) && (
+            <form onSubmit={handleConfigureDomain} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Custom Subdomain
+                </label>
+                <input
+                  type="text"
+                  value={domainInput}
+                  onChange={(e) => setDomainInput(e.target.value.toLowerCase())}
+                  className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="assessment.yourdomain.com"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Must be a subdomain (e.g., assessment.yourdomain.com), not an apex domain
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={configuringDomain || !domainInput.trim()}
+                className="inline-flex items-center gap-2 bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+              >
+                {configuringDomain ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Configuring...
+                  </>
+                ) : (
+                  <>
+                    <Globe className="w-4 h-4" />
+                    Configure Domain
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Domain configured - show status */}
+          {domainStatus?.configured && (
+            <div className="space-y-4">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Domain</p>
+                  <p className="font-medium text-foreground font-mono">{domainStatus.domain}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {domainStatus.status === 'verified' && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      <CheckCircle className="w-4 h-4" />
+                      Verified
+                    </span>
+                  )}
+                  {domainStatus.status === 'pending' && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                      <Clock className="w-4 h-4" />
+                      Pending Verification
+                    </span>
+                  )}
+                  {domainStatus.status === 'failed' && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                      <XCircle className="w-4 h-4" />
+                      Verification Failed
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Verified - show active URL */}
+              {domainStatus.status === 'verified' && domainStatus.url && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-800 mb-2">Your custom domain is active!</p>
+                  <a
+                    href={domainStatus.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {domainStatus.url}
+                  </a>
+                </div>
+              )}
+
+              {/* Pending - show DNS instructions */}
+              {domainStatus.status === 'pending' && domainStatus.dns_instructions && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
+                  <p className="text-sm text-yellow-800 font-medium">
+                    Add this DNS record at your domain registrar:
+                  </p>
+                  <div className="bg-white rounded-lg border border-yellow-300 p-3 space-y-2">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground text-xs mb-1">Type</p>
+                        <p className="font-mono font-medium">{domainStatus.dns_instructions.record_type}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs mb-1">Name/Host</p>
+                        <p className="font-mono font-medium">{domainStatus.dns_instructions.host}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs mb-1">Target/Value</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-mono font-medium text-xs truncate">{domainStatus.dns_instructions.target}</p>
+                          <button
+                            type="button"
+                            onClick={copyDnsTarget}
+                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            title="Copy target"
+                          >
+                            {domainCopied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-yellow-700">
+                    DNS changes can take up to 24 hours to propagate. Click "Check Status" to verify.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCheckDomainStatus}
+                    disabled={checkingDomainStatus}
+                    className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {checkingDomainStatus ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Checking...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-3 h-3" />
+                        Check Status
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Failed - show error and instructions */}
+              {domainStatus.status === 'failed' && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm text-red-800 mb-2">
+                    {domainStatus.error || 'Domain verification failed. Please check your DNS settings.'}
+                  </p>
+                  {domainStatus.dns_instructions && (
+                    <p className="text-xs text-red-700">
+                      Expected CNAME: {domainStatus.dns_instructions.host} → {domainStatus.dns_instructions.target}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Remove Domain Button */}
+              <div className="pt-4 border-t border-border">
+                <button
+                  type="button"
+                  onClick={handleRemoveDomain}
+                  disabled={removingDomain}
+                  className="inline-flex items-center gap-2 text-destructive hover:text-destructive/80 text-sm transition-colors disabled:opacity-50"
+                >
+                  {removingDomain ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Removing...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Remove Custom Domain
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
