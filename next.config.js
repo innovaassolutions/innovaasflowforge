@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	basePath: '/flowforge',
+	// Required for @react-pdf/renderer to work on Vercel serverless
+	serverExternalPackages: ['@react-pdf/renderer'],
 	experimental: {
 		serverActions: {
 			bodySizeLimit: '10mb',
