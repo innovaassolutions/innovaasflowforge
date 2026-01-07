@@ -1121,6 +1121,38 @@ export default function BrandingSettingsPage() {
                   Must be a subdomain (e.g., assessment.yourdomain.com), not an apex domain
                 </p>
               </div>
+
+              {/* DNS Setup Instructions - shown before configuration */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-blue-800 font-medium">
+                  DNS Setup Required
+                </p>
+                <p className="text-sm text-blue-700">
+                  After clicking "Configure Domain", you'll need to add a CNAME record at your domain registrar:
+                </p>
+                <div className="bg-white rounded-lg border border-blue-300 p-3">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Type</p>
+                      <p className="font-mono font-medium">CNAME</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Name/Host</p>
+                      <p className="font-mono font-medium text-blue-600">
+                        {domainInput ? domainInput.split('.')[0] : 'assessment'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Target/Value</p>
+                      <p className="font-mono font-medium text-xs">flowforge.innovaas.co</p>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-blue-600">
+                  DNS changes can take up to 24 hours to propagate. You can configure the domain now and add the DNS record afterwards.
+                </p>
+              </div>
+
               <button
                 type="submit"
                 disabled={configuringDomain || !domainInput.trim()}
