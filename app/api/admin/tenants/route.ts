@@ -62,14 +62,14 @@ export async function GET(request: NextRequest) {
     const tenantType = searchParams.get('type') // 'coach', 'consultant', 'school'
     const search = searchParams.get('search')
 
-    // Fetch tenants
+    // Fetch tenants (left join user_profiles - some tenants may not have owners)
     let query = supabaseAdmin
       .from('tenant_profiles')
       .select(`
         id, slug, display_name, tenant_type,
         subscription_tier, is_active, created_at, updated_at,
         user_id, custom_domain,
-        user_profiles!inner(email, full_name, last_seen_at)
+        user_profiles(email, full_name, last_seen_at)
       `)
       .order('created_at', { ascending: false })
 
