@@ -89,20 +89,24 @@ export async function GET(request: NextRequest) {
     // Get session counts for each tenant
     const tenantIds = tenants?.map((t) => t.id) || []
 
-    const [sessionResult, campaignResult] = await Promise.all([
-      supabaseAdmin
-        .from('coaching_sessions')
-        .select('tenant_id, client_status')
-        .in('tenant_id', tenantIds),
-      supabaseAdmin
-        .from('campaigns')
-        .select('tenant_id, status')
-        .in('tenant_id', tenantIds),
-    ])
+    // Only query sessions/campaigns if we have tenants (empty .in() can fail)
+    let sessions: SessionRecord[] | null = null
+    let campaignData: CampaignRecord[] | null = null
 
-    // Type assertions for query results
-    const sessions = sessionResult.data as SessionRecord[] | null
-    const campaignData = campaignResult.data as CampaignRecord[] | null
+    if (tenantIds.length > 0) {
+      const [sessionResult, campaignResult] = await Promise.all([
+        supabaseAdmin
+          .from('coaching_sessions')
+          .select('tenant_id, client_status')
+          .in('tenant_id', tenantIds),
+        supabaseAdmin
+          .from('campaigns')
+          .select('tenant_id, status')
+          .in('tenant_id', tenantIds),
+      ])
+      sessions = sessionResult.data as SessionRecord[] | null
+      campaignData = campaignResult.data as CampaignRecord[] | null
+    }
 
     // Map session counts
     const sessionCounts = new Map<string, { total: number; completed: number }>()
