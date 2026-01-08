@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import UAParser from 'ua-parser-js'
+import { UAParser } from 'ua-parser-js'
 
 interface LogLoginRequest {
   userId?: string

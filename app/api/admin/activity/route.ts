@@ -9,6 +9,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
+interface LoginHistoryRecord {
+  id: string
+  user_id: string
+  login_at: string
+  ip_address: string | null
+  user_agent: string | null
+  device_type: string | null
+  browser: string | null
+  os: string | null
+  auth_method: string | null
+  success: boolean
+  failure_reason: string | null
+  created_at: string
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin user
@@ -55,12 +70,14 @@ export async function GET(request: NextRequest) {
       query = query.eq('success', success === 'true')
     }
 
-    const { data: logins, count, error } = await query
+    const { data, count, error } = await query
 
     if (error) {
       console.error('Error fetching login history:', error)
       return NextResponse.json({ error: 'Failed to fetch login history' }, { status: 500 })
     }
+
+    const logins = data as LoginHistoryRecord[] | null
 
     // Fetch user details for each login
     const userIds = [...new Set(logins?.map((l) => l.user_id) || [])]
