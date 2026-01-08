@@ -76,27 +76,33 @@ export async function GET(request: NextRequest) {
     const events = data as UsageEvent[] | null
 
     // Aggregate by event type
-    const byEventType: Record<string, { count: number; tokens: number; cost: number }> = {}
+    const byEventTypeMap: Record<string, { event_count: number; total_tokens: number; total_cost_cents: number }> = {}
     events?.forEach((e) => {
       const type = e.event_type || 'unknown'
-      if (!byEventType[type]) {
-        byEventType[type] = { count: 0, tokens: 0, cost: 0 }
+      if (!byEventTypeMap[type]) {
+        byEventTypeMap[type] = { event_count: 0, total_tokens: 0, total_cost_cents: 0 }
       }
-      byEventType[type].count++
-      byEventType[type].tokens += e.tokens_used || 0
-      byEventType[type].cost += e.cost_cents || 0
+      byEventTypeMap[type].event_count++
+      byEventTypeMap[type].total_tokens += e.tokens_used || 0
+      byEventTypeMap[type].total_cost_cents += e.cost_cents || 0
     })
 
+    // Convert to array format for byType
+    const byType = Object.entries(byEventTypeMap).map(([event_type, data]) => ({
+      event_type,
+      ...data,
+    }))
+
     // Aggregate by tenant
-    const byTenantMap: Record<string, { tokens: number; cost: number; events: number }> = {}
+    const byTenantMap: Record<string, { total_tokens: number; total_cost_cents: number; event_count: number }> = {}
     events?.forEach((e) => {
       if (e.tenant_id) {
         if (!byTenantMap[e.tenant_id]) {
-          byTenantMap[e.tenant_id] = { tokens: 0, cost: 0, events: 0 }
+          byTenantMap[e.tenant_id] = { total_tokens: 0, total_cost_cents: 0, event_count: 0 }
         }
-        byTenantMap[e.tenant_id].tokens += e.tokens_used || 0
-        byTenantMap[e.tenant_id].cost += e.cost_cents || 0
-        byTenantMap[e.tenant_id].events++
+        byTenantMap[e.tenant_id].total_tokens += e.tokens_used || 0
+        byTenantMap[e.tenant_id].total_cost_cents += e.cost_cents || 0
+        byTenantMap[e.tenant_id].event_count++
       }
     })
 
@@ -119,39 +125,46 @@ export async function GET(request: NextRequest) {
         subscription_tier: tenant?.subscription_tier || 'starter',
         ...data,
       }
-    }).sort((a, b) => b.cost - a.cost) // Sort by cost descending
+    }).sort((a, b) => b.total_cost_cents - a.total_cost_cents) // Sort by cost descending
 
     // Aggregate by month
-    const byMonth: Record<string, { tokens: number; cost: number; events: number }> = {}
+    const byMonthMap: Record<string, { total_tokens: number; total_cost_cents: number; event_count: number }> = {}
     events?.forEach((e) => {
       const month = e.created_at?.substring(0, 7) || 'unknown' // YYYY-MM
-      if (!byMonth[month]) {
-        byMonth[month] = { tokens: 0, cost: 0, events: 0 }
+      if (!byMonthMap[month]) {
+        byMonthMap[month] = { total_tokens: 0, total_cost_cents: 0, event_count: 0 }
       }
-      byMonth[month].tokens += e.tokens_used || 0
-      byMonth[month].cost += e.cost_cents || 0
-      byMonth[month].events++
+      byMonthMap[month].total_tokens += e.tokens_used || 0
+      byMonthMap[month].total_cost_cents += e.cost_cents || 0
+      byMonthMap[month].event_count++
     })
 
-    const monthlyData = Object.entries(byMonth)
+    const byMonth = Object.entries(byMonthMap)
       .map(([month, data]) => ({ month, ...data }))
       .sort((a, b) => a.month.localeCompare(b.month))
 
     // Aggregate by model
-    const byModel: Record<string, { tokens: number; cost: number; count: number }> = {}
+    const byModelMap: Record<string, { total_tokens: number; total_cost_cents: number; event_count: number }> = {}
     events?.forEach((e) => {
       const model = e.model_used || 'unknown'
-      if (!byModel[model]) {
-        byModel[model] = { tokens: 0, cost: 0, count: 0 }
+      if (!byModelMap[model]) {
+        byModelMap[model] = { total_tokens: 0, total_cost_cents: 0, event_count: 0 }
       }
-      byModel[model].tokens += e.tokens_used || 0
-      byModel[model].cost += e.cost_cents || 0
-      byModel[model].count++
+      byModelMap[model].total_tokens += e.tokens_used || 0
+      byModelMap[model].total_cost_cents += e.cost_cents || 0
+      byModelMap[model].event_count++
     })
+
+    // Convert to array format for byModel
+    const byModel = Object.entries(byModelMap).map(([model, data]) => ({
+      model,
+      ...data,
+    }))
 
     // Calculate totals
     const totalTokens = events?.reduce((sum, e) => sum + (e.tokens_used || 0), 0) || 0
     const totalCost = events?.reduce((sum, e) => sum + (e.cost_cents || 0), 0) || 0
+    const uniqueTenants = Object.keys(byTenantMap).length
 
     return NextResponse.json({
       summary: {
@@ -159,10 +172,11 @@ export async function GET(request: NextRequest) {
         totalTokens,
         totalCostCents: totalCost,
         totalCostDollars: (totalCost / 100).toFixed(2),
+        uniqueTenants,
       },
-      byEventType,
+      byType,
       byTenant,
-      byMonth: monthlyData,
+      byMonth,
       byModel,
     })
   } catch (error) {
