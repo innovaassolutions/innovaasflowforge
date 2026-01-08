@@ -1,0 +1,122 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#f5f3ef"/>
+
+  <!-- Gradient overlay -->
+  <defs>
+    <linearGradient id="lwmFade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f5f3ef;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ebe8e3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#lwmFade)"/>
+
+  <!-- Left side - Chat interface mockup -->
+  <g transform="translate(80, 70)">
+    <!-- Chat window -->
+    <rect x="0" y="0" width="500" height="490" rx="16" fill="#ffffff" stroke="#e0dcd5" stroke-width="1"/>
+
+    <!-- Chat header -->
+    <rect x="0" y="0" width="500" height="65" rx="16" fill="#1e3a5f"/>
+    <rect x="0" y="45" width="500" height="20" fill="#1e3a5f"/>
+    <circle cx="35" cy="32" r="18" fill="#ffffff" opacity="0.2"/>
+    <text x="35" y="37" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">AI</text>
+    <text x="65" y="28" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" fill="#ffffff">Leadership Assessment</text>
+    <text x="65" y="46" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#ffffff" opacity="0.7">Powered by Leading with Meaning</text>
+    <circle cx="465" cy="32" r="6" fill="#22C55E"/>
+
+    <!-- AI Message 1 -->
+    <g transform="translate(20, 85)">
+      <rect x="0" y="0" width="360" height="75" rx="12" fill="#ebe8e3"/>
+      <text x="15" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Welcome. I'm here to help you gain clarity</text>
+      <text x="15" y="45" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">about your leadership style. Let's start with</text>
+      <text x="15" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">what matters most to you as a leader...</text>
+    </g>
+
+    <!-- User Message -->
+    <g transform="translate(120, 180)">
+      <rect x="0" y="0" width="360" height="55" rx="12" fill="#1e3a5f"/>
+      <text x="15" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#ffffff">I want to lead authentically but feel like</text>
+      <text x="15" y="45" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#ffffff">I'm losing myself in the corporate demands.</text>
+    </g>
+
+    <!-- AI Message 2 -->
+    <g transform="translate(20, 255)">
+      <rect x="0" y="0" width="400" height="95" rx="12" fill="#ebe8e3"/>
+      <text x="15" y="25" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">That tension between authenticity and</text>
+      <text x="15" y="45" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">expectation is very common. It often signals</text>
+      <text x="15" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">a</text>
+      <text x="25" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#c4776a" font-weight="600">Navigator</text>
+      <text x="100" y="65" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">archetype. Tell me about</text>
+      <text x="15" y="85" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">a recent decision that felt misaligned...</text>
+    </g>
+
+    <!-- Typing indicator -->
+    <g transform="translate(20, 370)">
+      <rect x="0" y="0" width="90" height="35" rx="12" fill="#ebe8e3"/>
+      <circle cx="22" cy="17" r="4" fill="#5a6a7a">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="40" cy="17" r="4" fill="#5a6a7a">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="58" cy="17" r="4" fill="#5a6a7a">
+        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+
+    <!-- Input field -->
+    <g transform="translate(15, 430)">
+      <rect x="0" y="0" width="470" height="45" rx="22" fill="#f5f3ef" stroke="#e0dcd5" stroke-width="1"/>
+      <text x="20" y="28" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a">Share what comes to mind...</text>
+      <circle cx="440" cy="22" r="16" fill="#1e3a5f"/>
+      <path d="M435 22 L445 22 M440 17 L440 27" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Right side - Content -->
+  <g transform="translate(640, 120)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="220" height="32" rx="16" fill="#1e3a5f" opacity="0.1"/>
+    <text x="110" y="21" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a5f" text-anchor="middle" letter-spacing="0.5">THOUGHTFUL DISCOVERY</text>
+
+    <!-- Headline -->
+    <text x="0" y="80" font-family="Inter, system-ui, sans-serif" font-size="40" font-weight="700" fill="#1e3a5f">Not a Survey.</text>
+    <text x="0" y="130" font-family="Inter, system-ui, sans-serif" font-size="40" font-weight="700" fill="#c4776a">A Conversation.</text>
+
+    <!-- Description -->
+    <text x="0" y="190" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">Our AI guide asks the questions a great</text>
+    <text x="0" y="215" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">coach would ask - revealing patterns</text>
+    <text x="0" y="240" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">you might not see yourself.</text>
+
+    <!-- Divider -->
+    <rect x="0" y="270" width="60" height="3" rx="1.5" fill="#c4776a"/>
+
+    <!-- Stats -->
+    <g transform="translate(0, 310)">
+      <g transform="translate(0, 0)">
+        <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700" fill="#1e3a5f">15</text>
+        <text x="50" y="0" font-family="Inter, system-ui, sans-serif" font-size="18" fill="#5a6a7a">minutes</text>
+        <text x="0" y="25" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a">Average session</text>
+      </g>
+      <g transform="translate(180, 0)">
+        <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700" fill="#1e3a5f">Deep</text>
+        <text x="0" y="25" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a">Not surface-level</text>
+      </g>
+    </g>
+
+    <g transform="translate(0, 390)">
+      <g transform="translate(0, 0)">
+        <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700" fill="#1e3a5f">Private</text>
+        <text x="0" y="25" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a">Confidential insights</text>
+      </g>
+      <g transform="translate(180, 0)">
+        <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700" fill="#1e3a5f">Instant</text>
+        <text x="0" y="25" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a">Results delivered</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#1e3a5f"/>
+</svg>

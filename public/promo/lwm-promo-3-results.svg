@@ -1,0 +1,122 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#f5f3ef"/>
+
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="200" fill="#1e3a5f" opacity="0.02"/>
+  <circle cx="1100" cy="530" r="180" fill="#c4776a" opacity="0.04"/>
+
+  <!-- Left content -->
+  <g transform="translate(80, 90)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="200" height="32" rx="16" fill="#1e3a5f" opacity="0.1"/>
+    <text x="100" y="21" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a5f" text-anchor="middle" letter-spacing="0.5">YOUR LEADERSHIP MAP</text>
+
+    <!-- Headline -->
+    <text x="0" y="80" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="700" fill="#1e3a5f">Insights That</text>
+    <text x="0" y="130" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="700" fill="#c4776a">Actually Help</text>
+
+    <!-- Description -->
+    <text x="0" y="190" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">Clear, actionable insights about your</text>
+    <text x="0" y="215" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">leadership style - ready for your</text>
+    <text x="0" y="240" font-family="Inter, system-ui, sans-serif" font-size="17" fill="#5a6a7a">coaching conversation.</text>
+
+    <!-- Divider -->
+    <rect x="0" y="270" width="60" height="3" rx="1.5" fill="#c4776a"/>
+
+    <!-- Feature list -->
+    <g transform="translate(0, 300)">
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="28" height="28" rx="6" fill="#1e3a5f" opacity="0.1"/>
+        <path d="M8 14 L12 18 L20 10" stroke="#1e3a5f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="40" y="19" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">Your leadership archetype</text>
+      </g>
+      <g transform="translate(0, 45)">
+        <rect x="0" y="0" width="28" height="28" rx="6" fill="#1e3a5f" opacity="0.1"/>
+        <path d="M8 14 L12 18 L20 10" stroke="#1e3a5f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="40" y="19" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">Natural strengths revealed</text>
+      </g>
+      <g transform="translate(0, 90)">
+        <rect x="0" y="0" width="28" height="28" rx="6" fill="#1e3a5f" opacity="0.1"/>
+        <path d="M8 14 L12 18 L20 10" stroke="#1e3a5f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="40" y="19" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">Growth opportunities identified</text>
+      </g>
+      <g transform="translate(0, 135)">
+        <rect x="0" y="0" width="28" height="28" rx="6" fill="#1e3a5f" opacity="0.1"/>
+        <path d="M8 14 L12 18 L20 10" stroke="#1e3a5f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="40" y="19" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">PDF report to keep</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Right side - Results mockup -->
+  <g transform="translate(530, 50)">
+    <!-- Main results card -->
+    <rect x="0" y="0" width="580" height="530" rx="16" fill="#ffffff" stroke="#e0dcd5" stroke-width="1" filter="drop-shadow(0 4px 20px rgba(30,58,95,0.08))"/>
+
+    <!-- Header -->
+    <rect x="0" y="0" width="580" height="85" rx="16" fill="#1e3a5f"/>
+    <rect x="0" y="65" width="580" height="20" fill="#1e3a5f"/>
+    <text x="30" y="35" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#ffffff" opacity="0.7">LEADING WITH MEANING</text>
+    <text x="30" y="60" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Your Leadership Archetype</text>
+
+    <!-- Archetype badge -->
+    <g transform="translate(430, 28)">
+      <rect x="0" y="0" width="120" height="40" rx="20" fill="#c4776a"/>
+      <text x="60" y="26" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">NAVIGATOR</text>
+    </g>
+
+    <!-- Profile summary -->
+    <g transform="translate(30, 105)">
+      <text x="0" y="20" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#5a6a7a" letter-spacing="0.5">YOUR PROFILE</text>
+      <text x="0" y="50" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">You lead through careful navigation and balance.</text>
+      <text x="0" y="72" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">Your strength is finding paths through complexity</text>
+      <text x="0" y="94" font-family="Inter, system-ui, sans-serif" font-size="15" fill="#1e3a5f">while keeping your team grounded.</text>
+    </g>
+
+    <!-- Strength bars -->
+    <g transform="translate(30, 220)">
+      <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#5a6a7a" letter-spacing="0.5">CORE STRENGTHS</text>
+
+      <g transform="translate(0, 25)">
+        <text x="0" y="12" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Strategic Balance</text>
+        <text x="520" y="12" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="end">94%</text>
+        <rect x="0" y="22" width="520" height="8" rx="4" fill="#ebe8e3"/>
+        <rect x="0" y="22" width="488" height="8" rx="4" fill="#1e3a5f"/>
+      </g>
+
+      <g transform="translate(0, 65)">
+        <text x="0" y="12" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Adaptive Leadership</text>
+        <text x="520" y="12" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="end">87%</text>
+        <rect x="0" y="22" width="520" height="8" rx="4" fill="#ebe8e3"/>
+        <rect x="0" y="22" width="452" height="8" rx="4" fill="#1e3a5f"/>
+      </g>
+
+      <g transform="translate(0, 105)">
+        <text x="0" y="12" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Team Grounding</text>
+        <text x="520" y="12" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="end">82%</text>
+        <rect x="0" y="22" width="520" height="8" rx="4" fill="#ebe8e3"/>
+        <rect x="0" y="22" width="426" height="8" rx="4" fill="#c4776a"/>
+      </g>
+
+      <g transform="translate(0, 145)">
+        <text x="0" y="12" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Authentic Communication</text>
+        <text x="520" y="12" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="end">79%</text>
+        <rect x="0" y="22" width="520" height="8" rx="4" fill="#ebe8e3"/>
+        <rect x="0" y="22" width="410" height="8" rx="4" fill="#c4776a"/>
+      </g>
+    </g>
+
+    <!-- Growth area -->
+    <g transform="translate(30, 420)">
+      <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#5a6a7a" letter-spacing="0.5">GROWTH OPPORTUNITY</text>
+      <rect x="0" y="15" width="520" height="75" rx="8" fill="#f5f3ef"/>
+      <text x="15" y="42" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">Practice setting clearer boundaries without feeling like</text>
+      <text x="15" y="62" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">you're letting others down. Your adaptability is a strength</text>
+      <text x="15" y="82" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#1e3a5f">- make sure it doesn't come at the cost of your energy.</text>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#1e3a5f"/>
+</svg>

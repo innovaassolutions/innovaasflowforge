@@ -1,0 +1,131 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="lwmBgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f3ef;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ebe8e3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#lwmBgGradient)"/>
+
+  <!-- Header -->
+  <g transform="translate(600, 45)">
+    <rect x="-100" y="0" width="200" height="32" rx="16" fill="#1e3a5f" opacity="0.1"/>
+    <text x="0" y="21" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a5f" text-anchor="middle" letter-spacing="0.5">YOUR PATH FORWARD</text>
+  </g>
+
+  <!-- Main headline -->
+  <text x="600" y="120" font-family="Inter, system-ui, sans-serif" font-size="40" font-weight="700" fill="#1e3a5f" text-anchor="middle">Three Steps to Leadership Clarity</text>
+
+  <!-- Journey timeline -->
+  <g transform="translate(100, 200)">
+    <!-- Connecting line -->
+    <line x1="150" y1="100" x2="850" y2="100" stroke="#e0dcd5" stroke-width="3"/>
+    <line x1="150" y1="100" x2="850" y2="100" stroke="#1e3a5f" stroke-width="3" stroke-dasharray="230 700"/>
+
+    <!-- Step 1: Take Assessment -->
+    <g transform="translate(150, 0)">
+      <!-- Circle -->
+      <circle cx="0" cy="100" r="50" fill="#ffffff" stroke="#1e3a5f" stroke-width="3"/>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1e3a5f" text-anchor="middle">1</text>
+      <text x="0" y="115" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#5a6a7a" text-anchor="middle">STEP</text>
+
+      <!-- Icon above -->
+      <g transform="translate(-20, 20)">
+        <rect x="0" y="0" width="40" height="30" rx="4" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <circle cx="20" cy="15" r="8" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <line x1="20" y1="7" x2="20" y2="12" stroke="#c4776a" stroke-width="2"/>
+      </g>
+
+      <!-- Label below -->
+      <text x="0" y="180" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#1e3a5f" text-anchor="middle">Take the Assessment</text>
+      <text x="0" y="210" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">15-minute AI-guided</text>
+      <text x="0" y="230" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">conversation about</text>
+      <text x="0" y="250" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">your leadership.</text>
+    </g>
+
+    <!-- Step 2: Get Results -->
+    <g transform="translate(500, 0)">
+      <!-- Circle - highlighted -->
+      <circle cx="0" cy="100" r="50" fill="#1e3a5f" stroke="#1e3a5f" stroke-width="3"/>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+      <text x="0" y="115" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#ffffff" opacity="0.8" text-anchor="middle">STEP</text>
+
+      <!-- Icon above -->
+      <g transform="translate(-18, 20)">
+        <rect x="0" y="0" width="36" height="28" rx="3" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <line x1="6" y1="10" x2="30" y2="10" stroke="#c4776a" stroke-width="2"/>
+        <line x1="6" y1="18" x2="22" y2="18" stroke="#c4776a" stroke-width="2"/>
+      </g>
+
+      <!-- Label below -->
+      <text x="0" y="180" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#1e3a5f" text-anchor="middle">Get Your Results</text>
+      <text x="0" y="210" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">Instant archetype</text>
+      <text x="0" y="230" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">identification with</text>
+      <text x="0" y="250" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">detailed insights.</text>
+    </g>
+
+    <!-- Step 3: Begin Coaching -->
+    <g transform="translate(850, 0)">
+      <!-- Circle -->
+      <circle cx="0" cy="100" r="50" fill="#ffffff" stroke="#1e3a5f" stroke-width="3"/>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1e3a5f" text-anchor="middle">3</text>
+      <text x="0" y="115" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#5a6a7a" text-anchor="middle">STEP</text>
+
+      <!-- Icon above -->
+      <g transform="translate(-18, 18)">
+        <circle cx="12" cy="10" r="8" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <path d="M12 22 Q12 30 22 30" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <circle cx="28" cy="14" r="6" stroke="#c4776a" stroke-width="2" fill="none"/>
+        <path d="M28 22 Q28 28 22 30" stroke="#c4776a" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Label below -->
+      <text x="0" y="180" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#1e3a5f" text-anchor="middle">Begin Coaching</text>
+      <text x="0" y="210" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">Start with Mark from</text>
+      <text x="0" y="230" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">a place of clarity,</text>
+      <text x="0" y="250" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#5a6a7a" text-anchor="middle">not confusion.</text>
+    </g>
+  </g>
+
+  <!-- Bottom stats bar -->
+  <g transform="translate(100, 490)">
+    <rect x="0" y="0" width="1000" height="90" rx="12" fill="#ffffff" stroke="#e0dcd5" stroke-width="1"/>
+
+    <!-- Stat 1 -->
+    <g transform="translate(125, 45)">
+      <text x="0" y="-8" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1e3a5f" text-anchor="middle">Free</text>
+      <text x="0" y="18" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a" text-anchor="middle">Assessment</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="250" y1="20" x2="250" y2="70" stroke="#e0dcd5" stroke-width="1"/>
+
+    <!-- Stat 2 -->
+    <g transform="translate(375, 45)">
+      <text x="0" y="-8" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1e3a5f" text-anchor="middle">15 min</text>
+      <text x="0" y="18" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a" text-anchor="middle">To complete</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="500" y1="20" x2="500" y2="70" stroke="#e0dcd5" stroke-width="1"/>
+
+    <!-- Stat 3 -->
+    <g transform="translate(625, 45)">
+      <text x="0" y="-8" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#1e3a5f" text-anchor="middle">Instant</text>
+      <text x="0" y="18" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a" text-anchor="middle">Results</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="750" y1="20" x2="750" y2="70" stroke="#e0dcd5" stroke-width="1"/>
+
+    <!-- Stat 4 -->
+    <g transform="translate(875, 45)">
+      <text x="0" y="-8" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#c4776a" text-anchor="middle">Meaningful</text>
+      <text x="0" y="18" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#5a6a7a" text-anchor="middle">First conversation</text>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#1e3a5f"/>
+</svg>

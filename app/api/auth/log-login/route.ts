@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert login record using admin client (bypasses RLS)
-    const { error } = await supabaseAdmin.from('login_history').insert({
+    const { error } = await (supabaseAdmin.from('login_history') as any).insert({
       user_id: userId,
       ip_address: ip,
       user_agent: userAgent,

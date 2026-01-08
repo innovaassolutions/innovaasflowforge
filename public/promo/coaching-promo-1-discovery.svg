@@ -1,0 +1,113 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#FFFEFB"/>
+
+  <!-- Subtle pattern -->
+  <defs>
+    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#E6E2D6" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- Left content area -->
+  <g transform="translate(80, 120)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="180" height="32" rx="16" fill="#FEF5EE"/>
+    <text x="90" y="21" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F25C05" text-anchor="middle">AI-POWERED COACHING</text>
+
+    <!-- Main headline -->
+    <text x="0" y="80" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="#171614">Discover Your</text>
+    <text x="0" y="140" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="#F25C05">Leadership Archetype</text>
+
+    <!-- Subheadline -->
+    <text x="0" y="200" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#71706B">AI-facilitated assessments that reveal authentic</text>
+    <text x="0" y="230" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#71706B">leadership patterns and growth opportunities.</text>
+
+    <!-- CTA Button -->
+    <rect x="0" y="280" width="220" height="56" rx="8" fill="#F25C05"/>
+    <text x="110" y="315" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="600" fill="#FFFFFF" text-anchor="middle">Start Assessment</text>
+
+    <!-- Trust indicator -->
+    <text x="0" y="380" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B">Trusted by 500+ coaches worldwide</text>
+  </g>
+
+  <!-- Right illustration area - Archetype wheel -->
+  <g transform="translate(700, 315)">
+    <!-- Outer glow -->
+    <circle cx="200" cy="0" r="220" fill="#FEF5EE" opacity="0.5"/>
+
+    <!-- Main circle -->
+    <circle cx="200" cy="0" r="180" fill="#FAF8F3" stroke="#E6E2D6" stroke-width="2"/>
+
+    <!-- Archetype segments -->
+    <g transform="translate(200, 0)">
+      <!-- Center -->
+      <circle cx="0" cy="0" r="50" fill="#F25C05"/>
+      <text x="0" y="5" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">YOU</text>
+
+      <!-- Archetype icons around the wheel -->
+      <!-- Visionary - Top -->
+      <g transform="translate(0, -120)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#F25C05" stroke-width="2"/>
+        <text x="0" y="-45" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="middle">Visionary</text>
+        <path d="M-12 5 L0 -10 L12 5 M0 -10 L0 15" stroke="#F25C05" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Strategist - Top Right -->
+      <g transform="translate(104, -60)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="start">Strategist</text>
+        <rect x="-10" y="-10" width="20" height="20" rx="3" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Connector - Right -->
+      <g transform="translate(120, 0)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="start">Connector</text>
+        <circle cx="-8" cy="0" r="6" stroke="#71706B" stroke-width="2" fill="none"/>
+        <circle cx="8" cy="0" r="6" stroke="#71706B" stroke-width="2" fill="none"/>
+        <line x1="-2" y1="0" x2="2" y2="0" stroke="#71706B" stroke-width="2"/>
+      </g>
+
+      <!-- Builder - Bottom Right -->
+      <g transform="translate(104, 60)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="start">Builder</text>
+        <rect x="-12" y="-5" width="24" height="15" rx="2" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Guardian - Bottom -->
+      <g transform="translate(0, 120)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="0" y="50" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="middle">Guardian</text>
+        <path d="M0 -12 L12 0 L0 12 L-12 0 Z" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Catalyst - Bottom Left -->
+      <g transform="translate(-104, 60)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="-45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="end">Catalyst</text>
+        <path d="M-8 8 L0 -10 L8 8 Z" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Mentor - Left -->
+      <g transform="translate(-120, 0)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="-45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="end">Mentor</text>
+        <circle cx="0" cy="-3" r="7" stroke="#71706B" stroke-width="2" fill="none"/>
+        <path d="M-8 8 Q0 15 8 8" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Pioneer - Top Left -->
+      <g transform="translate(-104, -60)">
+        <circle cx="0" cy="0" r="35" fill="#FFFEFB" stroke="#E6E2D6" stroke-width="2"/>
+        <text x="-45" y="5" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#171614" text-anchor="end">Pioneer</text>
+        <path d="M0 -10 L10 10 L-10 10 Z" stroke="#71706B" stroke-width="2" fill="none"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#F25C05"/>
+</svg>

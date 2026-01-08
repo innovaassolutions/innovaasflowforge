@@ -1,0 +1,104 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - Warm beige -->
+  <rect width="1200" height="630" fill="#f5f3ef"/>
+
+  <!-- Subtle pattern -->
+  <defs>
+    <pattern id="lwmDots" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#e0dcd5" opacity="0.6"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#lwmDots)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1050" cy="150" r="250" fill="#1e3a5f" opacity="0.03"/>
+  <circle cx="150" cy="500" r="180" fill="#c4776a" opacity="0.05"/>
+
+  <!-- Left content area -->
+  <g transform="translate(80, 100)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="200" height="32" rx="16" fill="#1e3a5f" opacity="0.1"/>
+    <text x="100" y="21" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a5f" text-anchor="middle" letter-spacing="0.5">LEADERSHIP COACHING</text>
+
+    <!-- Main headline -->
+    <text x="0" y="85" font-family="Inter, system-ui, sans-serif" font-size="52" font-weight="700" fill="#1e3a5f">Lead with</text>
+    <text x="0" y="145" font-family="Inter, system-ui, sans-serif" font-size="52" font-weight="700" fill="#c4776a">Clarity</text>
+
+    <!-- Subheadline -->
+    <text x="0" y="210" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#5a6a7a">Manage with confidence.</text>
+    <text x="0" y="240" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#5a6a7a">Do your best work without losing yourself.</text>
+
+    <!-- Divider line -->
+    <rect x="0" y="275" width="80" height="3" rx="1.5" fill="#c4776a"/>
+
+    <!-- Value props -->
+    <g transform="translate(0, 310)">
+      <g transform="translate(0, 0)">
+        <circle cx="8" cy="8" r="8" fill="#1e3a5f" opacity="0.1"/>
+        <circle cx="8" cy="8" r="3" fill="#1e3a5f"/>
+        <text x="28" y="13" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#1e3a5f">Less noise. More direction.</text>
+      </g>
+      <g transform="translate(0, 40)">
+        <circle cx="8" cy="8" r="8" fill="#1e3a5f" opacity="0.1"/>
+        <circle cx="8" cy="8" r="3" fill="#1e3a5f"/>
+        <text x="28" y="13" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#1e3a5f">Less doubt. More authority.</text>
+      </g>
+    </g>
+
+    <!-- CTA Button -->
+    <rect x="0" y="420" width="240" height="56" rx="8" fill="#1e3a5f"/>
+    <text x="120" y="455" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#ffffff" text-anchor="middle">Discover Your Archetype</text>
+  </g>
+
+  <!-- Right side - Leadership compass illustration -->
+  <g transform="translate(680, 315)">
+    <!-- Outer glow -->
+    <circle cx="200" cy="0" r="240" fill="#1e3a5f" opacity="0.03"/>
+
+    <!-- Main compass circle -->
+    <circle cx="200" cy="0" r="190" fill="#ffffff" stroke="#e0dcd5" stroke-width="2"/>
+
+    <!-- Inner ring -->
+    <circle cx="200" cy="0" r="150" fill="none" stroke="#ebe8e3" stroke-width="1"/>
+
+    <!-- Compass points -->
+    <g transform="translate(200, 0)">
+      <!-- North - Clarity -->
+      <g transform="translate(0, -130)">
+        <polygon points="0,-25 15,10 -15,10" fill="#1e3a5f"/>
+        <text x="0" y="-35" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="middle">CLARITY</text>
+      </g>
+
+      <!-- East - Confidence -->
+      <g transform="translate(130, 0)">
+        <polygon points="25,0 -10,15 -10,-15" fill="#c4776a"/>
+        <text x="35" y="5" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="start">CONFIDENCE</text>
+      </g>
+
+      <!-- South - Authority -->
+      <g transform="translate(0, 130)">
+        <polygon points="0,25 15,-10 -15,-10" fill="#5a6a7a"/>
+        <text x="0" y="45" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="middle">AUTHORITY</text>
+      </g>
+
+      <!-- West - Direction -->
+      <g transform="translate(-130, 0)">
+        <polygon points="-25,0 10,15 10,-15" fill="#c4776a" opacity="0.7"/>
+        <text x="-35" y="5" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a5f" text-anchor="end">DIRECTION</text>
+      </g>
+
+      <!-- Center -->
+      <circle cx="0" cy="0" r="40" fill="#1e3a5f"/>
+      <text x="0" y="5" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">YOU</text>
+
+      <!-- Connecting lines -->
+      <line x1="0" y1="-55" x2="0" y2="-100" stroke="#e0dcd5" stroke-width="1"/>
+      <line x1="55" y1="0" x2="100" y2="0" stroke="#e0dcd5" stroke-width="1"/>
+      <line x1="0" y1="55" x2="0" y2="100" stroke="#e0dcd5" stroke-width="1"/>
+      <line x1="-55" y1="0" x2="-100" y2="0" stroke="#e0dcd5" stroke-width="1"/>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#1e3a5f"/>
+</svg>

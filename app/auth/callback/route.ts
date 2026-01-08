@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         const realIp = request.headers.get('x-real-ip')
         const userAgent = request.headers.get('user-agent')
 
-        await supabaseAdmin.from('login_history').insert({
+        await (supabaseAdmin.from('login_history') as any).insert({
           user_id: data.user.id,
           ip_address: forwardedFor?.split(',')[0].trim() || realIp || null,
           user_agent: userAgent,

@@ -1,0 +1,143 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFEFB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FEF5EE;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Header -->
+  <g transform="translate(600, 50)">
+    <rect x="-110" y="0" width="220" height="32" rx="16" fill="#FEF5EE" stroke="#F25C05" stroke-width="1"/>
+    <text x="0" y="21" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F25C05" text-anchor="middle">THE CLIENT JOURNEY</text>
+  </g>
+
+  <!-- Main headline -->
+  <text x="600" y="130" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="700" fill="#171614" text-anchor="middle">From Assessment to Transformation</text>
+
+  <!-- Journey timeline -->
+  <g transform="translate(100, 200)">
+    <!-- Connecting line -->
+    <line x1="100" y1="80" x2="900" y2="80" stroke="#E6E2D6" stroke-width="3"/>
+    <line x1="100" y1="80" x2="900" y2="80" stroke="#F25C05" stroke-width="3" stroke-dasharray="200" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" from="200" to="0" dur="2s" fill="freeze"/>
+    </line>
+
+    <!-- Step 1: Invite -->
+    <g transform="translate(100, 0)">
+      <circle cx="0" cy="80" r="40" fill="#FFFFFF" stroke="#F25C05" stroke-width="3"/>
+      <text x="0" y="75" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="#F25C05" text-anchor="middle">1</text>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#71706B" text-anchor="middle">STEP</text>
+
+      <!-- Label -->
+      <text x="0" y="150" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#171614" text-anchor="middle">Invite</text>
+      <text x="0" y="175" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">Send personalized</text>
+      <text x="0" y="193" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">assessment link</text>
+
+      <!-- Icon -->
+      <g transform="translate(-15, 50)">
+        <rect x="0" y="0" width="30" height="22" rx="3" stroke="#F25C05" stroke-width="2" fill="none"/>
+        <path d="M0 5 L15 15 L30 5" stroke="#F25C05" stroke-width="2" fill="none"/>
+      </g>
+    </g>
+
+    <!-- Step 2: Discover -->
+    <g transform="translate(350, 0)">
+      <circle cx="0" cy="80" r="40" fill="#FFFFFF" stroke="#F25C05" stroke-width="3"/>
+      <text x="0" y="75" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="#F25C05" text-anchor="middle">2</text>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#71706B" text-anchor="middle">STEP</text>
+
+      <!-- Label -->
+      <text x="0" y="150" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#171614" text-anchor="middle">Discover</text>
+      <text x="0" y="175" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">AI-guided</text>
+      <text x="0" y="193" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">conversation</text>
+
+      <!-- Icon -->
+      <g transform="translate(-12, 50)">
+        <circle cx="12" cy="8" r="8" stroke="#F25C05" stroke-width="2" fill="none"/>
+        <path d="M12 20 Q12 28 20 28 L4 28 Q12 28 12 20" stroke="#F25C05" stroke-width="2" fill="none"/>
+      </g>
+    </g>
+
+    <!-- Step 3: Reveal -->
+    <g transform="translate(600, 0)">
+      <circle cx="0" cy="80" r="40" fill="#F25C05" stroke="#F25C05" stroke-width="3"/>
+      <text x="0" y="75" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#FFFFFF" text-anchor="middle">STEP</text>
+
+      <!-- Label -->
+      <text x="0" y="150" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#171614" text-anchor="middle">Reveal</text>
+      <text x="0" y="175" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">Instant archetype</text>
+      <text x="0" y="193" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">results delivered</text>
+
+      <!-- Icon -->
+      <g transform="translate(-12, 48)">
+        <rect x="0" y="0" width="24" height="30" rx="2" stroke="#F25C05" stroke-width="2" fill="none"/>
+        <line x1="5" y1="10" x2="19" y2="10" stroke="#F25C05" stroke-width="2"/>
+        <line x1="5" y1="17" x2="15" y2="17" stroke="#F25C05" stroke-width="2"/>
+        <line x1="5" y1="24" x2="19" y2="24" stroke="#F25C05" stroke-width="2"/>
+      </g>
+    </g>
+
+    <!-- Step 4: Transform -->
+    <g transform="translate(850, 0)">
+      <circle cx="0" cy="80" r="40" fill="#FFFFFF" stroke="#F25C05" stroke-width="3"/>
+      <text x="0" y="75" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="#F25C05" text-anchor="middle">4</text>
+      <text x="0" y="95" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#71706B" text-anchor="middle">STEP</text>
+
+      <!-- Label -->
+      <text x="0" y="150" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" fill="#171614" text-anchor="middle">Transform</text>
+      <text x="0" y="175" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">Deep coaching</text>
+      <text x="0" y="193" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#71706B" text-anchor="middle">with rich insights</text>
+
+      <!-- Icon -->
+      <g transform="translate(-15, 50)">
+        <path d="M15 0 L30 15 L15 30 L0 15 Z" stroke="#F25C05" stroke-width="2" fill="none"/>
+        <circle cx="15" cy="15" r="6" fill="#F25C05"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Stats bar -->
+  <g transform="translate(100, 480)">
+    <rect x="0" y="0" width="1000" height="100" rx="16" fill="#FFFFFF" stroke="#E6E2D6" stroke-width="1"/>
+
+    <!-- Stat 1 -->
+    <g transform="translate(100, 50)">
+      <text x="0" y="-10" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="700" fill="#F25C05" text-anchor="middle">15 min</text>
+      <text x="0" y="20" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Assessment time</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="250" y1="20" x2="250" y2="80" stroke="#E6E2D6" stroke-width="1"/>
+
+    <!-- Stat 2 -->
+    <g transform="translate(375, 50)">
+      <text x="0" y="-10" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="700" fill="#F25C05" text-anchor="middle">Instant</text>
+      <text x="0" y="20" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Results delivery</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="500" y1="20" x2="500" y2="80" stroke="#E6E2D6" stroke-width="1"/>
+
+    <!-- Stat 3 -->
+    <g transform="translate(625, 50)">
+      <text x="0" y="-10" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="700" fill="#F25C05" text-anchor="middle">PDF</text>
+      <text x="0" y="20" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Downloadable report</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="750" y1="20" x2="750" y2="80" stroke="#E6E2D6" stroke-width="1"/>
+
+    <!-- Stat 4 -->
+    <g transform="translate(875, 50)">
+      <text x="0" y="-10" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="700" fill="#F25C05" text-anchor="middle">Branded</text>
+      <text x="0" y="20" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Your look and feel</text>
+    </g>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#F25C05"/>
+</svg>

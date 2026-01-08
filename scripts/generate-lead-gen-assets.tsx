@@ -31,7 +31,7 @@ dotenv.config({ path: '.env.local' })
 // ============================================================================
 
 const API_KEY = process.env.GOOGLE_AI_STUDIO || process.env.GOOGLE_GEMINI_API_KEY
-const MODEL_NAME = 'gemini-2.0-flash' // Using stable model; change to gemini-3-pro-preview when available
+const MODEL_NAME = 'gemini-3-pro-image-preview' // Using stable model; change to gemini-3-pro-preview when available
 
 if (!API_KEY) {
   console.error('No Google AI API key found. Set GOOGLE_AI_STUDIO in .env.local')

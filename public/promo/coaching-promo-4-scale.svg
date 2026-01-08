@@ -1,0 +1,109 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#FFFEFB"/>
+
+  <!-- Grid pattern background -->
+  <defs>
+    <pattern id="grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#E6E2D6" stroke-width="0.5" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Center content -->
+  <g transform="translate(600, 80)">
+    <!-- Badge -->
+    <rect x="-100" y="0" width="200" height="32" rx="16" fill="#FEF5EE"/>
+    <text x="0" y="21" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#F25C05" text-anchor="middle">FOR COACHES</text>
+
+    <!-- Headline -->
+    <text x="0" y="80" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="#171614" text-anchor="middle">Scale Your Practice</text>
+    <text x="0" y="135" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="#F25C05" text-anchor="middle">Without Burning Out</text>
+
+    <!-- Subheadline -->
+    <text x="0" y="190" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#71706B" text-anchor="middle">AI handles the assessment. You focus on transformation.</text>
+  </g>
+
+  <!-- Three columns of benefits -->
+  <g transform="translate(100, 280)">
+    <!-- Column 1 -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="300" height="260" rx="16" fill="#FFFFFF" stroke="#E6E2D6" stroke-width="1"/>
+
+      <!-- Icon -->
+      <circle cx="150" cy="60" r="35" fill="#FEF5EE"/>
+      <text x="150" y="70" font-family="Inter, system-ui, sans-serif" font-size="28" text-anchor="middle">24/7</text>
+
+      <!-- Title -->
+      <text x="150" y="130" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#171614" text-anchor="middle">Always Available</text>
+
+      <!-- Description -->
+      <text x="150" y="165" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Clients take assessments</text>
+      <text x="150" y="185" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">on their schedule, not yours.</text>
+      <text x="150" y="205" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">No more calendar juggling.</text>
+
+      <!-- Stat -->
+      <text x="150" y="245" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#F25C05" text-anchor="middle">Save 5+ hours per client</text>
+    </g>
+
+    <!-- Column 2 -->
+    <g transform="translate(350, 0)">
+      <rect x="0" y="0" width="300" height="260" rx="16" fill="#FFFFFF" stroke="#F25C05" stroke-width="2"/>
+
+      <!-- Popular badge -->
+      <rect x="100" y="-12" width="100" height="24" rx="12" fill="#F25C05"/>
+      <text x="150" y="4" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle">MOST POPULAR</text>
+
+      <!-- Icon -->
+      <circle cx="150" cy="60" r="35" fill="#FEF5EE"/>
+      <g transform="translate(130, 45)">
+        <rect x="0" y="0" width="15" height="25" rx="2" fill="#F25C05"/>
+        <rect x="18" y="8" width="15" height="17" rx="2" fill="#F25C05" opacity="0.6"/>
+        <rect x="36" y="15" width="15" height="10" rx="2" fill="#F25C05" opacity="0.3"/>
+      </g>
+
+      <!-- Title -->
+      <text x="150" y="130" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#171614" text-anchor="middle">Consistent Quality</text>
+
+      <!-- Description -->
+      <text x="150" y="165" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Every client gets the same</text>
+      <text x="150" y="185" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">thorough, professional</text>
+      <text x="150" y="205" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">assessment experience.</text>
+
+      <!-- Stat -->
+      <text x="150" y="245" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#F25C05" text-anchor="middle">98% client satisfaction</text>
+    </g>
+
+    <!-- Column 3 -->
+    <g transform="translate(700, 0)">
+      <rect x="0" y="0" width="300" height="260" rx="16" fill="#FFFFFF" stroke="#E6E2D6" stroke-width="1"/>
+
+      <!-- Icon -->
+      <circle cx="150" cy="60" r="35" fill="#FEF5EE"/>
+      <g transform="translate(135, 45)">
+        <circle cx="15" cy="10" r="8" stroke="#F25C05" stroke-width="2" fill="none"/>
+        <path d="M7 25 Q15 32 23 25" stroke="#F25C05" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Title -->
+      <text x="150" y="130" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="700" fill="#171614" text-anchor="middle">Deeper Sessions</text>
+
+      <!-- Description -->
+      <text x="150" y="165" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">Start coaching sessions</text>
+      <text x="150" y="185" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">with rich insights already</text>
+      <text x="150" y="205" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#71706B" text-anchor="middle">in hand.</text>
+
+      <!-- Stat -->
+      <text x="150" y="245" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#F25C05" text-anchor="middle">2x faster breakthroughs</text>
+    </g>
+  </g>
+
+  <!-- Bottom CTA -->
+  <g transform="translate(600, 575)">
+    <rect x="-130" y="-25" width="260" height="50" rx="25" fill="#F25C05"/>
+    <text x="0" y="5" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">Start Free Trial</text>
+  </g>
+
+  <!-- Bottom accent line -->
+  <rect x="0" y="620" width="1200" height="10" fill="#F25C05"/>
+</svg>
