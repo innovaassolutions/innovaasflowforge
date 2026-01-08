@@ -9,6 +9,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
+interface TenantRecord {
+  id: string
+  slug: string | null
+  display_name: string | null
+  tenant_type: string | null
+  subscription_tier: string | null
+  is_active: boolean | null
+  created_at: string | null
+  updated_at: string | null
+  user_id: string | null
+  custom_domain: string | null
+  user_profiles: {
+    email: string | null
+    full_name: string | null
+    last_seen_at: string | null
+  } | null
+}
+
 interface SessionRecord {
   tenant_id: string
   client_status: string | null
@@ -59,12 +77,14 @@ export async function GET(request: NextRequest) {
       query = query.eq('tenant_type', tenantType)
     }
 
-    const { data: tenants, error } = await query
+    const { data, error } = await query
 
     if (error) {
       console.error('Error fetching tenants:', error)
       return NextResponse.json({ error: 'Failed to fetch tenants' }, { status: 500 })
     }
+
+    const tenants = data as TenantRecord[] | null
 
     // Get session counts for each tenant
     const tenantIds = tenants?.map((t) => t.id) || []
@@ -122,9 +142,9 @@ export async function GET(request: NextRequest) {
       created_at: tenant.created_at,
       updated_at: tenant.updated_at,
       owner: {
-        email: (tenant.user_profiles as any)?.email,
-        name: (tenant.user_profiles as any)?.full_name,
-        last_seen_at: (tenant.user_profiles as any)?.last_seen_at,
+        email: tenant.user_profiles?.email,
+        name: tenant.user_profiles?.full_name,
+        last_seen_at: tenant.user_profiles?.last_seen_at,
       },
       sessions: sessionCounts.get(tenant.id) || { total: 0, completed: 0 },
       campaigns: campaignCounts.get(tenant.id) || { total: 0, completed: 0 },
