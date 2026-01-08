@@ -123,7 +123,7 @@ export default function AdminTenantsPage() {
         params.append('search', search)
       }
 
-      const response = await fetch(`/api/admin/tenants?${params}`)
+      const response = await fetch(`/flowforge/api/admin/tenants?${params}`)
       if (!response.ok) {
         throw new Error('Failed to fetch tenants')
       }
