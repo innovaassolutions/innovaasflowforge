@@ -9,6 +9,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
+interface UsageEvent {
+  event_type: string | null
+  tokens_used: number | null
+  cost_cents: number | null
+  tenant_id: string | null
+  model_used: string | null
+  created_at: string | null
+}
+
+interface TenantProfile {
+  id: string
+  display_name: string | null
+  tenant_type: string | null
+  subscription_tier: string | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin user
@@ -50,12 +66,14 @@ export async function GET(request: NextRequest) {
       query = query.eq('tenant_id', tenantId)
     }
 
-    const { data: events, error } = await query
+    const { data, error } = await query
 
     if (error) {
       console.error('Error fetching usage events:', error)
       return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 })
     }
+
+    const events = data as UsageEvent[] | null
 
     // Aggregate by event type
     const byEventType: Record<string, { count: number; tokens: number; cost: number }> = {}
@@ -84,11 +102,12 @@ export async function GET(request: NextRequest) {
 
     // Get tenant details
     const tenantIds = Object.keys(byTenantMap)
-    const { data: tenants } = await supabaseAdmin
+    const { data: tenantsData } = await supabaseAdmin
       .from('tenant_profiles')
       .select('id, display_name, tenant_type, subscription_tier')
       .in('id', tenantIds)
 
+    const tenants = tenantsData as TenantProfile[] | null
     const tenantMap = new Map(tenants?.map((t) => [t.id, t]) || [])
 
     const byTenant = Object.entries(byTenantMap).map(([id, data]) => {

@@ -9,6 +9,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
+interface SessionRecord {
+  tenant_id: string
+  client_status: string | null
+}
+
+interface CampaignRecord {
+  tenant_id: string
+  status: string | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin user
@@ -70,9 +80,13 @@ export async function GET(request: NextRequest) {
         .in('tenant_id', tenantIds),
     ])
 
+    // Type assertions for query results
+    const sessions = sessionResult.data as SessionRecord[] | null
+    const campaignData = campaignResult.data as CampaignRecord[] | null
+
     // Map session counts
     const sessionCounts = new Map<string, { total: number; completed: number }>()
-    sessionResult.data?.forEach((s) => {
+    sessions?.forEach((s) => {
       if (!sessionCounts.has(s.tenant_id)) {
         sessionCounts.set(s.tenant_id, { total: 0, completed: 0 })
       }
@@ -85,7 +99,7 @@ export async function GET(request: NextRequest) {
 
     // Map campaign counts
     const campaignCounts = new Map<string, { total: number; completed: number }>()
-    campaignResult.data?.forEach((c) => {
+    campaignData?.forEach((c) => {
       if (!campaignCounts.has(c.tenant_id)) {
         campaignCounts.set(c.tenant_id, { total: 0, completed: 0 })
       }
