@@ -1,0 +1,148 @@
+/**
+ * Admin Tenants API
+ *
+ * Returns tenant profiles with session/campaign counts by type.
+ * Admin-only endpoint.
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/server'
+
+export async function GET(request: NextRequest) {
+  try {
+    // Verify admin user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.user_type !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Parse query parameters
+    const searchParams = request.nextUrl.searchParams
+    const tenantType = searchParams.get('type') // 'coach', 'consultant', 'school'
+    const search = searchParams.get('search')
+
+    // Fetch tenants
+    let query = supabaseAdmin
+      .from('tenant_profiles')
+      .select(`
+        id, slug, display_name, tenant_type,
+        subscription_tier, is_active, created_at, updated_at,
+        user_id, custom_domain,
+        user_profiles!inner(email, full_name, last_seen_at)
+      `)
+      .order('created_at', { ascending: false })
+
+    if (tenantType) {
+      query = query.eq('tenant_type', tenantType)
+    }
+
+    const { data: tenants, error } = await query
+
+    if (error) {
+      console.error('Error fetching tenants:', error)
+      return NextResponse.json({ error: 'Failed to fetch tenants' }, { status: 500 })
+    }
+
+    // Get session counts for each tenant
+    const tenantIds = tenants?.map((t) => t.id) || []
+
+    const [sessionResult, campaignResult] = await Promise.all([
+      supabaseAdmin
+        .from('coaching_sessions')
+        .select('tenant_id, client_status')
+        .in('tenant_id', tenantIds),
+      supabaseAdmin
+        .from('campaigns')
+        .select('tenant_id, status')
+        .in('tenant_id', tenantIds),
+    ])
+
+    // Map session counts
+    const sessionCounts = new Map<string, { total: number; completed: number }>()
+    sessionResult.data?.forEach((s) => {
+      if (!sessionCounts.has(s.tenant_id)) {
+        sessionCounts.set(s.tenant_id, { total: 0, completed: 0 })
+      }
+      const counts = sessionCounts.get(s.tenant_id)!
+      counts.total++
+      if (s.client_status === 'completed') {
+        counts.completed++
+      }
+    })
+
+    // Map campaign counts
+    const campaignCounts = new Map<string, { total: number; completed: number }>()
+    campaignResult.data?.forEach((c) => {
+      if (!campaignCounts.has(c.tenant_id)) {
+        campaignCounts.set(c.tenant_id, { total: 0, completed: 0 })
+      }
+      const counts = campaignCounts.get(c.tenant_id)!
+      counts.total++
+      if (c.status === 'completed') {
+        counts.completed++
+      }
+    })
+
+    // Enrich tenants with counts
+    let enrichedTenants = tenants?.map((tenant) => ({
+      id: tenant.id,
+      slug: tenant.slug,
+      display_name: tenant.display_name,
+      tenant_type: tenant.tenant_type,
+      subscription_tier: tenant.subscription_tier,
+      is_active: tenant.is_active,
+      custom_domain: tenant.custom_domain,
+      created_at: tenant.created_at,
+      updated_at: tenant.updated_at,
+      owner: {
+        email: (tenant.user_profiles as any)?.email,
+        name: (tenant.user_profiles as any)?.full_name,
+        last_seen_at: (tenant.user_profiles as any)?.last_seen_at,
+      },
+      sessions: sessionCounts.get(tenant.id) || { total: 0, completed: 0 },
+      campaigns: campaignCounts.get(tenant.id) || { total: 0, completed: 0 },
+    }))
+
+    // Filter by search if provided
+    if (search) {
+      const searchLower = search.toLowerCase()
+      enrichedTenants = enrichedTenants?.filter(
+        (t) =>
+          t.display_name?.toLowerCase().includes(searchLower) ||
+          t.slug?.toLowerCase().includes(searchLower) ||
+          t.owner?.email?.toLowerCase().includes(searchLower) ||
+          t.owner?.name?.toLowerCase().includes(searchLower)
+      )
+    }
+
+    // Group by type for summary
+    const summary = {
+      coaches: enrichedTenants?.filter((t) => t.tenant_type === 'coach').length || 0,
+      consultants: enrichedTenants?.filter((t) => t.tenant_type === 'consultant').length || 0,
+      schools: enrichedTenants?.filter((t) => t.tenant_type === 'school').length || 0,
+      active: enrichedTenants?.filter((t) => t.is_active).length || 0,
+      total: enrichedTenants?.length || 0,
+    }
+
+    return NextResponse.json({
+      tenants: enrichedTenants,
+      summary,
+    })
+  } catch (error) {
+    console.error('Admin tenants error:', error)
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
+}

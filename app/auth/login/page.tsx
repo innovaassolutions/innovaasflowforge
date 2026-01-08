@@ -50,6 +50,17 @@ export default function LoginPage() {
           .from('user_profiles') as any)
           .update({ last_seen_at: new Date().toISOString() })
           .eq('id', data.user.id)
+
+        // Log the login for admin tracking (non-blocking)
+        fetch('/api/auth/log-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: data.user.id,
+            authMethod: 'password',
+            success: true,
+          }),
+        }).catch((err) => console.error('Failed to log login:', err))
       }
 
       // Redirect to dashboard

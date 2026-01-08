@@ -16,7 +16,9 @@ import {
   UserCog,
   GraduationCap,
   UserCircle,
-  Palette
+  Palette,
+  Activity,
+  DollarSign,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -165,10 +167,34 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
     {
+      name: 'Overview',
+      href: '/dashboard/admin/overview',
+      icon: BarChart3,
+      matchPaths: ['/dashboard/admin/overview']
+    },
+    {
       name: 'Users',
       href: '/dashboard/admin/users',
       icon: Shield,
-      matchPaths: ['/dashboard/admin']
+      matchPaths: ['/dashboard/admin/users']
+    },
+    {
+      name: 'Tenants',
+      href: '/dashboard/admin/tenants',
+      icon: Building2,
+      matchPaths: ['/dashboard/admin/tenants']
+    },
+    {
+      name: 'Activity',
+      href: '/dashboard/admin/activity',
+      icon: Activity,
+      matchPaths: ['/dashboard/admin/activity']
+    },
+    {
+      name: 'Billing',
+      href: '/dashboard/admin/billing',
+      icon: DollarSign,
+      matchPaths: ['/dashboard/admin/billing']
     }
   ] : []
 
