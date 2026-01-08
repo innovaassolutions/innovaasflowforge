@@ -24,6 +24,13 @@ interface LoginHistoryRecord {
   created_at: string
 }
 
+interface UserProfile {
+  id: string
+  email: string | null
+  full_name: string | null
+  user_type: string | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin user
@@ -81,11 +88,12 @@ export async function GET(request: NextRequest) {
 
     // Fetch user details for each login
     const userIds = [...new Set(logins?.map((l) => l.user_id) || [])]
-    const { data: users } = await supabaseAdmin
+    const { data: usersData } = await supabaseAdmin
       .from('user_profiles')
       .select('id, email, full_name, user_type')
       .in('id', userIds)
 
+    const users = usersData as UserProfile[] | null
     const userMap = new Map(users?.map((u) => [u.id, u]) || [])
 
     // Enrich logins with user info
