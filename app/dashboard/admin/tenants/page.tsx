@@ -73,7 +73,7 @@ export default function AdminTenantsPage() {
   const [search, setSearch] = useState('')
 
   // Get initial tab from URL params
-  const initialTab = (searchParams.get('type') as TabType) || 'all'
+  const initialTab = (searchParams?.get('type') as TabType) || 'all'
   const [activeTab, setActiveTab] = useState<TabType>(initialTab)
 
   useEffect(() => {
@@ -356,7 +356,9 @@ export default function AdminTenantsPage() {
                           {tenant.display_name}
                         </p>
                         {tenant.custom_domain && (
-                          <Globe className="w-3 h-3 text-muted-foreground" title="Custom domain" />
+                          <span title="Custom domain">
+                            <Globe className="w-3 h-3 text-muted-foreground" />
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground">/{tenant.slug}</p>
