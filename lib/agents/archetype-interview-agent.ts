@@ -190,8 +190,8 @@ function buildSystemPrompt(
   } else if (state.phase === 'default_mode') {
     sections.push('CURRENT TASK: Default Mode Questions (Q4-Q12)')
     sections.push('These questions explore how the participant responds under pressure.')
-    sections.push('Ranked selection: ask for MOST like them, then SECOND most.')
-    sections.push('After their selection, probe for a real example or story.')
+    sections.push('Ranked selection: ask for MOST like them, then SECOND most like them.')
+    sections.push('DO NOT ask for examples or stories - just collect their two selections and move to the next question.')
     const question = getQuestionByIndex(state.current_question_index)
     if (question) {
       sections.push('')
@@ -202,7 +202,8 @@ function buildSystemPrompt(
   } else if (state.phase === 'authentic_mode') {
     sections.push('CURRENT TASK: Authentic Mode Questions (Q13-Q16)')
     sections.push('These questions explore leadership when grounded and at their best.')
-    sections.push('Same ranked format: MOST like them, then SECOND most.')
+    sections.push('Same ranked format: ask for MOST like them, then SECOND most like them.')
+    sections.push('DO NOT ask for examples or stories - just collect their two selections and move to the next question.')
     const question = getQuestionByIndex(state.current_question_index)
     if (question) {
       sections.push('')
@@ -213,8 +214,8 @@ function buildSystemPrompt(
   } else if (state.phase === 'friction_signals') {
     sections.push('CURRENT TASK: Friction Signal Questions (Q17-Q19)')
     sections.push('These questions identify what is currently draining the participant.')
-    sections.push('Single-select: ask them to pick ONE that resonates most.')
-    sections.push('These can be tender - be extra gentle and normalizing.')
+    sections.push('Single-select: ask them to pick ONE option that resonates most.')
+    sections.push('DO NOT ask for elaboration - just collect their selection and move to the next question.')
     const question = getQuestionByIndex(state.current_question_index)
     if (question) {
       sections.push('')
@@ -229,22 +230,13 @@ function buildSystemPrompt(
     sections.push('The coach will be in touch to discuss their archetype pattern.')
   }
 
-  // Story probing reminders
-  if (['default_mode', 'authentic_mode'].includes(state.phase)) {
-    sections.push('')
-    sections.push('STORY PROBING:')
-    sections.push('After they select their options, ask for a concrete example:')
-    ARCHETYPE_CONSTITUTION.story_probing.prompts.default_mode.forEach((p) =>
-      sections.push(`- "${p}"`)
-    )
-  }
-
   // Output format
   sections.push('')
   sections.push('RESPONSE FORMAT:')
-  sections.push('Respond conversationally. Do not use markdown formatting.')
-  sections.push('Keep responses focused and warm.')
-  sections.push('One question at a time. Do not overwhelm with multiple questions.')
+  sections.push('Respond conversationally but efficiently. Do not use markdown formatting.')
+  sections.push('Keep responses brief and warm - acknowledge their answer, then move to the next question.')
+  sections.push('One question at a time. Do NOT ask follow-up questions or request stories/examples.')
+  sections.push('CRITICAL: This is a survey-style assessment. Collect answers quickly without probing.')
 
   return sections.join('\n')
 }
