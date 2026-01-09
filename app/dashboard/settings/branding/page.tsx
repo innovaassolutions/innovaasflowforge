@@ -399,7 +399,7 @@ export default function BrandingSettingsPage() {
 
   async function loadDomainStatus() {
     try {
-      const response = await fetch('/api/tenant/domain')
+      const response = await fetch('/flowforge/api/tenant/domain')
       if (response.ok) {
         const data = await response.json()
         setDomainStatus(data)
@@ -416,7 +416,7 @@ export default function BrandingSettingsPage() {
     setConfiguringDomain(true)
 
     try {
-      const response = await fetch('/api/tenant/domain', {
+      const response = await fetch('/flowforge/api/tenant/domain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: domainInput.trim() }),
@@ -448,7 +448,7 @@ export default function BrandingSettingsPage() {
     setRemovingDomain(true)
 
     try {
-      const response = await fetch('/api/tenant/domain', {
+      const response = await fetch('/flowforge/api/tenant/domain', {
         method: 'DELETE',
       })
 
@@ -474,7 +474,7 @@ export default function BrandingSettingsPage() {
     setCheckingDomainStatus(true)
 
     try {
-      const response = await fetch('/api/tenant/domain/status')
+      const response = await fetch('/flowforge/api/tenant/domain/status')
       if (response.ok) {
         const data = await response.json()
         setDomainStatus(data)
