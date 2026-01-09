@@ -409,8 +409,7 @@ export default function BrandingSettingsPage() {
     }
   }
 
-  async function handleConfigureDomain(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleConfigureDomain() {
     if (!domainInput.trim()) return
 
     setDomainError(null)
@@ -1103,9 +1102,9 @@ export default function BrandingSettingsPage() {
             </div>
           )}
 
-          {/* No domain configured - show input form */}
+          {/* No domain configured - show input (NOT a nested form!) */}
           {(!domainStatus || !domainStatus.configured) && (
-            <form onSubmit={handleConfigureDomain} className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Custom Subdomain
@@ -1154,7 +1153,8 @@ export default function BrandingSettingsPage() {
               </div>
 
               <button
-                type="submit"
+                type="button"
+                onClick={handleConfigureDomain}
                 disabled={configuringDomain || !domainInput.trim()}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-[hsl(var(--accent-hover))] text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
               >
@@ -1170,7 +1170,7 @@ export default function BrandingSettingsPage() {
                   </>
                 )}
               </button>
-            </form>
+            </div>
           )}
 
           {/* Domain configured - show status */}
