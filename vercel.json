@@ -6,7 +6,7 @@
       "has": [
         {
           "type": "host",
-          "value": "^(?!.*\\.vercel\\.app$|.*innovaas\\.co$|localhost.*).*$"
+          "value": "(?<domain>.*\\.leadingwithmeaning\\.com)"
         }
       ],
       "destination": "/flowforge/:path*"
