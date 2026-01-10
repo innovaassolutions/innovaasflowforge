@@ -7,6 +7,11 @@ import {
   hostnameExists,
 } from '@/lib/services/cloudflare-domains'
 import {
+  addDomainToVercel,
+  removeDomainFromVercel,
+  isVercelDomainConfigured,
+} from '@/lib/services/vercel-domains'
+import {
   validateCustomDomain,
   getSubdomain,
   getApexDomain,
@@ -114,6 +119,22 @@ export async function POST(request: NextRequest) {
       hostnameId = cfResult.hostnameId
     }
 
+    // 6b. Add to Vercel so it recognizes the hostname
+    // This is essential for multi-tenant custom domains to work
+    if (isVercelDomainConfigured()) {
+      const vercelResult = await addDomainToVercel(domain)
+
+      if (!vercelResult.success) {
+        console.error('Vercel domain error:', vercelResult.error)
+        // Don't fail the request - Cloudflare is configured, Vercel can be retried
+        // The domain might work if Vercel is already configured via dashboard
+      } else {
+        console.log(`Domain ${domain} added to Vercel (verified: ${vercelResult.verified})`)
+      }
+    } else {
+      console.log('Vercel domain integration not configured - skipping Vercel domain registration')
+    }
+
     // 7. Update tenant profile in database
     const { error: updateError } = await (supabaseAdmin
       .from('tenant_profiles') as any)
@@ -217,6 +238,18 @@ export async function DELETE(request: NextRequest) {
       if (!cfResult.success) {
         console.error('Cloudflare delete error:', cfResult.error)
         // Continue anyway - domain might have been manually deleted
+      }
+    }
+
+    // 4b. Remove from Vercel
+    if (isVercelDomainConfigured() && tenant.custom_domain) {
+      const vercelResult = await removeDomainFromVercel(tenant.custom_domain)
+
+      if (!vercelResult.success) {
+        console.error('Vercel remove error:', vercelResult.error)
+        // Continue anyway - domain might have been manually removed
+      } else {
+        console.log(`Domain ${tenant.custom_domain} removed from Vercel`)
       }
     }
 
