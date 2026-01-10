@@ -25,12 +25,13 @@ export async function middleware(request: NextRequest) {
     const tenant = await lookupTenantByDomain(hostname)
 
     if (tenant.found && tenant.slug && tenant.tenantType) {
-      // Build the internal path including basePath
+      // Build the internal path WITHOUT basePath - Next.js adds it automatically
+      // when basePath is configured in next.config.js
       const internalPath = buildInternalPath(
         pathname,
         tenant.slug,
         tenant.tenantType,
-        BASE_PATH
+        '' // Don't include basePath - Next.js handles it
       )
 
       // Clone the URL and update the pathname
