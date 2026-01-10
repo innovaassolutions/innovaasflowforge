@@ -1,15 +1,26 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/",
       "has": [
         {
           "type": "host",
-          "value": "(?<domain>.*\\.leadingwithmeaning\\.com)"
+          "value": "archetypequiz.leadingwithmeaning.com"
         }
       ],
-      "destination": "/flowforge/:path*"
+      "destination": "/flowforge/"
+    },
+    {
+      "source": "/:path((?!flowforge|_next|api).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "archetypequiz.leadingwithmeaning.com"
+        }
+      ],
+      "destination": "/flowforge/:path"
     }
   ]
 }
