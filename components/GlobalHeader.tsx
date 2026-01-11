@@ -6,16 +6,48 @@ import Image from 'next/image'
 import { Home } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
+// System domains where GlobalHeader should show
+// Custom domains should NOT show the FlowForge header
+const SYSTEM_DOMAINS = [
+  'innovaas.co',
+  'flowforge.innovaas.co',
+  'localhost',
+  'vercel.app',
+]
+
+function isSystemDomain(hostname: string): boolean {
+  const normalizedHost = hostname.split(':')[0].toLowerCase()
+
+  // Check exact matches or subdomain matches
+  for (const domain of SYSTEM_DOMAINS) {
+    if (normalizedHost === domain || normalizedHost.endsWith(`.${domain}`)) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export default function GlobalHeader() {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
+  const [isCustomDomain, setIsCustomDomain] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    // Check if we're on a custom domain
+    if (typeof window !== 'undefined') {
+      setIsCustomDomain(!isSystemDomain(window.location.hostname))
+    }
   }, [])
 
   // Prevent hydration mismatch - don't render until client-side
   if (!mounted) {
+    return null
+  }
+
+  // Hide header on custom domains (they have their own branded layouts)
+  if (isCustomDomain) {
     return null
   }
 
