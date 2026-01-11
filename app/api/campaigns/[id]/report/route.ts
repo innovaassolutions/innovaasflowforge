@@ -111,9 +111,8 @@ export async function GET(
     }
 
     // Construct shareable report URL
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
-    const reportUrl = `${baseUrl}${basePath}/reports/${report.access_token}`;
+    const reportUrl = `${baseUrl}/reports/${report.access_token}`;
 
     // Return success response with report details
     return NextResponse.json(

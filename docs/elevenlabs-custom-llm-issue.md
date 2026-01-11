@@ -164,10 +164,12 @@ We have invested significant development effort into this integration and need i
 ## Environment
 
 - **Hosting:** Vercel (Next.js 15)
-- **Custom LLM URL:** `https://innovaasflowforge.vercel.app/flowforge/api/voice/edge-llm`
+- **Custom LLM URL:** `https://flowforge.innovaas.co/api/voice/chat/completions`
 - **API Type:** `chat_completions`
 - **ElevenLabs SDK:** `@elevenlabs/react` (latest)
 - **Connection Type:** WebRTC
+
+> **Note:** As of January 2026, FlowForge moved from `innovaasflowforge.vercel.app/flowforge/` to `flowforge.innovaas.co/`. See `docs/migration-basepath-removal.md` for migration details.
 
 ---
 
@@ -229,7 +231,7 @@ Output Tokens: 0
 
 ### Endpoint Response Format (Verified Working via curl)
 ```
-POST /flowforge/api/voice/edge-llm
+POST /api/voice/chat/completions
 Content-Type: application/json
 
 Request:
@@ -263,7 +265,7 @@ Access-Control-Allow-Origin: *
 
 ### curl Test Result (WORKS)
 ```bash
-curl -s "https://innovaasflowforge.vercel.app/flowforge/api/voice/edge-llm" \
+curl -s "https://flowforge.innovaas.co/api/voice/chat/completions" \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{"messages":[{"role":"user","content":"hello"}],"stream":true}'
@@ -288,8 +290,8 @@ curl -s "https://innovaasflowforge.vercel.app/flowforge/api/voice/edge-llm" \
         "temperature": 0.7,
         "max_tokens": 1024,
         "custom_llm": {
-          "url": "https://innovaasflowforge.vercel.app/flowforge/api/voice/node-llm",
-          "model_id": "node-llm",
+          "url": "https://flowforge.innovaas.co/api/voice/chat/completions",
+          "model_id": "flowforge-llm",
           "api_type": "chat_completions"
         }
       }
@@ -358,7 +360,7 @@ We deployed a debug endpoint that logs ALL incoming requests to a Supabase datab
 ### Debug Endpoint Details
 
 - **Agent ID:** `agent_8401ke60x5j4f3av281her96xtn4`
-- **URL:** `https://innovaasflowforge.vercel.app/flowforge/api/voice/debug-llm`
+- **URL:** `https://flowforge.innovaas.co/api/voice/chat/completions`
 - **Logging:** Supabase `debug_logs` table (timestamps, headers, body preview)
 
 ### Conclusion
@@ -381,7 +383,7 @@ This is a **connectivity issue between ElevenLabs infrastructure and Vercel**, n
 
 4. **Are there specific requirements for Vercel-hosted endpoints?** Other hosting providers? IP allowlisting? Specific TLS requirements?
 
-5. **Can you test our endpoint from your infrastructure?** URL: `https://innovaasflowforge.vercel.app/flowforge/api/voice/debug-llm`
+5. **Can you test our endpoint from your infrastructure?** URL: `https://flowforge.innovaas.co/api/voice/chat/completions`
 
 ---
 
@@ -398,5 +400,5 @@ This is a **connectivity issue between ElevenLabs infrastructure and Vercel**, n
 ## Contact
 
 Project: FlowForge
-URL: https://innovaasflowforge.vercel.app
-Test Page: https://innovaasflowforge.vercel.app/flowforge/voice-test
+URL: https://flowforge.innovaas.co
+Test Page: https://flowforge.innovaas.co/voice-test

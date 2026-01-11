@@ -1,23 +1,19 @@
 # OAuth Production Configuration Guide
 
-> Date: 2025-12-06
-> For: FlowForge proxied through www.innovaas.co/flowforge
+> Date: 2026-01-11 (Updated)
+> For: FlowForge at flowforge.innovaas.co subdomain
 
 ## Architecture Overview
 
 **User Access:**
-- Users visit: `https://www.innovaas.co/flowforge`
-- URL stays: `https://www.innovaas.co/flowforge/*` (never changes)
-- Content proxied from: `https://innovaasflowforge.vercel.app`
+- Users visit: `https://flowforge.innovaas.co`
+- Content served directly from Vercel deployment
+- No basePath or proxy configuration needed
 
 **Technical Setup:**
-- Main website (`www.innovaas.co`) proxies `/flowforge` path to FlowForge app
-- FlowForge app has `basePath: '/flowforge'` configured in `next.config.js`
-- All OAuth callbacks MUST use the custom domain, not the Vercel URL
-
-## Current Problem
-
-OAuth redirect is trying to go to `http://localhost:3000` instead of `https://www.innovaas.co/flowforge`
+- FlowForge app deployed to dedicated subdomain `flowforge.innovaas.co`
+- All OAuth callbacks use the subdomain directly
+- Clean URL structure without `/flowforge` prefix
 
 ## Configuration Steps
 
@@ -29,13 +25,12 @@ OAuth redirect is trying to go to `http://localhost:3000` instead of `https://ww
 
 | Variable | Value | Environment |
 |----------|-------|-------------|
-| `NEXT_PUBLIC_APP_URL` | `https://www.innovaas.co/flowforge` | Production |
+| `NEXT_PUBLIC_APP_URL` | `https://flowforge.innovaas.co` | Production |
 
 **Important Notes:**
-- ✅ Include `/flowforge` in the URL (matches your basePath)
-- ✅ Use `https://` (not `http://`)
-- ✅ Use `www.innovaas.co` (not the Vercel URL)
-- ✅ NO trailing slash
+- Use `https://` (not `http://`)
+- Use `flowforge.innovaas.co` subdomain
+- NO trailing slash
 
 ### Step 2: Supabase Authentication Configuration
 
@@ -43,15 +38,15 @@ OAuth redirect is trying to go to `http://localhost:3000` instead of `https://ww
 
 **Site URL:**
 ```
-https://www.innovaas.co/flowforge
+https://flowforge.innovaas.co
 ```
 
 **Redirect URLs (add ALL of these):**
 ```
-https://www.innovaas.co/flowforge/auth/callback
-https://www.innovaas.co/flowforge/*
+https://flowforge.innovaas.co/auth/callback
+https://flowforge.innovaas.co/**
 http://localhost:3000/auth/callback
-http://localhost:3000/*
+http://localhost:3000/**
 ```
 
 **Why we need localhost URLs:**
@@ -66,15 +61,14 @@ For **each provider** (Google, Microsoft, GitHub):
 
 1. **Authorized Redirect URIs** should include:
    ```
-   https://www.innovaas.co/flowforge/auth/v1/callback
+   https://flowforge.innovaas.co/auth/v1/callback
    https://tlynzgbxrnujphaatagu.supabase.co/auth/v1/callback
    http://localhost:3000/auth/v1/callback
    ```
 
 2. **Authorized JavaScript Origins** (if applicable):
    ```
-   https://www.innovaas.co
-   https://innovaasflowforge.vercel.app
+   https://flowforge.innovaas.co
    http://localhost:3000
    ```
 
@@ -96,21 +90,21 @@ After setting environment variables:
 1. **Hard refresh browser:** Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
 2. **Clear cookies:** DevTools → Application → Clear site data
 3. **Test OAuth flow:**
-   - Go to `https://www.innovaas.co/flowforge`
+   - Go to `https://flowforge.innovaas.co`
    - Click "Sign in with Google"
-   - Should redirect to Google, then back to `https://www.innovaas.co/flowforge/auth/callback`
+   - Should redirect to Google, then back to `https://flowforge.innovaas.co/auth/callback`
    - Should NOT see `localhost:3000` anywhere
 
 ## Verification Checklist
 
 After configuration:
 
-- [ ] Vercel env var `NEXT_PUBLIC_APP_URL` set to `https://www.innovaas.co/flowforge`
-- [ ] Supabase Site URL set to `https://www.innovaas.co/flowforge`
-- [ ] Supabase Redirect URLs include custom domain
-- [ ] Google OAuth redirect URIs include custom domain
-- [ ] Microsoft OAuth redirect URIs include custom domain
-- [ ] GitHub OAuth redirect URIs include custom domain
+- [ ] Vercel env var `NEXT_PUBLIC_APP_URL` set to `https://flowforge.innovaas.co`
+- [ ] Supabase Site URL set to `https://flowforge.innovaas.co`
+- [ ] Supabase Redirect URLs include subdomain
+- [ ] Google OAuth redirect URIs include subdomain
+- [ ] Microsoft OAuth redirect URIs include subdomain
+- [ ] GitHub OAuth redirect URIs include subdomain
 - [ ] Vercel redeployed with new environment variables
 - [ ] Browser cache cleared
 - [ ] OAuth login tested and working
@@ -133,7 +127,7 @@ After configuration:
 
 **Fix:**
 1. Go to Google/Microsoft/GitHub OAuth app settings
-2. Add `https://www.innovaas.co/flowforge/auth/v1/callback` to authorized redirects
+2. Add `https://flowforge.innovaas.co/auth/v1/callback` to authorized redirects
 3. Try again
 
 ### Issue: After OAuth, user sees "Error loading campaigns"
@@ -150,15 +144,11 @@ After configuration:
 ```
 User Browser
     ↓
-https://www.innovaas.co/flowforge/auth/login
-    ↓ (proxy via main website)
-https://innovaasflowforge.vercel.app/flowforge/auth/login
+https://flowforge.innovaas.co/auth/login
     ↓ (OAuth redirect)
 Google/Microsoft/GitHub
     ↓ (callback)
-https://www.innovaas.co/flowforge/auth/callback
-    ↓ (proxy via main website)
-https://innovaasflowforge.vercel.app/flowforge/auth/callback
+https://flowforge.innovaas.co/auth/callback
     ↓ (Supabase auth completes)
 User authenticated & redirected to dashboard
 ```
@@ -172,20 +162,23 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 **Production (Vercel):**
 ```bash
-NEXT_PUBLIC_APP_URL=https://www.innovaas.co/flowforge
+NEXT_PUBLIC_APP_URL=https://flowforge.innovaas.co
 ```
 
 **Why they're different:**
-- Local dev runs on `localhost:3000` without basePath
-- Production runs through proxy at `www.innovaas.co/flowforge` with basePath
+- Local dev runs on `localhost:3000`
+- Production runs at `flowforge.innovaas.co` subdomain
 
-## Next Steps
+## Migration Note
 
-1. Follow Steps 1-5 above
-2. Test OAuth login with Google
-3. If working, test Microsoft and GitHub
-4. Document any additional issues that come up
-5. Update this guide as needed
+As of January 2026, FlowForge moved from a basePath configuration (`www.innovaas.co/flowforge`) to a dedicated subdomain (`flowforge.innovaas.co`). This simplifies OAuth configuration as:
+
+- No proxy layer required
+- No basePath in URLs
+- Direct Vercel deployment
+- Cleaner custom domain support
+
+See `docs/migration-basepath-removal.md` for full migration details.
 
 ---
 

@@ -264,8 +264,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     // Send welcome email with new credentials
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
-    const loginUrl = `${baseUrl}${basePath}/auth/login`
+    const loginUrl = `${baseUrl}/auth/login`
 
     try {
       await resend.emails.send({

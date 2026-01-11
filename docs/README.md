@@ -182,79 +182,55 @@ The platform is designed to:
 
 ## Deployment Architecture
 
-### FlowForge Proxy Setup
+### FlowForge Subdomain Setup
 
-FlowForge is deployed as a **separate application** that appears seamlessly integrated into the main Innovaas website through Next.js rewrites (proxy, not redirect).
+> **Note:** As of January 2026, FlowForge moved from a basePath configuration to a dedicated subdomain. See `docs/migration-basepath-removal.md` for migration details.
 
-#### Two Separate Applications
+FlowForge is deployed as a standalone application on its own subdomain:
 
-1. **Main Website** (`www.innovaas.co`)
-   - Repository: `innovaasWebsite`
-   - Vercel deployment of main company site
-   - Configured with rewrites to proxy `/flowforge` requests
-
-2. **FlowForge App** (`https://innovaasflowforge.vercel.app`)
-   - Repository: `innovaasflowforge` (this project)
-   - Separate Vercel deployment
-   - Independent Next.js application
-   - Configured with `basePath: '/flowforge'`
-
-#### How the Proxy Works
-
-**Main Website Configuration** (`next.config.js`):
-```javascript
-async rewrites() {
-  return [
-    {
-      source: '/flowforge',
-      destination: 'https://innovaasflowforge.vercel.app/flowforge',
-    },
-    {
-      source: '/flowforge/:path*',
-      destination: 'https://innovaasflowforge.vercel.app/flowforge/:path*',
-    },
-  ];
-}
-```
-
-**FlowForge App Configuration** (`next.config.js`):
-```javascript
-basePath: '/flowforge'
-```
+- **Production URL:** `https://flowforge.innovaas.co`
+- **Repository:** `innovaasflowforge` (this project)
+- **Deployment:** Vercel (direct, no proxy)
 
 #### Request Flow
 
-1. User visits: `www.innovaas.co/flowforge`
-2. Main website's Next.js matches the rewrite rule
-3. Request is **proxied** (not redirected) to `https://innovaasflowforge.vercel.app/flowforge`
-4. FlowForge serves the page (basePath configured)
-5. Static assets load correctly via same proxy mechanism
-6. **User sees**: `www.innovaas.co/flowforge` in browser (seamless single-domain experience)
+1. User visits: `https://flowforge.innovaas.co`
+2. Vercel serves the page directly
+3. No basePath, no proxy layer
+4. Clean URL structure (e.g., `/dashboard`, `/auth/login`)
 
-#### Important Development Notes
+#### Custom Domain Support
 
-- **All API routes** in FlowForge require `/flowforge` prefix via the `apiUrl()` helper function
-- **Static assets** automatically handled by `basePath` configuration
-- **No redirects** = Better UX and single domain experience
-- **Testing locally**: Run FlowForge on its own without basePath, deploy to Vercel with basePath enabled
+The subdomain architecture enables proper custom domain routing:
 
-#### The `apiUrl` Helper
+1. Tenant configures custom domain (e.g., `assessment.clientcompany.com`)
+2. DNS points to Vercel
+3. Middleware detects custom domain and rewrites to tenant's internal path
+4. Tenant sees their branded experience on their own domain
 
-Located in `lib/api-url.ts`, this helper ensures all API calls work correctly under the `/flowforge` basePath:
+#### URL Helpers
+
+Located in `lib/api-url.ts`, these helpers construct URLs:
 
 ```typescript
-export function apiUrl(path: string): string {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+// Build a full public URL (for emails, API responses)
+export function buildPublicUrl(path: string): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const cleanPath = path.startsWith('/') ? path : `/${path}`
-  return `${basePath}${cleanPath}`
+  return `${appUrl}${cleanPath}`
+}
+
+// Build a relative API URL
+export function apiUrl(path: string): string {
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path
+  return `/${cleanPath}`
 }
 ```
 
 Usage in components:
 ```typescript
 const response = await fetch(apiUrl('api/campaigns'))
-// Resolves to: /flowforge/api/campaigns in production
-// Resolves to: /api/campaigns in local development
+// Resolves to: /api/campaigns
 ```
 
 ---

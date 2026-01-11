@@ -210,8 +210,7 @@ export async function POST(request: NextRequest) {
     // Helper to generate access link
     const generateAccessLink = (token: string) => {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
-      return `${baseUrl}${basePath}/session/${token}`
+      return `${baseUrl}/session/${token}`
     }
 
     // Process simple participants (non-company campaigns: coaches, institutions)

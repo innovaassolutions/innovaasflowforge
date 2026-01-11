@@ -161,24 +161,22 @@ export function getTenantPathPrefix(tenantType: 'coach' | 'consultant' | 'school
  * @param externalPath - The path from the custom domain request
  * @param slug - The tenant's URL slug
  * @param tenantType - The type of tenant
- * @param basePath - The Next.js basePath (e.g., '')
  * @returns The internal path to rewrite to
  *
  * @example
- * buildInternalPath('/results/abc123', 'leadingwithmeaning', 'coach', '')
+ * buildInternalPath('/results/abc123', 'leadingwithmeaning', 'coach')
  * // Returns: '/coach/leadingwithmeaning/results/abc123'
  */
 export function buildInternalPath(
   externalPath: string,
   slug: string,
-  tenantType: 'coach' | 'consultant' | 'school',
-  basePath: string = ''
+  tenantType: 'coach' | 'consultant' | 'school'
 ): string {
   const prefix = getTenantPathPrefix(tenantType)
   const cleanPath = externalPath === '/' ? '' : externalPath
 
-  // Build internal path: basePath + /tenantType/slug + externalPath
-  return `${basePath}/${prefix}/${slug}${cleanPath}`
+  // Build internal path: /tenantType/slug + externalPath
+  return `/${prefix}/${slug}${cleanPath}`
 }
 
 /**
