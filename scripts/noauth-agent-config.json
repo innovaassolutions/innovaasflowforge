@@ -10,7 +10,7 @@
         "temperature": 0.7,
         "max_tokens": 1024,
         "custom_llm": {
-          "url": "https://innovaasflowforge.vercel.app/flowforge/api/voice/edge-llm",
+          "url": "https://flowforge.innovaas.co/api/voice/edge-llm",
           "model_id": "edge-llm",
           "api_type": "chat_completions"
         }

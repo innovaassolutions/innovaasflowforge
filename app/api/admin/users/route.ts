@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
                 <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
                   <!-- Header with Logo -->
                   <div style="text-align: center; margin-bottom: 32px;">
-                    <img src="https://www.innovaas.co/icon-orb.svg" alt="FlowForge" width="60" height="60" style="margin-bottom: 16px;">
+                    <img src="https://flowforge.innovaas.co/icon-orb.svg" alt="FlowForge" width="60" height="60" style="margin-bottom: 16px;">
                     <h1 style="color: #171614; font-size: 24px; font-weight: 700; margin: 0;">FlowForge</h1>
                     <p style="color: #71706B; font-size: 14px; margin: 8px 0 0;">Assessment Platform</p>
                   </div>

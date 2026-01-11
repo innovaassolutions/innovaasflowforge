@@ -339,7 +339,7 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image
-                src="https://www.innovaas.co/icon-orb.svg"
+                src="/icon-orb.svg"
                 alt="FlowForge"
                 width={32}
                 height={32}

@@ -120,7 +120,7 @@ export default function DashboardLayout({
         {/* App Logo - positioned on far left */}
         <div className="flex items-center gap-3">
           <Image
-            src="https://www.innovaas.co/icon-orb.svg"
+            src="/icon-orb.svg"
             alt="Innovaas FlowForge"
             width={40}
             height={40}

@@ -31,7 +31,7 @@ SELECT
   'coach',
   '{
     "logo": {
-      "url": "/flowforge/brand/lwm_logo.png",
+      "url": "/brand/lwm_logo.png",
       "alt": "Leading with Meaning",
       "width": 200
     },

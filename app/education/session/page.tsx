@@ -109,7 +109,7 @@ function EducationSessionContent() {
                         lg:px-8">
           <div className="flex items-center gap-3">
             <Image
-              src="https://www.innovaas.co/icon-orb.svg"
+              src="/icon-orb.svg"
               alt="FlowForge"
               width={36}
               height={36}

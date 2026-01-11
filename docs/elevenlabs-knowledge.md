@@ -295,7 +295,7 @@ Expected responses:
 
 ### Custom LLM Settings
 
-- **Server URL**: `https://innovaas.co/flowforge/api/voice/chat/completions`
+- **Server URL**: `https://flowforge.innovaas.co/api/voice/chat/completions`
 - **Authorization**: `Bearer {ELEVENLABS_LLM_SECRET from Vercel env}`
 - **Custom LLM extra body**: Enabled
 

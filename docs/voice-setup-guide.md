@@ -85,8 +85,7 @@ ELEVENLABS_LLM_SECRET=your_secure_random_secret
 Under "Advanced" > "Custom LLM":
 
 1. **Enable Custom LLM**: Toggle ON
-2. **Server URL**: `https://innovaas.co/flowforge/api/voice/chat/completions`
-   - IMPORTANT: Include `/flowforge` basePath for production!
+2. **Server URL**: `https://flowforge.innovaas.co/api/voice/chat/completions`
    - IMPORTANT: Include `/chat/completions` suffix!
    - For local dev: `http://localhost:3000/api/voice/chat/completions`
 3. **API Key / Authorization**: Add header `Authorization: Bearer your_ELEVENLABS_LLM_SECRET`
@@ -263,9 +262,8 @@ This usually means ElevenLabs is NOT calling your Custom LLM. Follow this checkl
 
 **2. Verify Server URL is EXACTLY correct:**
 ```
-https://innovaas.co/flowforge/api/voice/chat/completions
+https://flowforge.innovaas.co/api/voice/chat/completions
 ```
-- MUST include `/flowforge` basePath
 - MUST include `/chat/completions` suffix (not just `/api/voice`)
 - No trailing slash
 
@@ -304,7 +302,7 @@ Check Vercel Runtime Logs for entries containing `[voice/chat/completions]`:
 
 You can also test the endpoint directly with curl:
 ```bash
-curl -X POST https://innovaas.co/flowforge/api/voice/chat/completions \
+curl -X POST https://flowforge.innovaas.co/api/voice/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ELEVENLABS_LLM_SECRET" \
   -d '{"messages":[{"role":"system","content":"session_token: ff_edu_test123\nmodule_id: student_wellbeing\nvertical_key: education"}],"stream":true}'
