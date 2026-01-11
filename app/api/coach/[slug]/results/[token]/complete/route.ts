@@ -288,7 +288,7 @@ export async function POST(
     const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
     let pdfBuffer: Buffer
     try {
-      const pdfApiUrl = `${internalBaseUrl}/flowforge/api/generate-archetype-pdf`
+      const pdfApiUrl = `${internalBaseUrl}/api/generate-archetype-pdf`
 
       console.log('📤 Calling Pages Router PDF API at:', pdfApiUrl)
 
@@ -337,7 +337,7 @@ export async function POST(
 
     // Build results URL using the public-facing URL (not internal Vercel URL)
     const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
-    const resultsUrl = `${publicBaseUrl}/flowforge/coach/${slug}/results/${token}`
+    const resultsUrl = `${publicBaseUrl}/coach/${slug}/results/${token}`
 
     // Get coach email from tenant config
     const emailConfig = tenantProfile.email_config as {

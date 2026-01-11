@@ -31,7 +31,7 @@ export const StakeholderInvitationEmail = ({
   campaignName = 'Industry 4.0 Readiness Assessment',
   stakeholderRole = 'IT Operations Manager',
   stakeholderTitle,
-  accessLink = 'https://flowforge.innovaas.com/session/abc123',
+  accessLink = 'https://flowforge.innovaas.co/session/abc123',
   estimatedTime = '20-30 minutes',
 }: StakeholderInvitationEmailProps) => {
   const previewText = `${facilitatorName} has invited you to participate in ${companyName}'s ${campaignName}`
@@ -45,7 +45,7 @@ export const StakeholderInvitationEmail = ({
           {/* Header with Innovaas branding */}
           <Section style={header}>
             <Img
-              src="https://flowforge.innovaas.com/innovaas-logo.png"
+              src="https://flowforge.innovaas.co/innovaas-logo.png"
               alt="Innovaas"
               style={logo}
             />

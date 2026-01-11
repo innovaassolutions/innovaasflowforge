@@ -78,7 +78,7 @@ export default function ReportDashboard({
                           sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <Image
-                src="https://www.innovaas.co/flowforge/icon-orb.svg"
+                src="https://www.innovaas.co/icon-orb.svg"
                 alt="FlowForge"
                 width={48}
                 height={48}
@@ -226,7 +226,7 @@ export default function ReportDashboard({
             </div>
             <div className="flex items-center gap-2">
               <Image
-                src="https://www.innovaas.co/flowforge/icon-orb.svg"
+                src="https://www.innovaas.co/icon-orb.svg"
                 alt="FlowForge"
                 width={20}
                 height={20}

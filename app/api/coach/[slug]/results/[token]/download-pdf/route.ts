@@ -208,7 +208,7 @@ export async function GET(
 
     // Generate PDF using Pages Router API
     const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
-    const pdfApiUrl = `${internalBaseUrl}/flowforge/api/generate-archetype-pdf`
+    const pdfApiUrl = `${internalBaseUrl}/api/generate-archetype-pdf`
 
     console.log('📄 Generating PDF for download:', session.client_name)
 

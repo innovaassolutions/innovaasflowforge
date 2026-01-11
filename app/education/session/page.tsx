@@ -109,7 +109,7 @@ function EducationSessionContent() {
                         lg:px-8">
           <div className="flex items-center gap-3">
             <Image
-              src="https://www.innovaas.co/flowforge/icon-orb.svg"
+              src="https://www.innovaas.co/icon-orb.svg"
               alt="FlowForge"
               width={36}
               height={36}
@@ -278,7 +278,7 @@ function EducationSessionContent() {
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <span>Powered by</span>
             <Image
-              src="https://www.innovaas.co/flowforge/designguide/innovaas_orange_and_black_transparent_bkgrnd_2559x594.png"
+              src="https://www.innovaas.co/designguide/innovaas_orange_and_black_transparent_bkgrnd_2559x594.png"
               alt="Innovaas"
               width={80}
               height={19}

@@ -55,7 +55,7 @@ export default function ContinuePage() {
     setNotFound(false)
 
     try {
-      const response = await fetch(`/flowforge/api/coach/${slug}/continue`, {
+      const response = await fetch(`/api/coach/${slug}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

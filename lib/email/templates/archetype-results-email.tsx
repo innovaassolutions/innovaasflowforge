@@ -179,7 +179,7 @@ export function ArchetypeResultsEmail({
             <Text style={{ ...styles.footerText, color: mutedColor }}>
               Assessment platform powered by{' '}
               <Link
-                href="https://www.innovaas.co/flowforge"
+                href="https://flowforge.innovaas.co"
                 style={{ color: mutedColor }}
               >
                 Innovaas FlowForge

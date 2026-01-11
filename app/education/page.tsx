@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     images: ['/og/education-landing.png'],
   },
   alternates: {
-    canonical: 'https://innovaas.co/flowforge/education',
+    canonical: 'https://innovaas.co/education',
   },
 }
 

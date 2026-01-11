@@ -27,7 +27,7 @@ async function main() {
           temperature: 0.7,
           max_tokens: 1024,
           custom_llm: {
-            url: 'https://innovaasflowforge.vercel.app/flowforge/api/voice/node-llm',
+            url: 'https://innovaasflowforge.vercel.app/api/voice/node-llm',
             model_id: 'node-llm',
             api_type: 'chat_completions'
           }

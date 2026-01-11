@@ -83,7 +83,7 @@ export default function AdminOverviewPage() {
 
     // Fetch stats
     try {
-      const response = await fetch('/flowforge/api/admin/stats')
+      const response = await fetch('/api/admin/stats')
       if (!response.ok) {
         throw new Error('Failed to fetch stats')
       }

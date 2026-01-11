@@ -4,7 +4,7 @@
  */
 
 // Get basePath from next.config.js
-const BASE_PATH = '/flowforge'
+const BASE_PATH = ''
 
 /**
  * Construct a full public URL with basePath for server-side use

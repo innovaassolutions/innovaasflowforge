@@ -123,7 +123,7 @@ export function BrandedFooter({ className = '' }: { className?: string }) {
             <p className="text-xs text-[var(--brand-text-muted)]">
               Assessment platform by{' '}
               <a
-                href="https://www.innovaas.co/flowforge"
+                href="https://flowforge.innovaas.co"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--brand-primary)] hover:underline"

@@ -121,7 +121,7 @@ export default function AdminActivityPage() {
       if (deviceFilter) params.append('device', deviceFilter)
       if (successFilter) params.append('success', successFilter)
 
-      const response = await fetch(`/flowforge/api/admin/activity?${params}`)
+      const response = await fetch(`/api/admin/activity?${params}`)
       if (!response.ok) {
         throw new Error('Failed to fetch activity')
       }

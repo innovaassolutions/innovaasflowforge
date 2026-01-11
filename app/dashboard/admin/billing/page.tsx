@@ -104,7 +104,7 @@ export default function AdminBillingPage() {
     setIsAdmin(true)
 
     try {
-      const response = await fetch('/flowforge/api/admin/billing')
+      const response = await fetch('/api/admin/billing')
       if (!response.ok) {
         throw new Error('Failed to fetch billing data')
       }

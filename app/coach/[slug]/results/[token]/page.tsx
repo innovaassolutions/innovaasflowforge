@@ -41,7 +41,7 @@ export default function ResultsPage() {
   async function loadResults() {
     try {
       setLoading(true)
-      const response = await fetch(`/flowforge/api/coach/${slug}/results/${token}`)
+      const response = await fetch(`/api/coach/${slug}/results/${token}`)
       const result: ResultsResponse = await response.json()
 
       if (result.success) {

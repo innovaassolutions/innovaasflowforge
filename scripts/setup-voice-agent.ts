@@ -36,14 +36,14 @@ interface EnvironmentConfig {
 const ENVIRONMENTS: Record<string, EnvironmentConfig> = {
   production: {
     name: 'Production',
-    baseUrl: 'https://innovaas.co/flowforge',
-    llmEndpoint: 'https://innovaas.co/flowforge/api/voice/chat/completions',
+    baseUrl: 'https://flowforge.innovaas.co',
+    llmEndpoint: 'https://innovaas.co/api/voice/chat/completions',
   },
   preview: {
     name: 'Preview',
-    baseUrl: 'https://innovaasflowforge.vercel.app/flowforge',
+    baseUrl: 'https://innovaasflowforge.vercel.app',
     llmEndpoint:
-      'https://innovaasflowforge.vercel.app/flowforge/api/voice/chat/completions',
+      'https://innovaasflowforge.vercel.app/api/voice/chat/completions',
   },
   local: {
     name: 'Local Development',

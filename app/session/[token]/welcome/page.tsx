@@ -347,7 +347,7 @@ export default function StakeholderWelcomePage() {
           <div className="flex justify-end items-center gap-2">
             <p className="text-sm text-muted-foreground">Powered by</p>
             <Image
-              src="https://www.innovaas.co/flowforge/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
+              src="https://www.innovaas.co/designguide/innovaas_orange_and_white_transparent_bkgrnd_2559x594.png"
               alt="Innovaas"
               width={120}
               height={28}

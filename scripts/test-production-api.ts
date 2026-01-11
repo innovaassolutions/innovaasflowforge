@@ -18,7 +18,7 @@ async function testProductionAPI() {
 
   // You'll need to provide your session token
   console.log('\n📝 To run this test:')
-  console.log('1. Log in to https://www.innovaas.co/flowforge')
+  console.log('1. Log in to https://flowforge.innovaas.co')
   console.log('2. Open DevTools (F12)')
   console.log('3. Go to Application → Local Storage → https://www.innovaas.co')
   console.log('4. Find the Supabase auth token')
@@ -32,7 +32,7 @@ async function testProductionAPI() {
     process.exit(1)
   }
 
-  const productionUrl = 'https://www.innovaas.co/flowforge'
+  const productionUrl = 'https://flowforge.innovaas.co'
 
   console.log(`\n🌐 Testing against: ${productionUrl}`)
   console.log(`🔑 Token: ${token.substring(0, 20)}...`)

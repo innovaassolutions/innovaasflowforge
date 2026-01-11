@@ -58,7 +58,7 @@ export default function ReflectPage() {
       setLoading(true)
 
       // First check if there's existing reflection state
-      const getResponse = await fetch(`/flowforge/api/coach/${slug}/results/${token}/reflect`)
+      const getResponse = await fetch(`/api/coach/${slug}/results/${token}/reflect`)
       const existingData = await getResponse.json()
 
       if (existingData.success && existingData.conversationHistory?.length > 0) {
@@ -96,7 +96,7 @@ export default function ReflectPage() {
         setInputMessage('')
       }
 
-      const response = await fetch(`/flowforge/api/coach/${slug}/results/${token}/reflect`, {
+      const response = await fetch(`/api/coach/${slug}/results/${token}/reflect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message }),

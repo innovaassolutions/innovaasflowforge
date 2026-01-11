@@ -313,10 +313,9 @@ export default function BrandingSettingsPage() {
 
   function copyLandingPageUrl() {
     if (!tenant) return
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.innovaas.co'
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/flowforge'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowforge.innovaas.co'
     const tenantType = tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type
-    const url = `${baseUrl}${basePath}/${tenantType}/${tenant.slug}`
+    const url = `${baseUrl}/${tenantType}/${tenant.slug}`
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -399,7 +398,7 @@ export default function BrandingSettingsPage() {
 
   async function loadDomainStatus() {
     try {
-      const response = await fetch('/flowforge/api/tenant/domain')
+      const response = await fetch('/api/tenant/domain')
       if (response.ok) {
         const data = await response.json()
         setDomainStatus(data)
@@ -416,7 +415,7 @@ export default function BrandingSettingsPage() {
     setConfiguringDomain(true)
 
     try {
-      const response = await fetch('/flowforge/api/tenant/domain', {
+      const response = await fetch('/api/tenant/domain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: domainInput.trim() }),
@@ -448,7 +447,7 @@ export default function BrandingSettingsPage() {
     setRemovingDomain(true)
 
     try {
-      const response = await fetch('/flowforge/api/tenant/domain', {
+      const response = await fetch('/api/tenant/domain', {
         method: 'DELETE',
       })
 
@@ -474,7 +473,7 @@ export default function BrandingSettingsPage() {
     setCheckingDomainStatus(true)
 
     try {
-      const response = await fetch('/flowforge/api/tenant/domain/status')
+      const response = await fetch('/api/tenant/domain/status')
       if (response.ok) {
         const data = await response.json()
         setDomainStatus(data)
@@ -533,9 +532,8 @@ export default function BrandingSettingsPage() {
     )
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.innovaas.co'
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '/flowforge'
-  const landingPageUrl = `${baseUrl}${basePath}/${tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type}/${formData.slug}`
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowforge.innovaas.co'
+  const landingPageUrl = `${baseUrl}/${tenant.tenant_type === 'school' ? 'institution' : tenant.tenant_type}/${formData.slug}`
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

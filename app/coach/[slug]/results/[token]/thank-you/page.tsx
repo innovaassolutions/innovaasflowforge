@@ -42,7 +42,7 @@ export default function ThankYouPage() {
 
   async function loadSession() {
     try {
-      const response = await fetch(`/flowforge/api/coach/${slug}/results/${token}`)
+      const response = await fetch(`/api/coach/${slug}/results/${token}`)
       const result = await response.json()
 
       if (result.success) {
@@ -66,7 +66,7 @@ export default function ThankYouPage() {
   async function markAsDeclined() {
     try {
       // Just update status via a lightweight call - no email
-      await fetch(`/flowforge/api/coach/${slug}/results/${token}/mark-declined`, {
+      await fetch(`/api/coach/${slug}/results/${token}/mark-declined`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       })
@@ -79,7 +79,7 @@ export default function ThankYouPage() {
   async function handleDownloadPDF() {
     setIsDownloading(true)
     try {
-      const response = await fetch(`/flowforge/api/coach/${slug}/results/${token}/download-pdf`)
+      const response = await fetch(`/api/coach/${slug}/results/${token}/download-pdf`)
 
       if (!response.ok) {
         throw new Error('Failed to generate PDF')

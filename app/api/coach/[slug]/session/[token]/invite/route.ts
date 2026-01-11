@@ -108,7 +108,7 @@ export async function POST(
 
     // Generate the session URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const sessionUrl = `${baseUrl}/flowforge/coach/${slug}/session/${token}`
+    const sessionUrl = `${baseUrl}/coach/${slug}/session/${token}`
 
     // Get coach email from user profile
     const coachEmail = (tenant.email_config as any)?.replyTo || user.email || ''

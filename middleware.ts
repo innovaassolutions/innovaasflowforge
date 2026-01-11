@@ -8,9 +8,6 @@ import {
   shouldRewritePath,
 } from '@/lib/services/tenant-lookup'
 
-// The Next.js basePath from next.config.js
-const BASE_PATH = '/flowforge'
-
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   const pathname = request.nextUrl.pathname
@@ -25,13 +22,11 @@ export async function middleware(request: NextRequest) {
     const tenant = await lookupTenantByDomain(hostname)
 
     if (tenant.found && tenant.slug && tenant.tenantType) {
-      // Build the internal path WITHOUT basePath - Next.js adds it automatically
-      // when basePath is configured in next.config.js
+      // Build the internal path for this tenant
       const internalPath = buildInternalPath(
         pathname,
         tenant.slug,
-        tenant.tenantType,
-        '' // Don't include basePath - Next.js handles it
+        tenant.tenantType
       )
 
       // Clone the URL and update the pathname
@@ -42,7 +37,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(url)
     } else {
       // Custom domain not found or not verified - redirect to main site
-      return NextResponse.redirect(new URL('https://innovaas.co'))
+      return NextResponse.redirect(new URL('https://flowforge.innovaas.co'))
     }
   }
 

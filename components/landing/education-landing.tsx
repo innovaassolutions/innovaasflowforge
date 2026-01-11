@@ -21,7 +21,7 @@ import {
 import { useLandingAnalytics, submitLead } from '@/hooks/use-landing-analytics'
 
 // Base path for static assets
-const BASE_PATH = '/flowforge'
+const BASE_PATH = ''
 
 // Static content - can be replaced with CMS content from Supabase
 const CONTENT = {

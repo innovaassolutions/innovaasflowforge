@@ -137,7 +137,7 @@ export default function SignupPage() {
               </div>
               <div className="hidden md:flex md:items-center md:justify-center">
                 <Image
-                  src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
+                  src="https://www.innovaas.co/illustrations/welcome-greeter.png"
                   alt="Welcome"
                   width={280}
                   height={280}
@@ -370,7 +370,7 @@ export default function SignupPage() {
             {/* Right side - Illustration */}
             <div className="hidden md:flex md:items-center md:justify-center">
               <Image
-                src="https://www.innovaas.co/flowforge/illustrations/welcome-greeter.png"
+                src="https://www.innovaas.co/illustrations/welcome-greeter.png"
                 alt="Welcome"
                 width={280}
                 height={280}

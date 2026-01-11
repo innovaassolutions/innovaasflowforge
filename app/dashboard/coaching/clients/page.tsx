@@ -175,7 +175,7 @@ export default function CoachingClientsPage() {
         try {
           const { data: { session: authSession } } = await supabase.auth.getSession()
           if (authSession) {
-            const response = await fetch(`/flowforge/api/coach/${tenant.slug}/session/${newClient.access_token}/invite`, {
+            const response = await fetch(`/api/coach/${tenant.slug}/session/${newClient.access_token}/invite`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -240,7 +240,7 @@ export default function CoachingClientsPage() {
         return
       }
 
-      const response = await fetch(`/flowforge/api/coach/${tenant.slug}/session/${client.access_token}/invite`, {
+      const response = await fetch(`/api/coach/${tenant.slug}/session/${client.access_token}/invite`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -267,12 +267,12 @@ export default function CoachingClientsPage() {
 
   function getSessionUrl(accessToken: string) {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-    return `${baseUrl}/flowforge/coach/${tenant?.slug}/session/${accessToken}`
+    return `${baseUrl}/coach/${tenant?.slug}/session/${accessToken}`
   }
 
   function getReportUrl(accessToken: string) {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-    return `${baseUrl}/flowforge/coach/${tenant?.slug}/results/${accessToken}`
+    return `${baseUrl}/coach/${tenant?.slug}/results/${accessToken}`
   }
 
   function copySessionLink(accessToken: string) {
@@ -286,7 +286,7 @@ export default function CoachingClientsPage() {
 
     setDownloadingPdf(client.id)
     try {
-      const response = await fetch(`/flowforge/api/coach/${tenant.slug}/results/${client.access_token}/download-pdf`)
+      const response = await fetch(`/api/coach/${tenant.slug}/results/${client.access_token}/download-pdf`)
 
       if (!response.ok) {
         throw new Error('Failed to generate PDF')

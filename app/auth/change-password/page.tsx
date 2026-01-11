@@ -117,7 +117,7 @@ export default function ChangePasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Image
-            src="https://www.innovaas.co/flowforge/icon-orb.svg"
+            src="https://www.innovaas.co/icon-orb.svg"
             alt="FlowForge"
             width={60}
             height={60}
