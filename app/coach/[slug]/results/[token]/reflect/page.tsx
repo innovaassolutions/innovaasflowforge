@@ -14,6 +14,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -31,6 +32,7 @@ export default function ReflectPage() {
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
+  const { buildPath } = useTenantPaths()
 
   const slug = params?.slug as string
   const token = params?.token as string
@@ -140,7 +142,7 @@ export default function ReflectPage() {
   }
 
   function handleReturnToResults() {
-    router.push(`/coach/${slug}/results/${token}`)
+    router.push(buildPath(`/results/${token}`))
   }
 
   // Loading state

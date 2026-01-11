@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { BrandedHeader, BrandedFooter } from '@/components/coaching/BrandedHeader'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 
 interface FormData {
   name: string
@@ -29,6 +30,7 @@ export default function RegisterPage() {
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
+  const { buildPath } = useTenantPaths()
 
   const [formData, setFormData] = useState<FormData>({ name: '', email: '' })
   const [errors, setErrors] = useState<FormErrors>({})
@@ -92,7 +94,7 @@ export default function RegisterPage() {
 
   function handleStartAssessment() {
     if (sessionToken) {
-      router.push(`/coach/${slug}/session/${sessionToken}`)
+      router.push(buildPath(`/session/${sessionToken}`))
     }
   }
 

@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { BrandedHeader, BrandedFooter } from '@/components/coaching/BrandedHeader'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 import Link from 'next/link'
 
 interface FormErrors {
@@ -24,6 +25,7 @@ export default function ContinuePage() {
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
+  const { buildPath } = useTenantPaths()
 
   const [email, setEmail] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
@@ -67,7 +69,7 @@ export default function ContinuePage() {
 
       if (data.success && data.sessionToken) {
         // Redirect to the session
-        router.push(`/coach/${slug}/session/${data.sessionToken}`)
+        router.push(buildPath(`/session/${data.sessionToken}`))
       } else if (data.notFound) {
         setNotFound(true)
       } else {
@@ -135,7 +137,7 @@ export default function ContinuePage() {
 
             <div className="space-y-3">
               <Link
-                href={`/coach/${slug}/register`}
+                href={buildPath('/register')}
                 className="block w-full py-3 px-6 rounded-lg font-semibold transition-colors text-center"
                 style={{
                   backgroundColor: 'var(--brand-primary)',
@@ -294,7 +296,7 @@ export default function ContinuePage() {
             >
               Don't have an account?{' '}
               <Link
-                href={`/coach/${slug}/register`}
+                href={buildPath('/register')}
                 className="font-medium"
                 style={{ color: 'var(--brand-primary)' }}
               >

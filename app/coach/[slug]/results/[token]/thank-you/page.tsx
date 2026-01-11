@@ -14,6 +14,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 
 interface SessionData {
   client_name: string
@@ -25,6 +26,7 @@ export default function ThankYouPage() {
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
+  const { buildPath } = useTenantPaths()
 
   const slug = params?.slug as string
   const token = params?.token as string
@@ -162,7 +164,7 @@ export default function ThankYouPage() {
             {error}
           </h2>
           <Link
-            href={`/coach/${slug}/results/${token}`}
+            href={buildPath(`/results/${token}`)}
             className="inline-block mt-4 px-4 py-2 rounded-lg font-medium transition-opacity hover:opacity-90"
             style={{
               backgroundColor: 'var(--brand-primary)',
@@ -448,7 +450,7 @@ export default function ThankYouPage() {
         {/* Return to Results Link */}
         <div className="text-center mt-8">
           <Link
-            href={`/coach/${slug}/results/${token}`}
+            href={buildPath(`/results/${token}`)}
             className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-80"
             style={{ color: 'var(--brand-text-muted)' }}
           >

@@ -10,7 +10,9 @@
 import { BrandedHeader, BrandedFooter } from '@/components/coaching/BrandedHeader'
 import { getTenantBySlug } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import Link from 'next/link'
+import { buildTenantPath } from '@/lib/utils/tenant-paths'
 
 interface CoachPageProps {
   params: Promise<{ slug: string }>
@@ -19,6 +21,10 @@ interface CoachPageProps {
 export default async function CoachPage({ params }: CoachPageProps) {
   const { slug } = await params
   const tenant = await getTenantBySlug(slug)
+
+  // Get hostname for custom domain detection
+  const headersList = await headers()
+  const hostname = headersList.get('host') || 'flowforge.innovaas.co'
 
   if (!tenant) {
     notFound()
@@ -60,7 +66,7 @@ export default async function CoachPage({ params }: CoachPageProps) {
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Register Card */}
             <Link
-              href={`/coach/${slug}/register`}
+              href={buildTenantPath('/register', slug, tenant.tenant_type, hostname)}
               className="block p-6 rounded-xl border transition-all hover:shadow-lg"
               style={{
                 backgroundColor: 'var(--brand-bg-subtle)',
@@ -105,7 +111,7 @@ export default async function CoachPage({ params }: CoachPageProps) {
 
             {/* Continue Card */}
             <Link
-              href={`/coach/${slug}/continue`}
+              href={buildTenantPath('/continue', slug, tenant.tenant_type, hostname)}
               className="block p-6 rounded-xl border transition-all hover:shadow-lg"
               style={{
                 backgroundColor: 'var(--brand-bg-subtle)',
