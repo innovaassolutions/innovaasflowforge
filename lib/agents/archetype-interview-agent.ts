@@ -5,11 +5,19 @@
  * the constitution and question flow from archetype-constitution.ts.
  *
  * Story: 3-3-registration-sessions
+ *
+ * FIXED: 2026-01-12
+ * - Added robust selection parsing to avoid false positives (e.g., "a" as article)
+ * - Added response storage to track answers for scoring
+ * - Fixed premature completion (was using >= instead of checking phase)
+ * - Added support for ranked selections (most + second most)
  */
 
 import Anthropic from '@anthropic-ai/sdk'
 import {
   ArchetypeSessionState,
+  ArchetypeResponse,
+  SurveyQuestion,
   createInitialSessionState,
   generateArchetypeSystemPrompt,
   calculateResults,
@@ -40,6 +48,174 @@ export interface AgentResponse {
 interface Message {
   role: 'user' | 'assistant'
   content: string
+}
+
+/**
+ * Result of parsing user's selection from their message
+ */
+interface ParsedSelection {
+  detected: boolean
+  most_like_me: 'A' | 'B' | 'C' | 'D' | 'E' | null
+  second_most_like_me: 'A' | 'B' | 'C' | 'D' | 'E' | null
+  confidence: 'high' | 'medium' | 'low'
+}
+
+/**
+ * Parse user's selection from their message with robust pattern matching.
+ * Avoids false positives from casual mentions of letters (e.g., "a" as article).
+ */
+function parseUserSelection(
+  userMessage: string,
+  question: SurveyQuestion
+): ParsedSelection {
+  const msg = userMessage.trim()
+  const msgLower = msg.toLowerCase()
+
+  // Pattern 1: Just letter(s) at end of message - "A" or "B and C" or "A, B"
+  // Must be the primary content, not buried in a sentence
+  const endLetterPattern = /\b([A-E])(?:\s*(?:and|then|,|&)\s*([A-E]))?\s*[.!?]?\s*$/i
+  const endMatch = msg.match(endLetterPattern)
+
+  // Pattern 2: Explicit choice phrases - "I choose A", "Option B", "My answer is C"
+  const choicePattern = /(?:i\s+)?(?:choose|pick|select|go\s+with|say|think)\s+(?:option\s+)?([A-E])\b/i
+  const choiceMatch = msg.match(choicePattern)
+
+  // Pattern 3: "option A" or "answer A" standalone
+  const optionPattern = /\b(?:option|answer|choice)\s+([A-E])\b/i
+  const optionMatch = msg.match(optionPattern)
+
+  // Pattern 4: Ranked selection - "B is most like me, D is second" or "B first, D second"
+  const rankedPattern = /([A-E])\s+(?:is\s+)?(?:most|first|#1|number\s+one).*?([A-E])\s+(?:is\s+)?(?:second|next|#2|number\s+two)/i
+  const rankedMatch = msg.match(rankedPattern)
+
+  // Pattern 5: Reverse ranked - "most like me is B, second is D"
+  const reverseRankedPattern = /(?:most|first).*?(?:is\s+)?([A-E]).*?(?:second|next).*?(?:is\s+)?([A-E])/i
+  const reverseRankedMatch = msg.match(reverseRankedPattern)
+
+  // Pattern 6: Two letters with "and" - "A and B" or "B & D" (for ranked questions)
+  const twoLettersPattern = /\b([A-E])\s*(?:and|&|,)\s*([A-E])\b/i
+  const twoLettersMatch = msg.match(twoLettersPattern)
+
+  // Pattern 7: Single letter at START of message (common quick response)
+  const startLetterPattern = /^([A-E])\b/i
+  const startMatch = msg.match(startLetterPattern)
+
+  // Pattern 8: Contains substantial option text (at least 25 chars to avoid false positives)
+  const textMatches: Array<{ key: 'A' | 'B' | 'C' | 'D' | 'E', matchLength: number }> = []
+  for (const opt of question.options) {
+    const optTextLower = opt.text.toLowerCase()
+    // Check for significant substring match (25+ chars or 50%+ of option text)
+    const minMatchLength = Math.min(25, Math.floor(optTextLower.length * 0.5))
+    if (optTextLower.length >= minMatchLength) {
+      const searchText = optTextLower.slice(0, minMatchLength)
+      if (msgLower.includes(searchText)) {
+        textMatches.push({ key: opt.key, matchLength: searchText.length })
+      }
+    }
+  }
+  // Sort by match length descending and take the best match
+  textMatches.sort((a, b) => b.matchLength - a.matchLength)
+
+  // Evaluate patterns in order of confidence
+
+  // Ranked patterns (highest confidence for ranked questions)
+  if (rankedMatch) {
+    return {
+      detected: true,
+      most_like_me: rankedMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: rankedMatch[2].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      confidence: 'high'
+    }
+  }
+
+  if (reverseRankedMatch) {
+    return {
+      detected: true,
+      most_like_me: reverseRankedMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: reverseRankedMatch[2].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      confidence: 'high'
+    }
+  }
+
+  // Two letters with connector (good for ranked)
+  if (twoLettersMatch) {
+    return {
+      detected: true,
+      most_like_me: twoLettersMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: twoLettersMatch[2].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      confidence: 'high'
+    }
+  }
+
+  // End of message letter(s) - high confidence
+  if (endMatch && endMatch[1]) {
+    return {
+      detected: true,
+      most_like_me: endMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: endMatch[2]?.toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E' | null || null,
+      confidence: 'high'
+    }
+  }
+
+  // Start of message letter - high confidence (quick response like "B")
+  if (startMatch && msg.length < 20) {
+    return {
+      detected: true,
+      most_like_me: startMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: null,
+      confidence: 'high'
+    }
+  }
+
+  // Explicit choice phrase
+  if (choiceMatch) {
+    return {
+      detected: true,
+      most_like_me: choiceMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: null,
+      confidence: 'medium'
+    }
+  }
+
+  // Option/answer phrase
+  if (optionMatch) {
+    return {
+      detected: true,
+      most_like_me: optionMatch[1].toUpperCase() as 'A' | 'B' | 'C' | 'D' | 'E',
+      second_most_like_me: null,
+      confidence: 'medium'
+    }
+  }
+
+  // Text match (lowest confidence)
+  if (textMatches.length > 0) {
+    return {
+      detected: true,
+      most_like_me: textMatches[0].key,
+      second_most_like_me: textMatches.length > 1 ? textMatches[1].key : null,
+      confidence: 'low'
+    }
+  }
+
+  // No valid selection detected
+  return {
+    detected: false,
+    most_like_me: null,
+    second_most_like_me: null,
+    confidence: 'low'
+  }
+}
+
+/**
+ * Determine the phase for a given question index
+ */
+function getPhaseForQuestionIndex(index: number): ArchetypeSessionState['phase'] {
+  if (index <= 0) return 'opening'
+  if (index <= 3) return 'context'
+  if (index <= 12) return 'default_mode'
+  if (index <= 16) return 'authentic_mode'
+  if (index <= 19) return 'friction_signals'
+  return 'closing'
 }
 
 /**
@@ -242,65 +418,133 @@ function buildSystemPrompt(
 }
 
 /**
- * Update session state based on conversation
+ * Update session state based on conversation.
+ *
+ * This function:
+ * 1. Parses user selections using robust pattern matching
+ * 2. Stores responses for later scoring
+ * 3. Handles both single-select and ranked questions
+ * 4. Advances through phases appropriately
  */
 function updateSessionState(
   state: ArchetypeSessionState,
   userMessage: string | null,
   assistantMessage: string
 ): ArchetypeSessionState {
-  const newState = { ...state }
+  // Deep clone state to avoid mutations
+  const newState: ArchetypeSessionState = {
+    ...state,
+    responses: { ...state.responses },
+    stories_captured: [...state.stories_captured],
+    context: { ...state.context },
+    scores: {
+      default: { ...state.scores.default },
+      authentic: { ...state.scores.authentic },
+      friction: { ...state.scores.friction },
+    },
+  }
 
-  // Detect phase transitions and question progress
-  // This is a simplified heuristic - in production, we'd parse responses more carefully
-
+  // Handle opening phase - transition after AI delivers greeting
   if (state.phase === 'opening') {
-    // After opening greeting, move to context
+    // The AI has delivered the opening greeting, move to first question
     newState.phase = 'context'
     newState.current_question_index = 1
-  } else if (userMessage) {
-    // User responded, potentially advance to next question
-    const currentQ = getQuestionByIndex(state.current_question_index)
+    return newState
+  }
 
-    if (currentQ) {
-      // Check if this looks like a question response (contains A, B, C, D, or E reference)
-      const hasSelection = /\b[A-E]\b/i.test(userMessage) ||
-        currentQ.options.some(opt =>
-          userMessage.toLowerCase().includes(opt.text.toLowerCase().slice(0, 20))
-        )
+  // Handle closing phase - transition to completed after closing message delivered
+  if (state.phase === 'closing') {
+    newState.phase = 'completed'
+    return newState
+  }
 
-      if (hasSelection) {
-        // Move to next question
-        const nextIndex = state.current_question_index + 1
+  // No user message means nothing to process
+  if (!userMessage) {
+    return newState
+  }
 
-        if (nextIndex > getTotalQuestions()) {
-          newState.phase = 'closing'
-          newState.current_question_index = getTotalQuestions()
-        } else if (nextIndex > 16) {
-          newState.phase = 'friction_signals'
-          newState.current_question_index = nextIndex
-        } else if (nextIndex > 12) {
-          newState.phase = 'authentic_mode'
-          newState.current_question_index = nextIndex
-        } else if (nextIndex > 3) {
-          newState.phase = 'default_mode'
-          newState.current_question_index = nextIndex
-        } else {
-          newState.phase = 'context'
-          newState.current_question_index = nextIndex
+  // Get current question
+  const currentQ = getQuestionByIndex(state.current_question_index)
+  if (!currentQ) {
+    return newState
+  }
+
+  // Parse the user's selection
+  const parsed = parseUserSelection(userMessage, currentQ)
+
+  // If no valid selection detected, don't advance
+  // The AI will re-prompt for the answer
+  if (!parsed.detected || !parsed.most_like_me) {
+    return newState
+  }
+
+  // For ranked questions (Q4-Q16), we need both selections
+  if (currentQ.selection_type === 'ranked') {
+    if (!parsed.second_most_like_me) {
+      // Only got first selection - store partial and wait for second
+      // Check if we already have a partial response
+      const existingResponse = state.responses[currentQ.id]
+      if (existingResponse?.most_like_me && !existingResponse.second_most_like_me) {
+        // We had first choice, this might be the second
+        // Treat the new selection as second choice
+        newState.responses[currentQ.id] = {
+          question_id: currentQ.id,
+          most_like_me: existingResponse.most_like_me,
+          second_most_like_me: parsed.most_like_me,
         }
+      } else {
+        // Store as partial response - waiting for second choice
+        newState.responses[currentQ.id] = {
+          question_id: currentQ.id,
+          most_like_me: parsed.most_like_me,
+          second_most_like_me: null,
+        }
+        // Don't advance - AI will prompt for second choice
+        return newState
+      }
+    } else {
+      // Got both selections
+      newState.responses[currentQ.id] = {
+        question_id: currentQ.id,
+        most_like_me: parsed.most_like_me,
+        second_most_like_me: parsed.second_most_like_me,
       }
     }
+  } else {
+    // Single-select question (context Q1-Q3, friction Q17-Q19)
+    newState.responses[currentQ.id] = {
+      question_id: currentQ.id,
+      most_like_me: parsed.most_like_me,
+      second_most_like_me: null,
+    }
+  }
+
+  // Advance to next question
+  const nextIndex = state.current_question_index + 1
+  const totalQuestions = getTotalQuestions()
+
+  if (nextIndex > totalQuestions) {
+    // All questions answered, move to closing
+    newState.phase = 'closing'
+    newState.current_question_index = totalQuestions
+  } else {
+    // Move to next question and update phase
+    newState.current_question_index = nextIndex
+    newState.phase = getPhaseForQuestionIndex(nextIndex)
   }
 
   return newState
 }
 
 /**
- * Check if the interview is complete
+ * Check if the interview is complete.
+ *
+ * FIXED: Previously used `>= getTotalQuestions()` which caused premature completion
+ * when reaching question 19 (before it was answered).
+ * Now only returns true when phase is 'completed' (after closing message delivered).
  */
 function checkCompletion(state: ArchetypeSessionState): boolean {
-  return state.phase === 'closing' || state.current_question_index >= getTotalQuestions()
+  return state.phase === 'completed'
 }
 
 /**
