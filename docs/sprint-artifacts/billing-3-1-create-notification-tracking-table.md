@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-3-notifications (Usage Notifications)
 **Story ID:** billing-3-1-create-notification-tracking-table
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---

@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-4-admin-dashboard (Admin Dashboard Enhancement)
 **Story ID:** billing-4-1-display-calculated-costs
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -51,25 +51,25 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Verify dashboard infrastructure**
-  - [ ] 1.1 Review existing `app/dashboard/admin/billing/page.tsx`
-  - [ ] 1.2 Identify current cost display locations
-  - [ ] 1.3 Check API endpoints for cost aggregation
+- [x] **1. Verify dashboard infrastructure**
+  - [x] 1.1 Review existing `app/dashboard/admin/billing/page.tsx`
+  - [x] 1.2 Identify current cost display locations
+  - [x] 1.3 Check API endpoints for cost aggregation
 
-- [ ] **2. Update cost aggregation queries**
-  - [ ] 2.1 Update query to sum cost_cents
-  - [ ] 2.2 Group by model, tenant, provider
-  - [ ] 2.3 Ensure proper date filtering
+- [x] **2. Update cost aggregation queries**
+  - [x] 2.1 Update query to sum cost_cents
+  - [x] 2.2 Group by model, tenant, provider
+  - [x] 2.3 Ensure proper date filtering
 
-- [ ] **3. Update cost display formatting**
-  - [ ] 3.1 Format cents to dollars ($X.XX)
-  - [ ] 3.2 Handle 0 costs gracefully
-  - [ ] 3.3 Add proper number formatting
+- [x] **3. Update cost display formatting**
+  - [x] 3.1 Format cents to dollars ($X.XX)
+  - [x] 3.2 Handle 0 costs gracefully
+  - [x] 3.3 Add proper number formatting
 
-- [ ] **4. Test with real data**
-  - [ ] 4.1 Verify costs match expected calculations
-  - [ ] 4.2 Check aggregations are correct
-  - [ ] 4.3 Verify date filtering works
+- [x] **4. Test with real data**
+  - [x] 4.1 Verify costs match expected calculations
+  - [x] 4.2 Check aggregations are correct
+  - [x] 4.3 Verify date filtering works
 
 ---
 
@@ -120,12 +120,12 @@ ORDER BY total_cost_cents DESC;
 
 ## Definition of Done
 
-- [ ] Dashboard shows real costs (not $0.00)
-- [ ] By Model tab correct
-- [ ] By Tenant tab correct
-- [ ] By Provider tab correct
-- [ ] Date filtering works
-- [ ] Currency properly formatted
+- [x] Dashboard shows real costs (not $0.00)
+- [x] By Model tab correct
+- [x] By Tenant tab correct
+- [x] By Provider tab correct
+- [x] Date filtering works
+- [x] Currency properly formatted
 
 ---
 

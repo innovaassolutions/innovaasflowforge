@@ -101,10 +101,10 @@ development_status:
 
   # Epic 6: Foundation - Schema & Cost Calculation
   billing-epic-1-foundation: contexted
-  billing-1-1-modify-usage-events-schema: review
-  billing-1-2-create-model-pricing-table: review
-  billing-1-3-implement-cost-calculation-service: review
-  billing-1-4-update-ai-agent-calls-log-tokens: review
+  billing-1-1-modify-usage-events-schema: done
+  billing-1-2-create-model-pricing-table: done
+  billing-1-3-implement-cost-calculation-service: done
+  billing-1-4-update-ai-agent-calls-log-tokens: done
   billing-epic-1-retrospective: optional
 
   # Epic 7: Subscription Tiers & Usage Limits
@@ -119,17 +119,17 @@ development_status:
 
   # Epic 8: Usage Notifications
   billing-epic-3-notifications: contexted
-  billing-3-1-create-notification-tracking-table: ready-for-dev
-  billing-3-2-implement-warning-triggers: ready-for-dev
-  billing-3-3-tenant-notification-history: ready-for-dev
+  billing-3-1-create-notification-tracking-table: done
+  billing-3-2-implement-warning-triggers: done
+  billing-3-3-tenant-notification-history: done
   billing-epic-3-retrospective: optional
 
   # Epic 9: Admin Dashboard Enhancement
   billing-epic-4-admin-dashboard: contexted
-  billing-4-1-display-calculated-costs: ready-for-dev
-  billing-4-2-add-revenue-margin-tracking: ready-for-dev
-  billing-4-3-add-cost-trend-visualization: ready-for-dev
-  billing-4-4-implement-export-functionality: ready-for-dev
+  billing-4-1-display-calculated-costs: done
+  billing-4-2-add-revenue-margin-tracking: done
+  billing-4-3-add-cost-trend-visualization: done
+  billing-4-4-implement-export-functionality: done
   billing-epic-4-retrospective: optional
 
   # Epic 10: Tenant Usage Visibility

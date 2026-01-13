@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-3-notifications (Usage Notifications)
 **Story ID:** billing-3-3-tenant-notification-history
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -46,28 +46,28 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Create Notifications Page**
-  - [ ] 1.1 Create `app/dashboard/settings/notifications/page.tsx`
-  - [ ] 1.2 Fetch notifications for tenant
-  - [ ] 1.3 Display in list format
+- [x] **1. Create Notifications Page**
+  - [x] 1.1 Create `app/dashboard/settings/notifications/page.tsx`
+  - [x] 1.2 Fetch notifications for tenant
+  - [x] 1.3 Display in list format
 
-- [ ] **2. Create Notification List Component**
-  - [ ] 2.1 Create NotificationList component
-  - [ ] 2.2 Show type, date, method, status
-  - [ ] 2.3 Visual distinction for acknowledged
+- [x] **2. Create Notification List Component**
+  - [x] 2.1 Create NotificationList component
+  - [x] 2.2 Show type, date, method, status
+  - [x] 2.3 Visual distinction for acknowledged
 
-- [ ] **3. Create API Endpoints**
-  - [ ] 3.1 GET `/api/tenant/notifications` - list
-  - [ ] 3.2 PATCH `/api/tenant/notifications/[id]/acknowledge`
+- [x] **3. Create API Endpoints**
+  - [x] 3.1 GET `/api/tenant/notifications` - list
+  - [x] 3.2 POST `/api/tenant/notifications/acknowledge`
 
-- [ ] **4. Implement acknowledge**
-  - [ ] 4.1 Update acknowledged_at timestamp
-  - [ ] 4.2 Refresh list after acknowledge
+- [x] **4. Implement acknowledge**
+  - [x] 4.1 Update acknowledged_at timestamp
+  - [x] 4.2 Refresh list after acknowledge
 
-- [ ] **5. Style and polish**
-  - [ ] 5.1 Follow Pearl Vibrant design
-  - [ ] 5.2 Add empty state
-  - [ ] 5.3 Add loading state
+- [x] **5. Style and polish**
+  - [x] 5.1 Follow Pearl Vibrant design
+  - [x] 5.2 Add empty state
+  - [x] 5.3 Add loading state
 
 ---
 
@@ -111,11 +111,11 @@ interface NotificationResponse {
 
 ## Definition of Done
 
-- [ ] Notifications page created
-- [ ] Shows notification history
-- [ ] Acknowledge functionality works
-- [ ] Filter by period works
-- [ ] Follows design system
+- [x] Notifications page created
+- [x] Shows notification history
+- [x] Acknowledge functionality works
+- [x] Filter by period works
+- [x] Follows design system
 
 ---
 

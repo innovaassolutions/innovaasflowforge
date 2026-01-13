@@ -3,12 +3,16 @@
  *
  * Logs usage events for billing and analytics.
  * Integrates with CostCalculatorService for automatic cost calculation.
+ * Triggers usage notifications when thresholds are crossed.
  *
  * Story: billing-1-3-implement-cost-calculation-service
+ * Updated: billing-3-2-implement-warning-triggers
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { calculateCost } from '@/lib/services/cost-calculator'
+import { getTenantUsage, invalidateUsageCache } from '@/lib/services/usage-tracker'
+import { checkAndSendNotifications } from '@/lib/services/notification-service'
 
 // ============================================================================
 // Types
@@ -117,6 +121,25 @@ export async function logUsageEvent(
     if (error) {
       console.error('[logUsageEvent] Failed to insert usage event:', error)
       return null
+    }
+
+    // After successful logging, check usage thresholds and send notifications
+    // This is done async and non-blocking to not slow down the main request
+    if (eventType === 'llm_request') {
+      setImmediate(async () => {
+        try {
+          // Invalidate cache so we get fresh usage data
+          invalidateUsageCache(tenantId)
+
+          // Get current usage and check thresholds
+          const usage = await getTenantUsage(tenantId)
+          if (usage) {
+            await checkAndSendNotifications(tenantId, usage)
+          }
+        } catch (notifError) {
+          console.error('[logUsageEvent] Failed to check notifications:', notifError)
+        }
+      })
     }
 
     return data?.id || null

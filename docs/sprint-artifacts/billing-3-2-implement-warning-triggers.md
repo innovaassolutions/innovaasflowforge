@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-3-notifications (Usage Notifications)
 **Story ID:** billing-3-2-implement-warning-triggers
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -52,33 +52,33 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Create NotificationService**
-  - [ ] 1.1 Create `lib/services/notification-service.ts`
-  - [ ] 1.2 Implement `checkAndSendNotifications(tenantId, usage)`
-  - [ ] 1.3 Implement `hasNotificationBeenSent(tenantId, type, period)`
+- [x] **1. Create NotificationService**
+  - [x] 1.1 Create `lib/services/notification-service.ts`
+  - [x] 1.2 Implement `checkAndSendNotifications(tenantId, usage)`
+  - [x] 1.3 Implement `hasNotificationBeenSent(tenantId, type, period)`
 
-- [ ] **2. Implement threshold checks**
-  - [ ] 2.1 Check if 75% threshold crossed
-  - [ ] 2.2 Check if 90% threshold crossed
-  - [ ] 2.3 Check existing notifications before sending
+- [x] **2. Implement threshold checks**
+  - [x] 2.1 Check if 75% threshold crossed
+  - [x] 2.2 Check if 90% threshold crossed
+  - [x] 2.3 Check existing notifications before sending
 
-- [ ] **3. Create in-app notifications**
-  - [ ] 3.1 Insert into usage_notifications table
-  - [ ] 3.2 Set delivery_method appropriately
+- [x] **3. Create in-app notifications**
+  - [x] 3.1 Insert into usage_notifications table
+  - [x] 3.2 Set delivery_method appropriately
 
-- [ ] **4. Implement email sending**
-  - [ ] 4.1 Create email template for usage warning
-  - [ ] 4.2 Use existing Resend integration
-  - [ ] 4.3 Send at 90% threshold
+- [x] **4. Implement email sending**
+  - [x] 4.1 Create email template for usage warning
+  - [x] 4.2 Use existing Resend integration
+  - [x] 4.3 Send at 90% threshold
 
-- [ ] **5. Integrate with usage logging**
-  - [ ] 5.1 Call notification check after each usage event
-  - [ ] 5.2 Pass current usage to service
+- [x] **5. Integrate with usage logging**
+  - [x] 5.1 Call notification check after each usage event
+  - [x] 5.2 Pass current usage to service
 
-- [ ] **6. Test notification flow**
-  - [ ] 6.1 Test 75% triggers in-app only
-  - [ ] 6.2 Test 90% triggers in-app + email
-  - [ ] 6.3 Test no duplicates
+- [x] **6. Test notification flow**
+  - [x] 6.1 Test 75% triggers in-app only
+  - [x] 6.2 Test 90% triggers in-app + email
+  - [x] 6.3 Test no duplicates
 
 ---
 
@@ -149,12 +149,12 @@ To avoid interruption, consider upgrading your plan:
 
 ## Definition of Done
 
-- [ ] NotificationService created
-- [ ] 75% triggers in-app notification
-- [ ] 90% triggers in-app + email
-- [ ] No duplicate notifications
-- [ ] Email uses Resend integration
-- [ ] Integrated with usage logging
+- [x] NotificationService created
+- [x] 75% triggers in-app notification
+- [x] 90% triggers in-app + email
+- [x] No duplicate notifications
+- [x] Email uses Resend integration
+- [x] Integrated with usage logging
 
 ---
 
