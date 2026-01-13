@@ -70,13 +70,13 @@ So that **I can manage my client acquisition and follow up with interested prosp
   - [x] Format dates appropriately
   - [x] Trigger browser download
 
-- [ ] **Create client detail page** (AC: #5)
-  - [ ] Create `app/dashboard/coaching/clients/[id]/page.tsx`
-  - [ ] Display client info (name, email, registration)
-  - [ ] Display archetype results (if completed)
-  - [ ] Status dropdown to update
-  - [ ] View conversation history (optional)
-  - [ ] Back to list navigation
+- [x] **Create client detail page** (AC: #5)
+  - [x] Create `app/dashboard/coaching/clients/[id]/page.tsx`
+  - [x] Display client info (name, email, registration)
+  - [x] Display archetype results (if completed)
+  - [x] Status dropdown to update
+  - [ ] View conversation history (future)
+  - [x] Back to list navigation
 
 - [ ] **Create campaign management pages** (AC: #6, #7)
   - [ ] Create `app/dashboard/coaching/campaigns/page.tsx` - List campaigns
@@ -208,15 +208,23 @@ Core dashboard and CSV export functionality completed:
    - "No matching clients" state for empty filter results
    - Updated count display showing "X of Y Clients" when filtered
 
+4. **Client Detail Page** (`/dashboard/coaching/clients/[id]`)
+   - Timeline showing registration, started, and completion dates
+   - Archetype results display (Default and Authentic archetypes)
+   - Alignment indicator showing if archetypes match
+   - Status update dropdown with all 6 pipeline statuses
+   - Quick actions: View Report, Download PDF, Send Invite, Copy Link
+   - Clickable client names in list to navigate to detail
+
 **Remaining work for full story completion:**
-- Client detail page (`/dashboard/coaching/clients/[id]`)
 - Campaign management pages
 - API endpoints for dashboard data
 
 ### Files Modified
 
 - `app/dashboard/coaching/page.tsx` - Created (new dashboard page)
-- `app/dashboard/coaching/clients/page.tsx` - Modified (added CSV export, metadata field)
+- `app/dashboard/coaching/clients/page.tsx` - Modified (CSV export, filter, search, link to detail)
+- `app/dashboard/coaching/clients/[id]/page.tsx` - Created (new client detail page)
 
 ### Test Results
 

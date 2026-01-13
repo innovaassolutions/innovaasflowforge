@@ -675,9 +675,12 @@ export default function CoachingClientsPage() {
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-semibold text-foreground">
+                      <Link
+                        href={`/dashboard/coaching/clients/${client.id}`}
+                        className="text-lg font-semibold text-foreground hover:text-primary transition-colors"
+                      >
                         {client.client_name}
-                      </h3>
+                      </Link>
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusStyles(
                           client.client_status
