@@ -43,6 +43,11 @@ export interface AgentResponse {
   message: string
   sessionState: ArchetypeSessionState
   isComplete: boolean
+  usage?: {
+    input_tokens: number
+    output_tokens: number
+    model: string
+  }
 }
 
 interface Message {
@@ -262,8 +267,9 @@ export async function processArchetypeMessage(
   }
 
   try {
+    const model = 'claude-sonnet-4-20250514'
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model,
       max_tokens: 1024,
       system: systemPrompt,
       messages,
@@ -291,6 +297,11 @@ export async function processArchetypeMessage(
       message: assistantMessage,
       sessionState: newState,
       isComplete,
+      usage: {
+        input_tokens: response.usage.input_tokens,
+        output_tokens: response.usage.output_tokens,
+        model,
+      },
     }
   } catch (error) {
     console.error('Archetype agent error:', error)

@@ -112,9 +112,11 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      * - reports/* (public token-based report access)
-     * - session/* (public token-based stakeholder sessions)
      * - api/voice/* (ElevenLabs voice API routes - use their own auth)
+     *
+     * NOTE: /session/* is intentionally NOT excluded - it needs middleware
+     * for custom domain routing to rewrite to /coach/[slug]/session/[token]
      */
-    '/((?!_next/static|_next/image|favicon.ico|reports|session|api/voice|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|reports|api/voice|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

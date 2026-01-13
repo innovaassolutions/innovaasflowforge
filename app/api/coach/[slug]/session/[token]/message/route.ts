@@ -2,6 +2,7 @@
  * Coach Session Message API - POST
  *
  * Processes messages in an archetype interview session.
+ * Tracks usage events for billing and analytics.
  *
  * Story: 3-3-registration-sessions
  */
@@ -16,6 +17,31 @@ function getServiceClient() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+}
+
+/**
+ * Log a usage event for billing/analytics
+ */
+async function logUsageEvent(
+  supabase: ReturnType<typeof getServiceClient>,
+  tenantId: string,
+  eventType: 'session_started' | 'llm_request' | 'session_completed',
+  eventData: Record<string, unknown>,
+  tokensUsed?: number,
+  modelUsed?: string
+) {
+  try {
+    await supabase.from('usage_events').insert({
+      tenant_id: tenantId,
+      event_type: eventType,
+      event_data: eventData,
+      tokens_used: tokensUsed || 0,
+      model_used: modelUsed || null,
+    })
+  } catch (error) {
+    // Log but don't fail the request if usage tracking fails
+    console.error('Failed to log usage event:', error)
+  }
 }
 
 interface MessageRequest {
@@ -133,9 +159,34 @@ export async function POST(
     }
 
     // Mark as started if first message
-    if (!session.started_at) {
+    const isFirstMessage = !session.started_at
+    if (isFirstMessage) {
       updates.started_at = new Date().toISOString()
       updates.client_status = 'in_progress'
+
+      // Log session_started event
+      await logUsageEvent(supabase, tenant.id, 'session_started', {
+        session_id: session.id,
+        assessment_type: 'archetype',
+        client_name: session.client_name,
+      })
+    }
+
+    // Log llm_request event for this message
+    if (agentResponse.usage) {
+      await logUsageEvent(
+        supabase,
+        tenant.id,
+        'llm_request',
+        {
+          session_id: session.id,
+          assessment_type: 'archetype',
+          prompt_type: isFirstMessage ? 'opening' : 'conversation',
+          question_index: agentResponse.sessionState.current_question_index,
+        },
+        agentResponse.usage.input_tokens + agentResponse.usage.output_tokens,
+        agentResponse.usage.model
+      )
     }
 
     // Mark as completed if interview is done
@@ -151,6 +202,15 @@ export async function POST(
           completed_at: new Date().toISOString(),
         },
       }
+
+      // Log session_completed event
+      await logUsageEvent(supabase, tenant.id, 'session_completed', {
+        session_id: session.id,
+        assessment_type: 'archetype',
+        default_archetype: agentResponse.sessionState.default_archetype,
+        authentic_archetype: agentResponse.sessionState.authentic_archetype,
+        is_aligned: agentResponse.sessionState.is_aligned,
+      })
     }
 
     await supabase
