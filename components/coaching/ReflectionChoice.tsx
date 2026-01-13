@@ -12,6 +12,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 
 interface BookingConfig {
   enabled: boolean
@@ -39,14 +40,50 @@ export function ReflectionChoice({
   onStatusChange
 }: ReflectionChoiceProps) {
   const router = useRouter()
+  const { buildPath } = useTenantPaths()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadSuccess, setDownloadSuccess] = useState(false)
 
   // Handle "No thanks" graceful exit - redirect to thank you page
   function handleDecline() {
     setIsLoading(true)
     // Navigate to thank you page which handles PDF download and booking CTA
-    router.push(`/coach/${slug}/results/${token}/thank-you`)
+    router.push(buildPath(`/results/${token}/thank-you`))
+  }
+
+  // Handle inline PDF download (for completed/declined states)
+  async function handleDownloadPDF() {
+    setIsDownloading(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/coach/${slug}/results/${token}/download-pdf`)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob()
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `leadership-archetype-results.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+
+      setDownloadSuccess(true)
+    } catch (err) {
+      console.error('Download error:', err)
+      setError('Failed to download PDF. Please try again.')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   // If reflection is already completed, show completion message with PDF download
@@ -88,7 +125,7 @@ export function ReflectionChoice({
           Thank you for taking the time to reflect on your results. Your personalized insights are now ready.
         </p>
         <Link
-          href={`/coach/${slug}/results/${token}/reflect`}
+          href={buildPath(`/results/${token}/reflect`)}
           className="inline-block mt-4 text-sm underline"
           style={{ color: 'var(--brand-text-muted)' }}
         >
@@ -107,30 +144,40 @@ export function ReflectionChoice({
             Your personalized results are ready
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {/* PDF Download Button */}
-            <Link
-              href={`/coach/${slug}/results/${token}/thank-you`}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+            {/* PDF Download Button - downloads inline */}
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
               style={{
                 backgroundColor: 'var(--brand-primary)',
                 color: 'white',
               }}
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Download PDF
-            </Link>
+              {isDownloading ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Generating PDF...
+                </>
+              ) : downloadSuccess ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Download Again
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PDF
+                </>
+              )}
+            </button>
 
             {/* Booking CTA */}
             {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && (
@@ -205,32 +252,42 @@ export function ReflectionChoice({
           Your results are available to download or you can still go deeper if you&apos;d like.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href={`/coach/${slug}/results/${token}/thank-you`}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
             style={{
               backgroundColor: 'var(--brand-bg)',
               color: 'var(--brand-text)',
               border: '1px solid var(--brand-border)',
             }}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-            Download PDF
-          </Link>
+            {isDownloading ? (
+              <>
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Generating...
+              </>
+            ) : downloadSuccess ? (
+              <>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Download Again
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download PDF
+              </>
+            )}
+          </button>
           <Link
-            href={`/coach/${slug}/results/${token}/reflect`}
+            href={buildPath(`/results/${token}/reflect`)}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
             style={{
               backgroundColor: 'var(--brand-primary)',
@@ -336,7 +393,7 @@ export function ReflectionChoice({
           You started a reflection conversation. Continue where you left off.
         </p>
         <Link
-          href={`/coach/${slug}/results/${token}/reflect`}
+          href={buildPath(`/results/${token}/reflect`)}
           className="inline-block px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
           style={{
             backgroundColor: 'var(--brand-primary)',
@@ -392,7 +449,7 @@ export function ReflectionChoice({
       {/* Choice Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link
-          href={`/coach/${slug}/results/${token}/reflect`}
+          href={buildPath(`/results/${token}/reflect`)}
           className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
           style={{
             backgroundColor: 'var(--brand-primary)',
