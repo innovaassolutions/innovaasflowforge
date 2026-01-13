@@ -207,8 +207,10 @@ export async function GET(
     }
 
     // Generate PDF using Pages Router API
-    const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
-    const pdfApiUrl = `${internalBaseUrl}/api/generate-archetype-pdf`
+    // Use request host to ensure it works on custom domains
+    const host = request.headers.get('host') || 'localhost:3000'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const pdfApiUrl = `${protocol}://${host}/api/generate-archetype-pdf`
 
     console.log('📄 Generating PDF for download:', session.client_name)
 
