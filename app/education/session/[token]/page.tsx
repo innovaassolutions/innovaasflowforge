@@ -331,8 +331,8 @@ export default function EducationSessionPage({ params }: { params: Promise<{ tok
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border bg-card flex-shrink-0">
+      {/* Header - Sticky to show progress while scrolling */}
+      <header className="border-b border-border bg-card flex-shrink-0 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4
                         sm:px-6
                         lg:px-8">

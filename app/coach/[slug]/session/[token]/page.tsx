@@ -239,9 +239,9 @@ export default function SessionPage() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: 'var(--brand-bg)' }}
     >
-      {/* Header */}
+      {/* Header - Sticky to show progress while scrolling */}
       <header
-        className="flex-shrink-0 border-b"
+        className="flex-shrink-0 border-b sticky top-0 z-10"
         style={{
           backgroundColor: 'var(--brand-bg)',
           borderColor: 'var(--brand-border)',

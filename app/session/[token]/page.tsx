@@ -218,8 +218,8 @@ export default function StakeholderInterviewPage() {
   if (!session) return null
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="bg-muted border-b border-border flex-shrink-0">
+      {/* Header - Sticky to show progress while scrolling */}
+      <header className="bg-muted border-b border-border flex-shrink-0 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
