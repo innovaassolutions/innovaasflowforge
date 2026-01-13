@@ -32,6 +32,8 @@ import {
   FileText,
   Download,
   FileSpreadsheet,
+  Search,
+  Filter,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -75,6 +77,10 @@ export default function CoachingClientsPage() {
   const [sendingInvite, setSendingInvite] = useState<string | null>(null)
   const [inviteSent, setInviteSent] = useState<string | null>(null)
   const [downloadingPdf, setDownloadingPdf] = useState<string | null>(null)
+
+  // Filter and search state
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   // New client form state
   const [newClientName, setNewClientName] = useState('')
@@ -408,6 +414,23 @@ export default function CoachingClientsPage() {
     window.URL.revokeObjectURL(url)
   }
 
+  // Filter and search clients
+  const filteredClients = clients.filter((client) => {
+    // Status filter
+    if (statusFilter !== 'all' && client.client_status !== statusFilter) {
+      return false
+    }
+    // Search filter (name or email)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      return (
+        client.client_name.toLowerCase().includes(query) ||
+        client.client_email.toLowerCase().includes(query)
+      )
+    }
+    return true
+  })
+
   return (
     <div className="min-h-screen bg-background">
       {/* Add Client Modal */}
@@ -543,12 +566,49 @@ export default function CoachingClientsPage() {
       <main className="px-8 py-8">
         {/* Back Link */}
         <Link
-          href="/dashboard"
+          href="/dashboard/coaching"
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          Back to Coaching Dashboard
         </Link>
+
+        {/* Filter and Search Bar */}
+        {clients.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground
+                           placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            {/* Status Filter Dropdown */}
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-border bg-background text-foreground
+                           focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="all">All Statuses</option>
+                <option value="registered">Not Started</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="contacted">Contacted</option>
+                <option value="converted">Converted</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+        )}
 
         {/* Clients List */}
         {loading ? (
@@ -580,10 +640,34 @@ export default function CoachingClientsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-foreground">
-                {clients.length} Client{clients.length !== 1 ? 's' : ''}
+                {filteredClients.length === clients.length
+                  ? `${clients.length} Client${clients.length !== 1 ? 's' : ''}`
+                  : `${filteredClients.length} of ${clients.length} Client${clients.length !== 1 ? 's' : ''}`}
               </h2>
+              {(statusFilter !== 'all' || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setStatusFilter('all')
+                    setSearchQuery('')
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground underline"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
-            {clients.map((client) => (
+            {filteredClients.length === 0 ? (
+              <div className="bg-card border border-border rounded-lg p-8 text-center">
+                <Search className="mx-auto h-10 w-10 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
+                  No matching clients
+                </h3>
+                <p className="mt-2 text-muted-foreground">
+                  Try adjusting your search or filter criteria.
+                </p>
+              </div>
+            ) : (
+            filteredClients.map((client) => (
               <div
                 key={client.id}
                 className="bg-card border border-border rounded-lg p-6 transition-colors hover:border-primary/30"
@@ -708,7 +792,8 @@ export default function CoachingClientsPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         )}
       </main>

@@ -53,8 +53,8 @@ So that **I can manage my client acquisition and follow up with interested prosp
   - [x] `app/dashboard/coaching/clients/page.tsx` (existed from Story 3)
   - [x] Fetch all clients for coach's tenant
   - [x] Card-based list with status badges
-  - [ ] Status filter dropdown (future)
-  - [ ] Search by name/email (future)
+  - [x] Status filter dropdown
+  - [x] Search by name/email
 
 - [ ] **Create ClientTable component** (AC: #3, #4)
   - [ ] Create `components/coaching/ClientTable.tsx`
@@ -201,9 +201,14 @@ Core dashboard and CSV export functionality completed:
    - Proper CSV escaping for special characters
    - Downloads as `coaching-clients-YYYY-MM-DD.csv`
 
+3. **Filter & Search** (on clients page)
+   - Status filter dropdown (All, Not Started, In Progress, Completed, Contacted, Converted, Archived)
+   - Search by name or email with real-time filtering
+   - Clear filters button when filters are active
+   - "No matching clients" state for empty filter results
+   - Updated count display showing "X of Y Clients" when filtered
+
 **Remaining work for full story completion:**
-- Status filter dropdown on clients page
-- Search by name/email on clients page
 - Client detail page (`/dashboard/coaching/clients/[id]`)
 - Campaign management pages
 - API endpoints for dashboard data
