@@ -31,6 +31,7 @@ import {
   Loader2,
   FileText,
   Download,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -46,6 +47,12 @@ interface CoachingClient {
   started_at: string | null
   completed_at: string | null
   last_activity_at: string | null
+  metadata?: {
+    default_archetype?: string
+    authentic_archetype?: string
+    is_aligned?: boolean
+    scores?: Record<string, number>
+  }
 }
 
 interface TenantProfile {
@@ -110,7 +117,7 @@ export default function CoachingClientsPage() {
       // Fetch coaching clients (type assertion needed as coaching_sessions not in generated types yet)
       const { data: clientsData, error: clientsError } = await (client
         .from('coaching_sessions') as any)
-        .select('id, client_name, client_email, client_status, access_token, created_at, started_at, completed_at, last_activity_at')
+        .select('id, client_name, client_email, client_status, access_token, created_at, started_at, completed_at, last_activity_at, metadata')
         .eq('tenant_id', tenantData.id)
         .order('created_at', { ascending: false })
 
@@ -350,6 +357,57 @@ export default function CoachingClientsPage() {
     }
   }
 
+  function handleExportCSV() {
+    if (clients.length === 0) return
+
+    // Define CSV headers
+    const headers = [
+      'Name',
+      'Email',
+      'Status',
+      'Default Archetype',
+      'Authentic Archetype',
+      'Registration Date',
+      'Completion Date',
+    ]
+
+    // Build CSV rows
+    const rows = clients.map((client) => [
+      client.client_name,
+      client.client_email,
+      getStatusLabel(client.client_status),
+      client.metadata?.default_archetype || '',
+      client.metadata?.authentic_archetype || '',
+      new Date(client.created_at).toLocaleDateString(),
+      client.completed_at ? new Date(client.completed_at).toLocaleDateString() : '',
+    ])
+
+    // Escape CSV values (handle commas, quotes, newlines)
+    const escapeCSV = (value: string) => {
+      if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+        return `"${value.replace(/"/g, '""')}"`
+      }
+      return value
+    }
+
+    // Build CSV content
+    const csvContent = [
+      headers.map(escapeCSV).join(','),
+      ...rows.map((row) => row.map(escapeCSV).join(',')),
+    ].join('\n')
+
+    // Download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `coaching-clients-${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Add Client Modal */}
@@ -466,10 +524,18 @@ export default function CoachingClientsPage() {
               Manage assessment sessions for your coaching clients
             </p>
           </div>
-          <Button onClick={() => setShowAddModal(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Client
-          </Button>
+          <div className="flex gap-3">
+            {clients.length > 0 && (
+              <Button variant="outline" onClick={handleExportCSV}>
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            )}
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Client
+            </Button>
+          </div>
         </div>
       </div>
 

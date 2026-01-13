@@ -65,7 +65,7 @@ development_status:
   3-1-database-foundation: done
   3-2-branding-infrastructure: done
   3-3-registration-sessions: review
-  3-4-dashboard-pipeline: backlog
+  3-4-dashboard-pipeline: in-progress  # Dashboard page created, CSV export added
   3-5-results-custom-domain: backlog
   epic-3-retrospective: optional
 
