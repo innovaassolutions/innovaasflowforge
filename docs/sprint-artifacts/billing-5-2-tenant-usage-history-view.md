@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-5-tenant-visibility (Tenant Usage Visibility)
 **Story ID:** billing-5-2-tenant-usage-history-view
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -49,91 +49,91 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Create usage history page**
-  - [ ] 1.1 Create `app/dashboard/settings/usage/page.tsx`
-  - [ ] 1.2 Layout with chart and list sections
-  - [ ] 1.3 Date range filter
+- [x] **1. Create usage history page**
+  - [x] 1.1 Create `app/dashboard/settings/usage/page.tsx`
+  - [x] 1.2 Layout with chart and list sections
+  - [x] 1.3 Date range filter
 
-- [ ] **2. Create history API endpoint**
-  - [ ] 2.1 GET `/api/tenant/usage/history`
-  - [ ] 2.2 Return daily aggregates
-  - [ ] 2.3 Return recent events
+- [x] **2. Create history API endpoint**
+  - [x] 2.1 GET `/api/tenant/usage/history`
+  - [x] 2.2 Return daily aggregates
+  - [x] 2.3 Return recent events
 
-- [ ] **3. Create usage chart**
-  - [ ] 3.1 Use Recharts
-  - [ ] 3.2 Bar chart for daily usage
-  - [ ] 3.3 Apply theme colors
+- [x] **3. Create usage chart**
+  - [x] 3.1 Use Recharts
+  - [x] 3.2 Bar chart for daily usage
+  - [x] 3.3 Apply theme colors
 
-- [ ] **4. Create event list**
-  - [ ] 4.1 List recent events
-  - [ ] 4.2 Show date, type, tokens
-  - [ ] 4.3 Link to session if applicable
+- [x] **4. Create event list**
+  - [x] 4.1 List recent events
+  - [x] 4.2 Show date, type, tokens
+  - [x] 4.3 Link to session if applicable
 
-- [ ] **5. Add date filtering**
-  - [ ] 5.1 Date range picker
-  - [ ] 5.2 Update chart on change
-  - [ ] 5.3 Update list on change
+- [x] **5. Add date filtering**
+  - [x] 5.1 Date range picker
+  - [x] 5.2 Update chart on change
+  - [x] 5.3 Update list on change
 
 ---
 
-## Dev Notes
+## Implementation Details
 
-### History API Response
+### Files Created
+
+- `app/api/tenant/usage/history/route.ts` - API endpoint for historical data
+- `app/dashboard/settings/usage/page.tsx` - Usage history page
+- Updated `components/billing/UsageCard.tsx` - Added "History" link
+
+### API Response Format
 
 ```typescript
-// GET /api/tenant/usage/history?startDate=X&endDate=Y
-interface UsageHistoryResponse {
-  dailyUsage: Array<{
-    date: string;
-    tokens: number;
-  }>;
+{
+  dateRange: { start: string, end: string },
+  summary: {
+    totalTokens: number,
+    avgDailyTokens: number,
+    peakDay: string,
+    peakTokens: number,
+    totalEvents: number
+  },
+  dailyUsage: Array<{ date: string, tokens: number }>,
   recentEvents: Array<{
-    id: string;
-    date: string;
-    eventType: string;
-    inputTokens: number;
-    outputTokens: number;
-    totalTokens: number;
-    sessionId?: string;
-  }>;
+    id: string,
+    date: string,
+    eventType: string,
+    inputTokens: number,
+    outputTokens: number,
+    totalTokens: number,
+    modelUsed: string | null,
+    sessionId: string | null
+  }>
 }
 ```
 
-### Page Layout
+### Page Features
 
-```
-Usage History
-┌─────────────────────────────────────────────────────┐
-│ Date Range: [Jan 1 ▼] to [Jan 31 ▼]                │
-├─────────────────────────────────────────────────────┤
-│                 Daily Usage Chart                   │
-│   ▄▄                                               │
-│   ██ ▄▄    ▄▄         ▄▄                           │
-│   ██ ██ ▄▄ ██    ▄▄   ██ ▄▄                        │
-│ ──────────────────────────────────────             │
-│   1  2  3  4  5  6  7  8  9  10                    │
-├─────────────────────────────────────────────────────┤
-│ Recent Activity                                     │
-│────────────────────────────────────────────────────│
-│ Jan 15 • Interview Message    1,500 tokens         │
-│ Jan 15 • Interview Message    2,300 tokens         │
-│ Jan 14 • Synthesis           12,000 tokens         │
-└─────────────────────────────────────────────────────┘
-```
+- Summary cards: Total tokens, Avg daily, Peak day, Total events
+- Bar chart using Recharts with purple theme color
+- Recent events list with event type badges
+- Date range filter with Apply button
+- Loading and error states
+- Refresh button
 
-### Prerequisites
-- Story 5.1 (tenant usage API)
+### Navigation
+
+- "History" link added to UsageCard period info section
+- Back to Dashboard link in page header
 
 ---
 
 ## Definition of Done
 
-- [ ] History page created
-- [ ] Daily chart displays
-- [ ] Event list shows recent activity
-- [ ] Date filter works
-- [ ] RLS ensures tenant isolation
+- [x] History page created
+- [x] Daily chart displays
+- [x] Event list shows recent activity
+- [x] Date filter works
+- [x] RLS ensures tenant isolation
 
 ---
 
-_Story Version 1.0 | Created 2026-01-13_
+_Story Version 1.1 | Created 2026-01-13 | Completed 2026-01-13_

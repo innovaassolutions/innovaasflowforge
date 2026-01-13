@@ -134,13 +134,13 @@ development_status:
 
   # Epic 10: Tenant Usage Visibility
   billing-epic-5-tenant-visibility: contexted
-  billing-5-1-tenant-usage-dashboard-component: ready-for-dev
-  billing-5-2-tenant-usage-history-view: ready-for-dev
-  billing-5-3-in-app-usage-warning-banner: ready-for-dev
+  billing-5-1-tenant-usage-dashboard-component: done
+  billing-5-2-tenant-usage-history-view: done
+  billing-5-3-in-app-usage-warning-banner: done
   billing-epic-5-retrospective: optional
 
   # Epic 11: Automated Pricing Sync (Growth Phase)
   billing-epic-6-pricing-sync: contexted
-  billing-6-1-implement-provider-pricing-api: ready-for-dev
-  billing-6-2-pricing-change-alerts: ready-for-dev
+  billing-6-1-implement-provider-pricing-api: done
+  billing-6-2-pricing-change-alerts: done
   billing-epic-6-retrospective: optional

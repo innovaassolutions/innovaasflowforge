@@ -8,6 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import DashboardSidebar from '@/components/DashboardSidebar'
 import { Menu } from 'lucide-react'
+import { UsageBanner } from '@/components/billing'
 
 interface UserProfile {
   full_name: string
@@ -146,6 +147,10 @@ export default function DashboardLayout({
         {/* Main Content Area - offset by narrow sidebar width on desktop */}
         <div className="flex-1 lg:ml-16 flex flex-col min-h-[calc(100vh-4rem)]">
           <div className="flex-1">
+            {/* Usage Warning Banner - shows for tenants approaching limits */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+              <UsageBanner />
+            </div>
             {children}
           </div>
 

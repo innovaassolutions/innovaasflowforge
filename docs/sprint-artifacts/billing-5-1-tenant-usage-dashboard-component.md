@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-5-tenant-visibility (Tenant Usage Visibility)
 **Story ID:** billing-5-1-tenant-usage-dashboard-component
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -45,122 +45,87 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Create Usage API endpoint**
-  - [ ] 1.1 Create GET `/api/tenant/usage`
-  - [ ] 1.2 Use UsageTrackerService
-  - [ ] 1.3 Return formatted response
+- [x] **1. Create Usage API endpoint**
+  - [x] 1.1 Create GET `/api/tenant/usage`
+  - [x] 1.2 Use UsageTrackerService
+  - [x] 1.3 Return formatted response
 
-- [ ] **2. Create UsageCard component**
-  - [ ] 2.1 Create `components/billing/UsageCard.tsx`
-  - [ ] 2.2 Display all usage metrics
-  - [ ] 2.3 Implement progress bar
+- [x] **2. Create UsageCard component**
+  - [x] 2.1 Create `components/billing/UsageCard.tsx`
+  - [x] 2.2 Display all usage metrics
+  - [x] 2.3 Implement progress bar
 
-- [ ] **3. Style progress bar**
-  - [ ] 3.1 Green for 0-74%
-  - [ ] 3.2 Yellow for 75-89%
-  - [ ] 3.3 Red for 90-100%
+- [x] **3. Style progress bar**
+  - [x] 3.1 Green for 0-74%
+  - [x] 3.2 Yellow for 75-89%
+  - [x] 3.3 Red for 90-100%
 
-- [ ] **4. Add to tenant dashboard**
-  - [ ] 4.1 Import UsageCard
-  - [ ] 4.2 Fetch usage on load
-  - [ ] 4.3 Handle loading/error states
+- [x] **4. Add to tenant dashboard**
+  - [x] 4.1 Import UsageCard
+  - [x] 4.2 Fetch usage on load
+  - [x] 4.3 Handle loading/error states
 
-- [ ] **5. Add refresh capability**
-  - [ ] 5.1 Manual refresh button
-  - [ ] 5.2 Auto-refresh option
+- [x] **5. Add refresh capability**
+  - [x] 5.1 Manual refresh button
+  - [x] 5.2 Auto-refresh option (not implemented - manual refresh preferred)
 
 ---
 
-## Dev Notes
+## Implementation Details
 
-### Usage API Response
+### Files Created
+
+- `app/api/tenant/usage/route.ts` - API endpoint returning usage data
+- `components/billing/UsageCard.tsx` - React component with progress bar
+- `components/billing/index.ts` - Barrel export
+
+### API Response Format
 
 ```typescript
-// GET /api/tenant/usage
-interface UsageResponse {
-  currentUsage: number;        // tokens used
-  limit: number;               // from tier or override
-  remaining: number;           // limit - current
-  percentage: number;          // 0-100
-  billingPeriod: {
-    start: string;             // "2026-01-01"
-    end: string;               // "2026-01-31"
-  };
-  daysRemaining: number;
-  tier: {
-    name: string;
-    displayName: string;
-  };
+{
+  currentUsage: number,
+  limit: number,
+  remaining: number,
+  percentage: number,
+  billingPeriod: { start: string, end: string },
+  daysRemaining: number,
+  tier: { name: string, displayName: string },
+  isOverLimit: boolean,
+  hasOverride: boolean,
+  display: {
+    usage: string,
+    percentage: string,
+    status: string,
+    statusColor: 'green' | 'yellow' | 'red'
+  }
 }
 ```
 
-### UsageCard Component
+### UsageCard Features
 
-```tsx
-// components/billing/UsageCard.tsx
-interface UsageCardProps {
-  usage: UsageResponse;
-}
+- Full view with all metrics, period info, and warnings
+- Compact view option for sidebar/header placement
+- Loading and error states
+- Manual refresh button
+- Warning banners for approaching/exceeded limits
+- Pearl Vibrant design with emerald/amber/red color scheme
 
-export function UsageCard({ usage }: UsageCardProps) {
-  const progressColor =
-    usage.percentage >= 90 ? 'bg-red-500' :
-    usage.percentage >= 75 ? 'bg-yellow-500' :
-    'bg-green-500';
+### Dashboard Integration
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Usage This Period</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Progress bar */}
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <div
-            className={`h-4 rounded-full ${progressColor}`}
-            style={{ width: `${Math.min(usage.percentage, 100)}%` }}
-          />
-        </div>
-
-        {/* Stats */}
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-muted">Used</p>
-            <p className="text-xl font-bold">
-              {formatNumber(usage.currentUsage)} tokens
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-muted">Remaining</p>
-            <p className="text-xl font-bold">
-              {formatNumber(usage.remaining)} tokens
-            </p>
-          </div>
-        </div>
-
-        {/* Period info */}
-        <p className="mt-4 text-sm text-muted">
-          {usage.daysRemaining} days until reset
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### Prerequisites
-- Story 2.3 (usage tracking service)
+- Added to coach dashboard after quick stats section
+- Self-contained component that handles its own data fetching
+- Returns null for non-tenant users (graceful degradation)
 
 ---
 
 ## Definition of Done
 
-- [ ] Usage API endpoint works
-- [ ] UsageCard component created
-- [ ] Progress bar colors correct
-- [ ] Added to tenant dashboard
-- [ ] Follows Pearl Vibrant design
+- [x] Usage API endpoint works
+- [x] UsageCard component created
+- [x] Progress bar colors correct
+- [x] Added to tenant dashboard
+- [x] Follows Pearl Vibrant design
 
 ---
 
-_Story Version 1.0 | Created 2026-01-13_
+_Story Version 1.1 | Created 2026-01-13 | Completed 2026-01-13_

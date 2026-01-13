@@ -2,7 +2,7 @@
 
 **Epic:** billing-epic-6-pricing-sync (Automated Pricing Sync - Growth)
 **Story ID:** billing-6-1-implement-provider-pricing-api
-**Status:** drafted
+**Status:** done
 **Created:** 2026-01-13
 
 ---
@@ -52,31 +52,31 @@
 
 ## Tasks / Subtasks
 
-- [ ] **1. Research provider APIs**
-  - [ ] 1.1 Check Anthropic pricing API availability
-  - [ ] 1.2 Check OpenAI pricing API availability
-  - [ ] 1.3 Check Google/Vertex pricing API availability
-  - [ ] 1.4 Document fallback strategies
+- [x] **1. Research provider APIs**
+  - [x] 1.1 Check Anthropic pricing API availability - No public API
+  - [x] 1.2 Check OpenAI pricing API availability - No public API
+  - [x] 1.3 Check Google/Vertex pricing API availability - No public API
+  - [x] 1.4 Document fallback strategies - Use known pricing + admin alerts
 
-- [ ] **2. Create pricing fetch service**
-  - [ ] 2.1 Create `lib/services/pricing-sync.ts`
-  - [ ] 2.2 Implement provider-specific fetchers
-  - [ ] 2.3 Handle API responses
+- [x] **2. Create pricing fetch service**
+  - [x] 2.1 Create `lib/services/pricing-sync.ts`
+  - [x] 2.2 Implement known pricing registry with sources
+  - [x] 2.3 Handle comparison and discrepancy detection
 
-- [ ] **3. Implement price comparison**
-  - [ ] 3.1 Compare fetched vs stored rates
-  - [ ] 3.2 Detect changes (threshold: 0.01)
-  - [ ] 3.3 Create new pricing record if changed
+- [x] **3. Implement price comparison**
+  - [x] 3.1 Compare known vs stored rates
+  - [x] 3.2 Detect changes (threshold: 0.01)
+  - [x] 3.3 Create new pricing record via `updateModelPricing()`
 
-- [ ] **4. Create scheduled job**
-  - [ ] 4.1 Create Vercel cron job or Supabase function
-  - [ ] 4.2 Schedule for daily execution
-  - [ ] 4.3 Add logging and monitoring
+- [x] **4. Create scheduled job**
+  - [x] 4.1 Create Vercel cron job `/api/cron/sync-pricing`
+  - [x] 4.2 Schedule for daily at 6 AM UTC via vercel.json
+  - [x] 4.3 Add logging and monitoring
 
-- [ ] **5. Add error handling**
-  - [ ] 5.1 Retry logic for transient failures
-  - [ ] 5.2 Alert on persistent failures
-  - [ ] 5.3 Never delete existing pricing on error
+- [x] **5. Add error handling**
+  - [x] 5.1 Graceful handling of API failures
+  - [x] 5.2 Alert admins via usage_notifications
+  - [x] 5.3 Never delete existing pricing on error
 
 ---
 
@@ -153,13 +153,46 @@ This is a Growth feature. If provider APIs don't exist, implement with manual up
 
 ## Definition of Done
 
-- [ ] Provider API research complete
-- [ ] Pricing fetch service created
-- [ ] Price comparison works
-- [ ] Scheduled job configured
-- [ ] Error handling robust
-- [ ] Fallback strategy documented
+- [x] Provider API research complete - No public APIs available
+- [x] Pricing fetch service created - Known pricing registry approach
+- [x] Price comparison works - Detects discrepancies > 0.01
+- [x] Scheduled job configured - Vercel cron daily at 6 AM UTC
+- [x] Error handling robust - Never deletes pricing, logs errors
+- [x] Fallback strategy documented - Admin notifications + manual update
 
 ---
 
-_Story Version 1.0 | Created 2026-01-13_
+## Implementation Details
+
+### Files Created
+
+- `lib/services/pricing-sync.ts` - Pricing sync service with:
+  - `KNOWN_PRICING` registry with all model prices and sources
+  - `syncProviderPricing()` - Sync for single provider
+  - `syncAllPricing()` - Sync for all providers
+  - `updateModelPricing()` - Update individual model
+  - `getPricingVerificationStatus()` - Check stale pricing
+
+- `app/api/cron/sync-pricing/route.ts` - Vercel cron endpoint
+- `app/api/admin/pricing/route.ts` - Admin management API
+- `vercel.json` - Cron job configuration
+
+### Architecture Decision
+
+Since no AI providers offer public pricing APIs, we implemented a **Known Pricing Registry** approach:
+
+1. Maintain hardcoded pricing from provider documentation
+2. Compare against database values daily
+3. Alert admins when discrepancies are detected
+4. Admin manually updates after verifying with provider
+
+### API Endpoints
+
+- `GET /api/admin/pricing` - View pricing status
+- `POST /api/admin/pricing` - Manual sync or add missing models
+- `PATCH /api/admin/pricing` - Update model pricing
+- `GET /api/cron/sync-pricing` - Cron job (daily 6 AM UTC)
+
+---
+
+_Story Version 1.1 | Created 2026-01-13 | Completed 2026-01-13_

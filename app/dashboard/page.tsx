@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
-import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail, GraduationCap, Key, FileText } from 'lucide-react'
+import { Building2, BarChart3, Users, Plus, Trash2, UserCircle, CheckCircle, Clock, Mail, GraduationCap, Key, FileText, Zap } from 'lucide-react'
+import { UsageCard } from '@/components/billing'
 import { apiUrl } from '@/lib/api-url'
 import { Button } from '@/components/ui/button'
 
@@ -384,6 +385,9 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Usage Card */}
+          <UsageCard className="mb-8" />
 
           {/* Clients List */}
           {loading ? (
