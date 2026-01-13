@@ -19,6 +19,8 @@ import {
 } from '@/lib/agents/reflection-agent'
 import { processEnhancement, type EnhancedResults } from '@/lib/agents/enhancement-agent'
 import { type Archetype } from '@/lib/agents/archetype-constitution'
+import { logLLMUsage } from '@/lib/usage/log-usage'
+import { checkUsageLimit, createUsageLimitError } from '@/lib/services/usage-tracker'
 
 function getServiceClient() {
   return createClient(
@@ -120,6 +122,16 @@ export async function POST(
       )
     }
 
+    // Check usage limit before processing AI request (Story 2.4)
+    const usageCheck = await checkUsageLimit(tenant.id)
+    if (!usageCheck.allowed) {
+      const errorResponse = createUsageLimitError(usageCheck)
+      return NextResponse.json(
+        { success: false, error: errorResponse.body.message as string },
+        { status: errorResponse.status, headers: errorResponse.headers }
+      )
+    }
+
     // Extract archetype results from metadata
     const metadata = session.metadata as { archetype_results?: ArchetypeResultsData } | null
     const archetypeResults = metadata?.archetype_results
@@ -158,6 +170,22 @@ export async function POST(
       },
       session.client_name
     )
+
+    // Log LLM usage for billing (with separate input/output tokens)
+    if (agentResponse.usage) {
+      await logLLMUsage(
+        tenant.id,
+        agentResponse.usage.model,
+        agentResponse.usage.input_tokens,
+        agentResponse.usage.output_tokens,
+        {
+          session_id: session.id,
+          assessment_type: 'archetype_reflection',
+          exchange_count: agentResponse.state.exchange_count,
+        },
+        supabase
+      )
+    }
 
     // Build updated conversation history
     const updatedMessages: ReflectionMessage[] = [...reflectionMessages]

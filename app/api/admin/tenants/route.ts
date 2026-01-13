@@ -15,6 +15,9 @@ interface TenantRecord {
   display_name: string | null
   tenant_type: string | null
   subscription_tier: string | null
+  tier_id: string | null
+  usage_limit_override: number | null
+  billing_period_start: string | null
   is_active: boolean | null
   created_at: string | null
   updated_at: string | null
@@ -24,6 +27,12 @@ interface TenantRecord {
     email: string | null
     full_name: string | null
     last_seen_at: string | null
+  } | null
+  subscription_tiers: {
+    id: string
+    name: string
+    display_name: string | null
+    monthly_token_limit: number | null
   } | null
 }
 
@@ -62,14 +71,16 @@ export async function GET(request: NextRequest) {
     const tenantType = searchParams.get('type') // 'coach', 'consultant', 'school'
     const search = searchParams.get('search')
 
-    // Fetch tenants (left join user_profiles - some tenants may not have owners)
+    // Fetch tenants (left join user_profiles and subscription_tiers)
     let query = supabaseAdmin
       .from('tenant_profiles')
       .select(`
         id, slug, display_name, tenant_type,
-        subscription_tier, is_active, created_at, updated_at,
+        subscription_tier, tier_id, usage_limit_override, billing_period_start,
+        is_active, created_at, updated_at,
         user_id, custom_domain,
-        user_profiles(email, full_name, last_seen_at)
+        user_profiles(email, full_name, last_seen_at),
+        subscription_tiers(id, name, display_name, monthly_token_limit)
       `)
       .order('created_at', { ascending: false })
 
@@ -134,25 +145,43 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Enrich tenants with counts
-    let enrichedTenants = tenants?.map((tenant) => ({
-      id: tenant.id,
-      slug: tenant.slug,
-      display_name: tenant.display_name,
-      tenant_type: tenant.tenant_type,
-      subscription_tier: tenant.subscription_tier,
-      is_active: tenant.is_active,
-      custom_domain: tenant.custom_domain,
-      created_at: tenant.created_at,
-      updated_at: tenant.updated_at,
-      owner: {
-        email: tenant.user_profiles?.email,
-        name: tenant.user_profiles?.full_name,
-        last_seen_at: tenant.user_profiles?.last_seen_at,
-      },
-      sessions: sessionCounts.get(tenant.id) || { total: 0, completed: 0 },
-      campaigns: campaignCounts.get(tenant.id) || { total: 0, completed: 0 },
-    }))
+    // Enrich tenants with counts and tier info
+    let enrichedTenants = tenants?.map((tenant) => {
+      // Calculate effective usage limit (override takes precedence)
+      const effectiveLimit = tenant.usage_limit_override
+        ?? tenant.subscription_tiers?.monthly_token_limit
+        ?? null
+
+      return {
+        id: tenant.id,
+        slug: tenant.slug,
+        display_name: tenant.display_name,
+        tenant_type: tenant.tenant_type,
+        subscription_tier: tenant.subscription_tier,
+        is_active: tenant.is_active,
+        custom_domain: tenant.custom_domain,
+        created_at: tenant.created_at,
+        updated_at: tenant.updated_at,
+        owner: {
+          email: tenant.user_profiles?.email,
+          name: tenant.user_profiles?.full_name,
+          last_seen_at: tenant.user_profiles?.last_seen_at,
+        },
+        tier: tenant.subscription_tiers
+          ? {
+              id: tenant.subscription_tiers.id,
+              name: tenant.subscription_tiers.name,
+              displayName: tenant.subscription_tiers.display_name,
+              monthlyTokenLimit: tenant.subscription_tiers.monthly_token_limit,
+            }
+          : null,
+        usageLimitOverride: tenant.usage_limit_override,
+        effectiveLimit,
+        billingPeriodStart: tenant.billing_period_start,
+        sessions: sessionCounts.get(tenant.id) || { total: 0, completed: 0 },
+        campaigns: campaignCounts.get(tenant.id) || { total: 0, completed: 0 },
+      }
+    })
 
     // Filter by search if provided
     if (search) {

@@ -11,37 +11,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { processArchetypeMessage, TenantContext } from '@/lib/agents/archetype-interview-agent'
 import { ArchetypeSessionState } from '@/lib/agents/archetype-constitution'
+import { logUsageEvent, logLLMUsage } from '@/lib/usage/log-usage'
+import { checkUsageLimit, createUsageLimitError } from '@/lib/services/usage-tracker'
 
 function getServiceClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-}
-
-/**
- * Log a usage event for billing/analytics
- */
-async function logUsageEvent(
-  supabase: ReturnType<typeof getServiceClient>,
-  tenantId: string,
-  eventType: 'session_started' | 'llm_request' | 'session_completed',
-  eventData: Record<string, unknown>,
-  tokensUsed?: number,
-  modelUsed?: string
-) {
-  try {
-    await supabase.from('usage_events').insert({
-      tenant_id: tenantId,
-      event_type: eventType,
-      event_data: eventData,
-      tokens_used: tokensUsed || 0,
-      model_used: modelUsed || null,
-    })
-  } catch (error) {
-    // Log but don't fail the request if usage tracking fails
-    console.error('Failed to log usage event:', error)
-  }
 }
 
 interface MessageRequest {
@@ -99,6 +76,16 @@ export async function POST(
         { success: false, error: 'This session has already been completed' },
         { status: 400 }
       )
+    }
+
+    // Check usage limit before processing AI request (Story 2.4)
+    const usageCheck = await checkUsageLimit(tenant.id)
+    if (!usageCheck.allowed) {
+      const errorResponse = createUsageLimitError(usageCheck)
+      return NextResponse.json(errorResponse.body, {
+        status: errorResponse.status,
+        headers: errorResponse.headers,
+      })
     }
 
     // Get or create agent session
@@ -165,27 +152,31 @@ export async function POST(
       updates.client_status = 'in_progress'
 
       // Log session_started event
-      await logUsageEvent(supabase, tenant.id, 'session_started', {
-        session_id: session.id,
-        assessment_type: 'archetype',
-        client_name: session.client_name,
-      })
+      await logUsageEvent({
+        tenantId: tenant.id,
+        eventType: 'session_started',
+        eventData: {
+          session_id: session.id,
+          assessment_type: 'archetype',
+          client_name: session.client_name,
+        },
+      }, supabase)
     }
 
-    // Log llm_request event for this message
+    // Log llm_request event for this message (with separate input/output tokens for accurate cost)
     if (agentResponse.usage) {
-      await logUsageEvent(
-        supabase,
+      await logLLMUsage(
         tenant.id,
-        'llm_request',
+        agentResponse.usage.model,
+        agentResponse.usage.input_tokens,
+        agentResponse.usage.output_tokens,
         {
           session_id: session.id,
           assessment_type: 'archetype',
           prompt_type: isFirstMessage ? 'opening' : 'conversation',
           question_index: agentResponse.sessionState.current_question_index,
         },
-        agentResponse.usage.input_tokens + agentResponse.usage.output_tokens,
-        agentResponse.usage.model
+        supabase
       )
     }
 
@@ -204,13 +195,17 @@ export async function POST(
       }
 
       // Log session_completed event
-      await logUsageEvent(supabase, tenant.id, 'session_completed', {
-        session_id: session.id,
-        assessment_type: 'archetype',
-        default_archetype: agentResponse.sessionState.default_archetype,
-        authentic_archetype: agentResponse.sessionState.authentic_archetype,
-        is_aligned: agentResponse.sessionState.is_aligned,
-      })
+      await logUsageEvent({
+        tenantId: tenant.id,
+        eventType: 'session_completed',
+        eventData: {
+          session_id: session.id,
+          assessment_type: 'archetype',
+          default_archetype: agentResponse.sessionState.default_archetype,
+          authentic_archetype: agentResponse.sessionState.authentic_archetype,
+          is_aligned: agentResponse.sessionState.is_aligned,
+        },
+      }, supabase)
     }
 
     await supabase

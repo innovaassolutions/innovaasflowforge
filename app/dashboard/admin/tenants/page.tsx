@@ -5,6 +5,7 @@
  *
  * Displays tenant list with tabs for filtering by type.
  * Shows session/campaign counts per tenant.
+ * Includes tier management functionality (Story 2.5).
  * Admin-only access.
  */
 
@@ -23,7 +24,18 @@ import {
   XCircle,
   ExternalLink,
   Globe,
+  Settings,
+  X,
+  Zap,
+  TrendingUp,
 } from 'lucide-react'
+
+interface TierInfo {
+  id: string
+  name: string
+  displayName: string
+  monthlyTokenLimit: number | null
+}
 
 interface Tenant {
   id: string
@@ -48,6 +60,11 @@ interface Tenant {
     total: number
     completed: number
   }
+  // Tier management fields (Story 2.5)
+  tier?: TierInfo | null
+  usageLimitOverride?: number | null
+  effectiveLimit?: number
+  billingPeriodStart?: string | null
 }
 
 interface TenantsData {
@@ -75,6 +92,15 @@ export default function AdminTenantsPage() {
   // Get initial tab from URL params
   const initialTab = (searchParams?.get('type') as TabType) || 'all'
   const [activeTab, setActiveTab] = useState<TabType>(initialTab)
+
+  // Tier management state (Story 2.5)
+  const [availableTiers, setAvailableTiers] = useState<TierInfo[]>([])
+  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null)
+  const [showTierModal, setShowTierModal] = useState(false)
+  const [selectedTierId, setSelectedTierId] = useState<string>('')
+  const [overrideValue, setOverrideValue] = useState<string>('')
+  const [enableOverride, setEnableOverride] = useState(false)
+  const [savingTier, setSavingTier] = useState(false)
 
   useEffect(() => {
     checkAdminAndLoadData()
@@ -108,6 +134,18 @@ export default function AdminTenantsPage() {
     }
 
     setIsAdmin(true)
+    loadAvailableTiers()
+  }
+
+  async function loadAvailableTiers() {
+    try {
+      const response = await fetch('/api/admin/tiers')
+      if (!response.ok) return
+      const data = await response.json()
+      setAvailableTiers(data.tiers || [])
+    } catch (err) {
+      console.error('Error loading tiers:', err)
+    }
   }
 
   async function loadTenants() {
@@ -162,6 +200,74 @@ export default function AdminTenantsPage() {
       day: 'numeric',
       year: 'numeric',
     })
+  }
+
+  function formatTokens(n: number | null | undefined): string {
+    if (n === null || n === undefined) return 'Unlimited'
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
+    return n.toString()
+  }
+
+  function openTierModal(tenant: Tenant) {
+    setSelectedTenant(tenant)
+    setSelectedTierId(tenant.tier?.id || '')
+    setOverrideValue(tenant.usageLimitOverride?.toString() || '')
+    setEnableOverride(tenant.usageLimitOverride !== null && tenant.usageLimitOverride !== undefined)
+    setShowTierModal(true)
+  }
+
+  function closeTierModal() {
+    setSelectedTenant(null)
+    setShowTierModal(false)
+    setSelectedTierId('')
+    setOverrideValue('')
+    setEnableOverride(false)
+  }
+
+  async function saveTierChanges() {
+    if (!selectedTenant) return
+
+    setSavingTier(true)
+    try {
+      const response = await fetch(`/api/admin/tenants/${selectedTenant.id}/tier`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tierId: selectedTierId || null,
+          usageLimitOverride: enableOverride && overrideValue
+            ? parseInt(overrideValue, 10)
+            : null,
+        }),
+      })
+
+      if (!response.ok) {
+        const errData = await response.json()
+        throw new Error(errData.error || 'Failed to update tier')
+      }
+
+      // Reload tenants to reflect changes
+      await loadTenants()
+      closeTierModal()
+    } catch (err: any) {
+      console.error('Error saving tier:', err)
+      setError(err.message || 'Failed to save tier changes')
+    } finally {
+      setSavingTier(false)
+    }
+  }
+
+  function getTierBadgeColor(tierName: string | null | undefined): string {
+    switch (tierName?.toLowerCase()) {
+      case 'starter':
+        return 'bg-emerald-100 text-emerald-700'
+      case 'pro':
+        return 'bg-blue-100 text-blue-700'
+      case 'enterprise':
+        return 'bg-purple-100 text-purple-700'
+      default:
+        return 'bg-muted text-muted-foreground'
+    }
   }
 
   function getTypeIcon(type: string) {
@@ -339,11 +445,11 @@ export default function AdminTenantsPage() {
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Tenant</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Type</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Tier</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Owner</th>
                 <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Sessions</th>
-                <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Campaigns</th>
                 <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Last Active</th>
+                <th className="text-center px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -372,6 +478,19 @@ export default function AdminTenantsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div>
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getTierBadgeColor(tenant.tier?.name)}`}>
+                        <Zap className="w-3 h-3" />
+                        {tenant.tier?.displayName || tenant.tier?.name || 'No Tier'}
+                      </span>
+                      {tenant.usageLimitOverride && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          Override: {formatTokens(tenant.usageLimitOverride)}
+                        </p>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div>
                       <p className="text-sm text-foreground">{tenant.owner?.name || 'Unknown'}</p>
                       <p className="text-xs text-muted-foreground">{tenant.owner?.email}</p>
                     </div>
@@ -380,15 +499,7 @@ export default function AdminTenantsPage() {
                     <div>
                       <p className="text-sm font-medium text-foreground">{tenant.sessions.total}</p>
                       <p className="text-xs text-muted-foreground">
-                        {tenant.sessions.completed} completed
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{tenant.campaigns.total}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {tenant.campaigns.completed} completed
+                        {tenant.sessions.completed} done
                       </p>
                     </div>
                   </td>
@@ -405,10 +516,15 @@ export default function AdminTenantsPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(tenant.owner?.last_seen_at)}
-                    </p>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => openTierModal(tenant)}
+                      className="p-2 rounded-lg text-muted-foreground hover:text-foreground
+                                 hover:bg-muted transition-colors"
+                      title="Manage Tier"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -423,6 +539,161 @@ export default function AdminTenantsPage() {
           </table>
         </div>
       </div>
+
+      {/* Tier Management Modal (Story 2.5) */}
+      {showTierModal && selectedTenant && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={closeTierModal}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-card border border-border rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-bold text-foreground">
+                  Manage Subscription
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {selectedTenant.display_name}
+                </p>
+              </div>
+              <button
+                onClick={closeTierModal}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="space-y-6">
+              {/* Tier Selection */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Subscription Tier
+                </label>
+                <select
+                  value={selectedTierId}
+                  onChange={(e) => setSelectedTierId(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg
+                             text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">No Tier</option>
+                  {availableTiers.map((tier) => (
+                    <option key={tier.id} value={tier.id}>
+                      {tier.displayName || tier.name} ({formatTokens(tier.monthlyTokenLimit)} tokens)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Override Toggle */}
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={enableOverride}
+                    onChange={(e) => setEnableOverride(e.target.checked)}
+                    className="w-4 h-4 rounded border-border accent-purple-600"
+                  />
+                  <span className="text-sm font-medium text-foreground">
+                    Enable limit override
+                  </span>
+                </label>
+                <p className="text-xs text-muted-foreground mt-1 ml-7">
+                  Override the tier limit with a custom value
+                </p>
+              </div>
+
+              {/* Override Value */}
+              {enableOverride && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Custom Token Limit
+                  </label>
+                  <input
+                    type="number"
+                    value={overrideValue}
+                    onChange={(e) => setOverrideValue(e.target.value)}
+                    placeholder="e.g., 5000000"
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg
+                               text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Enter the monthly token limit (e.g., 5000000 for 5M tokens)
+                  </p>
+                </div>
+              )}
+
+              {/* Current Info */}
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-foreground mb-2">
+                  Current Settings
+                </h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tier:</span>
+                    <span className="text-foreground">
+                      {selectedTenant.tier?.displayName || selectedTenant.tier?.name || 'None'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tier Limit:</span>
+                    <span className="text-foreground">
+                      {formatTokens(selectedTenant.tier?.monthlyTokenLimit)}
+                    </span>
+                  </div>
+                  {selectedTenant.usageLimitOverride && (
+                    <div className="flex justify-between">
+                      <span className="text-amber-600">Override:</span>
+                      <span className="text-amber-600 font-medium">
+                        {formatTokens(selectedTenant.usageLimitOverride)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between pt-2 border-t border-border">
+                    <span className="text-muted-foreground">Effective Limit:</span>
+                    <span className="text-foreground font-medium">
+                      {formatTokens(selectedTenant.effectiveLimit)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={closeTierModal}
+                  className="flex-1 px-4 py-2 border border-border rounded-lg text-sm font-medium
+                             text-foreground hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveTierChanges}
+                  disabled={savingTier}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium
+                             hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed
+                             transition-colors flex items-center justify-center gap-2"
+                >
+                  {savingTier ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

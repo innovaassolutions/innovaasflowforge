@@ -8,6 +8,7 @@ import {
   NoInterviewsError,
   DatabaseError
 } from '@/lib/errors/synthesis-errors'
+import { UsageAccumulator, createSynthesisAccumulator } from '@/lib/usage/usage-accumulator'
 
 // ============================================================================
 // Type Definitions
@@ -67,6 +68,8 @@ interface CampaignInfo {
   facilitator_name: string
   description?: string
   report_tier?: ReportTier
+  created_by?: string
+  company_profile_id?: string
 }
 
 // ============================================================================
@@ -191,7 +194,7 @@ async function fetchCampaignInfo(campaignId: string): Promise<CampaignInfo> {
   // Try to fetch with report_tier first (for after migration)
   let { data: campaign, error } = await (supabaseAdmin
     .from('campaigns') as any)
-    .select('id, name, company_name, facilitator_name, description, report_tier')
+    .select('id, name, company_name, facilitator_name, description, report_tier, created_by, company_profile_id')
     .eq('id', campaignId)
     .single()
 
@@ -200,7 +203,7 @@ async function fetchCampaignInfo(campaignId: string): Promise<CampaignInfo> {
     console.log('[fetchCampaignInfo] report_tier column not found, fetching without it')
     const fallback = await (supabaseAdmin
       .from('campaigns') as any)
-      .select('id, name, company_name, facilitator_name, description')
+      .select('id, name, company_name, facilitator_name, description, created_by, company_profile_id')
       .eq('id', campaignId)
       .single()
 
@@ -213,6 +216,36 @@ async function fetchCampaignInfo(campaignId: string): Promise<CampaignInfo> {
   }
 
   return campaign
+}
+
+/**
+ * Resolve tenant ID for usage attribution
+ *
+ * For consultant campaigns, we attribute to the consultant's tenant.
+ * Falls back to company_profile_id if no tenant found.
+ */
+async function resolveTenantId(campaignInfo: CampaignInfo): Promise<string | null> {
+  // Try to find consultant's tenant_profile
+  if (campaignInfo.created_by) {
+    const { data: tenant } = await (supabaseAdmin
+      .from('tenant_profiles') as any)
+      .select('id')
+      .eq('user_id', campaignInfo.created_by)
+      .single()
+
+    if (tenant?.id) {
+      return tenant.id
+    }
+  }
+
+  // Fall back to company_profile_id (the company being assessed)
+  // This ensures we track usage somewhere even if no tenant found
+  if (campaignInfo.company_profile_id) {
+    return campaignInfo.company_profile_id
+  }
+
+  console.warn('[resolveTenantId] Could not resolve tenant for campaign', campaignInfo.id)
+  return null
 }
 
 // ============================================================================
@@ -299,7 +332,8 @@ IMPORTANT: Return ONLY valid JSON, no additional text.`
 async function analyzeDimension(
   dimension: { id: string; name: string; description: string },
   transcripts: SessionTranscript[],
-  modelId: string
+  modelId: string,
+  accumulator?: UsageAccumulator
 ): Promise<DimensionalScore> {
   // Wrap API call with retry logic
   return retryWithBackoff(async () => {
@@ -317,6 +351,11 @@ async function analyzeDimension(
           }
         ]
       })
+
+      // Track usage if accumulator provided
+      if (accumulator) {
+        await accumulator.addFromResponse(`dimension_${dimension.id}`, response)
+      }
 
       const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}'
 
@@ -357,7 +396,8 @@ async function generateExecutiveSummary(
   campaignInfo: CampaignInfo,
   transcripts: SessionTranscript[],
   pillars: PillarScore[],
-  modelId: string
+  modelId: string,
+  accumulator?: UsageAccumulator
 ): Promise<string> {
   return retryWithBackoff(async () => {
     try {
@@ -404,6 +444,11 @@ Return ONLY the executive summary text, no JSON or formatting.`
         ]
       })
 
+      // Track usage if accumulator provided
+      if (accumulator) {
+        await accumulator.addFromResponse('executive_summary', response)
+      }
+
       return response.content[0].type === 'text' ? response.content[0].text : ''
     } catch (error) {
       throw classifyAnthropicError(error)
@@ -417,7 +462,8 @@ Return ONLY the executive summary text, no JSON or formatting.`
 async function extractThemesAndContradictions(
   transcripts: SessionTranscript[],
   pillars: PillarScore[],
-  modelId: string
+  modelId: string,
+  accumulator?: UsageAccumulator
 ): Promise<{ themes: string[]; contradictions: string[] }> {
   const allFindings = pillars.flatMap(p =>
     p.dimensions.flatMap(d => d.keyFindings)
@@ -458,6 +504,11 @@ Return ONLY valid JSON, no additional text.`
     ]
   })
 
+  // Track usage if accumulator provided
+  if (accumulator) {
+    await accumulator.addFromResponse('themes_contradictions', response)
+  }
+
   const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}'
 
   try {
@@ -483,7 +534,11 @@ Return ONLY valid JSON, no additional text.`
 /**
  * Generate prioritized recommendations
  */
-async function generateRecommendations(pillars: PillarScore[], modelId: string): Promise<string[]> {
+async function generateRecommendations(
+  pillars: PillarScore[],
+  modelId: string,
+  accumulator?: UsageAccumulator
+): Promise<string[]> {
   // Get critical and important priorities
   const criticalDimensions = pillars.flatMap(p =>
     p.dimensions.filter(d => d.priority === 'critical')
@@ -531,6 +586,11 @@ Return ONLY valid JSON, no additional text.`
       }
     ]
   })
+
+  // Track usage if accumulator provided
+  if (accumulator) {
+    await accumulator.addFromResponse('recommendations', response)
+  }
 
   const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}'
 
@@ -597,6 +657,9 @@ function extractStakeholderPerspectives(transcripts: SessionTranscript[]): Stake
 export async function synthesizeCampaign(campaignId: string): Promise<ReadinessAssessment> {
   console.log(`[Synthesis] Starting synthesis for campaign ${campaignId}`)
 
+  // Create accumulator for usage tracking (will be initialized after we have tenant ID)
+  let accumulator: UsageAccumulator | undefined
+
   try {
     // Fetch campaign data with error handling
     let campaignInfo: CampaignInfo
@@ -613,6 +676,15 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
         campaignId,
         error: error instanceof Error ? error.message : 'Unknown error'
       })
+    }
+
+    // Resolve tenant ID and create usage accumulator
+    const tenantId = await resolveTenantId(campaignInfo)
+    if (tenantId) {
+      accumulator = createSynthesisAccumulator(tenantId, campaignId)
+      console.log(`[Synthesis] Usage tracking enabled for tenant ${tenantId}`)
+    } else {
+      console.warn('[Synthesis] No tenant found - usage will not be tracked')
     }
 
     // Determine which AI model to use based on report tier
@@ -637,7 +709,7 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
 
       for (const dimension of pillarData.dimensions) {
         console.log(`[Synthesis]   - Analyzing dimension: ${dimension.name}`)
-        const score = await analyzeDimension(dimension, transcripts, modelId)
+        const score = await analyzeDimension(dimension, transcripts, modelId, accumulator)
         dimensionScores.push(score)
       }
 
@@ -657,16 +729,28 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
     }, 0)
 
     console.log('[Synthesis] Generating executive summary...')
-    const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars, modelId)
+    const executiveSummary = await generateExecutiveSummary(campaignInfo, transcripts, pillars, modelId, accumulator)
 
     console.log('[Synthesis] Extracting themes and contradictions...')
-    const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars, modelId)
+    const { themes, contradictions } = await extractThemesAndContradictions(transcripts, pillars, modelId, accumulator)
 
     console.log('[Synthesis] Generating recommendations...')
-    const recommendations = await generateRecommendations(pillars, modelId)
+    const recommendations = await generateRecommendations(pillars, modelId, accumulator)
 
     console.log('[Synthesis] Extracting stakeholder perspectives...')
     const stakeholderPerspectives = extractStakeholderPerspectives(transcripts)
+
+    // Log consolidated usage
+    if (accumulator?.hasUsage()) {
+      await accumulator.logConsolidated({
+        campaignId,
+        campaignName: campaignInfo.name,
+        companyName: campaignInfo.company_name,
+        stakeholderCount: transcripts.length,
+        reportTier,
+        modelId,
+      })
+    }
 
     console.log('[Synthesis] Synthesis complete!')
 
@@ -680,6 +764,14 @@ export async function synthesizeCampaign(campaignId: string): Promise<ReadinessA
       stakeholderPerspectives
     }
   } catch (error) {
+    // Log partial usage if we have any (synthesis failed partway through)
+    if (accumulator?.hasUsage()) {
+      await accumulator.logPartial(
+        error instanceof Error ? error : 'Unknown synthesis error',
+        { campaignId }
+      )
+    }
+
     // Log the error for debugging
     console.error('[Synthesis] Synthesis failed:', error)
 

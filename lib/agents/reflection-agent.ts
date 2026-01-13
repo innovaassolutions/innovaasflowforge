@@ -50,6 +50,11 @@ export interface ReflectionAgentResponse {
   message: string
   state: ReflectionState
   isComplete: boolean
+  usage?: {
+    input_tokens: number
+    output_tokens: number
+    model: string
+  }
 }
 
 /**
@@ -106,8 +111,9 @@ export async function processReflectionMessage(
   }
 
   try {
+    const model = 'claude-sonnet-4-20250514'
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model,
       max_tokens: 1024,
       system: systemPrompt,
       messages,
@@ -123,6 +129,11 @@ export async function processReflectionMessage(
       message: assistantMessage,
       state: newState,
       isComplete: newState.is_complete,
+      usage: {
+        input_tokens: response.usage.input_tokens,
+        output_tokens: response.usage.output_tokens,
+        model,
+      },
     }
   } catch (error) {
     console.error('Reflection agent error:', error)
