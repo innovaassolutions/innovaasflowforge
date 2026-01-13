@@ -3,8 +3,10 @@
  *
  * Fetches archetype results for a completed coaching session.
  * Returns session data, archetype results, and tenant branding.
+ * Respects tenant's results_disclosure setting (full/teaser/none).
  *
  * Story: 1.1 Results Page Foundation
+ * Updated: 3-5 Results Disclosure
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -31,8 +33,11 @@ export interface ArchetypeResultsData {
   completed_at: string
 }
 
+export type ResultsDisclosure = 'full' | 'teaser' | 'none'
+
 export interface ResultsResponse {
   success: boolean
+  disclosure?: ResultsDisclosure
   session?: {
     id: string
     client_name: string
@@ -45,25 +50,25 @@ export interface ResultsResponse {
     primary_archetype: {
       key: Archetype
       name: string
-      core_traits: string[]
-      under_pressure: string
-      when_grounded: string
-      overuse_signals: string[]
+      core_traits?: string[]
+      under_pressure?: string
+      when_grounded?: string
+      overuse_signals?: string[]
     }
     authentic_archetype: {
       key: Archetype
       name: string
-      core_traits: string[]
-      under_pressure: string
-      when_grounded: string
-      overuse_signals: string[]
+      core_traits?: string[]
+      under_pressure?: string
+      when_grounded?: string
+      overuse_signals?: string[]
     }
     tension_pattern: {
       has_tension: boolean
       description?: string
       triggers?: string[]
     }
-    scores: ArchetypeResultsData['scores']
+    scores?: ArchetypeResultsData['scores']
   }
   enhancedResults?: EnhancedResults | null
   tenant?: {
@@ -71,6 +76,7 @@ export interface ResultsResponse {
     display_name: string
     slug: string
     brand_config: Record<string, unknown>
+    contact_email?: string
   }
   error?: string
 }
@@ -86,7 +92,7 @@ export async function GET(
     // Verify tenant exists and is active
     const { data: tenant, error: tenantError } = await supabase
       .from('tenant_profiles')
-      .select('id, display_name, slug, is_active, brand_config')
+      .select('id, display_name, slug, is_active, brand_config, email_config, results_disclosure')
       .eq('slug', slug)
       .single()
 
@@ -163,8 +169,17 @@ export async function GET(
         .eq('id', session.id)
     }
 
-    return NextResponse.json({
+    // Get disclosure level (default to 'full' for backwards compatibility)
+    const disclosure = (tenant.results_disclosure as ResultsDisclosure) || 'full'
+
+    // Extract contact email from email_config
+    const emailConfig = tenant.email_config as { replyTo?: string } | null
+    const contactEmail = emailConfig?.replyTo
+
+    // Build response based on disclosure level
+    const baseResponse = {
       success: true,
+      disclosure,
       session: {
         id: session.id,
         client_name: session.client_name,
@@ -173,6 +188,43 @@ export async function GET(
         reflection_status: session.reflection_status || 'pending',
         completed_at: session.completed_at,
       },
+      tenant: {
+        id: tenant.id,
+        display_name: tenant.display_name,
+        slug: tenant.slug,
+        brand_config: tenant.brand_config as Record<string, unknown>,
+        contact_email: contactEmail,
+      }
+    }
+
+    // For 'none' disclosure: only return tenant info (no results)
+    if (disclosure === 'none') {
+      return NextResponse.json(baseResponse)
+    }
+
+    // For 'teaser' disclosure: only archetype names, no details
+    if (disclosure === 'teaser') {
+      return NextResponse.json({
+        ...baseResponse,
+        results: {
+          primary_archetype: {
+            key: archetypeResults.default_archetype,
+            name: primaryArchetypeData.name
+          },
+          authentic_archetype: {
+            key: archetypeResults.authentic_archetype,
+            name: authenticArchetypeData.name
+          },
+          tension_pattern: {
+            has_tension: hasTension
+          }
+        }
+      })
+    }
+
+    // For 'full' disclosure: return everything
+    return NextResponse.json({
+      ...baseResponse,
       results: {
         primary_archetype: {
           ...primaryArchetypeData,
@@ -186,12 +238,6 @@ export async function GET(
         scores: archetypeResults.scores
       },
       enhancedResults: session.enhanced_results as EnhancedResults | null,
-      tenant: {
-        id: tenant.id,
-        display_name: tenant.display_name,
-        slug: tenant.slug,
-        brand_config: tenant.brand_config as Record<string, unknown>
-      }
     })
   } catch (error) {
     console.error('Results fetch error:', error)

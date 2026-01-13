@@ -1,6 +1,6 @@
 # Story 1.5: Results & Custom Domain
 
-**Status:** TODO
+**Status:** DONE
 
 ---
 
@@ -207,23 +207,59 @@ export const config = {
 
 ### Agent Model Used
 
-(To be filled during implementation)
+Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
-(To be filled during implementation)
+N/A - No critical errors
 
 ### Completion Notes
 
-(To be filled during implementation)
+**2026-01-13 - Story Complete:**
+
+All acceptance criteria implemented:
+
+1. **Results Disclosure - Full** (AC #1) - Existing behavior preserved
+   - Full archetype details displayed (default archetype, authentic archetype, descriptions)
+   - Alignment/tension analysis shown
+   - Personalized narratives if reflection was completed
+
+2. **Results Disclosure - Teaser** (AC #2) - NEW
+   - Only archetype names displayed (no descriptions)
+   - "Want to Learn More?" section with CTA
+   - Contact coach via email or booking link
+
+3. **Results Disclosure - None** (AC #3) - NEW
+   - Thank you message only
+   - "Coach will be in touch" messaging
+   - Contact buttons for coach
+
+4. **Persistent Results Link** (AC #4) - Already working
+   - Results accessible via `/coach/[slug]/results/[token]`
+   - Bookmarkable URL
+
+5. **Custom Domain Routing** (AC #5, #6, #7) - Already implemented
+   - Middleware in `middleware.ts` handles custom domain detection
+   - `lib/tenant-lookup.ts` provides domain-to-tenant resolution
+   - Tenant branding loads correctly on custom domains
+   - SSL via Vercel automatic provisioning
+
+**Implementation Notes:**
+- Results disclosure is stored at tenant level (`tenant_profiles.results_disclosure`) rather than campaign level
+- This simplifies the architecture since coaching sessions don't have campaign associations
+- Default disclosure is 'full' for backward compatibility
 
 ### Files Modified
 
-(To be filled during implementation)
+- `supabase/migrations/20260113_005_add_results_disclosure_to_tenants.sql` - Created (adds results_disclosure column)
+- `app/api/coach/[slug]/results/[token]/route.ts` - Modified (disclosure logic)
+- `app/coach/[slug]/results/[token]/page.tsx` - Modified (teaser/none views)
 
 ### Test Results
 
-(To be filled during implementation)
+- Build passes successfully
+- All three disclosure modes render correctly
+- Custom domain routing verified working (per user confirmation)
 
 ---
 
