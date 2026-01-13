@@ -99,10 +99,22 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
   // Coach-specific navigation
   const coachNavItems = isCoach ? [
     {
+      name: 'Pipeline',
+      href: '/dashboard/coaching',
+      icon: LayoutDashboard,
+      matchPaths: ['/dashboard/coaching']
+    },
+    {
       name: 'Clients',
       href: '/dashboard/coaching/clients',
       icon: UserCircle,
       matchPaths: ['/dashboard/coaching/clients']
+    },
+    {
+      name: 'Campaigns',
+      href: '/dashboard/coaching/campaigns',
+      icon: BarChart3,
+      matchPaths: ['/dashboard/coaching/campaigns']
     }
   ] : []
 
