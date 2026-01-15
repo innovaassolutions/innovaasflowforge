@@ -623,6 +623,13 @@ export default function ResultsPage() {
           </div>
         </section>
 
+        {/* Assessment Complete - PDF Download & Booking */}
+        <AssessmentCompleteSection
+          slug={slug}
+          token={token}
+          bookingConfig={tenant.brand_config.booking}
+        />
+
         {/* Footer */}
         <ResultsFooter tenant={tenant} />
       </main>
@@ -772,5 +779,168 @@ function ContactButtons({ contactEmail, tenant, variant = 'default' }: ContactBu
         </p>
       )}
     </div>
+  )
+}
+
+interface AssessmentCompleteSectionProps {
+  slug: string
+  token: string
+  bookingConfig?: {
+    enabled?: boolean
+    url?: string
+    buttonText?: string
+    showOnResults?: boolean
+  }
+}
+
+function AssessmentCompleteSection({ slug, token, bookingConfig }: AssessmentCompleteSectionProps) {
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadSuccess, setDownloadSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleDownloadPDF() {
+    setIsDownloading(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/coach/${slug}/results/${token}/download-pdf`)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `leadership-archetype-results.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+
+      setDownloadSuccess(true)
+    } catch (err) {
+      console.error('Download error:', err)
+      setError('Failed to download PDF. Please try again.')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  return (
+    <section
+      className="rounded-xl p-6 sm:p-8"
+      style={{
+        backgroundColor: 'var(--brand-bg-muted)',
+        border: '1px solid var(--brand-border)',
+      }}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <svg
+          className="w-6 h-6"
+          style={{ color: 'var(--brand-secondary, var(--brand-primary))' }}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <h2
+          className="text-xl font-bold"
+          style={{
+            color: 'var(--brand-secondary, var(--brand-text))',
+            fontFamily: 'var(--brand-font-heading)',
+          }}
+        >
+          Assessment Complete
+        </h2>
+      </div>
+      <p className="mb-4" style={{ color: 'var(--brand-text)' }}>
+        Your results are ready to download.
+      </p>
+
+      {error && (
+        <div
+          className="mb-4 p-3 rounded-lg text-center text-sm"
+          style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            color: '#DC2626',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={handleDownloadPDF}
+          disabled={isDownloading}
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{
+            backgroundColor: 'var(--brand-primary)',
+            color: 'white',
+          }}
+        >
+          {isDownloading ? (
+            <>
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Generating PDF...
+            </>
+          ) : downloadSuccess ? (
+            <>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Download Again
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download PDF
+            </>
+          )}
+        </button>
+
+        {bookingConfig?.enabled && bookingConfig?.showOnResults !== false && bookingConfig?.url && (
+          <a
+            href={bookingConfig.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
+            style={{
+              backgroundColor: 'var(--brand-bg)',
+              color: 'var(--brand-text)',
+              border: '1px solid var(--brand-border)',
+            }}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {bookingConfig.buttonText || 'Book a Session'}
+          </a>
+        )}
+      </div>
+    </section>
   )
 }
