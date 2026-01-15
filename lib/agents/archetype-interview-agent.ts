@@ -696,9 +696,9 @@ function updateSessionState(
     },
   }
 
-  // Handle opening phase - transition after AI delivers greeting
-  if (state.phase === 'opening') {
-    // The AI has delivered the opening greeting, move to first question
+  // Handle opening phase - only transition when user confirms ready
+  if (state.phase === 'opening' && userMessage) {
+    // User has confirmed ready, move to first question
     newState.phase = 'context'
     newState.current_question_index = 1
     return newState
