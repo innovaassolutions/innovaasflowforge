@@ -12,17 +12,18 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { useTenant } from '@/lib/contexts/tenant-context'
+import { useTenantPaths } from '@/lib/hooks/use-tenant-paths'
 
 export default function ResultsIntroPage() {
   const params = useParams()
   const router = useRouter()
   const { tenant } = useTenant()
+  const { buildPath } = useTenantPaths()
 
-  const slug = params?.slug as string
   const token = params?.token as string
 
   function handleViewResults() {
-    router.push(`/coach/${slug}/results/${token}`)
+    router.push(buildPath(`/results/${token}`))
   }
 
   return (
