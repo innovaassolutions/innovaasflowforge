@@ -268,7 +268,7 @@ export async function processArchetypeMessage(
   const prefill = buildAssistantPrefill(state, userMessage)
 
   try {
-    const model = 'claude-sonnet-4-20250514'
+    const model = 'claude-sonnet-4-5-20250929'
 
     // If we have a prefill, add it as an assistant message to force continuation
     const messagesWithPrefill = prefill
