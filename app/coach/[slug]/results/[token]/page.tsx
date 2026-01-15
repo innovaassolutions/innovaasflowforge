@@ -18,7 +18,6 @@ import { Mail, Calendar, Sparkles } from 'lucide-react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { ArchetypeResults } from '@/components/coaching/ArchetypeResults'
 import { TensionPatternCard } from '@/components/coaching/TensionPatternCard'
-import { ReflectionChoice } from '@/components/coaching/ReflectionChoice'
 import type { ResultsResponse, ResultsDisclosure } from '@/app/api/coach/[slug]/results/[token]/route'
 import type { EnhancedResults } from '@/lib/agents/enhancement-agent'
 import type { Archetype } from '@/lib/agents/archetype-constitution'
@@ -33,7 +32,6 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<ResultsResponse | null>(null)
-  const [reflectionStatus, setReflectionStatus] = useState<'none' | 'pending' | 'accepted' | 'completed' | 'declined'>('pending')
 
   useEffect(() => {
     loadResults()
@@ -47,8 +45,6 @@ export default function ResultsPage() {
 
       if (result.success) {
         setData(result)
-        const status = result.session?.reflection_status as 'none' | 'pending' | 'accepted' | 'completed' | 'declined' | undefined
-        setReflectionStatus(status || 'pending')
       } else {
         setError(result.error || 'Failed to load results')
       }
@@ -626,15 +622,6 @@ export default function ResultsPage() {
             </div>
           </div>
         </section>
-
-        {/* Reflection Choice */}
-        <ReflectionChoice
-          slug={slug}
-          token={token}
-          reflectionStatus={reflectionStatus}
-          bookingConfig={tenant.brand_config.booking}
-          onStatusChange={setReflectionStatus}
-        />
 
         {/* Footer */}
         <ResultsFooter tenant={tenant} />
