@@ -919,9 +919,8 @@ function AssessmentCompleteSection({ slug, token, bookingConfig }: AssessmentCom
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: 'var(--brand-bg)',
-              color: 'var(--brand-text)',
-              border: '1px solid var(--brand-border)',
+              backgroundColor: 'var(--brand-secondary, var(--brand-primary))',
+              color: 'white',
             }}
           >
             <svg
