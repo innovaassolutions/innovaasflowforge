@@ -267,6 +267,17 @@ export async function processArchetypeMessage(
   // This prevents the AI from substituting its own questions
   const prefill = buildAssistantPrefill(state, userMessage)
 
+  // DEBUG: Log state and prefill info
+  console.log('[ARCHETYPE DEBUG] processArchetypeMessage:', {
+    inputPhase: currentState?.phase || 'null (new session)',
+    inputIndex: currentState?.current_question_index ?? 'null',
+    statePhase: state.phase,
+    stateIndex: state.current_question_index,
+    userMessage: userMessage?.substring(0, 50) || 'null',
+    hasPrefill: !!prefill,
+    prefillPreview: prefill?.substring(0, 100) || 'null',
+  })
+
   try {
     const model = 'claude-sonnet-4-20250514'
 
@@ -699,9 +710,15 @@ function updateSessionState(
   // Handle opening phase - only transition when user confirms ready
   if (state.phase === 'opening' && userMessage) {
     // User has confirmed ready, move to first question
+    console.log('[ARCHETYPE DEBUG] Opening transition: moving to context, index=1')
     newState.phase = 'context'
     newState.current_question_index = 1
     return newState
+  }
+
+  // DEBUG: Log when NOT transitioning from opening
+  if (state.phase === 'opening' && !userMessage) {
+    console.log('[ARCHETYPE DEBUG] Opening phase but no userMessage - staying at opening')
   }
 
   // Handle closing phase - transition to completed after closing message delivered
