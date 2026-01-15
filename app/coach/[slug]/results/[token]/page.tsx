@@ -390,7 +390,7 @@ export default function ResultsPage() {
               fontFamily: 'var(--brand-font-heading)',
             }}
           >
-            Your Leadership Archetype
+            Your Leadership Archetypes
           </h1>
           <p
             className="text-lg max-w-2xl mx-auto"
@@ -435,106 +435,98 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Primary Archetype */}
-        <ArchetypeResults
-          archetype={fullResults.primary_archetype}
-          label="Your Primary Archetype"
-          description="This is how you naturally respond when pressure is high and things feel messy."
-          personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
-        />
+        {/* Primary and Authentic Archetypes - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Primary Archetype */}
+          <ArchetypeResults
+            archetype={fullResults.primary_archetype}
+            label="Your Primary Archetype"
+            description="This is how you naturally respond when pressure is high and things feel messy."
+            personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
+          />
+
+          {/* Authentic Archetype */}
+          <ArchetypeResults
+            archetype={fullResults.authentic_archetype}
+            label="Your Authentic Archetype"
+            description={fullResults.tension_pattern.has_tension
+              ? "This is the leadership style that feels most sustainable and energizing when you're at your best."
+              : "This is also the leadership style that feels most sustainable when you're at your best - reinforcing your natural alignment."}
+            personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
+          />
+        </div>
 
         {/* Tension Pattern OR Alignment Pattern */}
         {fullResults.tension_pattern.has_tension ? (
-          <>
-            {/* Tension: Primary differs from Authentic */}
-            <TensionPatternCard
-              tensionPattern={fullResults.tension_pattern}
-              primaryArchetype={fullResults.primary_archetype.name}
-              authenticArchetype={fullResults.authentic_archetype.name}
-              personalizedInsights={enhancedResults?.personalizedTensionInsights}
-            />
-            {/* Authentic Archetype (different from Primary) */}
-            <ArchetypeResults
-              archetype={fullResults.authentic_archetype}
-              label="Your Authentic Archetype"
-              description="This is the leadership style that feels most sustainable and energizing when you're at your best."
-              personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
-            />
-          </>
+          <TensionPatternCard
+            tensionPattern={fullResults.tension_pattern}
+            primaryArchetype={fullResults.primary_archetype.name}
+            authenticArchetype={fullResults.authentic_archetype.name}
+            personalizedInsights={enhancedResults?.personalizedTensionInsights}
+          />
         ) : (
-          <>
-            {/* Alignment: Primary matches Authentic - this is rare and valuable */}
-            <section
-              className="rounded-xl p-6 sm:p-8"
-              style={{
-                backgroundColor: 'var(--brand-bg-subtle)',
-                border: '1px solid var(--brand-border)',
-              }}
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'var(--brand-secondary, var(--brand-primary))', opacity: 0.15 }}
+          <section
+            className="rounded-xl p-6 sm:p-8"
+            style={{
+              backgroundColor: 'var(--brand-bg-subtle)',
+              border: '1px solid var(--brand-border)',
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'var(--brand-secondary, var(--brand-primary))', opacity: 0.15 }}
+              >
+                <svg
+                  className="w-6 h-6"
+                  style={{ color: 'var(--brand-secondary, var(--brand-primary))' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <svg
-                    className="w-6 h-6"
-                    style={{ color: 'var(--brand-secondary, var(--brand-primary))' }}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3
-                    className="text-xl font-bold mb-2"
-                    style={{
-                      color: 'var(--brand-secondary, var(--brand-primary))',
-                      fontFamily: 'var(--brand-font-heading)',
-                    }}
-                  >
-                    Natural Alignment
-                  </h3>
-                  <p className="mb-4" style={{ color: 'var(--brand-text)' }}>
-                    Your default response under pressure aligns with your authentic leadership style.
-                    This consistency is relatively rare and represents a significant strength.
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3
+                  className="text-xl font-bold mb-2"
+                  style={{
+                    color: 'var(--brand-secondary, var(--brand-primary))',
+                    fontFamily: 'var(--brand-font-heading)',
+                  }}
+                >
+                  Natural Alignment
+                </h3>
+                <p className="mb-4" style={{ color: 'var(--brand-text)' }}>
+                  Your default response under pressure aligns with your authentic leadership style.
+                  This consistency is relatively rare and represents a significant strength.
+                </p>
+                <div
+                  className="p-4 rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--brand-bg)',
+                    border: '1px solid var(--brand-border)',
+                  }}
+                >
+                  <p className="font-medium mb-2" style={{ color: 'var(--brand-text)' }}>
+                    What This Means
                   </p>
-                  <div
-                    className="p-4 rounded-lg"
-                    style={{
-                      backgroundColor: 'var(--brand-bg)',
-                      border: '1px solid var(--brand-border)',
-                    }}
-                  >
-                    <p className="font-medium mb-2" style={{ color: 'var(--brand-text)' }}>
-                      What This Means
-                    </p>
-                    <p className="text-sm" style={{ color: 'var(--brand-text-muted)' }}>
-                      When you&apos;re under pressure, you naturally lean into {fullResults.primary_archetype.name} energy -
-                      and this is also the style that feels most sustainable and authentic to you.
-                      Unlike many leaders who experience a gap between their stressed and grounded selves,
-                      you have a consistent leadership presence. Focus on recognizing overuse signals
-                      and knowing when to intentionally draw from other archetype energies.
-                    </p>
-                  </div>
+                  <p className="text-sm" style={{ color: 'var(--brand-text-muted)' }}>
+                    When you&apos;re under pressure, you naturally lean into {fullResults.primary_archetype.name} energy -
+                    and this is also the style that feels most sustainable and authentic to you.
+                    Unlike many leaders who experience a gap between their stressed and grounded selves,
+                    you have a consistent leadership presence. Focus on recognizing overuse signals
+                    and knowing when to intentionally draw from other archetype energies.
+                  </p>
                 </div>
               </div>
-            </section>
-
-            {/* Show Authentic section with same archetype but different framing */}
-            <ArchetypeResults
-              archetype={fullResults.authentic_archetype}
-              label="Your Authentic Archetype"
-              description="This is also the leadership style that feels most sustainable when you're at your best - reinforcing your natural alignment."
-              personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
-            />
-          </>
+            </div>
+          </section>
         )}
 
         {/* Moving Forward Section */}
