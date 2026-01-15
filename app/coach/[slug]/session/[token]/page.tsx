@@ -73,9 +73,9 @@ export default function SessionPage() {
       if (data.success) {
         setSession(data.session)
 
-        // If session is completed, redirect to results page
+        // If session is completed, redirect to results intro page
         if (data.session.client_status === 'completed') {
-          router.push(buildPath(`/results/${token}`))
+          router.push(buildPath(`/results/${token}/intro`))
           return
         }
 
@@ -136,11 +136,11 @@ export default function SessionPage() {
         setMessages((prev) => [...prev, assistantMessage])
         setSessionState(data.sessionState)
 
-        // Check if interview is complete - redirect to results page
+        // Check if interview is complete - redirect to results intro page
         if (data.isComplete) {
           // Short delay to show the final AI message before redirecting
           setTimeout(() => {
-            router.push(buildPath(`/results/${token}`))
+            router.push(buildPath(`/results/${token}/intro`))
           }, 2000)
           setIsComplete(true)
         }

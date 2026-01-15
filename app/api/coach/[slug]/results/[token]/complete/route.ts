@@ -336,8 +336,9 @@ export async function POST(
     }
 
     // Build results URL using the public-facing URL (not internal Vercel URL)
+    // Points to intro page so clients read "How to Read Your Results" first
     const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
-    const resultsUrl = `${publicBaseUrl}/coach/${slug}/results/${token}`
+    const resultsUrl = `${publicBaseUrl}/coach/${slug}/results/${token}/intro`
 
     // Get coach email from tenant config
     const emailConfig = tenantProfile.email_config as {
