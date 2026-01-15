@@ -930,10 +930,10 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
           <ReflectionThemes themes={enhancedResults.reflectionThemes} styles={styles} />
         )}
 
-        {/* Primary Archetype - with personalized narrative if enhanced */}
+        {/* Default Archetype Under Pressure - with personalized narrative if enhanced */}
         <ArchetypeCard
           archetype={results.primary_archetype}
-          label="Your Primary Archetype"
+          label="Default Archetype Under Pressure"
           description="This is how you naturally respond when pressure is high and things feel messy."
           personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
           styles={styles}
@@ -974,10 +974,10 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
             </View>
           )}
 
-          {/* Authentic Archetype - with personalized narrative if enhanced */}
+          {/* Authentic Archetype When Grounded - with personalized narrative if enhanced */}
           <ArchetypeCard
             archetype={results.authentic_archetype}
-            label="Your Authentic Archetype"
+            label="Authentic Archetype When Grounded"
             description="This is the leadership style that feels most sustainable and energizing when you're at your best."
             personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
             styles={styles}

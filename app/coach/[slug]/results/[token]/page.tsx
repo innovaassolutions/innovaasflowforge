@@ -224,7 +224,7 @@ export default function ResultsPage() {
             <div className="space-y-6">
               <div>
                 <p className="text-sm font-medium mb-2" style={{ color: 'var(--brand-text-muted)' }}>
-                  Your Primary Archetype
+                  Default Archetype Under Pressure
                 </p>
                 <p
                   className="text-2xl sm:text-3xl font-bold"
@@ -431,20 +431,20 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Primary and Authentic Archetypes - Side by Side */}
+        {/* Default and Authentic Archetypes - Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Primary Archetype */}
+          {/* Default Archetype Under Pressure */}
           <ArchetypeResults
             archetype={fullResults.primary_archetype}
-            label="Your Primary Archetype"
+            label="Default Archetype Under Pressure"
             description="This is how you naturally respond when pressure is high and things feel messy."
             personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
           />
 
-          {/* Authentic Archetype */}
+          {/* Authentic Archetype When Grounded */}
           <ArchetypeResults
             archetype={fullResults.authentic_archetype}
-            label="Your Authentic Archetype"
+            label="Authentic Archetype When Grounded"
             description={fullResults.tension_pattern.has_tension
               ? "This is the leadership style that feels most sustainable and energizing when you're at your best."
               : "This is also the leadership style that feels most sustainable when you're at your best - reinforcing your natural alignment."}
