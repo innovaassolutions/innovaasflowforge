@@ -267,10 +267,6 @@ export async function processArchetypeMessage(
   // This prevents the AI from substituting its own questions
   const prefill = buildAssistantPrefill(state, userMessage)
 
-  // Determine stop sequences to prevent AI from adding extra options
-  // Questions with 4 options (A-D) should stop on "e." to prevent fabrication
-  const stopSequences = getStopSequences(state, userMessage)
-
   try {
     const model = 'claude-sonnet-4-20250514'
 
@@ -284,8 +280,6 @@ export async function processArchetypeMessage(
       max_tokens: 1024,
       system: systemPrompt,
       messages: messagesWithPrefill,
-      // Only include stop_sequences when we have them
-      ...(stopSequences.length > 0 ? { stop_sequences: stopSequences } : {}),
     })
 
     // Handle response - may be empty if prefill covered everything
@@ -333,46 +327,6 @@ export async function processArchetypeMessage(
     })
     throw new Error(`Failed to generate response: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
-}
-
-/**
- * Determine stop sequences to prevent AI from adding extra options.
- * Questions with 4 options (A-D) need to stop on "e." to prevent fabrication.
- */
-function getStopSequences(
-  state: ArchetypeSessionState,
-  userMessage: string | null
-): string[] {
-  // Only apply stop sequences when presenting a question
-  if (state.phase === 'closing' || state.phase === 'completed') {
-    return []
-  }
-
-  if (!userMessage) {
-    return []
-  }
-
-  // Calculate which question will be presented
-  let questionIndex: number
-  if (state.phase === 'opening') {
-    questionIndex = 1
-  } else {
-    questionIndex = state.current_question_index + 1
-  }
-
-  const question = getQuestionByIndex(questionIndex)
-  if (!question) {
-    return []
-  }
-
-  // If question has fewer than 5 options, stop on the next letter
-  // Q2 and Q3 have 4 options (A-D), so stop on "e."
-  if (question.options.length < 5) {
-    const nextLetter = String.fromCharCode(97 + question.options.length) // 'e' for 4 options
-    return [`${nextLetter}.`, `\n${nextLetter}.`]
-  }
-
-  return []
 }
 
 /**
