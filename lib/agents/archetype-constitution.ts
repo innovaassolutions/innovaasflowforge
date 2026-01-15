@@ -208,7 +208,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     scored: true,
     options: [
       { key: 'A', archetype: 'anchor', text: 'Slow things down and help everyone regain calm before moving' },
-      { key: 'B', archetype: 'catalyst', text: 'Push for a decision so we don\'t stall' },
+      { key: 'B', archetype: 'catalyst', text: 'Push for a decision so we do not stall' },
       { key: 'C', archetype: 'steward', text: 'Check in on how people are feeling and try to reduce strain' },
       { key: 'D', archetype: 'wayfinder', text: 'Step back to think through what actually matters' },
       { key: 'E', archetype: 'architect', text: 'Fix the process or system that seems broken' }
@@ -237,9 +237,9 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     selection_type: 'ranked',
     scored: true,
     options: [
-      { key: 'A', archetype: 'anchor', text: 'Try to keep things steady so people don\'t panic' },
+      { key: 'A', archetype: 'anchor', text: 'Try to keep things steady so people do not panic' },
       { key: 'B', archetype: 'catalyst', text: 'Increase the pace and drive execution' },
-      { key: 'C', archetype: 'steward', text: 'Take on more myself so others aren\'t overwhelmed' },
+      { key: 'C', archetype: 'steward', text: 'Take on more myself so others are not overwhelmed' },
       { key: 'D', archetype: 'wayfinder', text: 'Reprioritize and reassess what truly matters' },
       { key: 'E', archetype: 'architect', text: 'Improve how the work is structured so it flows better' }
     ]
@@ -299,7 +299,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     options: [
       { key: 'A', archetype: 'anchor', text: 'Stay composed and try not to add to the chaos' },
       { key: 'B', archetype: 'catalyst', text: 'Step in and drive action myself' },
-      { key: 'C', archetype: 'steward', text: 'Take on more so others aren\'t overwhelmed' },
+      { key: 'C', archetype: 'steward', text: 'Take on more so others are not overwhelmed' },
       { key: 'D', archetype: 'wayfinder', text: 'Pull back to reassess what is really going on' },
       { key: 'E', archetype: 'architect', text: 'Start changing how the work is set up' }
     ]
