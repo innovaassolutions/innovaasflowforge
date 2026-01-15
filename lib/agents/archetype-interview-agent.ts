@@ -284,7 +284,8 @@ export async function processArchetypeMessage(
       max_tokens: 1024,
       system: systemPrompt,
       messages: messagesWithPrefill,
-      ...(stopSequences.length > 0 && { stop_sequences: stopSequences }),
+      // Only include stop_sequences when we have them
+      ...(stopSequences.length > 0 ? { stop_sequences: stopSequences } : {}),
     })
 
     // Handle response - may be empty if prefill covered everything
