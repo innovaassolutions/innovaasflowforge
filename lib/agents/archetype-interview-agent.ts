@@ -263,17 +263,30 @@ export async function processArchetypeMessage(
     })
   }
 
+  // Build prefilled response for question phases to FORCE exact question text
+  // This prevents the AI from substituting its own questions
+  const prefill = buildAssistantPrefill(state, userMessage)
+
   try {
     const model = 'claude-sonnet-4-20250514'
+
+    // If we have a prefill, add it as an assistant message to force continuation
+    const messagesWithPrefill = prefill
+      ? [...messages, { role: 'assistant' as const, content: prefill }]
+      : messages
+
     const response = await anthropic.messages.create({
       model,
       max_tokens: 1024,
       system: systemPrompt,
-      messages,
+      messages: messagesWithPrefill,
     })
 
-    const assistantMessage =
+    const generatedText =
       response.content[0].type === 'text' ? response.content[0].text : ''
+
+    // Combine prefill with generated text
+    const assistantMessage = prefill ? prefill + generatedText : generatedText
 
     // Update session state based on conversation
     const newState = updateSessionState(state, userMessage, assistantMessage)
@@ -304,6 +317,99 @@ export async function processArchetypeMessage(
     console.error('Archetype agent error:', error)
     throw new Error('Failed to generate response')
   }
+}
+
+/**
+ * Build a prefilled assistant response to FORCE the exact question text.
+ * This prevents the AI from substituting its own questions.
+ *
+ * When user answers question N, we present question N+1.
+ * Returns null for closing/completed phases.
+ */
+function buildAssistantPrefill(
+  state: ArchetypeSessionState,
+  userMessage: string | null
+): string | null {
+  // Don't prefill for closing or completed phases
+  if (state.phase === 'closing' || state.phase === 'completed') {
+    return null
+  }
+
+  // Only prefill when user has provided a message
+  if (!userMessage) {
+    return null
+  }
+
+  let questionIndex: number
+
+  // Special case: Opening phase - user confirmed ready, present Q1
+  if (state.phase === 'opening') {
+    questionIndex = 1
+  } else {
+    // User just answered current question, present the NEXT question
+    questionIndex = state.current_question_index + 1
+  }
+
+  const totalQuestions = getTotalQuestions()
+
+  // If no more questions, don't prefill (let AI handle closing)
+  if (questionIndex > totalQuestions) {
+    return null
+  }
+
+  const question = getQuestionByIndex(questionIndex)
+  if (!question) {
+    return null
+  }
+
+  // Build the exact question text
+  const lines: string[] = []
+
+  // Brief acknowledgment (skip for Q1 since opening message handles intro)
+  if (state.phase !== 'opening') {
+    lines.push('Thank you.')
+    lines.push('')
+  }
+
+  // Add section transition messages at key points
+  if (questionIndex === 4) {
+    // Transition from Context (Q1-3) to Default Mode (Q4-12)
+    lines.push('Now we\'ll move into questions about how you tend to respond when things get tense, overloaded, or high stakes.')
+    lines.push('')
+    lines.push('What you do instinctively matters more than what you intend. Think about what you ACTUALLY do, not what you think you should do.')
+    lines.push('')
+  } else if (questionIndex === 13) {
+    // Transition from Default Mode to Authentic Mode
+    lines.push('We\'ve explored how you tend to respond under pressure. Now let\'s shift.')
+    lines.push('')
+    lines.push('Think about moments when your leadership feels sustainable, effective, and true to you. When you feel confident, controlled, and fully aligned.')
+    lines.push('')
+  } else if (questionIndex === 17) {
+    // Transition to Friction Signals
+    lines.push('Now for the last few questions. These are about the parts of leadership that drain you right now.')
+    lines.push('')
+    lines.push('Answer based on what you thought and felt during a recent hard or demanding stretch.')
+    lines.push('')
+    lines.push('For these final three questions, just select the ONE option that resonates most.')
+    lines.push('')
+  }
+
+  // Add selection format reminder for ranked questions (Q4-Q16)
+  if (question.selection_type === 'ranked') {
+    lines.push('Please select the option that is MOST like you, then the one that is SECOND most like you.')
+    lines.push('')
+  }
+
+  // The exact question - THIS IS THE KEY PART THAT CANNOT BE CHANGED
+  lines.push(`Question ${question.index}: ${question.stem}`)
+  lines.push('')
+
+  // All options exactly as defined
+  question.options.forEach((opt) => {
+    lines.push(`${opt.key.toLowerCase()}. ${opt.text}`)
+  })
+
+  return lines.join('\n')
 }
 
 /**
