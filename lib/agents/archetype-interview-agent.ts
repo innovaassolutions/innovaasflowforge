@@ -282,8 +282,11 @@ export async function processArchetypeMessage(
       messages: messagesWithPrefill,
     })
 
-    const generatedText =
-      response.content[0].type === 'text' ? response.content[0].text : ''
+    // Handle response - may be empty if prefill covered everything
+    let generatedText = ''
+    if (response.content && response.content.length > 0 && response.content[0].type === 'text') {
+      generatedText = response.content[0].text
+    }
 
     // Combine prefill with generated text
     const assistantMessage = prefill ? prefill + generatedText : generatedText
@@ -314,8 +317,15 @@ export async function processArchetypeMessage(
       },
     }
   } catch (error) {
-    console.error('Archetype agent error:', error)
-    throw new Error('Failed to generate response')
+    console.error('Archetype agent error:', {
+      error,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      phase: state.phase,
+      currentQuestionIndex: state.current_question_index,
+      hasPrefill: !!prefill,
+      userMessageLength: userMessage?.length || 0,
+    })
+    throw new Error(`Failed to generate response: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
