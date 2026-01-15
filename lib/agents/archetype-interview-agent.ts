@@ -419,10 +419,6 @@ function buildAssistantPrefill(
     lines.push(`${opt.key.toLowerCase()}. ${opt.text}`)
   })
 
-  // Add blank line after options to signal completion
-  // This helps prevent AI from continuing to add more options
-  lines.push('')
-
   return lines.join('\n')
 }
 

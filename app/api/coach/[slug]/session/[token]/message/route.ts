@@ -224,21 +224,9 @@ export async function POST(
       isComplete: agentResponse.isComplete,
     })
   } catch (error) {
-    console.error('Message processing error:', {
-      error,
-      errorMessage: error instanceof Error ? error.message : 'Unknown error',
-      errorStack: error instanceof Error ? error.stack : undefined,
-      errorName: error instanceof Error ? error.name : undefined,
-    })
+    console.error('Message processing error:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to process message',
-        // Include error details in development
-        details: process.env.NODE_ENV === 'development'
-          ? (error instanceof Error ? error.message : String(error))
-          : undefined
-      },
+      { success: false, error: 'Failed to process message' },
       { status: 500 }
     )
   }
