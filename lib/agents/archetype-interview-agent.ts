@@ -268,7 +268,7 @@ export async function processArchetypeMessage(
   const prefill = buildAssistantPrefill(state, userMessage)
 
   try {
-    const model = 'claude-sonnet-4-5-20250929'
+    const model = 'claude-sonnet-4-20250514'
 
     // If we have a prefill, add it as an assistant message to force continuation
     const messagesWithPrefill = prefill
@@ -700,11 +700,9 @@ function updateSessionState(
     },
   }
 
-  // Handle opening phase - transition ONLY after user confirms they're ready
-  // CRITICAL: Do NOT advance until user has responded (e.g., "Ready")
-  // If we advance before user responds, Q1 will be skipped!
-  if (state.phase === 'opening' && userMessage) {
-    // User confirmed ready, now transition to first question
+  // Handle opening phase - transition after AI delivers greeting
+  if (state.phase === 'opening') {
+    // The AI has delivered the opening greeting, move to first question
     newState.phase = 'context'
     newState.current_question_index = 1
     return newState
