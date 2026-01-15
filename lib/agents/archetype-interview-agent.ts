@@ -346,6 +346,13 @@ export async function processArchetypeMessage(
  *
  * When user answers question N, we present question N+1.
  * Returns null for closing/completed phases.
+ *
+ * IMPORTANT: For ranked questions (Q4-Q16), we must verify the user provided
+ * BOTH selections before advancing. Otherwise, we'd show the next question
+ * while the state hasn't advanced, causing response misattribution.
+ *
+ * FIX (2026-01-16): Added pre-validation to prevent prefill/state desync
+ * that was causing all results to show "matching" archetypes.
  */
 function buildAssistantPrefill(
   state: ArchetypeSessionState,
@@ -367,7 +374,54 @@ function buildAssistantPrefill(
   if (state.phase === 'opening') {
     questionIndex = 1
   } else {
-    // User just answered current question, present the NEXT question
+    // Before advancing, verify the current question's answer is complete
+    const currentQuestion = getQuestionByIndex(state.current_question_index)
+
+    if (currentQuestion) {
+      // For ranked questions (Q4-Q16), we need BOTH selections before advancing
+      if (currentQuestion.selection_type === 'ranked') {
+        const parsed = parseUserSelection(userMessage, currentQuestion)
+
+        // Check if we already have a partial response (first selection stored)
+        const existingResponse = state.responses[currentQuestion.id]
+        const hasPartialResponse = existingResponse?.most_like_me && !existingResponse.second_most_like_me
+
+        // If user only provided one selection and we don't have a partial to complete,
+        // DON'T advance - let the AI naturally prompt for the second selection
+        if (!parsed.second_most_like_me && !hasPartialResponse) {
+          console.log('[PREFILL DEBUG] Ranked question incomplete - not advancing', {
+            questionId: currentQuestion.id,
+            parsedMost: parsed.most_like_me,
+            parsedSecond: parsed.second_most_like_me,
+            hasPartial: hasPartialResponse,
+          })
+          return null  // Let AI handle prompting for second selection
+        }
+
+        // If we have a partial and user is providing just one more selection,
+        // that completes it - we CAN advance
+        if (hasPartialResponse && parsed.most_like_me) {
+          console.log('[PREFILL DEBUG] Completing partial ranked response - advancing', {
+            questionId: currentQuestion.id,
+            existingFirst: existingResponse.most_like_me,
+            newSecond: parsed.most_like_me,
+          })
+        }
+      } else {
+        // For single-select questions (context Q1-Q3, friction Q17-Q19),
+        // verify we got a valid selection before advancing
+        const parsed = parseUserSelection(userMessage, currentQuestion)
+        if (!parsed.detected || !parsed.most_like_me) {
+          console.log('[PREFILL DEBUG] Single-select not detected - not advancing', {
+            questionId: currentQuestion.id,
+            detected: parsed.detected,
+          })
+          return null  // Let AI re-prompt for the answer
+        }
+      }
+    }
+
+    // User successfully answered current question, present the NEXT question
     questionIndex = state.current_question_index + 1
   }
 

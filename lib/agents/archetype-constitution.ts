@@ -723,10 +723,32 @@ export function calculateResults(state: ArchetypeSessionState): {
   is_aligned: boolean
   scores: ArchetypeSessionState['scores']
 } {
+  // Debug: Log responses being scored
+  const responseCount = Object.keys(state.responses).length
+  const scoredQuestionIds = SURVEY_QUESTIONS.filter(q => q.scored).map(q => q.id)
+  const capturedScoredResponses = scoredQuestionIds.filter(id => state.responses[id])
+
+  console.log('[SCORING DEBUG] calculateResults called:', {
+    totalResponses: responseCount,
+    scoredQuestionsExpected: scoredQuestionIds.length,
+    scoredResponsesCaptured: capturedScoredResponses.length,
+    missingResponses: scoredQuestionIds.filter(id => !state.responses[id]),
+  })
+
   const scores = calculateScores(state.responses)
   const default_archetype = determineArchetype(scores.default)
   const authentic_archetype = determineArchetype(scores.authentic)
   const is_aligned = default_archetype === authentic_archetype
+
+  // Debug: Log final results
+  console.log('[SCORING DEBUG] Results calculated:', {
+    default_archetype,
+    authentic_archetype,
+    is_aligned,
+    defaultScores: scores.default,
+    authenticScores: scores.authentic,
+    frictionScores: scores.friction,
+  })
 
   return {
     default_archetype,
