@@ -101,9 +101,9 @@ export function ArchetypeResults({ archetype, label, description, personalizedNa
                 key={index}
                 className="px-3 py-1.5 rounded-full text-sm font-medium"
                 style={{
-                  backgroundColor: 'var(--brand-bg-muted)',
-                  color: 'var(--brand-text)',
-                  border: '1px solid var(--brand-border)',
+                  backgroundColor: 'color-mix(in srgb, var(--brand-primary) 15%, transparent)',
+                  color: 'var(--brand-primary)',
+                  border: '1px solid color-mix(in srgb, var(--brand-primary) 30%, transparent)',
                 }}
               >
                 {trait}
