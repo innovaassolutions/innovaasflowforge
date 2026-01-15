@@ -100,6 +100,16 @@ export async function POST(
     // Parse existing session state
     const currentState = agentSession.session_context as ArchetypeSessionState | null
 
+    // DEBUG: Log the incoming state
+    console.log('[ROUTE DEBUG] Before processArchetypeMessage:', {
+      sessionId: session.id,
+      agentSessionId: agentSession.id,
+      currentStatePhase: currentState?.phase || 'null',
+      currentStateIndex: currentState?.current_question_index ?? 'null',
+      bodyMessage: body.message?.substring(0, 50) || 'null',
+      historyLength: conversationHistory.length,
+    })
+
     // Build tenant context for the agent
     const tenantContext: TenantContext = {
       display_name: tenant.display_name,
@@ -114,6 +124,14 @@ export async function POST(
       tenantContext,
       session.client_name
     )
+
+    // DEBUG: Log the output state
+    console.log('[ROUTE DEBUG] After processArchetypeMessage:', {
+      outputPhase: agentResponse.sessionState.phase,
+      outputIndex: agentResponse.sessionState.current_question_index,
+      messagePreview: agentResponse.message?.substring(0, 100) || 'null',
+      isComplete: agentResponse.isComplete,
+    })
 
     // Build updated conversation history
     const updatedHistory = [...conversationHistory]
