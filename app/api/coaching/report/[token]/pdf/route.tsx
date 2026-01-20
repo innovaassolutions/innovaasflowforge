@@ -76,11 +76,24 @@ export async function POST(
     const coachName = tenant?.display_name || 'Your Coach'
     const brandName = tenant?.brand_config?.brandName || 'Leading with Meaning'
 
+    // Construct absolute URL for logo
+    // For react-pdf, we need an absolute URL since it runs server-side
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
+                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                    'http://localhost:3000'
+    const logoPath = tenant?.brand_config?.logo?.url || '/brand/lwm_logo.png'
+    const logoUrl = logoPath.startsWith('http')
+      ? logoPath
+      : `${baseUrl}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`
+
+    console.log(`[Coaching PDF] Using logo URL: ${logoUrl}`)
+
     // Prepare report data for PDF
     const reportData: CoachingReportData = {
       clientName: session.client_name,
       coachName,
       brandName,
+      logoUrl,
       generatedDate: new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',

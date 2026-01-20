@@ -7,7 +7,8 @@ import {
   StyleSheet,
   Svg,
   Path,
-  Circle
+  Circle,
+  Image
 } from '@react-pdf/renderer'
 import { ARCHETYPES, Archetype } from './agents/archetype-constitution'
 
@@ -19,6 +20,7 @@ export interface CoachingReportData {
   clientName: string
   coachName: string
   brandName: string
+  logoUrl?: string  // Absolute URL to the brand logo
   generatedDate: string
   context: {
     role: string
@@ -271,6 +273,31 @@ const styles = StyleSheet.create({
   pageNumber: {
     fontSize: 8,
     color: LWM_BRANDING.colors.textMuted
+  },
+
+  // Page Header with Logo
+  pageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: LWM_BRANDING.colors.secondary
+  },
+  headerLogo: {
+    width: 120,
+    height: 40
+  },
+  headerBrandText: {
+    fontSize: 10,
+    color: LWM_BRANDING.colors.primary,
+    fontWeight: 'bold'
+  },
+  headerPageTitle: {
+    fontSize: 10,
+    color: LWM_BRANDING.colors.textMuted,
+    textAlign: 'right'
   }
 })
 
@@ -326,6 +353,25 @@ function ScoreBar({ archetype, score, maxScore }: { archetype: Archetype, score:
 }
 
 // ============================================================================
+// PAGE HEADER COMPONENT
+// ============================================================================
+
+function PageHeader({ logoUrl, brandName, pageTitle }: { logoUrl?: string, brandName: string, pageTitle: string }) {
+  return (
+    <View style={styles.pageHeader} fixed>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {logoUrl ? (
+          <Image src={logoUrl} style={styles.headerLogo} />
+        ) : (
+          <Text style={styles.headerBrandText}>{brandName}</Text>
+        )}
+      </View>
+      <Text style={styles.headerPageTitle}>{pageTitle}</Text>
+    </View>
+  )
+}
+
+// ============================================================================
 // COVER PAGE
 // ============================================================================
 
@@ -363,6 +409,8 @@ function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
 
   return (
     <Page size="A4" style={styles.page}>
+      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Leadership Pattern" />
+
       <Text style={styles.header}>Your Leadership Pattern</Text>
 
       <Text style={styles.bodyText}>
@@ -371,48 +419,52 @@ function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
         These patterns are not fixed traits; they are adaptive responses that have served you well.
       </Text>
 
-      {/* Default Mode */}
-      <Text style={styles.sectionTitle}>Under Pressure: {defaultArch.name} Energy</Text>
-      <View style={styles.archetypeCard}>
-        <View style={styles.archetypeHeader}>
-          <View style={styles.archetypeIcon}>
-            <ArchetypeIcon archetype={data.default_archetype} />
+      {/* Default Mode - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Under Pressure: {defaultArch.name} Energy</Text>
+        <View style={styles.archetypeCard}>
+          <View style={styles.archetypeHeader}>
+            <View style={styles.archetypeIcon}>
+              <ArchetypeIcon archetype={data.default_archetype} />
+            </View>
+            <View>
+              <Text style={styles.archetypeLabel}>Default Mode</Text>
+              <Text style={styles.archetypeName}>{defaultArch.name}</Text>
+            </View>
           </View>
-          <View>
-            <Text style={styles.archetypeLabel}>Default Mode</Text>
-            <Text style={styles.archetypeName}>{defaultArch.name}</Text>
-          </View>
+          <Text style={styles.archetypeDescription}>
+            When stakes are high and things feel messy, you tend toward {defaultArch.name} energy: {defaultArch.under_pressure.toLowerCase()}.
+          </Text>
+          <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
+            Core traits: {defaultArch.core_traits.join(', ')}.
+          </Text>
         </View>
-        <Text style={styles.archetypeDescription}>
-          When stakes are high and things feel messy, you tend toward {defaultArch.name} energy: {defaultArch.under_pressure.toLowerCase()}.
-        </Text>
-        <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
-          Core traits: {defaultArch.core_traits.join(', ')}.
-        </Text>
       </View>
 
-      {/* Authentic Mode */}
-      <Text style={styles.sectionTitle}>At Your Best: {authenticArch.name} Energy</Text>
-      <View style={styles.archetypeCard}>
-        <View style={styles.archetypeHeader}>
-          <View style={styles.archetypeIcon}>
-            <ArchetypeIcon archetype={data.authentic_archetype} />
+      {/* Authentic Mode - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>At Your Best: {authenticArch.name} Energy</Text>
+        <View style={styles.archetypeCard}>
+          <View style={styles.archetypeHeader}>
+            <View style={styles.archetypeIcon}>
+              <ArchetypeIcon archetype={data.authentic_archetype} />
+            </View>
+            <View>
+              <Text style={styles.archetypeLabel}>Authentic Mode</Text>
+              <Text style={styles.archetypeName}>{authenticArch.name}</Text>
+            </View>
           </View>
-          <View>
-            <Text style={styles.archetypeLabel}>Authentic Mode</Text>
-            <Text style={styles.archetypeName}>{authenticArch.name}</Text>
-          </View>
+          <Text style={styles.archetypeDescription}>
+            When you are at your best - grounded and energized - you lead with {authenticArch.name} energy: {authenticArch.when_grounded.toLowerCase()}.
+          </Text>
+          <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
+            Core traits: {authenticArch.core_traits.join(', ')}.
+          </Text>
         </View>
-        <Text style={styles.archetypeDescription}>
-          When you are at your best - grounded and energized - you lead with {authenticArch.name} energy: {authenticArch.when_grounded.toLowerCase()}.
-        </Text>
-        <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
-          Core traits: {authenticArch.core_traits.join(', ')}.
-        </Text>
       </View>
 
-      {/* Alignment Insight */}
-      <View style={[
+      {/* Alignment Insight - wrap={false} keeps section together */}
+      <View wrap={false} style={[
         styles.alignmentBox,
         {
           backgroundColor: data.is_aligned
@@ -438,9 +490,9 @@ function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
         </Text>
       </View>
 
-      <View style={styles.pageFooter}>
+      <View style={styles.pageFooter} fixed>
         <Text>{data.brandName}</Text>
-        <Text style={styles.pageNumber}>2</Text>
+        <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
   )
@@ -457,6 +509,8 @@ function ScoresPage({ data }: { data: CoachingReportData }) {
 
   return (
     <Page size="A4" style={styles.page}>
+      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Detailed Scores" />
+
       <Text style={styles.header}>Detailed Scores</Text>
 
       <Text style={styles.bodyText}>
@@ -464,52 +518,58 @@ function ScoresPage({ data }: { data: CoachingReportData }) {
         Higher scores indicate stronger tendencies toward that pattern.
       </Text>
 
-      {/* Default Mode Scores */}
-      <Text style={styles.sectionTitle}>Default Mode Under Pressure</Text>
-      <View style={{ marginBottom: 20 }}>
-        {archetypes.map(arch => (
-          <ScoreBar
-            key={`default-${arch}`}
-            archetype={arch}
-            score={data.scores.default[arch]}
-            maxScore={defaultMax}
-          />
-        ))}
+      {/* Default Mode Scores - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Default Mode Under Pressure</Text>
+        <View style={{ marginBottom: 20 }}>
+          {archetypes.map(arch => (
+            <ScoreBar
+              key={`default-${arch}`}
+              archetype={arch}
+              score={data.scores.default[arch]}
+              maxScore={defaultMax}
+            />
+          ))}
+        </View>
       </View>
 
-      {/* Authentic Mode Scores */}
-      <Text style={styles.sectionTitle}>Authentic Mode When Grounded</Text>
-      <View style={{ marginBottom: 20 }}>
-        {archetypes.map(arch => (
-          <ScoreBar
-            key={`authentic-${arch}`}
-            archetype={arch}
-            score={data.scores.authentic[arch]}
-            maxScore={authenticMax}
-          />
-        ))}
+      {/* Authentic Mode Scores - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Authentic Mode When Grounded</Text>
+        <View style={{ marginBottom: 20 }}>
+          {archetypes.map(arch => (
+            <ScoreBar
+              key={`authentic-${arch}`}
+              archetype={arch}
+              score={data.scores.authentic[arch]}
+              maxScore={authenticMax}
+            />
+          ))}
+        </View>
       </View>
 
-      {/* Context Summary */}
-      <Text style={styles.sectionTitle}>Your Context</Text>
-      <View style={styles.archetypeCard}>
-        <Text style={[styles.bodyText, { marginBottom: 4 }]}>
-          <Text style={{ fontWeight: 'bold' }}>Role: </Text>
-          {data.context.role}
-        </Text>
-        <Text style={[styles.bodyText, { marginBottom: 4 }]}>
-          <Text style={{ fontWeight: 'bold' }}>Decision Environment: </Text>
-          {data.context.ambiguity_level}
-        </Text>
-        <Text style={styles.bodyText}>
-          <Text style={{ fontWeight: 'bold' }}>Current State: </Text>
-          {data.context.current_feeling}
-        </Text>
+      {/* Context Summary - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Your Context</Text>
+        <View style={styles.archetypeCard}>
+          <Text style={[styles.bodyText, { marginBottom: 4 }]}>
+            <Text style={{ fontWeight: 'bold' }}>Role: </Text>
+            {data.context.role}
+          </Text>
+          <Text style={[styles.bodyText, { marginBottom: 4 }]}>
+            <Text style={{ fontWeight: 'bold' }}>Decision Environment: </Text>
+            {data.context.ambiguity_level}
+          </Text>
+          <Text style={styles.bodyText}>
+            <Text style={{ fontWeight: 'bold' }}>Current State: </Text>
+            {data.context.current_feeling}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.pageFooter}>
+      <View style={styles.pageFooter} fixed>
         <Text>{data.brandName}</Text>
-        <Text style={styles.pageNumber}>3</Text>
+        <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
   )
@@ -526,6 +586,8 @@ function StoriesPage({ data }: { data: CoachingReportData }) {
 
   return (
     <Page size="A4" style={styles.page}>
+      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Your Stories" />
+
       <Text style={styles.header}>Your Stories</Text>
 
       <Text style={styles.bodyText}>
@@ -535,7 +597,7 @@ function StoriesPage({ data }: { data: CoachingReportData }) {
       </Text>
 
       {data.stories_captured.map((story, index) => (
-        <View key={index} style={styles.quoteCard}>
+        <View key={index} style={styles.quoteCard} wrap={false}>
           <Text style={styles.quoteText}>"{story.quote}"</Text>
           <Text style={styles.quoteTheme}>
             Theme: {story.theme} ({ARCHETYPES[story.archetype].name})
@@ -548,9 +610,9 @@ function StoriesPage({ data }: { data: CoachingReportData }) {
         they are expressions of the leadership energy you bring to challenging moments.
       </Text>
 
-      <View style={styles.pageFooter}>
+      <View style={styles.pageFooter} fixed>
         <Text>{data.brandName}</Text>
-        <Text style={styles.pageNumber}>4</Text>
+        <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
   )
@@ -566,6 +628,8 @@ function NextStepsPage({ data }: { data: CoachingReportData }) {
 
   return (
     <Page size="A4" style={styles.page}>
+      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Moving Forward" />
+
       <Text style={styles.header}>Moving Forward</Text>
 
       <Text style={styles.bodyText}>
@@ -573,54 +637,60 @@ function NextStepsPage({ data }: { data: CoachingReportData }) {
         sustainable ways to lead that feel true to you. Here are some things to consider:
       </Text>
 
-      {/* Watch For Section */}
-      <Text style={styles.sectionTitle}>Watch For: {defaultArch.name} Overuse</Text>
-      <View style={styles.archetypeCard}>
-        <Text style={styles.bodyText}>
-          When under pressure, you may over-rely on {defaultArch.name} energy.
-          Signs that you are overusing this pattern:
-        </Text>
-        {defaultArch.overuse_signals.map((signal, idx) => (
-          <Text key={idx} style={[styles.bodyText, { marginLeft: 12 }]}>
-            {'\u2022'} {signal}
+      {/* Watch For Section - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Watch For: {defaultArch.name} Overuse</Text>
+        <View style={styles.archetypeCard}>
+          <Text style={styles.bodyText}>
+            When under pressure, you may over-rely on {defaultArch.name} energy.
+            Signs that you are overusing this pattern:
           </Text>
-        ))}
+          {defaultArch.overuse_signals.map((signal, idx) => (
+            <Text key={idx} style={[styles.bodyText, { marginLeft: 12 }]}>
+              {'\u2022'} {signal}
+            </Text>
+          ))}
+        </View>
       </View>
 
-      {/* Lean Into Section */}
-      <Text style={styles.sectionTitle}>Lean Into: {authenticArch.name} Energy</Text>
-      <View style={styles.archetypeCard}>
-        <Text style={styles.bodyText}>
-          When you have the space to lead from your authentic mode, you bring
-          {authenticArch.name} energy: {authenticArch.when_grounded.toLowerCase()}.
-        </Text>
-        <Text style={[styles.bodyText, { marginTop: 8 }]}>
-          Look for moments where you can create the conditions for this - even small
-          shifts can have a significant impact on your sustainability and effectiveness.
-        </Text>
+      {/* Lean Into Section - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Lean Into: {authenticArch.name} Energy</Text>
+        <View style={styles.archetypeCard}>
+          <Text style={styles.bodyText}>
+            When you have the space to lead from your authentic mode, you bring
+            {authenticArch.name} energy: {authenticArch.when_grounded.toLowerCase()}.
+          </Text>
+          <Text style={[styles.bodyText, { marginTop: 8 }]}>
+            Look for moments where you can create the conditions for this - even small
+            shifts can have a significant impact on your sustainability and effectiveness.
+          </Text>
+        </View>
       </View>
 
-      {/* Coaching Conversation */}
-      <Text style={styles.sectionTitle}>Your Coaching Conversation</Text>
-      <View style={styles.archetypeCard}>
-        <Text style={styles.bodyText}>
-          This report provides a starting point for your conversation with {data.coachName}.
-          Together, you will explore:
-        </Text>
-        <Text style={[styles.bodyText, { marginLeft: 12, marginTop: 8 }]}>
-          {'\u2022'} What triggers your default mode response?
-        </Text>
-        <Text style={[styles.bodyText, { marginLeft: 12 }]}>
-          {'\u2022'} When does your authentic mode feel most accessible?
-        </Text>
-        <Text style={[styles.bodyText, { marginLeft: 12 }]}>
-          {'\u2022'} What small shifts might create more sustainable leadership?
-        </Text>
+      {/* Coaching Conversation - wrap={false} keeps section together */}
+      <View wrap={false}>
+        <Text style={styles.sectionTitle}>Your Coaching Conversation</Text>
+        <View style={styles.archetypeCard}>
+          <Text style={styles.bodyText}>
+            This report provides a starting point for your conversation with {data.coachName}.
+            Together, you will explore:
+          </Text>
+          <Text style={[styles.bodyText, { marginLeft: 12, marginTop: 8 }]}>
+            {'\u2022'} What triggers your default mode response?
+          </Text>
+          <Text style={[styles.bodyText, { marginLeft: 12 }]}>
+            {'\u2022'} When does your authentic mode feel most accessible?
+          </Text>
+          <Text style={[styles.bodyText, { marginLeft: 12 }]}>
+            {'\u2022'} What small shifts might create more sustainable leadership?
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.pageFooter}>
+      <View style={styles.pageFooter} fixed>
         <Text>{data.brandName}</Text>
-        <Text style={styles.pageNumber}>5</Text>
+        <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
   )
