@@ -179,6 +179,9 @@ export async function GET(
     // Cast tenant to TenantProfile type
     const tenantProfile = tenant as unknown as TenantProfile
 
+    // Debug: Log the raw brand_config to see what we're working with
+    console.log('📷 Raw tenant.brand_config:', JSON.stringify(tenant.brand_config, null, 2))
+
     // Validate logo URL before PDF generation
     // react-pdf doesn't support SVG - will fall back to text if logo is invalid
     const brandConfig = tenantProfile.brand_config as { logo?: { url?: string }; pdfFooterText?: string } | null
