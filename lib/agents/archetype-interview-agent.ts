@@ -847,8 +847,9 @@ function updateSessionState(
   const totalQuestions = getTotalQuestions()
 
   if (nextIndex > totalQuestions) {
-    // All questions answered, move to closing
-    newState.phase = 'closing'
+    // All questions answered - skip closing phase, go directly to completed
+    // This triggers immediate redirect to results without an AI closing message
+    newState.phase = 'completed'
     newState.current_question_index = totalQuestions
   } else {
     // Move to next question and update phase
