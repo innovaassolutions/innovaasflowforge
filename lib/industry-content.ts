@@ -282,77 +282,77 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 
   'professional-services': {
     key: 'professional-services',
-    name: 'Professional Services',
-    shortName: 'Prof Services',
+    name: 'Consulting',
+    shortName: 'Consulting',
     accentColor: 'hsl(260, 60%, 55%)', // Corporate purple
     accentColorLight: 'hsl(260, 60%, 93%)',
     illustration: '/illustrations/consultant.png',
-    heroHeadline: 'Elevate Client Delivery Through Strategic Alignment',
-    heroHighlight: 'Client Delivery',
-    heroDescription: 'AI-powered assessment platform that interviews partners, consultants, and staff to optimize service delivery, identify growth opportunities, and strengthen client relationships.',
+    heroHeadline: 'Automate Client Discovery With AI-Powered Interviews',
+    heroHighlight: 'Client Discovery',
+    heroDescription: 'AI-powered platform that conducts stakeholder interviews across your client organizations, identifies operational pain points, and synthesizes findings into comprehensive strategic reports.',
     valueProps: [
       {
-        title: 'Partner Alignment',
-        description: 'Surface strategic disagreements before they derail initiatives'
+        title: 'Faster Discovery',
+        description: 'Complete client assessments in days instead of weeks'
       },
       {
-        title: 'Client Intelligence',
-        description: 'Systematic capture of relationship insights across your team'
+        title: 'Deeper Insights',
+        description: 'AI interviews uncover friction points that surface interviews miss'
       },
       {
-        title: 'Scalable Discovery',
-        description: 'Run assessments for multiple clients simultaneously'
+        title: 'Beautiful Reports',
+        description: 'Deliver executive-ready synthesis documents that impress clients'
       }
     ],
     personas: [
       {
-        title: 'Managing Partners',
-        description: 'Assess firm-wide strategic alignment and identify growth opportunities.',
+        title: 'Management Consultants',
+        description: 'Automate the initial discovery phase and focus on strategic recommendations.',
         benefits: [
-          'Practice area evaluation',
-          'Partner alignment mapping',
-          'Market positioning analysis'
+          'Stakeholder interview automation',
+          'Cross-divisional synthesis',
+          'Actionable recommendations'
         ]
       },
       {
-        title: 'Client Engagement Leaders',
-        description: 'Evaluate delivery effectiveness and identify improvement opportunities.',
+        title: 'Strategy Firms',
+        description: 'Scale your discovery capacity without scaling headcount.',
         benefits: [
-          'Client satisfaction drivers',
-          'Delivery model assessment',
-          'Team utilization insights'
+          'Parallel client assessments',
+          'Consistent methodology',
+          'Faster time to insights'
         ]
       },
       {
-        title: 'Practice Directors',
-        description: 'Understand team capabilities and optimize resource allocation.',
+        title: 'Operations Consultants',
+        description: 'Identify operational bottlenecks and transformation opportunities.',
         benefits: [
-          'Skills inventory analysis',
-          'Knowledge management gaps',
-          'Training prioritization'
+          'Process pain point mapping',
+          'Stakeholder alignment gaps',
+          'Prioritized improvement roadmap'
         ]
       }
     ],
     painPoints: [
       {
-        title: 'Partner Politics',
-        description: 'Anonymous AI interviews reveal honest perspectives that partners wont share in meetings.'
+        title: 'Discovery Bottleneck',
+        description: 'Your best consultants spend weeks on interviews instead of strategy. AI handles discovery so you focus on value.'
       },
       {
-        title: 'Knowledge Silos',
-        description: 'Your best insights are trapped in individual consultant heads. Systematically capture institutional knowledge.'
+        title: 'Inconsistent Methodology',
+        description: 'Every consultant interviews differently. Standardize your discovery process across all engagements.'
       },
       {
-        title: 'Client Concentration Risk',
-        description: 'Understand relationship health across your portfolio before surprises hit revenue.'
+        title: 'Synthesis Overload',
+        description: 'Turning dozens of interview notes into coherent insights is exhausting. AI synthesizes everything automatically.'
       }
     ],
-    ctaPrimary: 'Start Firm Assessment',
-    ctaSecondary: 'See Services Demo',
+    ctaPrimary: 'Start Client Assessment',
+    ctaSecondary: 'See Consulting Demo',
     stats: [
-      { value: '360°', label: 'Stakeholder perspectives captured' },
-      { value: '15+', label: 'Practice areas analyzed' },
-      { value: '5 Days', label: 'From interview to strategic plan' }
+      { value: '80%', label: 'Faster discovery phase' },
+      { value: '25+', label: 'Stakeholders per engagement' },
+      { value: '3 Days', label: 'From kickoff to insights report' }
     ],
     heroMockup: 'professional-services'
   }
