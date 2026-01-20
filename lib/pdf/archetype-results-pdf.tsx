@@ -51,6 +51,8 @@ export interface ArchetypeResultsPDFData {
   generatedDate: string
   /** Pre-validated logo URL - pass null to skip logo rendering */
   validatedLogoUrl?: string | null
+  /** Custom footer text (e.g., website URL) - falls back to display_name */
+  pdfFooterText?: string
 }
 
 interface BrandColors {
@@ -180,6 +182,111 @@ function createStyles(colors: BrandColors) {
       color: colors.textMuted,
       marginBottom: 16,
       lineHeight: 1.5
+    },
+
+    // Side-by-side archetype cards container
+    archetypesRow: {
+      flexDirection: 'row',
+      gap: 12,
+      marginBottom: 20
+    },
+    archetypeCardCompact: {
+      flex: 1,
+      borderRadius: 8,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    archetypeHeaderCompact: {
+      backgroundColor: colors.primary,
+      padding: 12
+    },
+    archetypeLabelCompact: {
+      fontSize: 8,
+      color: 'rgba(255,255,255,0.8)',
+      marginBottom: 2
+    },
+    archetypeTitleCompact: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#FFFFFF'
+    },
+    archetypeContentCompact: {
+      backgroundColor: colors.backgroundSubtle,
+      padding: 12
+    },
+    archetypeDescriptionCompact: {
+      fontSize: 9,
+      color: colors.textMuted,
+      marginBottom: 10,
+      lineHeight: 1.4
+    },
+    traitsSectionCompact: {
+      marginBottom: 10
+    },
+    sectionLabelCompact: {
+      fontSize: 8,
+      fontWeight: 'bold',
+      color: colors.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 6
+    },
+    traitsContainerCompact: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 4
+    },
+    traitCompact: {
+      backgroundColor: colors.backgroundMuted,
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      borderRadius: 8,
+      fontSize: 7,
+      color: colors.text,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    infoBoxCompact: {
+      backgroundColor: colors.background,
+      padding: 8,
+      borderRadius: 4,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    infoBoxTitleCompact: {
+      fontSize: 8,
+      fontWeight: 'bold',
+      color: colors.secondary,
+      marginBottom: 4
+    },
+    infoBoxTextCompact: {
+      fontSize: 8,
+      color: colors.text,
+      lineHeight: 1.4
+    },
+    watchForSectionCompact: {
+      marginTop: 6
+    },
+    bulletItemCompact: {
+      flexDirection: 'row',
+      marginBottom: 4,
+      alignItems: 'flex-start'
+    },
+    bulletDotCompact: {
+      width: 3,
+      height: 3,
+      borderRadius: 1.5,
+      backgroundColor: colors.textMuted,
+      marginRight: 6,
+      marginTop: 4
+    },
+    bulletTextCompact: {
+      flex: 1,
+      fontSize: 8,
+      color: colors.text,
+      lineHeight: 1.3
     },
 
     // Traits
@@ -553,12 +660,14 @@ interface PageFooterProps {
   tenant: TenantProfile
   generatedDate: string
   styles: ReturnType<typeof createStyles>
+  pdfFooterText?: string
 }
 
-function PageFooter({ tenant, generatedDate, styles }: PageFooterProps) {
+function PageFooter({ tenant, generatedDate, styles, pdfFooterText }: PageFooterProps) {
+  const footerLabel = pdfFooterText || tenant.display_name
   return (
     <View style={styles.footer} fixed>
-      <Text style={styles.footerText}>{tenant.display_name}</Text>
+      <Text style={styles.footerText}>{footerLabel}</Text>
       <Text style={styles.footerConfidential}>Your results are confidential</Text>
       <Text style={styles.footerText}>{generatedDate}</Text>
     </View>
@@ -628,6 +737,68 @@ function ArchetypeCard({ archetype, label, description, personalizedNarrative, s
             <View key={index} style={styles.bulletItem}>
               <View style={styles.bulletDot} />
               <Text style={styles.bulletText}>{signal}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  )
+}
+
+// ============================================================================
+// COMPONENT: ArchetypeCardCompact (Side-by-side layout)
+// ============================================================================
+
+interface ArchetypeCardCompactProps {
+  archetype: NonNullable<ResultsResponse['results']>['primary_archetype']
+  label: string
+  description: string
+  styles: ReturnType<typeof createStyles>
+  colors: BrandColors
+}
+
+function ArchetypeCardCompact({ archetype, label, description, styles, colors }: ArchetypeCardCompactProps) {
+  return (
+    <View style={styles.archetypeCardCompact}>
+      {/* Header */}
+      <View style={styles.archetypeHeaderCompact}>
+        <Text style={styles.archetypeLabelCompact}>{label}</Text>
+        <Text style={styles.archetypeTitleCompact}>The {archetype.name}</Text>
+      </View>
+
+      {/* Content */}
+      <View style={styles.archetypeContentCompact}>
+        <Text style={styles.archetypeDescriptionCompact}>{description}</Text>
+
+        {/* Core Traits */}
+        <View style={styles.traitsSectionCompact}>
+          <Text style={styles.sectionLabelCompact}>Core Traits</Text>
+          <View style={styles.traitsContainerCompact}>
+            {(archetype.core_traits || []).map((trait, index) => (
+              <Text key={index} style={styles.traitCompact}>{trait}</Text>
+            ))}
+          </View>
+        </View>
+
+        {/* When Grounded */}
+        <View style={styles.infoBoxCompact}>
+          <Text style={styles.infoBoxTitleCompact}>When Grounded</Text>
+          <Text style={styles.infoBoxTextCompact}>{archetype.when_grounded}</Text>
+        </View>
+
+        {/* Under Pressure */}
+        <View style={styles.infoBoxCompact}>
+          <Text style={{ ...styles.infoBoxTitleCompact, color: colors.textMuted }}>Under Pressure</Text>
+          <Text style={styles.infoBoxTextCompact}>{archetype.under_pressure}</Text>
+        </View>
+
+        {/* Watch For (Overuse Signals) */}
+        <View style={styles.watchForSectionCompact}>
+          <Text style={styles.sectionLabelCompact}>Watch For</Text>
+          {(archetype.overuse_signals || []).slice(0, 3).map((signal, index) => (
+            <View key={index} style={styles.bulletItemCompact}>
+              <View style={styles.bulletDotCompact} />
+              <Text style={styles.bulletTextCompact}>{signal}</Text>
             </View>
           ))}
         </View>
@@ -897,7 +1068,7 @@ function ReflectionThemes({ themes, styles }: ReflectionThemesProps) {
 // ============================================================================
 
 export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData }) {
-  const { session, results, tenant, reflectionMessages, enhancedResults, generatedDate, validatedLogoUrl } = data
+  const { session, results, tenant, reflectionMessages, enhancedResults, generatedDate, validatedLogoUrl, pdfFooterText } = data
   const colors = getBrandColors(tenant)
   const styles = createStyles(colors)
 
@@ -910,7 +1081,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
 
   return (
     <Document>
-      {/* Page 1: Main Results */}
+      {/* Page 1: Both Archetypes Side-by-Side */}
       <Page size="A4" style={styles.page}>
         <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 
@@ -930,15 +1101,26 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
           <ReflectionThemes themes={enhancedResults.reflectionThemes} styles={styles} />
         )}
 
-        {/* Default Archetype Under Pressure - with personalized narrative if enhanced */}
-        <ArchetypeCard
-          archetype={results.primary_archetype}
-          label="Default Archetype Under Pressure"
-          description="This is how you naturally respond when pressure is high and things feel messy."
-          personalizedNarrative={enhancedResults?.personalizedDefaultNarrative}
-          styles={styles}
-          colors={colors}
-        />
+        {/* Side-by-Side Archetype Cards */}
+        <View style={styles.archetypesRow}>
+          {/* Default Archetype Under Pressure */}
+          <ArchetypeCardCompact
+            archetype={results.primary_archetype}
+            label="Default Archetype Under Pressure"
+            description="How you respond when pressure is high."
+            styles={styles}
+            colors={colors}
+          />
+
+          {/* Authentic Archetype When Grounded */}
+          <ArchetypeCardCompact
+            archetype={results.authentic_archetype}
+            label="Authentic Archetype When Grounded"
+            description="Your most sustainable leadership style."
+            styles={styles}
+            colors={colors}
+          />
+        </View>
 
         {/* Quote Callout (first quote on page 1 if enhanced) */}
         {isEnhanced && enhancedResults.meaningfulQuotes?.[0] && (
@@ -949,10 +1131,10 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
           />
         )}
 
-        <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} />
+        <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} pdfFooterText={pdfFooterText} />
       </Page>
 
-      {/* Page 2: Tension Pattern (if exists) + Authentic Archetype */}
+      {/* Page 2: Tension Pattern (if exists) + Personalized Insights */}
       {hasTension && (
         <Page size="A4" style={styles.page}>
           <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
@@ -966,6 +1148,21 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
             colors={colors}
           />
 
+          {/* Personalized Narratives (if enhanced) */}
+          {isEnhanced && enhancedResults.personalizedDefaultNarrative && (
+            <View style={styles.personalizedSection}>
+              <Text style={styles.personalizedLabel}>Your {primaryArchetypeName} Insight</Text>
+              <Text style={styles.personalizedNarrative}>{enhancedResults.personalizedDefaultNarrative}</Text>
+            </View>
+          )}
+
+          {isEnhanced && enhancedResults.personalizedAuthenticNarrative && (
+            <View style={styles.personalizedSection}>
+              <Text style={styles.personalizedLabel}>Your {authenticArchetypeName} Insight</Text>
+              <Text style={styles.personalizedNarrative}>{enhancedResults.personalizedAuthenticNarrative}</Text>
+            </View>
+          )}
+
           {/* Personalized Tension Insights (if enhanced) */}
           {isEnhanced && enhancedResults.personalizedTensionInsights && (
             <View style={styles.personalizedSection}>
@@ -973,16 +1170,6 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
               <Text style={styles.personalizedNarrative}>{enhancedResults.personalizedTensionInsights}</Text>
             </View>
           )}
-
-          {/* Authentic Archetype When Grounded - with personalized narrative if enhanced */}
-          <ArchetypeCard
-            archetype={results.authentic_archetype}
-            label="Authentic Archetype When Grounded"
-            description="This is the leadership style that feels most sustainable and energizing when you're at your best."
-            personalizedNarrative={enhancedResults?.personalizedAuthenticNarrative}
-            styles={styles}
-            colors={colors}
-          />
 
           {/* Quote Callout (second quote on page 2 if enhanced) */}
           {isEnhanced && enhancedResults.meaningfulQuotes?.[1] && (
@@ -993,7 +1180,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
             />
           )}
 
-          <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} />
+          <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} pdfFooterText={pdfFooterText} />
         </Page>
       )}
 
@@ -1016,7 +1203,7 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
           <ReflectionSection messages={reflectionMessages} styles={styles} />
         )}
 
-        <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} />
+        <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} pdfFooterText={pdfFooterText} />
       </Page>
     </Document>
   )

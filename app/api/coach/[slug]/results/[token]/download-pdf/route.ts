@@ -171,11 +171,15 @@ export async function GET(
 
     // Validate logo URL before PDF generation
     // react-pdf doesn't support SVG - will fall back to text if logo is invalid
-    const logoUrl = (tenantProfile.brand_config as { logo?: { url?: string } })?.logo?.url
+    const brandConfig = tenantProfile.brand_config as { logo?: { url?: string }; pdfFooterText?: string } | null
+    const logoUrl = brandConfig?.logo?.url
     const validatedLogoUrl = await validateLogoUrl(logoUrl)
     if (logoUrl && !validatedLogoUrl) {
       console.log('⚠️ Logo validation failed, falling back to text:', logoUrl)
     }
+
+    // Get PDF footer text (custom text or falls back to display_name in the PDF component)
+    const pdfFooterText = brandConfig?.pdfFooterText
 
     // Prepare PDF data
     const pdfData: ArchetypeResultsPDFData = {
@@ -203,7 +207,8 @@ export async function GET(
       reflectionMessages: session.reflection_messages as Array<{ role: 'user' | 'assistant'; content: string }> | undefined,
       enhancedResults: session.enhanced_results as ArchetypeResultsPDFData['enhancedResults'],
       generatedDate,
-      validatedLogoUrl
+      validatedLogoUrl,
+      pdfFooterText
     }
 
     // Generate PDF using Pages Router API
