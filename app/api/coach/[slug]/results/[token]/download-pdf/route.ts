@@ -18,7 +18,12 @@ import type { TenantProfile } from '@/lib/supabase/server'
  * react-pdf does NOT support SVG - only PNG, JPG, and base64.
  */
 async function validateLogoUrl(logoUrl: string | undefined): Promise<string | null> {
-  if (!logoUrl) return null
+  if (!logoUrl) {
+    console.log('📷 validateLogoUrl: No logo URL provided')
+    return null
+  }
+
+  console.log('📷 validateLogoUrl: Checking URL:', logoUrl)
 
   try {
     // Check if URL is valid and accessible with a HEAD request
@@ -27,28 +32,33 @@ async function validateLogoUrl(logoUrl: string | undefined): Promise<string | nu
       signal: AbortSignal.timeout(5000) // 5 second timeout
     })
 
+    console.log('📷 validateLogoUrl: Response status:', response.status)
+
     if (!response.ok) {
-      console.warn(`Logo URL returned ${response.status}: ${logoUrl}`)
+      console.warn(`📷 Logo URL returned ${response.status}: ${logoUrl}`)
       return null
     }
 
     // Check content type is a supported image format (NOT SVG)
     const contentType = response.headers.get('content-type')
+    console.log('📷 validateLogoUrl: Content-Type:', contentType)
+
     if (contentType) {
-      // react-pdf supports PNG, JPEG - NOT SVG
+      // react-pdf supports PNG, JPEG, WebP - NOT SVG
       if (contentType.includes('svg')) {
-        console.warn(`Logo is SVG (not supported by react-pdf): ${logoUrl}`)
+        console.warn(`📷 Logo is SVG (not supported by react-pdf). Upload a PNG, JPEG, or WebP instead: ${logoUrl}`)
         return null
       }
       if (!contentType.startsWith('image/')) {
-        console.warn(`Logo URL is not an image (${contentType}): ${logoUrl}`)
+        console.warn(`📷 Logo URL is not an image (${contentType}): ${logoUrl}`)
         return null
       }
     }
 
+    console.log('📷 validateLogoUrl: Validation passed!')
     return logoUrl
   } catch (error) {
-    console.warn(`Failed to validate logo URL: ${logoUrl}`, error)
+    console.warn(`📷 Failed to validate logo URL: ${logoUrl}`, error)
     return null
   }
 }
@@ -173,9 +183,12 @@ export async function GET(
     // react-pdf doesn't support SVG - will fall back to text if logo is invalid
     const brandConfig = tenantProfile.brand_config as { logo?: { url?: string }; pdfFooterText?: string } | null
     const logoUrl = brandConfig?.logo?.url
+    console.log('📷 Logo URL from brand_config:', logoUrl || '(none)')
     const validatedLogoUrl = await validateLogoUrl(logoUrl)
+    console.log('📷 Validated logo URL:', validatedLogoUrl || '(validation failed)')
     if (logoUrl && !validatedLogoUrl) {
-      console.log('⚠️ Logo validation failed, falling back to text:', logoUrl)
+      console.log('⚠️ Logo validation failed, falling back to text. Original URL:', logoUrl)
+      console.log('⚠️ Tip: react-pdf only supports PNG, JPEG, and WebP - NOT SVG')
     }
 
     // Get PDF footer text (custom text or falls back to display_name in the PDF component)

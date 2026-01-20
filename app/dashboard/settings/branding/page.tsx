@@ -727,7 +727,10 @@ export default function BrandingSettingsPage() {
                     )}
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    PNG, JPEG, WebP, or SVG. Max 2MB. Recommended: 200x60px
+                    PNG, JPEG, or WebP (max 2MB). Recommended: 200x60px
+                  </p>
+                  <p className="mt-1 text-xs text-amber-600">
+                    Note: SVG logos will display on web pages but NOT in PDF reports. Use PNG for best results.
                   </p>
                 </div>
 
