@@ -209,7 +209,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     shortName: 'Education',
     accentColor: 'hsl(220, 70%, 55%)', // Academic blue
     accentColorLight: 'hsl(220, 70%, 93%)',
-    illustration: '/illustrations/teacher.png',
+    illustration: '/illustrations/educator.png',
     heroHeadline: 'Transform Learning Outcomes Through Strategic Insight',
     heroHighlight: 'Learning Outcomes',
     heroDescription: 'AI-powered assessment platform that interviews faculty, administrators, parents, and staff to identify institutional strengths, gaps, and pathways to educational excellence.',
