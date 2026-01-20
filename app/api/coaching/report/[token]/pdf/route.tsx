@@ -79,14 +79,31 @@ export async function POST(
     // Construct absolute URL for logo
     // For react-pdf, we need an absolute URL since it runs server-side
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
-                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-                    'http://localhost:3000'
-    const logoPath = tenant?.brand_config?.logo?.url || '/brand/lwm_logo.png'
-    const logoUrl = logoPath.startsWith('http')
-      ? logoPath
-      : `${baseUrl}${logoPath.startsWith('/') ? '' : '/'}${logoPath}`
+                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
-    console.log(`[Coaching PDF] Using logo URL: ${logoUrl}`)
+    // Check if logo is configured in brand_config
+    const rawLogoUrl = tenant?.brand_config?.logo?.url
+    console.log(`[Coaching PDF] Raw logo URL from brand_config: ${rawLogoUrl}`)
+
+    // Determine final logo URL - use uploaded logo or fallback to default
+    let logoUrl: string | undefined = undefined
+    if (rawLogoUrl) {
+      // If logo was uploaded to Supabase, it should already be a full URL
+      logoUrl = rawLogoUrl.startsWith('http')
+        ? rawLogoUrl
+        : `${baseUrl}${rawLogoUrl.startsWith('/') ? '' : '/'}${rawLogoUrl}`
+    }
+    // Note: If no logo uploaded, we'll pass undefined and the PDF will show brand text instead
+
+    console.log(`[Coaching PDF] Final logo URL: ${logoUrl || 'none (will show brand text)'}`)
+    console.log(`[Coaching PDF] Base URL: ${baseUrl}`)
+
+    // Get PDF footer text from brand_config (or email footer as fallback)
+    const pdfFooterText = tenant?.brand_config?.pdfFooterText ||
+                          tenant?.email_config?.emailFooter ||
+                          undefined
+
+    console.log(`[Coaching PDF] PDF footer text: ${pdfFooterText || 'none'}`)
 
     // Prepare report data for PDF
     const reportData: CoachingReportData = {
@@ -94,6 +111,7 @@ export async function POST(
       coachName,
       brandName,
       logoUrl,
+      pdfFooterText,
       generatedDate: new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',

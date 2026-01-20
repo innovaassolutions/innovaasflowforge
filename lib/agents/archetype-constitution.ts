@@ -675,11 +675,18 @@ export function calculateScores(
     friction: { anchor: 0, catalyst: 0, steward: 0, wayfinder: 0, architect: 0 }
   }
 
+  // Enhanced logging for scoring debugging
+  console.log('[SCORING] === Starting score calculation ===')
+  console.log('[SCORING] Total responses received:', Object.keys(responses).length)
+
   for (const question of SURVEY_QUESTIONS) {
     if (!question.scored) continue
 
     const response = responses[question.id]
-    if (!response) continue
+    if (!response) {
+      console.log(`[SCORING] Missing response for ${question.id} (${question.section})`)
+      continue
+    }
 
     let section: keyof typeof scores
     if (question.section === 'default_mode') section = 'default'
@@ -691,14 +698,23 @@ export function calculateScores(
     if (response.most_like_me) {
       const archetype = getArchetypeFromKey(response.most_like_me)
       scores[section][archetype] += 2
+      console.log(`[SCORING] ${question.id} (${section}): most=${response.most_like_me}→${archetype} (+2)`)
     }
 
     // Second most like me = 1 point (only for ranked questions)
     if (question.selection_type === 'ranked' && response.second_most_like_me) {
       const archetype = getArchetypeFromKey(response.second_most_like_me)
       scores[section][archetype] += 1
+      console.log(`[SCORING] ${question.id} (${section}): second=${response.second_most_like_me}→${archetype} (+1)`)
+    } else if (question.selection_type === 'ranked' && !response.second_most_like_me) {
+      console.log(`[SCORING] WARNING: ${question.id} is ranked but missing second_most_like_me`)
     }
   }
+
+  console.log('[SCORING] === Final scores ===')
+  console.log('[SCORING] Default:', JSON.stringify(scores.default))
+  console.log('[SCORING] Authentic:', JSON.stringify(scores.authentic))
+  console.log('[SCORING] Friction:', JSON.stringify(scores.friction))
 
   return scores
 }

@@ -21,6 +21,7 @@ export interface CoachingReportData {
   coachName: string
   brandName: string
   logoUrl?: string  // Absolute URL to the brand logo
+  pdfFooterText?: string  // Custom footer text (e.g., website URL)
   generatedDate: string
   context: {
     role: string
@@ -400,8 +401,135 @@ function CoverPage({ data }: { data: CoachingReportData }) {
 }
 
 // ============================================================================
-// ARCHETYPE PROFILE PAGE
+// ARCHETYPE PROFILE PAGE - Side by Side Layout
 // ============================================================================
+
+// Styles for side-by-side archetype cards
+const sideByCardStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  card: {
+    flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  cardHeader: {
+    padding: 12,
+    backgroundColor: LWM_BRANDING.colors.primary,
+  },
+  cardHeaderLabel: {
+    fontSize: 8,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  cardHeaderTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  cardBody: {
+    padding: 12,
+    backgroundColor: LWM_BRANDING.colors.lightBackground,
+  },
+  cardDescription: {
+    fontSize: 9,
+    color: LWM_BRANDING.colors.textLight,
+    lineHeight: 1.4,
+    marginBottom: 8,
+  },
+  traitsLabel: {
+    fontSize: 7,
+    color: LWM_BRANDING.colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  traitsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  traitBadge: {
+    backgroundColor: 'rgba(45, 90, 123, 0.1)',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  traitText: {
+    fontSize: 7,
+    color: LWM_BRANDING.colors.primary,
+  },
+  sectionBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
+    padding: 8,
+    marginTop: 8,
+  },
+  sectionLabel: {
+    fontSize: 7,
+    fontWeight: 'bold',
+    color: LWM_BRANDING.colors.textMuted,
+    marginBottom: 3,
+    textTransform: 'uppercase',
+  },
+  sectionText: {
+    fontSize: 8,
+    color: LWM_BRANDING.colors.text,
+    lineHeight: 1.4,
+  },
+})
+
+function ArchetypeCard({
+  archetype,
+  label,
+  archetypeKey,
+}: {
+  archetype: typeof ARCHETYPES[keyof typeof ARCHETYPES]
+  label: string
+  archetypeKey: Archetype
+}) {
+  return (
+    <View style={sideByCardStyles.card}>
+      {/* Card Header */}
+      <View style={sideByCardStyles.cardHeader}>
+        <Text style={sideByCardStyles.cardHeaderLabel}>{label}</Text>
+        <Text style={sideByCardStyles.cardHeaderTitle}>The {archetype.name}</Text>
+      </View>
+
+      {/* Card Body */}
+      <View style={sideByCardStyles.cardBody}>
+        {/* Core Traits */}
+        <Text style={sideByCardStyles.traitsLabel}>Core Traits</Text>
+        <View style={sideByCardStyles.traitsContainer}>
+          {archetype.core_traits.map((trait, idx) => (
+            <View key={idx} style={sideByCardStyles.traitBadge}>
+              <Text style={sideByCardStyles.traitText}>{trait}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* When Grounded */}
+        <View style={sideByCardStyles.sectionBox}>
+          <Text style={[sideByCardStyles.sectionLabel, { color: LWM_BRANDING.colors.secondary }]}>
+            When Grounded
+          </Text>
+          <Text style={sideByCardStyles.sectionText}>{archetype.when_grounded}</Text>
+        </View>
+
+        {/* Under Pressure */}
+        <View style={sideByCardStyles.sectionBox}>
+          <Text style={sideByCardStyles.sectionLabel}>Under Pressure</Text>
+          <Text style={sideByCardStyles.sectionText}>{archetype.under_pressure}</Text>
+        </View>
+      </View>
+    </View>
+  )
+}
 
 function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
   const defaultArch = ARCHETYPES[data.default_archetype]
@@ -409,61 +537,29 @@ function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
 
   return (
     <Page size="A4" style={styles.page}>
-      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Leadership Pattern" />
+      <PageHeader logoUrl={data.logoUrl} brandName={data.brandName} pageTitle="Your Leadership Archetypes" />
 
-      <Text style={styles.header}>Your Leadership Pattern</Text>
+      <Text style={styles.header}>Your Leadership Archetypes</Text>
 
       <Text style={styles.bodyText}>
-        This report reveals patterns in how you lead - especially the difference between
-        how you respond under pressure versus what feels most sustainable and energizing.
-        These patterns are not fixed traits; they are adaptive responses that have served you well.
+        Based on your responses, here is what we discovered about your natural leadership patterns.
       </Text>
 
-      {/* Default Mode - wrap={false} keeps section together */}
-      <View wrap={false}>
-        <Text style={styles.sectionTitle}>Under Pressure: {defaultArch.name} Energy</Text>
-        <View style={styles.archetypeCard}>
-          <View style={styles.archetypeHeader}>
-            <View style={styles.archetypeIcon}>
-              <ArchetypeIcon archetype={data.default_archetype} />
-            </View>
-            <View>
-              <Text style={styles.archetypeLabel}>Default Mode</Text>
-              <Text style={styles.archetypeName}>{defaultArch.name}</Text>
-            </View>
-          </View>
-          <Text style={styles.archetypeDescription}>
-            When stakes are high and things feel messy, you tend toward {defaultArch.name} energy: {defaultArch.under_pressure.toLowerCase()}.
-          </Text>
-          <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
-            Core traits: {defaultArch.core_traits.join(', ')}.
-          </Text>
-        </View>
+      {/* Side by Side Archetype Cards */}
+      <View style={sideByCardStyles.row} wrap={false}>
+        <ArchetypeCard
+          archetype={defaultArch}
+          label="Default Archetype Under Pressure"
+          archetypeKey={data.default_archetype}
+        />
+        <ArchetypeCard
+          archetype={authenticArch}
+          label="Authentic Archetype When Grounded"
+          archetypeKey={data.authentic_archetype}
+        />
       </View>
 
-      {/* Authentic Mode - wrap={false} keeps section together */}
-      <View wrap={false}>
-        <Text style={styles.sectionTitle}>At Your Best: {authenticArch.name} Energy</Text>
-        <View style={styles.archetypeCard}>
-          <View style={styles.archetypeHeader}>
-            <View style={styles.archetypeIcon}>
-              <ArchetypeIcon archetype={data.authentic_archetype} />
-            </View>
-            <View>
-              <Text style={styles.archetypeLabel}>Authentic Mode</Text>
-              <Text style={styles.archetypeName}>{authenticArch.name}</Text>
-            </View>
-          </View>
-          <Text style={styles.archetypeDescription}>
-            When you are at your best - grounded and energized - you lead with {authenticArch.name} energy: {authenticArch.when_grounded.toLowerCase()}.
-          </Text>
-          <Text style={[styles.archetypeDescription, { marginTop: 8 }]}>
-            Core traits: {authenticArch.core_traits.join(', ')}.
-          </Text>
-        </View>
-      </View>
-
-      {/* Alignment Insight - wrap={false} keeps section together */}
+      {/* Alignment Insight */}
       <View wrap={false} style={[
         styles.alignmentBox,
         {
@@ -480,18 +576,48 @@ function ArchetypeProfilePage({ data }: { data: CoachingReportData }) {
           styles.alignmentTitle,
           { color: data.is_aligned ? '#27AE60' : '#E67E22' }
         ]}>
-          {data.is_aligned ? 'Aligned Pattern' : 'Misaligned Pattern'}
+          {data.is_aligned ? 'Natural Alignment' : 'Tension Pattern Detected'}
         </Text>
         <Text style={styles.alignmentText}>
           {data.is_aligned
-            ? `Your default response under pressure aligns with what feels most sustainable. This suggests you have developed coping mechanisms that serve both the immediate need and your long-term wellbeing.`
+            ? `Your default response under pressure aligns with what feels most sustainable. This consistency is relatively rare and represents a significant strength. When you're under pressure, you naturally lean into ${defaultArch.name} energy - and this is also the style that feels most authentic to you.`
             : `There is a gap between how you respond under pressure (${defaultArch.name}) and what feels most sustainable (${authenticArch.name}). This is common - we often develop coping patterns that work in the moment but cost us energy over time. The path forward is not to fix this, but to find more moments where you can lead from your authentic mode.`
           }
         </Text>
       </View>
 
+      {/* What This Means */}
+      <View wrap={false} style={{ marginTop: 16 }}>
+        <Text style={styles.sectionTitle}>What This Means For You</Text>
+        <Text style={styles.bodyText}>
+          These patterns are not fixed traits; they are adaptive responses that have served you well.
+          Understanding them helps you lead with greater intention and sustainability.
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.bodyText, { fontWeight: 'bold', marginBottom: 4 }]}>
+              Recognize your patterns
+            </Text>
+            <Text style={[styles.bodyText, { fontSize: 9 }]}>
+              Notice when you default to {defaultArch.name} energy under pressure. These patterns developed for good reasons.
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.bodyText, { fontWeight: 'bold', marginBottom: 4 }]}>
+              {data.is_aligned ? 'Strengthen your strengths' : 'Bridge the gap'}
+            </Text>
+            <Text style={[styles.bodyText, { fontSize: 9 }]}>
+              {data.is_aligned
+                ? `Focus on sustainable ways to leverage your ${defaultArch.name} strengths.`
+                : `Work on accessing your ${authenticArch.name} energy even when stressed.`
+              }
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <View style={styles.pageFooter} fixed>
-        <Text>{data.brandName}</Text>
+        <Text>{data.pdfFooterText || data.brandName}</Text>
         <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
@@ -568,7 +694,7 @@ function ScoresPage({ data }: { data: CoachingReportData }) {
       </View>
 
       <View style={styles.pageFooter} fixed>
-        <Text>{data.brandName}</Text>
+        <Text>{data.pdfFooterText || data.brandName}</Text>
         <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
@@ -611,7 +737,7 @@ function StoriesPage({ data }: { data: CoachingReportData }) {
       </Text>
 
       <View style={styles.pageFooter} fixed>
-        <Text>{data.brandName}</Text>
+        <Text>{data.pdfFooterText || data.brandName}</Text>
         <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>
@@ -689,7 +815,7 @@ function NextStepsPage({ data }: { data: CoachingReportData }) {
       </View>
 
       <View style={styles.pageFooter} fixed>
-        <Text>{data.brandName}</Text>
+        <Text>{data.pdfFooterText || data.brandName}</Text>
         <Text style={styles.pageNumber} render={({ pageNumber }) => `${pageNumber}`} />
       </View>
     </Page>

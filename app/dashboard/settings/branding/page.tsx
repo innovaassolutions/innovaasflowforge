@@ -76,6 +76,7 @@ interface TenantProfile {
     welcomeMessage?: string
     completionMessage?: string
     showPoweredBy?: boolean
+    pdfFooterText?: string
     booking?: {
       enabled: boolean
       url: string
@@ -128,6 +129,7 @@ export default function BrandingSettingsPage() {
     welcomeMessage: '',
     completionMessage: '',
     showPoweredBy: true,
+    pdfFooterText: '',
     colors: { ...DEFAULT_COLORS },
     replyTo: '',
     senderName: '',
@@ -185,6 +187,7 @@ export default function BrandingSettingsPage() {
         welcomeMessage: brandConfig.welcomeMessage || '',
         completionMessage: brandConfig.completionMessage || '',
         showPoweredBy: brandConfig.showPoweredBy !== false,
+        pdfFooterText: brandConfig.pdfFooterText || '',
         colors: {
           primary: brandConfig.colors?.primary || DEFAULT_COLORS.primary,
           primaryHover: brandConfig.colors?.primaryHover || DEFAULT_COLORS.primaryHover,
@@ -263,6 +266,7 @@ export default function BrandingSettingsPage() {
         welcomeMessage: formData.welcomeMessage || null,
         completionMessage: formData.completionMessage || null,
         showPoweredBy: formData.showPoweredBy,
+        pdfFooterText: formData.pdfFooterText || null,
         logo: formData.logoUrl ? {
           url: formData.logoUrl,
           alt: formData.logoAlt || formData.displayName,
@@ -1007,6 +1011,37 @@ export default function BrandingSettingsPage() {
               className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Your Business | Contact Info"
             />
+          </div>
+        </div>
+
+        {/* PDF Report Settings Section */}
+        <div className="bg-card border border-border rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">PDF Report Settings</h2>
+              <p className="text-sm text-muted-foreground">Customize your downloadable PDF reports</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              PDF Footer Text
+            </label>
+            <input
+              type="text"
+              value={formData.pdfFooterText}
+              onChange={(e) => setFormData({ ...formData, pdfFooterText: e.target.value })}
+              className="w-full px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder="www.yourwebsite.com | your@email.com"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Displayed at the bottom of every page in the PDF report. Leave blank to use your display name.
+            </p>
           </div>
         </div>
 

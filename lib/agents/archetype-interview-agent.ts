@@ -815,6 +815,7 @@ function updateSessionState(
           most_like_me: existingResponse.most_like_me,
           second_most_like_me: parsed.most_like_me,
         }
+        console.log(`[RESPONSE CAPTURE] ${currentQ.id} COMPLETED (partial+new): most=${existingResponse.most_like_me}, second=${parsed.most_like_me}`)
       } else {
         // Store as partial response - waiting for second choice
         newState.responses[currentQ.id] = {
@@ -822,6 +823,7 @@ function updateSessionState(
           most_like_me: parsed.most_like_me,
           second_most_like_me: null,
         }
+        console.log(`[RESPONSE CAPTURE] ${currentQ.id} PARTIAL: most=${parsed.most_like_me}, waiting for second`)
         // Don't advance - AI will prompt for second choice
         return newState
       }
@@ -832,6 +834,7 @@ function updateSessionState(
         most_like_me: parsed.most_like_me,
         second_most_like_me: parsed.second_most_like_me,
       }
+      console.log(`[RESPONSE CAPTURE] ${currentQ.id} COMPLETE: most=${parsed.most_like_me}, second=${parsed.second_most_like_me}`)
     }
   } else {
     // Single-select question (context Q1-Q3, friction Q17-Q19)
@@ -840,6 +843,7 @@ function updateSessionState(
       most_like_me: parsed.most_like_me,
       second_most_like_me: null,
     }
+    console.log(`[RESPONSE CAPTURE] ${currentQ.id} SINGLE: most=${parsed.most_like_me}`)
   }
 
   // Advance to next question
