@@ -83,10 +83,21 @@ export default function NewStakeholderPage({ params }: { params: Promise<{ id: s
     try {
       setSubmitting(true)
       setError(null)
+
+      // Get session for authorization
+      const supabase = createClient()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !session) {
+        setError('Authentication required. Please sign in again.')
+        return
+      }
+
       const response = await fetch(apiUrl(`api/company-profiles/${companyId}/stakeholders`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify(formData)
       })
