@@ -809,7 +809,8 @@ export default function CampaignDetailPage() {
             </h2>
             <div className="space-y-4">
               {campaign.stakeholders.map((stakeholder) => {
-                const accessLink = `${window.location.origin}/session/${stakeholder.access_token}`
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowforge.innovaas.co'
+                const accessLink = `${baseUrl}/session/${stakeholder.access_token}`
 
                 return (
                   <div
