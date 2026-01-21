@@ -285,7 +285,7 @@ export async function POST(
     // See: https://github.com/diegomura/react-pdf/issues/2460
     // Note: We MUST use the public URL (not VERCEL_URL) because Vercel Authentication
     // blocks direct deployment URL access. The public domain bypasses SSO protection.
-    const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
+    const internalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowforge.innovaas.co'
     let pdfBuffer: Buffer
     try {
       const pdfApiUrl = `${internalBaseUrl}/api/generate-archetype-pdf`
@@ -337,7 +337,7 @@ export async function POST(
 
     // Build results URL using the public-facing URL (not internal Vercel URL)
     // Points to intro page so clients read "How to Read Your Results" first
-    const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://innovaas.co'
+    const publicBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://flowforge.innovaas.co'
     const resultsUrl = `${publicBaseUrl}/coach/${slug}/results/${token}/intro`
 
     // Get coach email from tenant config

@@ -37,7 +37,7 @@ const ENVIRONMENTS: Record<string, EnvironmentConfig> = {
   production: {
     name: 'Production',
     baseUrl: 'https://flowforge.innovaas.co',
-    llmEndpoint: 'https://innovaas.co/api/voice/chat/completions',
+    llmEndpoint: 'https://flowforge.innovaas.co/api/voice/chat/completions',
   },
   preview: {
     name: 'Preview',
