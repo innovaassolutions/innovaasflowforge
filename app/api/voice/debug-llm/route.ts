@@ -8,10 +8,15 @@ import { createClient } from '@supabase/supabase-js'
  * ElevenLabs is reaching our endpoint.
  */
 
-// Create Supabase client for logging
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseKey)
+// Lazy-initialize Supabase client to avoid build-time errors
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseKey) {
+    return null
+  }
+  return createClient(supabaseUrl, supabaseKey)
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -90,6 +95,8 @@ export async function POST(request: NextRequest) {
     // Log to Supabase for verification (fire and forget)
     ;(async () => {
       try {
+        const supabase = getSupabaseClient()
+        if (!supabase) return
         await supabase.from('debug_logs').insert({
           endpoint: 'debug-llm',
           call_number: callNumber,
