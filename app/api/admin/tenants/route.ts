@@ -23,17 +23,19 @@ interface TenantRecord {
   updated_at: string | null
   user_id: string | null
   custom_domain: string | null
-  user_profiles: {
-    email: string | null
-    full_name: string | null
-    last_seen_at: string | null
-  } | null
   subscription_tiers: {
     id: string
     name: string
     display_name: string | null
     monthly_token_limit: number | null
   } | null
+}
+
+interface UserProfileRecord {
+  id: string
+  email: string | null
+  full_name: string | null
+  last_seen_at: string | null
 }
 
 interface SessionRecord {
@@ -71,7 +73,10 @@ export async function GET(request: NextRequest) {
     const tenantType = searchParams.get('type') // 'coach', 'consultant', 'school'
     const search = searchParams.get('search')
 
-    // Fetch tenants (left join user_profiles and subscription_tiers)
+    // Fetch tenants with subscription_tiers join (direct FK relationship)
+    // NOTE: user_profiles is fetched separately because tenant_profiles.user_id
+    // references auth.users(id), not user_profiles(id) directly, which can
+    // cause PostgREST relationship resolution issues.
     let query = supabaseAdmin
       .from('tenant_profiles')
       .select(`
@@ -79,7 +84,6 @@ export async function GET(request: NextRequest) {
         subscription_tier, tier_id, usage_limit_override, billing_period_start,
         is_active, created_at, updated_at,
         user_id, custom_domain,
-        user_profiles(email, full_name, last_seen_at),
         subscription_tiers(id, name, display_name, monthly_token_limit)
       `)
       .order('created_at', { ascending: false })
@@ -96,6 +100,23 @@ export async function GET(request: NextRequest) {
     }
 
     const tenants = data as TenantRecord[] | null
+
+    // Fetch user profiles separately for owner info
+    const userIds = tenants?.map((t) => t.user_id).filter(Boolean) as string[] || []
+    const userProfileMap = new Map<string, UserProfileRecord>()
+
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from('user_profiles')
+        .select('id, email, full_name, last_seen_at')
+        .in('id', userIds)
+
+      if (profiles) {
+        for (const p of profiles as UserProfileRecord[]) {
+          userProfileMap.set(p.id, p)
+        }
+      }
+    }
 
     // Get session counts for each tenant
     const tenantIds = tenants?.map((t) => t.id) || []
@@ -152,6 +173,8 @@ export async function GET(request: NextRequest) {
         ?? tenant.subscription_tiers?.monthly_token_limit
         ?? null
 
+      const ownerProfile = tenant.user_id ? userProfileMap.get(tenant.user_id) : null
+
       return {
         id: tenant.id,
         slug: tenant.slug,
@@ -163,9 +186,9 @@ export async function GET(request: NextRequest) {
         created_at: tenant.created_at,
         updated_at: tenant.updated_at,
         owner: {
-          email: tenant.user_profiles?.email,
-          name: tenant.user_profiles?.full_name,
-          last_seen_at: tenant.user_profiles?.last_seen_at,
+          email: ownerProfile?.email ?? null,
+          name: ownerProfile?.full_name ?? null,
+          last_seen_at: ownerProfile?.last_seen_at ?? null,
         },
         tier: tenant.subscription_tiers
           ? {

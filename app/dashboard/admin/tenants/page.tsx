@@ -28,6 +28,7 @@ import {
   X,
   Zap,
   TrendingUp,
+  RotateCcw,
 } from 'lucide-react'
 
 interface TierInfo {
@@ -101,6 +102,7 @@ export default function AdminTenantsPage() {
   const [overrideValue, setOverrideValue] = useState<string>('')
   const [enableOverride, setEnableOverride] = useState(false)
   const [savingTier, setSavingTier] = useState(false)
+  const [resettingUsage, setResettingUsage] = useState(false)
 
   useEffect(() => {
     checkAdminAndLoadData()
@@ -254,6 +256,37 @@ export default function AdminTenantsPage() {
       setError(err.message || 'Failed to save tier changes')
     } finally {
       setSavingTier(false)
+    }
+  }
+
+  async function resetUsage() {
+    if (!selectedTenant) return
+
+    const confirmed = window.confirm(
+      `Reset usage for "${selectedTenant.display_name}"? This will start a new billing period from today, effectively zeroing their usage counter. Historical data is preserved.`
+    )
+    if (!confirmed) return
+
+    setResettingUsage(true)
+    try {
+      const response = await fetch(`/api/admin/tenants/${selectedTenant.id}/reset-usage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (!response.ok) {
+        const errData = await response.json()
+        throw new Error(errData.error || 'Failed to reset usage')
+      }
+
+      // Reload tenants to reflect changes
+      await loadTenants()
+      closeTierModal()
+    } catch (err: any) {
+      console.error('Error resetting usage:', err)
+      setError(err.message || 'Failed to reset usage')
+    } finally {
+      setResettingUsage(false)
     }
   }
 
@@ -661,6 +694,48 @@ export default function AdminTenantsPage() {
                       {formatTokens(selectedTenant.effectiveLimit)}
                     </span>
                   </div>
+                  {selectedTenant.billingPeriodStart && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Billing Start:</span>
+                      <span className="text-foreground">
+                        {formatDate(selectedTenant.billingPeriodStart)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Reset Usage */}
+              <div className="border border-amber-200 bg-amber-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-amber-800">
+                      Reset Usage
+                    </h3>
+                    <p className="text-xs text-amber-600 mt-0.5">
+                      Start a new billing period from today
+                    </p>
+                  </div>
+                  <button
+                    onClick={resetUsage}
+                    disabled={resettingUsage}
+                    className="px-3 py-1.5 border border-amber-300 bg-white text-amber-700 rounded-lg
+                               text-xs font-medium hover:bg-amber-100
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               transition-colors flex items-center gap-1.5"
+                  >
+                    {resettingUsage ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="w-3 h-3" />
+                        Reset
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 

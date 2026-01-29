@@ -59,26 +59,20 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const { id } = await context.params
     const body: UpdateTierRequest = await request.json()
 
-    // Validate tierId is provided
-    if (!body.tierId) {
-      return NextResponse.json(
-        { error: 'tierId is required' },
-        { status: 400 }
-      )
-    }
+    // Verify the tier exists (if tierId is provided and not null)
+    if (body.tierId) {
+      const { data: tier, error: tierError } = await supabaseAdmin
+        .from('subscription_tiers')
+        .select('id, name, display_name, monthly_token_limit')
+        .eq('id', body.tierId)
+        .single()
 
-    // Verify the tier exists
-    const { data: tier, error: tierError } = await supabaseAdmin
-      .from('subscription_tiers')
-      .select('id, name, display_name, monthly_token_limit')
-      .eq('id', body.tierId)
-      .single()
-
-    if (tierError || !tier) {
-      return NextResponse.json(
-        { error: 'Invalid tier ID' },
-        { status: 400 }
-      )
+      if (tierError || !tier) {
+        return NextResponse.json(
+          { error: 'Invalid tier ID' },
+          { status: 400 }
+        )
+      }
     }
 
     // Verify the tenant exists
@@ -97,7 +91,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     // Build update object
     const updateData: Record<string, unknown> = {
-      tier_id: body.tierId,
+      tier_id: body.tierId || null,
       updated_at: new Date().toISOString(),
     }
 
