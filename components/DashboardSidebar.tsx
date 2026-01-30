@@ -19,6 +19,7 @@ import {
   Palette,
   Activity,
   DollarSign,
+  MessageSquare,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -174,7 +175,17 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...brandingNavItems]
+  // Conversations - shown for all user types
+  const conversationsNavItems = userProfile?.user_type ? [
+    {
+      name: 'Conversations',
+      href: '/dashboard/conversations',
+      icon: MessageSquare,
+      matchPaths: ['/dashboard/conversations']
+    }
+  ] : []
+
+  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...brandingNavItems, ...conversationsNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
