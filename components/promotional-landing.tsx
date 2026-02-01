@@ -202,7 +202,7 @@ export default function PromotionalLanding() {
           <h2 className="text-2xl font-bold text-center text-foreground mb-8
                          md:text-3xl
                          lg:text-4xl lg:mb-12">
-            Built For {content.name} Leaders
+            {content.key === 'professional-services' ? 'Built For Consultants Who Think Bigger' : `Built For ${content.name} Leaders`}
           </h2>
 
           <div className="grid grid-cols-1 gap-6

@@ -1,35 +1,40 @@
-# Innovaas FlowForge
+# FlowForge
 
-**Multi-Disciplinary Consulting Platform**
+**Multi-Vertical AI Conversation Platform**
 
 ## Overview
 
-FlowForge is a SaaS platform that enables management consultants to facilitate structured assessments, workshops, and strategy sessions using AI-powered agents specialized in various consulting methodologies.
+FlowForge is a SaaS platform that enables consultants, coaches, and educators to run structured AI-facilitated conversations at scale — capturing richer stakeholder insights, synthesizing patterns across participants, and delivering sophisticated deliverables in a fraction of the time.
 
-### Supported Methodologies (Modular Agent System)
+### Who It's For
 
-- **Theory of Constraints**: Identify and resolve system bottlenecks
-- **Lean Six Sigma**: Process optimization and waste reduction
-- **Industry 4.0 Best Practices**: Digital transformation readiness
-- **BMAD Method**: Business planning and strategic frameworks
-- **Additional Frameworks**: Extensible architecture for new methodologies
+- **Senior Consultants & Boutique Firms** — Scale your practice without scaling headcount. Run multiple discovery engagements simultaneously while maintaining the depth your clients expect.
+- **Coaches & Leadership Development** — Facilitate structured self-discovery conversations that reveal patterns, archetypes, and growth opportunities.
+- **Educators & Institutions** — Capture stakeholder perspectives across faculty, staff, parents, and administrators to drive institutional improvement.
+- **Manufacturing & Operations** — Assess digital transformation readiness across complex organizations with multiple stakeholder groups.
+
+### Live Use Cases
+
+- **Leadership Archetype Discovery** (Coaching) — Built with [Leading With Meaning](https://leadingwithmeaning.com), helping leaders uncover their leadership archetypes through guided AI conversations
+- **Digital Transformation Readiness** (Manufacturing) — Multi-stakeholder assessment of Industry 4.0 maturity
+- **Institutional Assessment** (Education) — Cross-stakeholder analysis for schools and universities
 
 ### Platform Capabilities
 
-FlowForge combines AI-facilitated stakeholder interviews with automated synthesis to deliver:
-- Structured assessment campaigns
-- Multi-stakeholder workshop facilitation
-- Cross-perspective synthesis and analysis
-- Strategic recommendations and roadmaps
-- Professional reporting and documentation
+FlowForge combines AI-facilitated stakeholder conversations with automated synthesis to deliver:
+- Structured assessment and discovery campaigns
+- Multi-stakeholder interview facilitation (text and voice)
+- Cross-perspective synthesis and pattern identification
+- Strategic recommendations and insights reports
+- Professional PDF reporting and documentation
 
-The platform supports both external consultants managing multiple clients and internal company teams running their own assessments.
+The platform supports both external consultants managing multiple clients and internal teams running their own assessments.
 
 ## Architecture
 
 ### Multi-Tenancy Model
 
-FlowForge uses a **campaign-level multi-tenancy** architecture with two distinct user types:
+FlowForge uses a **campaign-level multi-tenancy** architecture with multiple user types:
 
 #### User Types
 
@@ -40,7 +45,13 @@ FlowForge uses a **campaign-level multi-tenancy** architecture with two distinct
    - Billed per campaign
    - Access all campaigns they create
 
-2. **Company Users**
+2. **Coaches**
+   - Manage coaching sessions with individual clients
+   - Custom-branded tenant profiles with unique slugs
+   - Run archetype discovery and leadership assessments
+   - Token-based client access (no login required)
+
+3. **Company Users**
    - Linked to one company profile (their organization)
    - Manage stakeholder profiles (employees)
    - Create campaigns for their divisions
@@ -50,7 +61,12 @@ FlowForge uses a **campaign-level multi-tenancy** architecture with two distinct
 
 ```
 Users (Facilitators)
-└── User Type: Consultant | Company
+└── User Type: Consultant | Coach | Company
+
+Tenant Profiles (Coach/Consultant Branding)
+├── Custom slug and branding
+├── Enabled assessment types
+└── Brand colors and configuration
 
 Company Profiles
 ├── Managed by Consultants (many) OR
@@ -68,10 +84,16 @@ Campaigns
 ├── Campaign Type: Methodology/Framework being used
 └── Assessment type, status, metadata
 
+Coaching Sessions
+├── Belong to Tenant Profile
+├── Individual client sessions
+├── Token-based access
+└── Conversation data and artifacts
+
 Campaign Assignments
 ├── Links Stakeholder Profile → Campaign
 ├── Unique access_token per assignment
-├── Tracks interview/workshop progress
+├── Tracks interview progress
 └── Stores conversation data and artifacts
 ```
 
@@ -83,15 +105,16 @@ FlowForge uses a **methodology-specific agent system**:
 Campaign → Methodology Selection → Specialized Agent
 
 Examples:
-- Industry 4.0 Campaign → Industry 4.0 Assessment Agent
+- Consulting Discovery → Stakeholder Interview Agent
+- Coaching Session → Archetype Discovery Agent
+- Education Assessment → Institutional Review Agent
+- Industry 4.0 Campaign → Digital Transformation Agent
 - TOC Campaign → Theory of Constraints Agent
-- Lean Six Sigma Campaign → LSS Process Agent
-- BMAD Strategic Planning → Strategic Planning Agent
 ```
 
 Each agent is purpose-built with:
-- Domain-specific knowledge base
-- Methodology-appropriate questioning framework
+- Domain-specific knowledge and frameworks
+- Methodology-appropriate questioning strategies
 - Specialized synthesis and analysis capabilities
 - Custom reporting templates
 
@@ -99,8 +122,9 @@ Each agent is purpose-built with:
 
 - **Reusable Stakeholder Profiles**: Same stakeholder can participate in multiple campaigns without re-entering information
 - **Company-Level Isolation**: Data properly isolated by company, not by user account
-- **Flexible Access Control**: RLS policies support both consultant and company user workflows
-- **Token-Based Access**: Stakeholders access sessions via unique URLs (no login required)
+- **Flexible Access Control**: RLS policies support consultant, coach, and company user workflows
+- **Token-Based Access**: Stakeholders and coaching clients access sessions via unique URLs (no login required)
+- **Voice Interviews**: ElevenLabs integration for natural voice-based conversations
 - **Methodology Flexibility**: Modular agent system supports diverse consulting frameworks
 
 ## Tech Stack
@@ -108,8 +132,9 @@ Each agent is purpose-built with:
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Database**: Supabase (PostgreSQL)
-- **Styling**: TailwindCSS with Catppuccin Mocha theme
+- **Styling**: TailwindCSS with Pearl Vibrant theme
 - **AI**: Anthropic Claude API (Sonnet 4.5)
+- **Voice**: ElevenLabs Conversational AI
 - **PDF Generation**: @react-pdf/renderer
 - **Email**: Resend
 
@@ -125,14 +150,14 @@ Create a new company profile.
 
 ```json
 {
-  "companyName": "Acme Manufacturing",
-  "industry": "Automotive",
-  "description": "Leading automotive parts manufacturer",
-  "website": "https://acme.com",
-  "marketScope": "international",
-  "employeeCountRange": "500-1000",
-  "annualRevenueRange": "$50M-$100M",
-  "headquartersLocation": "Detroit, MI"
+  "companyName": "Meridian Strategy Group",
+  "industry": "Professional Services",
+  "description": "Boutique strategy consulting firm",
+  "website": "https://meridianstrategy.com",
+  "marketScope": "national",
+  "employeeCountRange": "10-50",
+  "annualRevenueRange": "$1M-$5M",
+  "headquartersLocation": "Austin, TX"
 }
 ```
 
@@ -148,11 +173,11 @@ Create a stakeholder profile for a company.
 
 ```json
 {
-  "fullName": "John Doe",
-  "email": "john@acme.com",
-  "roleType": "it_operations",
-  "title": "IT Director",
-  "department": "Information Technology"
+  "fullName": "Sarah Chen",
+  "email": "sarah@clientorg.com",
+  "roleType": "executive_leadership",
+  "title": "VP of Operations",
+  "department": "Operations"
 }
 ```
 
@@ -166,30 +191,32 @@ Create a new campaign.
 
 ```json
 {
-  "name": "Q1 2025 TOC Assessment",
+  "name": "Q1 2026 Organizational Assessment",
   "companyProfileId": "uuid",
-  "campaignType": "theory_of_constraints", // Methodology selection
+  "campaignType": "consulting_discovery",
   "facilitatorName": "Jane Smith",
   "facilitatorEmail": "jane@consultant.com",
-  "description": "Quarterly constraint analysis",
+  "description": "Cross-functional stakeholder discovery for strategic planning engagement",
   "stakeholders": [
     {
-      "stakeholderProfileId": "uuid" // Existing profile
+      "stakeholderProfileId": "uuid"
     },
     {
-      // OR create new profile inline
       "fullName": "New Stakeholder",
-      "email": "new@acme.com",
-      "roleType": "production_manager",
-      "position": "Plant Manager",
-      "department": "Manufacturing"
+      "email": "new@clientorg.com",
+      "roleType": "department_head",
+      "position": "Director of Engineering",
+      "department": "Engineering"
     }
   ]
 }
 ```
 
 **Supported Campaign Types:**
+- `consulting_discovery` - Stakeholder discovery and organizational assessment
+- `coaching_archetype_discovery` - Leadership archetype and self-discovery
 - `industry_4_0_readiness` - Digital transformation assessment
+- `education_institutional` - Institutional assessment
 - `theory_of_constraints` - System bottleneck identification
 - `lean_six_sigma` - Process optimization
 - `bmad_strategic_planning` - Business planning framework
@@ -203,17 +230,19 @@ List all campaigns created by the authenticated user.
 **GET /api/sessions/[token]**
 Access a session via access token.
 - Public endpoint (no auth required)
-- Used by stakeholders to access their interviews/workshops
+- Used by stakeholders to access their interviews
 
 ## Database Schema
 
 ### Key Tables
 
+- **user_profiles**: User accounts with type (consultant/coach/company)
+- **tenant_profiles**: Coach/consultant branding and configuration
 - **company_profiles**: Company information and metadata
 - **stakeholder_profiles**: Reusable stakeholder records
-- **user_profiles**: User accounts with type (consultant/company)
 - **campaigns**: Assessment/workshop campaigns with methodology type
 - **campaign_assignments**: Join table linking stakeholders to campaigns with access tokens
+- **coaching_sessions**: Individual coaching client sessions
 - **agent_sessions**: AI conversation state and history
 
 ### Row Level Security (RLS)
@@ -224,6 +253,7 @@ All tables use RLS policies to enforce multi-tenancy:
 - **stakeholder_profiles**: Users manage stakeholders for their companies
 - **campaigns**: Users manage campaigns they created or for their company
 - **campaign_assignments**: Facilitators manage assignments; stakeholders access via token
+- **coaching_sessions**: Coaches manage their sessions; clients access via token
 
 ## Development
 
@@ -233,6 +263,7 @@ All tables use RLS policies to enforce multi-tenancy:
 - Supabase account
 - Anthropic API key
 - Resend API key
+- ElevenLabs API key (for voice features)
 
 ### Environment Variables
 
@@ -247,6 +278,9 @@ ANTHROPIC_API_KEY=your-api-key
 
 # Resend
 RESEND_API_KEY=your-api-key
+
+# ElevenLabs
+ELEVENLABS_API_KEY=your-api-key
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -267,13 +301,7 @@ npm run dev
 
 ### Database Migrations
 
-Migrations are in `supabase/migrations/` and should be applied in order:
-1. Initial schema
-2. Multi-tenancy setup
-3. Company profiles and stakeholder profiles
-4. Table renames and cleanup
-
-See [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md) for details.
+Migrations are in `supabase/migrations/` and should be applied in order. See [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md) for details.
 
 ## User Journeys
 
@@ -281,10 +309,18 @@ See [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md) for details.
 
 1. **Signup** → Select "Consultant" user type
 2. **Create Company Profile** → Add client company details
-3. **Add Stakeholder Profiles** → Create profiles for client employees
+3. **Add Stakeholder Profiles** → Create profiles for client stakeholders
 4. **Create Campaign** → Select methodology, assign stakeholders
 5. **Monitor Progress** → Track session completion
 6. **Review Synthesis** → Access AI-generated insights and recommendations
+
+### Coach Workflow
+
+1. **Signup** → Select "Coach" user type
+2. **Set Up Tenant Profile** → Configure branding and slug
+3. **Create Session** → Add client details, select assessment type
+4. **Share Link** → Client accesses via unique token URL
+5. **Review Results** → Access conversation insights and archetype analysis
 
 ### Company Workflow
 
@@ -294,11 +330,11 @@ See [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md) for details.
 4. **Monitor Progress** → Track session completion
 5. **Review Synthesis** → Access AI-generated insights and recommendations
 
-### Stakeholder Workflow
+### Stakeholder / Client Workflow
 
 1. **Receive Email** → With unique access link
 2. **Click Link** → No login required
-3. **Complete Session** → AI-facilitated conversation/workshop (20-30 min)
+3. **Complete Session** → AI-facilitated conversation (20-30 min, text or voice)
 4. **Upload Documents** → Optional supporting materials
 5. **Submit** → Completion confirmation
 
@@ -307,25 +343,27 @@ See [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md) for details.
 ### Modular Agent Architecture
 
 FlowForge uses methodology-specific agents, each with:
-- **Domain Knowledge Base**: Relevant frameworks, best practices, terminology
+- **Domain Knowledge**: Relevant frameworks, best practices, terminology
 - **Questioning Strategy**: Methodology-appropriate interview structure
 - **Analysis Capabilities**: Specialized synthesis for that domain
 - **Reporting Templates**: Custom outputs for methodology
 
 ### Current Agents
 
+#### Coaching Archetype Discovery Agent
+- **Purpose**: Leadership archetype identification and self-discovery
+- **Model**: Claude Sonnet 4.5
+- **Outputs**: Archetype profile, leadership patterns, development recommendations
+
+#### Consulting Discovery Agent
+- **Purpose**: Multi-stakeholder organizational assessment
+- **Model**: Claude Sonnet 4.5
+- **Outputs**: Stakeholder synthesis, alignment analysis, strategic recommendations
+
 #### Industry 4.0 Assessment Agent
 - **Purpose**: Digital transformation readiness evaluation
 - **Model**: Claude Sonnet 4.5
-- **Knowledge Base**: Industry 4.0, UNS, IIoT, smart manufacturing
 - **Outputs**: Maturity assessment, technology roadmap, implementation plan
-
-### Planned Agents (Modular Expansion)
-
-- **Theory of Constraints Agent**: System bottleneck identification
-- **Lean Six Sigma Agent**: Process optimization and waste analysis
-- **BMAD Strategic Planning Agent**: Business model and strategy development
-- *(Additional agents for new methodologies)*
 
 ### Agent Architecture
 
@@ -344,21 +382,25 @@ interface ConsultingAgent {
 - **Architecture**: [docs/ARCHITECTURE-multi-tenancy-redesign.md](docs/ARCHITECTURE-multi-tenancy-redesign.md)
 - **Migration Plan**: [docs/MIGRATION-PLAN.md](docs/MIGRATION-PLAN.md)
 - **PDF Design**: [docs/pdf-design-guidelines.md](docs/pdf-design-guidelines.md)
+- **Design System**: [docs/design-system.md](docs/design-system.md)
+- **Voice Integration**: [docs/elevenlabs-knowledge.md](docs/elevenlabs-knowledge.md)
 - **Knowledge Base**: [docs/knowledge/](docs/knowledge/) - Methodology-specific reference materials
 
 ## Future Roadmap
 
 ### Methodology Expansion
-- Add Theory of Constraints agent and knowledge base
-- Add Lean Six Sigma agent and templates
-- Add BMAD Method strategic planning workflows
-- Build agent creation framework for custom methodologies
+- Additional coaching and leadership development frameworks
+- Theory of Constraints agent and knowledge base
+- Lean Six Sigma agent and templates
+- BMAD Method strategic planning workflows
+- Agent creation framework for custom methodologies
 
 ### Platform Enhancements
 - Multi-agent workshop facilitation
 - Real-time collaboration features
 - Advanced analytics dashboard
 - Custom reporting builder
+- White-label tenant experiences
 
 ## License
 

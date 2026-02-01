@@ -6,7 +6,9 @@
 
 **Innovaas FlowForge** is a management consulting platform that enables consultants to conduct structured assessments across any industry through AI-facilitated stakeholder interviews and intelligent synthesis.
 
-**First Use Case**: Digital Transformation Readiness Assessment - helping organizations across healthcare, manufacturing, retail, finance, education, logistics, and professional services evaluate their digital maturity and transformation readiness.
+**First Live Use Case**: Leadership Archetype Discovery — a coaching vertical built with Leading With Meaning, helping leaders uncover their leadership archetypes through AI-facilitated conversations and structured self-discovery.
+
+**Additional Verticals**: Digital transformation readiness assessments (manufacturing), institutional assessments (education), and consulting discovery across professional services.
 
 ## Key Technologies
 

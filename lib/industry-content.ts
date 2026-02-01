@@ -287,85 +287,85 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     accentColor: 'hsl(260, 60%, 55%)', // Corporate purple
     accentColorLight: 'hsl(260, 60%, 93%)',
     illustration: '/illustrations/consultant.png',
-    heroHeadline: 'Automate Client Discovery With AI-Powered Interviews',
-    heroHighlight: 'Client Discovery',
-    heroDescription: 'AI-powered platform that conducts stakeholder interviews across your client organizations, identifies operational pain points, and synthesizes findings into comprehensive strategic reports.',
+    heroHeadline: 'Scale Your Expertise Without Scaling Headcount',
+    heroHighlight: 'Your Expertise',
+    heroDescription: 'AI-powered conversations that let senior consultants, coaches, and boutique firms run more engagements simultaneously — capturing richer data, delivering better deliverables, and growing revenue per client.',
     valueProps: [
       {
-        title: 'Faster Discovery',
-        description: 'Complete client assessments in days instead of weeks'
+        title: 'More Revenue, Same Team',
+        description: 'Run 3-5x more engagements simultaneously without hiring junior staff'
       },
       {
-        title: 'Deeper Insights',
-        description: 'AI interviews uncover friction points that surface interviews miss'
+        title: 'Richer Stakeholder Data',
+        description: 'AI conversations capture nuance that surveys miss and go deeper than time-constrained interviews'
       },
       {
-        title: 'Beautiful Reports',
-        description: 'Deliver executive-ready synthesis documents that impress clients'
+        title: 'Sophisticated Deliverables',
+        description: 'Automated synthesis turns raw conversations into executive-ready insights and reports'
       }
     ],
     personas: [
       {
-        title: 'Management Consultants',
-        description: 'Automate the initial discovery phase and focus on strategic recommendations.',
+        title: 'Solo Consultants',
+        description: 'Multiply your capacity without sacrificing the quality your clients expect.',
         benefits: [
-          'Stakeholder interview automation',
-          'Cross-divisional synthesis',
-          'Actionable recommendations'
+          'Run multiple client campaigns at once',
+          'Consistent methodology across engagements',
+          'More billable hours on strategy, less on data gathering'
         ]
       },
       {
-        title: 'Strategy Firms',
-        description: 'Scale your discovery capacity without scaling headcount.',
+        title: 'Boutique Firms',
+        description: 'Compete with large firms on data depth while keeping the personal touch that wins clients.',
         benefits: [
-          'Parallel client assessments',
-          'Consistent methodology',
-          'Faster time to insights'
+          'Scale discovery without scaling headcount',
+          'Standardized yet flexible interview frameworks',
+          'Cross-stakeholder synthesis in hours, not weeks'
         ]
       },
       {
-        title: 'Operations Consultants',
-        description: 'Identify operational bottlenecks and transformation opportunities.',
+        title: 'Coaching Practices',
+        description: 'Deepen client self-awareness with structured conversations that reveal patterns and archetypes.',
         benefits: [
-          'Process pain point mapping',
-          'Stakeholder alignment gaps',
-          'Prioritized improvement roadmap'
+          'Guided leadership discovery sessions',
+          'Archetype and pattern identification',
+          'Beautiful client-facing reports'
         ]
       }
     ],
     painPoints: [
       {
-        title: 'Discovery Bottleneck',
-        description: 'Your best consultants spend weeks on interviews instead of strategy. AI handles discovery so you focus on value.'
+        title: 'Revenue Ceiling',
+        description: 'Your income is capped by your calendar. FlowForge lets you serve more clients without working more hours.'
       },
       {
-        title: 'Inconsistent Methodology',
-        description: 'Every consultant interviews differently. Standardize your discovery process across all engagements.'
+        title: 'Data Depth vs. Time',
+        description: 'Thorough stakeholder interviews take weeks. AI conversations run in parallel and go deeper than you have time to.'
       },
       {
-        title: 'Synthesis Overload',
-        description: 'Turning dozens of interview notes into coherent insights is exhausting. AI synthesizes everything automatically.'
+        title: 'Deliverable Bottleneck',
+        description: 'You spend more time synthesizing notes than advising clients. Let AI handle the synthesis so you focus on strategy.'
       }
     ],
-    ctaPrimary: 'Start Client Assessment',
-    ctaSecondary: 'See Consulting Demo',
+    ctaPrimary: 'Start Scaling Your Practice',
+    ctaSecondary: 'See How It Works',
     stats: [
-      { value: '80%', label: 'Faster discovery phase' },
-      { value: '25+', label: 'Stakeholders per engagement' },
-      { value: '3 Days', label: 'From kickoff to insights report' }
+      { value: '3-5x', label: 'More engagements per consultant' },
+      { value: '80%', label: 'Less time on data gathering' },
+      { value: '48hrs', label: 'From interviews to deliverable' }
     ],
     heroMockup: 'professional-services'
   }
 }
 
 // Default industry for new visitors
-export const defaultIndustry: IndustryKey = 'manufacturing'
+export const defaultIndustry: IndustryKey = 'professional-services'
 
 // All industries in display order (pharma temporarily hidden)
 export const industryOrder: IndustryKey[] = [
-  'manufacturing',
+  'professional-services',
   'education',
-  'professional-services'
+  'manufacturing'
 ]
 
 // Helper to get industry by key

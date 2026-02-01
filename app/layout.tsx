@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Flow Forge - A Junior Consultant in your Browser",
-  description: "AI-powered OPEX assistant platform with multi-stakeholder interviews and synthesis",
+  title: "FlowForge — Scale Your Consulting Practice with AI",
+  description: "AI-powered conversation platform that helps consultants, coaches, and educators scale their practices, capture richer stakeholder insights, and deliver more sophisticated deliverables.",
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
