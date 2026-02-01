@@ -287,71 +287,71 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
     accentColor: 'hsl(260, 60%, 55%)', // Corporate purple
     accentColorLight: 'hsl(260, 60%, 93%)',
     illustration: '/illustrations/consultant.png',
-    heroHeadline: 'Scale Your Expertise Without Scaling Headcount',
+    heroHeadline: 'Encode Your Expertise, Scale Your Impact',
     heroHighlight: 'Your Expertise',
-    heroDescription: 'AI-powered conversations that let senior consultants, coaches, and boutique firms run more engagements simultaneously — capturing richer data, delivering better deliverables, and growing revenue per client.',
+    heroDescription: 'Put your methodology, frameworks, and questioning approach into FlowForge — then run it across multiple clients simultaneously. Your brain, multiplied. Your expertise, encoded and working while you sleep.',
     valueProps: [
       {
-        title: 'More Revenue, Same Team',
-        description: 'Run 3-5x more engagements simultaneously without hiring junior staff'
+        title: 'Encode What Makes You Great',
+        description: 'Capture your methodology, frameworks, and interviewing instincts — FlowForge runs them at scale across every engagement'
       },
       {
-        title: 'Richer Stakeholder Data',
-        description: 'AI conversations capture nuance that surveys miss and go deeper than time-constrained interviews'
+        title: 'Your Brain, Multiplied',
+        description: 'Run 3-5x more client engagements simultaneously, each one reflecting your unique approach and expertise'
       },
       {
-        title: 'Sophisticated Deliverables',
-        description: 'Automated synthesis turns raw conversations into executive-ready insights and reports'
+        title: 'Richer Data, Better Deliverables',
+        description: 'AI conversations go deeper than time-constrained interviews, then synthesize everything into executive-ready insights'
       }
     ],
     personas: [
       {
         title: 'Solo Consultants',
-        description: 'Multiply your capacity without sacrificing the quality your clients expect.',
+        description: 'Encode your approach once, then deploy it across every client. Your methodology runs at scale while you focus on high-value strategy work.',
         benefits: [
-          'Run multiple client campaigns at once',
-          'Consistent methodology across engagements',
+          'Your frameworks, running across multiple clients at once',
+          'Consistent methodology without consistent effort',
           'More billable hours on strategy, less on data gathering'
         ]
       },
       {
         title: 'Boutique Firms',
-        description: 'Compete with large firms on data depth while keeping the personal touch that wins clients.',
+        description: 'Capture your firm\'s collective expertise in one platform. Every engagement reflects your best thinking, not whoever happens to be available.',
         benefits: [
-          'Scale discovery without scaling headcount',
-          'Standardized yet flexible interview frameworks',
+          'Institutional knowledge encoded, not locked in senior heads',
+          'Scale engagements without diluting quality',
           'Cross-stakeholder synthesis in hours, not weeks'
         ]
       },
       {
         title: 'Coaching Practices',
-        description: 'Deepen client self-awareness with structured conversations that reveal patterns and archetypes.',
+        description: 'Encode your coaching methodology into guided conversations that reveal patterns, archetypes, and growth opportunities at depth.',
         benefits: [
-          'Guided leadership discovery sessions',
-          'Archetype and pattern identification',
-          'Beautiful client-facing reports'
+          'Your coaching framework, available to more clients',
+          'Structured self-discovery that scales',
+          'Beautiful client-facing reports and insights'
         ]
       }
     ],
     painPoints: [
       {
-        title: 'Revenue Ceiling',
-        description: 'Your income is capped by your calendar. FlowForge lets you serve more clients without working more hours.'
+        title: 'Your Expertise Doesn\'t Scale',
+        description: 'Your best work lives in your head. FlowForge lets you encode it — your frameworks, your questions, your instincts — and run it across every engagement.'
       },
       {
-        title: 'Data Depth vs. Time',
-        description: 'Thorough stakeholder interviews take weeks. AI conversations run in parallel and go deeper than you have time to.'
+        title: 'Revenue Capped by Your Calendar',
+        description: 'You can only be in one room at a time. Your encoded expertise can be in dozens of conversations simultaneously.'
       },
       {
-        title: 'Deliverable Bottleneck',
-        description: 'You spend more time synthesizing notes than advising clients. Let AI handle the synthesis so you focus on strategy.'
+        title: 'Synthesis Eats Your Strategy Time',
+        description: 'You spend more time organizing notes than advising clients. Let AI synthesize — you focus on the insights only you can deliver.'
       }
     ],
-    ctaPrimary: 'Start Scaling Your Practice',
+    ctaPrimary: 'Encode Your Expertise',
     ctaSecondary: 'See How It Works',
     stats: [
       { value: '3-5x', label: 'More engagements per consultant' },
-      { value: '80%', label: 'Less time on data gathering' },
+      { value: '100%', label: 'Your methodology, every time' },
       { value: '48hrs', label: 'From interviews to deliverable' }
     ],
     heroMockup: 'professional-services'

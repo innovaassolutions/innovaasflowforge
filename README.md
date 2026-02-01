@@ -1,15 +1,17 @@
 # FlowForge
 
-**Multi-Vertical AI Conversation Platform**
+**Encode Your Expertise. Scale Your Impact.**
 
 ## Overview
 
-FlowForge is a SaaS platform that enables consultants, coaches, and educators to run structured AI-facilitated conversations at scale — capturing richer stakeholder insights, synthesizing patterns across participants, and delivering sophisticated deliverables in a fraction of the time.
+FlowForge lets senior consultants, coaches, and educators encode their methodology, frameworks, and questioning approach into an AI-powered platform — then run it across multiple clients simultaneously. Your brain, multiplied. Your expertise, working at scale.
+
+Instead of replacing experts with AI, FlowForge amplifies what makes them great. Encode your approach once, deploy it across every engagement, and focus your time on the high-value strategic work only you can deliver.
 
 ### Who It's For
 
-- **Senior Consultants & Boutique Firms** — Scale your practice without scaling headcount. Run multiple discovery engagements simultaneously while maintaining the depth your clients expect.
-- **Coaches & Leadership Development** — Facilitate structured self-discovery conversations that reveal patterns, archetypes, and growth opportunities.
+- **Senior Consultants & Boutique Firms** — Encode your methodology and run it across multiple client engagements simultaneously. Your frameworks, your questioning instincts, your approach — at scale.
+- **Coaches & Leadership Development** — Capture your coaching methodology in guided AI conversations that reveal patterns, archetypes, and growth opportunities — serving more clients without diluting depth.
 - **Educators & Institutions** — Capture stakeholder perspectives across faculty, staff, parents, and administrators to drive institutional improvement.
 - **Manufacturing & Operations** — Assess digital transformation readiness across complex organizations with multiple stakeholder groups.
 
@@ -21,12 +23,12 @@ FlowForge is a SaaS platform that enables consultants, coaches, and educators to
 
 ### Platform Capabilities
 
-FlowForge combines AI-facilitated stakeholder conversations with automated synthesis to deliver:
-- Structured assessment and discovery campaigns
-- Multi-stakeholder interview facilitation (text and voice)
-- Cross-perspective synthesis and pattern identification
-- Strategic recommendations and insights reports
-- Professional PDF reporting and documentation
+FlowForge lets experts encode their approach and run it at scale:
+- **Methodology encoding** — capture your frameworks, questioning strategies, and domain expertise
+- **Parallel engagement execution** — run conversations across multiple clients simultaneously
+- **Multi-stakeholder interview facilitation** — text and voice, adapting to each participant
+- **Cross-perspective synthesis** — AI identifies patterns and contradictions across all conversations
+- **Professional deliverables** — executive-ready reports, insights documents, and strategic recommendations
 
 The platform supports both external consultants managing multiple clients and internal teams running their own assessments.
 

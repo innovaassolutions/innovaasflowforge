@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FlowForge — Scale Your Consulting Practice with AI",
-  description: "AI-powered conversation platform that helps consultants, coaches, and educators scale their practices, capture richer stakeholder insights, and deliver more sophisticated deliverables.",
+  title: "FlowForge — Encode Your Expertise, Scale Your Impact",
+  description: "Encode your consulting methodology, frameworks, and questioning approach into AI — then run it across multiple clients simultaneously. Your brain, multiplied. Your expertise, at scale.",
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
