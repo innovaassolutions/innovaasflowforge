@@ -6,4 +6,5 @@
 
 export { ArchetypeResults } from './ArchetypeResults'
 export { TensionPatternCard } from './TensionPatternCard'
+export { ReliefMovesCard } from './ReliefMovesCard'
 export { ReflectionChoice } from './ReflectionChoice'

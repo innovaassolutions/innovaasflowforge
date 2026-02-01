@@ -21,6 +21,8 @@ import {
 } from '@react-pdf/renderer'
 import type { TenantProfile } from '@/lib/supabase/server'
 import type { ResultsResponse } from '@/app/api/coach/[slug]/results/[token]/route'
+import type { Archetype } from '@/lib/agents/archetype-constitution'
+import { getReliefMoves, getAlignedProtection } from '@/lib/data/relief-moves'
 
 // ============================================================================
 // TYPES
@@ -447,6 +449,130 @@ function createStyles(colors: BrandColors) {
       fontSize: 9,
       color: colors.textMuted,
       lineHeight: 1.5
+    },
+
+    // Relief Moves Section
+    reliefCard: {
+      marginBottom: 20,
+      borderRadius: 8,
+      overflow: 'hidden',
+      backgroundColor: colors.backgroundMuted,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    reliefHeader: {
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    reliefIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.background,
+      borderWidth: 2,
+      borderColor: colors.secondary,
+      marginRight: 12,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    reliefTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.secondary
+    },
+    reliefSubtitle: {
+      fontSize: 9,
+      color: colors.textMuted
+    },
+    reliefContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 16
+    },
+    reliefAimLabel: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: colors.secondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 6
+    },
+    reliefAimText: {
+      fontSize: 10,
+      color: colors.text,
+      lineHeight: 1.5,
+      marginBottom: 12
+    },
+    reliefNarrativeBox: {
+      backgroundColor: colors.background,
+      padding: 12,
+      borderRadius: 6,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    reliefNarrativeText: {
+      fontSize: 10,
+      color: colors.text,
+      lineHeight: 1.5
+    },
+    reliefMoveItem: {
+      flexDirection: 'row',
+      marginBottom: 8,
+      alignItems: 'flex-start',
+      backgroundColor: colors.background,
+      padding: 10,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    reliefMoveNumber: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: colors.secondary,
+      marginRight: 10,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    reliefMoveNumberText: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#FFFFFF'
+    },
+    reliefMoveText: {
+      flex: 1,
+      fontSize: 10,
+      color: colors.text,
+      lineHeight: 1.4
+    },
+    reliefFramingBox: {
+      backgroundColor: colors.background,
+      padding: 12,
+      borderRadius: 6,
+      marginTop: 12,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.secondary
+    },
+    reliefFramingText: {
+      fontSize: 11,
+      fontStyle: 'italic',
+      color: colors.secondary,
+      lineHeight: 1.5
+    },
+    reliefAlignedItem: {
+      flexDirection: 'row',
+      marginBottom: 6,
+      alignItems: 'flex-start',
+      backgroundColor: colors.background,
+      padding: 8,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: colors.border
+    },
+    reliefCheckIcon: {
+      marginRight: 8,
+      marginTop: 2
     },
 
     // Moving Forward Section
@@ -1064,6 +1190,160 @@ function ReflectionThemes({ themes, styles }: ReflectionThemesProps) {
 }
 
 // ============================================================================
+// COMPONENT: ReliefMovesSection
+// ============================================================================
+
+interface ReliefMovesSectionProps {
+  defaultArchetypeKey: Archetype
+  authenticArchetypeKey: Archetype
+  isAligned: boolean
+  styles: ReturnType<typeof createStyles>
+  colors: BrandColors
+}
+
+function ReliefMovesSection({
+  defaultArchetypeKey,
+  authenticArchetypeKey,
+  isAligned,
+  styles,
+  colors,
+}: ReliefMovesSectionProps) {
+  if (isAligned) {
+    const protection = getAlignedProtection(defaultArchetypeKey)
+    if (!protection) return null
+
+    const archetypeName = defaultArchetypeKey.charAt(0).toUpperCase() + defaultArchetypeKey.slice(1)
+
+    return (
+      <View style={styles.reliefCard}>
+        {/* Header */}
+        <View style={styles.reliefHeader}>
+          <View style={styles.reliefIconContainer}>
+            <Svg width={16} height={16} viewBox="0 0 24 24">
+              <Path
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                stroke={colors.secondary}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </Svg>
+          </View>
+          <View>
+            <Text style={styles.reliefTitle}>Staying Grounded as a {archetypeName}</Text>
+            <Text style={styles.reliefSubtitle}>Recognizing when your strength is being overused</Text>
+          </View>
+        </View>
+
+        {/* Content */}
+        <View style={styles.reliefContent}>
+          {/* Under Pressure */}
+          <View style={{ marginBottom: 12 }}>
+            <Text style={styles.reliefAimLabel}>Under Pressure You May</Text>
+            {protection.underPressure.map((item, index) => (
+              <View key={index} style={styles.bulletItem}>
+                <View style={styles.tensionTriggerNumber}>
+                  <Text style={styles.tensionTriggerNumberText}>{index + 1}</Text>
+                </View>
+                <Text style={styles.bulletText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* When Calm and Aligned */}
+          <View style={{ marginBottom: 12 }}>
+            <Text style={styles.reliefAimLabel}>When Calm and Aligned You</Text>
+            {protection.whenAligned.map((item, index) => (
+              <View key={index} style={styles.reliefAlignedItem}>
+                <View style={styles.reliefCheckIcon}>
+                  <Svg width={12} height={12} viewBox="0 0 24 24">
+                    <Path
+                      d="M5 13l4 4L19 7"
+                      stroke={colors.secondary}
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                  </Svg>
+                </View>
+                <Text style={styles.reliefMoveText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Reframe */}
+          <View style={styles.reliefFramingBox}>
+            <Text style={styles.reliefFramingText}>&ldquo;{protection.reframe}&rdquo;</Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  // Misaligned
+  const reliefMoves = getReliefMoves(defaultArchetypeKey, authenticArchetypeKey)
+  if (!reliefMoves) return null
+
+  return (
+    <View style={styles.reliefCard}>
+      {/* Header */}
+      <View style={styles.reliefHeader}>
+        <View style={styles.reliefIconContainer}>
+          <Svg width={16} height={16} viewBox="0 0 24 24">
+            <Path
+              d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+              stroke={colors.secondary}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </Svg>
+        </View>
+        <View>
+          <Text style={styles.reliefTitle}>Your Relief Moves</Text>
+          <Text style={styles.reliefSubtitle}>{reliefMoves.title}</Text>
+        </View>
+      </View>
+
+      {/* Content */}
+      <View style={styles.reliefContent}>
+        {/* Relief Aim */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={styles.reliefAimLabel}>Relief Aim</Text>
+          <Text style={styles.reliefAimText}>{reliefMoves.reliefAim}</Text>
+        </View>
+
+        {/* Narrative */}
+        <View style={styles.reliefNarrativeBox}>
+          <Text style={styles.reliefNarrativeText}>{reliefMoves.narrative}</Text>
+        </View>
+
+        {/* Relief Moves */}
+        <View style={{ marginBottom: 4 }}>
+          <Text style={styles.reliefAimLabel}>Practical Moves</Text>
+          {reliefMoves.moves.map((move, index) => (
+            <View key={index} style={styles.reliefMoveItem}>
+              <View style={styles.reliefMoveNumber}>
+                <Text style={styles.reliefMoveNumberText}>{index + 1}</Text>
+              </View>
+              <Text style={styles.reliefMoveText}>{move}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Framing Quote */}
+        <View style={styles.reliefFramingBox}>
+          <Text style={styles.reliefFramingText}>&ldquo;{reliefMoves.framing}&rdquo;</Text>
+        </View>
+      </View>
+    </View>
+  )
+}
+
+// ============================================================================
 // MAIN DOCUMENT COMPONENT
 // ============================================================================
 
@@ -1184,7 +1464,22 @@ export function ArchetypeResultsPDF({ data }: { data: ArchetypeResultsPDFData })
         </Page>
       )}
 
-      {/* Page 3 (or 2 if no tension): Moving Forward */}
+      {/* Relief Moves Page */}
+      <Page size="A4" style={styles.page}>
+        <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
+
+        <ReliefMovesSection
+          defaultArchetypeKey={results.primary_archetype.key as Archetype}
+          authenticArchetypeKey={results.authentic_archetype.key as Archetype}
+          isAligned={!hasTension}
+          styles={styles}
+          colors={colors}
+        />
+
+        <PageFooter tenant={tenant} generatedDate={generatedDate} styles={styles} pdfFooterText={pdfFooterText} />
+      </Page>
+
+      {/* Moving Forward Page */}
       <Page size="A4" style={styles.page}>
         <PageHeader tenant={tenant} clientName={session.client_name} styles={styles} logoUrl={validatedLogoUrl} />
 

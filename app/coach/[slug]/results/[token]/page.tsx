@@ -18,6 +18,7 @@ import { Mail, Calendar, Sparkles } from 'lucide-react'
 import { useTenant } from '@/lib/contexts/tenant-context'
 import { ArchetypeResults } from '@/components/coaching/ArchetypeResults'
 import { TensionPatternCard } from '@/components/coaching/TensionPatternCard'
+import { ReliefMovesCard } from '@/components/coaching/ReliefMovesCard'
 import type { ResultsResponse, ResultsDisclosure } from '@/app/api/coach/[slug]/results/[token]/route'
 import type { EnhancedResults } from '@/lib/agents/enhancement-agent'
 import type { Archetype } from '@/lib/agents/archetype-constitution'
@@ -524,6 +525,13 @@ export default function ResultsPage() {
             </div>
           </section>
         )}
+
+        {/* Relief Moves / Aligned Protection */}
+        <ReliefMovesCard
+          defaultArchetype={fullResults.primary_archetype.key}
+          authenticArchetype={fullResults.authentic_archetype.key}
+          isAligned={!fullResults.tension_pattern.has_tension}
+        />
 
         {/* Moving Forward Section */}
         <section
