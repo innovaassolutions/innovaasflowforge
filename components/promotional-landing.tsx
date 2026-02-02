@@ -16,9 +16,9 @@ import { useLandingAnalytics } from '@/hooks/use-landing-analytics'
 import { getIndustryContent, IndustryKey } from '@/lib/industry-content'
 import IndustrySelector from './industry-selector'
 import IndustryHeroMockup from './mockups/industry-hero-index'
-import DashboardMockup from './mockups/dashboard-mockup'
+import DashboardMockup from './mockups/dashboard-mockup-index'
 import InterviewMockup from './mockups/interview-mockup-index'
-import ReportMockup from './mockups/report-mockup'
+import ReportMockup from './mockups/report-mockup-index'
 import HeroBackground from './mockups/hero-background'
 
 export default function PromotionalLanding() {
@@ -393,7 +393,7 @@ export default function PromotionalLanding() {
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-border'
                           }`}>
-              Campaign Dashboard
+              Dashboard
             </button>
             <button
               onClick={() => setSelectedMockup('interview')}
@@ -419,9 +419,9 @@ export default function PromotionalLanding() {
 
           {/* Mockup Display */}
           <div className="max-w-5xl mx-auto">
-            {selectedMockup === 'dashboard' && <DashboardMockup />}
+            {selectedMockup === 'dashboard' && <DashboardMockup industry={industry} />}
             {selectedMockup === 'interview' && <InterviewMockup industry={industry} />}
-            {selectedMockup === 'report' && <ReportMockup />}
+            {selectedMockup === 'report' && <ReportMockup industry={industry} />}
           </div>
 
           {/* Feature Description */}
@@ -431,12 +431,19 @@ export default function PromotionalLanding() {
               <div>
                 <h3 className="text-xl font-bold text-foreground mb-3
                                md:text-2xl">
-                  Centralized Campaign Management
+                  {industry === 'coaching'
+                    ? 'Client & Program Management'
+                    : industry === 'education'
+                    ? 'Institutional Survey Dashboard'
+                    : 'Centralized Campaign Management'}
                 </h3>
                 <p className="text-muted-foreground
                               md:text-lg">
-                  Track multiple assessment campaigns, monitor stakeholder participation,
-                  and manage interview progress from a unified dashboard.
+                  {industry === 'coaching'
+                    ? 'Track coaching programs, monitor client progress across cohorts, and manage discovery sessions from a unified dashboard.'
+                    : industry === 'education'
+                    ? 'Manage parent surveys, faculty reviews, and staff assessments across your institution with real-time participation tracking.'
+                    : 'Track multiple client engagements, monitor stakeholder participation, and manage interview progress from a unified dashboard.'}
                 </p>
               </div>
             )}
@@ -444,12 +451,19 @@ export default function PromotionalLanding() {
               <div>
                 <h3 className="text-xl font-bold text-foreground mb-3
                                md:text-2xl">
-                  Intelligent Interview Agent
+                  {industry === 'coaching'
+                    ? 'AI-Guided Discovery Session'
+                    : industry === 'education'
+                    ? 'Adaptive Feedback Conversations'
+                    : 'Intelligent Interview Agent'}
                 </h3>
                 <p className="text-muted-foreground
                               md:text-lg">
-                  AI-powered conversations that adapt to stakeholder responses, probe deeper
-                  when needed, and capture rich qualitative insights.
+                  {industry === 'coaching'
+                    ? 'AI-facilitated sessions that explore leadership patterns, surface archetypes, and capture deep developmental insights.'
+                    : industry === 'education'
+                    ? 'AI-powered conversations that adapt to parent and faculty responses, uncovering actionable insights for institutional improvement.'
+                    : 'AI-powered conversations that adapt to stakeholder responses, probe deeper when needed, and capture rich qualitative insights.'}
                 </p>
               </div>
             )}
@@ -457,12 +471,19 @@ export default function PromotionalLanding() {
               <div>
                 <h3 className="text-xl font-bold text-foreground mb-3
                                md:text-2xl">
-                  Comprehensive Assessment Reports
+                  {industry === 'coaching'
+                    ? 'Leadership Profile Reports'
+                    : industry === 'education'
+                    ? 'Institutional Insights Reports'
+                    : 'Strategic Assessment Reports'}
                 </h3>
                 <p className="text-muted-foreground
                               md:text-lg">
-                  Multi-dimensional analysis with visual data representations, scoring across
-                  readiness dimensions, and actionable strategic recommendations.
+                  {industry === 'coaching'
+                    ? 'Archetype discovery profiles with dimension scores, growth edges, tension patterns, and personalized development pathways.'
+                    : industry === 'education'
+                    ? 'Satisfaction analysis across key dimensions with parent highlights, faculty recommendations, and data-driven improvement priorities.'
+                    : 'Multi-dimensional readiness analysis with visual data representations, scoring across strategic dimensions, and actionable recommendations.'}
                 </p>
               </div>
             )}
