@@ -639,10 +639,6 @@ export default function PromotionalLanding() {
             <ContactForm submitLabel={content.ctaPrimary} />
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground text-center
-                        md:text-base">
-            No credit card required • Enterprise-ready security
-          </p>
         </div>
       </section>
     </div>
