@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { supabaseAdmin, getTenantBySlug, TenantProfile } from '@/lib/supabase/server'
-import { resend } from '@/lib/resend'
+import { resend, buildFromAddress } from '@/lib/resend'
 import { CoachingInvitationEmail } from '@/lib/email/templates/coaching-invitation'
 import { randomBytes } from 'crypto'
 import type { Database } from '@/types/database'
@@ -146,7 +146,7 @@ export async function POST(
     // Send the invitation email using the branded template
     try {
       const senderName = tenant.email_config?.senderName || tenant.display_name
-      const fromAddress = `${senderName} <onboarding@resend.dev>`
+      const fromAddress = buildFromAddress(senderName)
 
       const result = await resend.emails.send({
         from: fromAddress,

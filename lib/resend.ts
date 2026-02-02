@@ -16,3 +16,16 @@ export const resend = new Proxy({} as Resend, {
     return (getResendClient() as any)[prop]
   }
 })
+
+/**
+ * Build the "from" address for outbound emails.
+ *
+ * Resend requires the from-domain to be verified in their dashboard,
+ * so we always send from the platform's verified domain and set the
+ * tenant's email as reply-to. The display name comes from the tenant's
+ * email_config.senderName or their display_name.
+ */
+export function buildFromAddress(senderName: string): string {
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'notifications@innovaas.co'
+  return `${senderName} <${fromEmail}>`
+}

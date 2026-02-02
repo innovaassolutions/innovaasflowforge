@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { resend } from '@/lib/resend'
+import { resend, buildFromAddress } from '@/lib/resend'
 import { render } from '@react-email/render'
 import type { ArchetypeResultsPDFData } from '@/lib/pdf/archetype-results-pdf'
 import { ArchetypeResultsEmail } from '@/lib/email/templates/archetype-results-email'
@@ -361,8 +361,7 @@ export async function POST(
     console.log('📧 Sending results email to:', session.client_email)
     try {
       const senderName = emailConfig?.senderName || tenantProfile.display_name
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
-      const fromAddress = `${senderName} <${fromEmail}>`
+      const fromAddress = buildFromAddress(senderName)
 
       // Pre-render email to HTML to avoid bundling issues on Vercel
       // (similar to react-pdf bundling issues)

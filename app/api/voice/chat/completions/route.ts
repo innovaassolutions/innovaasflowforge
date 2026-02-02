@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { notifyEducationAdmin, notifyTenantOwner, notifyCampaignOwner } from '@/lib/services/completion-notification'
 import {
   processEducationMessage,
   detectSafeguardingConcerns,
@@ -8,6 +9,11 @@ import {
   ConversationState,
   EducationModule,
 } from '@/lib/agents/education-interview-agent'
+import { processArchetypeMessage, TenantContext } from '@/lib/agents/archetype-interview-agent'
+import { ArchetypeSessionState } from '@/lib/agents/archetype-constitution'
+import { processMessage as processAssessmentMessage, generateGreeting as generateAssessmentGreeting } from '@/lib/agents/assessment-agent'
+import { logUsageEvent, logLLMUsage } from '@/lib/usage/log-usage'
+import { checkUsageLimit } from '@/lib/services/usage-tracker'
 import type { OpenAIChatMessage, OpenAIChatRequest } from '@/lib/types/voice'
 
 // CORS headers for ElevenLabs cross-origin requests
@@ -156,7 +162,8 @@ export async function POST(request: NextRequest) {
         contentPromise = generateInitialGreeting(
           sessionContext.sessionToken,
           sessionContext.stakeholderName,
-          sessionContext.moduleId
+          sessionContext.moduleId,
+          sessionContext.verticalKey
         )
       } else {
         switch (sessionContext.verticalKey) {
@@ -173,11 +180,15 @@ export async function POST(request: NextRequest) {
               userMessage
             )
             break
-          default:
-            contentPromise = handleEducationMessage(
+          case 'coaching':
+            contentPromise = handleCoachingMessage(
               sessionContext.sessionToken,
-              userMessage,
-              sessionContext.moduleId
+              userMessage
+            )
+            break
+          default:
+            contentPromise = Promise.resolve(
+              "I'm sorry, this interview type isn't configured. Please contact support."
             )
         }
       }
@@ -194,7 +205,8 @@ export async function POST(request: NextRequest) {
       response = await generateInitialGreeting(
         sessionContext.sessionToken,
         sessionContext.stakeholderName,
-        sessionContext.moduleId
+        sessionContext.moduleId,
+        sessionContext.verticalKey
       )
     } else {
       switch (sessionContext.verticalKey) {
@@ -211,12 +223,14 @@ export async function POST(request: NextRequest) {
             userMessage
           )
           break
-        default:
-          response = await handleEducationMessage(
+        case 'coaching':
+          response = await handleCoachingMessage(
             sessionContext.sessionToken,
-            userMessage,
-            sessionContext.moduleId
+            userMessage
           )
+          break
+        default:
+          response = "I'm sorry, this interview type isn't configured. Please contact support."
       }
     }
 
@@ -242,13 +256,11 @@ function parseSessionContext(messages: OpenAIChatMessage[]): {
   const systemPrompt = messages.find((m) => m.role === 'system')?.content || ''
 
   // Extract session_token from system prompt
-  // Format: session_token: ff_edu_xxxxx
-  const tokenMatch = systemPrompt.match(/session_token:\s*(ff_[a-z]+_[a-zA-Z0-9]+)/)
-  const sessionToken = tokenMatch ? tokenMatch[1] : null
-
-  // Check for test mode - detect test token patterns
+  // Supports ff_edu_xxx (education), base64url tokens (coaching/consulting), and test tokens
   const testTokenMatch = systemPrompt.match(/session_token:\s*(test[-_][\w-]+)/)
   const isTestMode = !!testTokenMatch
+  const tokenMatch = isTestMode ? null : systemPrompt.match(/session_token:\s*(\S+)/)
+  const sessionToken = testTokenMatch ? testTokenMatch[1] : (tokenMatch ? tokenMatch[1] : null)
 
   // Extract module_id
   const moduleMatch = systemPrompt.match(/module_id:\s*(\w+[-]?\w*)/)
@@ -279,6 +291,12 @@ async function handleEducationMessage(
   userMessage: string,
   moduleId: string | null
 ): Promise<string> {
+  // Validate education token format
+  if (!sessionToken.startsWith('ff_edu_')) {
+    console.error('[voice/education] Invalid token format — expected ff_edu_ prefix, got:', sessionToken.substring(0, 10))
+    throw new Error('Invalid education session token format')
+  }
+
   // Find participant token
   const { data: participantTokenData, error: tokenError } = await supabaseAdmin
     .from('education_participant_tokens')
@@ -486,15 +504,19 @@ async function handleEducationMessage(
 
   // Update session progress
   // Note: Using type assertion as RPC functions may not be in generated types
-  await (supabaseAdmin.rpc as Function)('update_education_session_progress', {
-    input_session_id: agentSession.id,
-    input_questions_asked: updatedState.questions_asked || 0,
-    input_sections_completed: updatedState.sections_completed || [],
-    input_estimated_completion: Math.min(
-      (updatedState.questions_asked || 0) / 15,
-      1
-    ),
-  })
+  try {
+    await (supabaseAdmin.rpc as Function)('update_education_session_progress', {
+      input_session_id: agentSession.id,
+      input_questions_asked: updatedState.questions_asked || 0,
+      input_sections_completed: updatedState.sections_completed || [],
+      input_estimated_completion: Math.min(
+        (updatedState.questions_asked || 0) / 15,
+        1
+      ),
+    })
+  } catch (rpcErr) {
+    console.error('[voice/education] update_education_session_progress RPC failed:', rpcErr)
+  }
 
   // Handle safeguarding alerts
   if (safeguardingFlags.length > 0 || safeguardingAlert) {
@@ -531,6 +553,21 @@ async function handleEducationMessage(
       input_token_id: participantToken.id,
       input_module: targetModule,
     })
+
+    // Notify school admin/facilitator
+    const participantLabel = participantToken.participant_type
+      ? `${participantToken.participant_type} participant`
+      : 'Participant'
+    try {
+      await notifyEducationAdmin({
+        campaignId: participantToken.campaign_id,
+        participantName: participantLabel,
+        assessmentType: `Education Assessment (${targetModule.replace(/_/g, ' ')})`,
+        dashboardPath: `/dashboard/education`,
+      })
+    } catch (notifyErr) {
+      console.error('Failed to send completion notification:', notifyErr)
+    }
   }
 
   // Update participant activity
@@ -542,34 +579,402 @@ async function handleEducationMessage(
 }
 
 /**
- * Handle assessment interview messages (placeholder)
+ * Handle assessment/consulting interview messages via voice
+ * Mirrors logic from app/api/sessions/[token]/messages/route.ts
  */
 async function handleAssessmentMessage(
   sessionToken: string,
   userMessage: string
 ): Promise<string> {
-  // TODO: Implement assessment interview handler
-  // For now, return a placeholder response
-  console.log('Assessment handler called with:', { sessionToken, userMessage })
-  return "I understand you'd like to discuss your digital transformation journey. However, the assessment interview module is still being configured. Please try again later."
+  console.log('[voice/assessment] Processing message for token:', sessionToken.substring(0, 10) + '...')
+
+  // Look up campaign assignment by access_token
+  const { data: stakeholderSession, error: sessionError } = await (supabaseAdmin
+    .from('campaign_assignments') as any)
+    .select(`
+      *,
+      campaigns (
+        id,
+        name,
+        company_name,
+        facilitator_name,
+        description,
+        company_profiles (
+          id,
+          company_name,
+          industry,
+          description,
+          market_scope,
+          employee_count_range,
+          annual_revenue_range,
+          headquarters_location
+        )
+      ),
+      stakeholder_profiles (
+        id,
+        full_name,
+        email,
+        role_type,
+        title,
+        department
+      )
+    `)
+    .eq('access_token', sessionToken)
+    .single()
+
+  if (sessionError || !stakeholderSession) {
+    console.error('[voice/assessment] Session lookup failed:', sessionError)
+    throw new Error('Invalid session token')
+  }
+
+  // Get or create agent session for this stakeholder
+  let agentSession: any
+
+  const { data: existingSession } = await (supabaseAdmin
+    .from('agent_sessions') as any)
+    .select('*')
+    .eq('stakeholder_session_id', stakeholderSession.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (existingSession) {
+    agentSession = existingSession
+  } else {
+    const { data: newSession, error: createError } = await (supabaseAdmin
+      .from('agent_sessions') as any)
+      .insert({
+        stakeholder_session_id: stakeholderSession.id,
+        agent_type: 'assessment_interview',
+        agent_model: 'claude-sonnet-4-5-20250929',
+        conversation_history: [],
+        session_context: { phase: 'introduction', topics_covered: [], questions_asked: 0 },
+      })
+      .select()
+      .single()
+
+    if (createError) {
+      throw new Error(`Failed to create agent session: ${createError.message}`)
+    }
+    agentSession = newSession
+  }
+
+  // Get conversation history and state
+  const rawHistory = (agentSession.conversation_history || []) as Array<{
+    role: 'user' | 'assistant'
+    content: string
+    timestamp?: string
+  }>
+  // Ensure all history entries have a timestamp (required by MessageHistory)
+  const conversationHistory = rawHistory.map((m) => ({
+    role: m.role,
+    content: m.content,
+    timestamp: m.timestamp || new Date().toISOString(),
+  }))
+  const currentState = agentSession.session_context || {
+    phase: 'introduction',
+    topics_covered: [],
+    questions_asked: 0,
+  }
+
+  // Process through assessment agent
+  const { response: assistantResponse, updatedState } = await processAssessmentMessage(
+    userMessage,
+    stakeholderSession,
+    conversationHistory,
+    currentState
+  )
+
+  // Update conversation history
+  const updatedHistory = [
+    ...conversationHistory,
+    { role: 'user' as const, content: userMessage, timestamp: new Date().toISOString() },
+    { role: 'assistant' as const, content: assistantResponse, timestamp: new Date().toISOString() },
+  ]
+
+  // Save to agent session
+  await (supabaseAdmin.from('agent_sessions') as any)
+    .update({
+      conversation_history: updatedHistory,
+      session_context: updatedState,
+      last_message_at: new Date().toISOString(),
+    })
+    .eq('id', agentSession.id)
+
+  // Handle completion
+  if (updatedState.is_complete && stakeholderSession.status !== 'completed') {
+    await (supabaseAdmin.from('campaign_assignments') as any)
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', stakeholderSession.id)
+
+    try {
+      await notifyCampaignOwner({
+        campaignId: stakeholderSession.campaign_id,
+        participantName: stakeholderSession.stakeholder_name,
+        assessmentType: 'Industry Assessment',
+        dashboardPath: `/dashboard/campaigns/${stakeholderSession.campaign_id}`,
+      })
+    } catch (notifyErr) {
+      console.error('[voice/assessment] Failed to send completion notification:', notifyErr)
+    }
+  }
+
+  return assistantResponse
+}
+
+/**
+ * Handle coaching interview messages via voice
+ * Mirrors logic from app/api/coach/[slug]/session/[token]/message/route.ts
+ */
+async function handleCoachingMessage(
+  sessionToken: string,
+  userMessage: string
+): Promise<string> {
+  console.log('[voice/coaching] Processing message for token:', sessionToken.substring(0, 10) + '...')
+
+  // Look up coaching session by access_token (token is unique, no slug needed)
+  const { data: session, error: sessionError } = await (supabaseAdmin
+    .from('coaching_sessions') as any)
+    .select('id, client_name, client_email, client_status, started_at, tenant_id')
+    .eq('access_token', sessionToken)
+    .single()
+
+  if (sessionError || !session) {
+    console.error('[voice/coaching] Session lookup failed:', sessionError)
+    throw new Error('Invalid session token')
+  }
+
+  if (session.client_status === 'completed') {
+    return 'This session has already been completed. Thank you for your time!'
+  }
+
+  // Get tenant profile for branding context
+  const { data: tenant, error: tenantError } = await (supabaseAdmin
+    .from('tenant_profiles') as any)
+    .select('id, display_name, is_active, brand_config')
+    .eq('id', session.tenant_id)
+    .single()
+
+  if (tenantError || !tenant) {
+    throw new Error('Coach profile not found')
+  }
+
+  if (!tenant.is_active) {
+    throw new Error('This coach is not currently active')
+  }
+
+  // Check usage limit
+  const usageCheck = await checkUsageLimit(tenant.id)
+  if (!usageCheck.allowed) {
+    return 'I apologize, but this coaching session has reached its usage limit. Please contact your coach for assistance.'
+  }
+
+  // Get or create agent session
+  let agentSession: any
+
+  const { data: existingSession } = await (supabaseAdmin
+    .from('agent_sessions') as any)
+    .select('*')
+    .eq('coaching_session_id', session.id)
+    .eq('agent_type', 'archetype_interview')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (existingSession) {
+    agentSession = existingSession
+  } else {
+    const { data: newSession, error: createError } = await (supabaseAdmin
+      .from('agent_sessions') as any)
+      .insert({
+        coaching_session_id: session.id,
+        agent_type: 'archetype_interview',
+        agent_model: 'claude-sonnet-4-20250514',
+        conversation_history: [],
+        session_context: null,
+      })
+      .select()
+      .single()
+
+    if (createError) {
+      throw new Error(`Failed to create agent session: ${createError.message}`)
+    }
+    agentSession = newSession
+  }
+
+  // Parse conversation history and session state
+  const conversationHistory = (agentSession.conversation_history || []) as Array<{
+    role: 'user' | 'assistant'
+    content: string
+  }>
+  const currentState = agentSession.session_context as ArchetypeSessionState | null
+
+  // Build tenant context
+  const tenantContext: TenantContext = {
+    display_name: tenant.display_name,
+    brand_config: tenant.brand_config as TenantContext['brand_config'],
+  }
+
+  // Process through archetype agent
+  const agentResponse = await processArchetypeMessage(
+    userMessage,
+    currentState,
+    conversationHistory,
+    tenantContext,
+    session.client_name
+  )
+
+  // Build updated history
+  const updatedHistory = [...conversationHistory]
+  updatedHistory.push({ role: 'user', content: userMessage })
+  updatedHistory.push({ role: 'assistant', content: agentResponse.message })
+
+  // Save to agent session
+  await (supabaseAdmin.from('agent_sessions') as any)
+    .update({
+      conversation_history: updatedHistory,
+      session_context: agentResponse.sessionState,
+      last_message_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', agentSession.id)
+
+  // Update coaching session status
+  const updates: Record<string, unknown> = {
+    last_activity_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+
+  // Mark as started if first message
+  const isFirstMessage = !session.started_at
+  if (isFirstMessage) {
+    updates.started_at = new Date().toISOString()
+    updates.client_status = 'in_progress'
+
+    await logUsageEvent({
+      tenantId: tenant.id,
+      eventType: 'session_started',
+      eventData: {
+        session_id: session.id,
+        assessment_type: 'archetype',
+        client_name: session.client_name,
+        channel: 'voice',
+      },
+    })
+  }
+
+  // Log LLM usage
+  if (agentResponse.usage) {
+    await logLLMUsage(
+      tenant.id,
+      agentResponse.usage.model,
+      agentResponse.usage.input_tokens,
+      agentResponse.usage.output_tokens,
+      {
+        session_id: session.id,
+        assessment_type: 'archetype',
+        prompt_type: isFirstMessage ? 'opening' : 'conversation',
+        question_index: agentResponse.sessionState.current_question_index,
+        channel: 'voice',
+      }
+    )
+  }
+
+  // Handle completion
+  if (agentResponse.isComplete) {
+    updates.completed_at = new Date().toISOString()
+    updates.client_status = 'completed'
+    updates.metadata = {
+      archetype_results: {
+        default_archetype: agentResponse.sessionState.default_archetype,
+        authentic_archetype: agentResponse.sessionState.authentic_archetype,
+        is_aligned: agentResponse.sessionState.is_aligned,
+        scores: agentResponse.sessionState.scores,
+        completed_at: new Date().toISOString(),
+      },
+    }
+
+    await logUsageEvent({
+      tenantId: tenant.id,
+      eventType: 'session_completed',
+      eventData: {
+        session_id: session.id,
+        assessment_type: 'archetype',
+        default_archetype: agentResponse.sessionState.default_archetype,
+        authentic_archetype: agentResponse.sessionState.authentic_archetype,
+        is_aligned: agentResponse.sessionState.is_aligned,
+        channel: 'voice',
+      },
+    })
+  }
+
+  // Apply session updates
+  const { error: updateError } = await (supabaseAdmin
+    .from('coaching_sessions') as any)
+    .update(updates)
+    .eq('id', session.id)
+
+  if (updateError) {
+    console.error('[voice/coaching] Failed to update coaching session:', updateError)
+  }
+
+  // Notify coach on completion
+  if (agentResponse.isComplete) {
+    try {
+      await notifyTenantOwner({
+        tenantId: tenant.id,
+        participantName: session.client_name,
+        assessmentType: 'Leadership Archetype',
+        dashboardPath: '/dashboard/clients',
+      })
+    } catch (notifyErr) {
+      console.error('[voice/coaching] Failed to send completion notification:', notifyErr)
+    }
+  }
+
+  return agentResponse.message
 }
 
 /**
  * Generate an initial greeting for the voice session.
  * This is called when ElevenLabs first connects (no user message yet).
+ * Routes to the appropriate greeting generator based on vertical.
  */
 async function generateInitialGreeting(
   sessionToken: string,
   stakeholderName: string | null,
-  moduleId: string | null
+  moduleId: string | null,
+  verticalKey: string
 ): Promise<string> {
   console.log('[voice/chat/completions] Generating initial greeting for:', {
     sessionToken: sessionToken.substring(0, 15) + '...',
     stakeholderName,
     moduleId,
+    verticalKey,
   })
 
-  // Fetch participant info to personalize the greeting
+  switch (verticalKey) {
+    case 'education':
+      return generateEducationGreeting(sessionToken, stakeholderName)
+    case 'assessment':
+      return generateConsultingGreeting(sessionToken)
+    case 'coaching':
+      return generateCoachingGreeting(sessionToken)
+    default:
+      return `Hi there! Thanks for joining me today. I'm here to have a conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
+  }
+}
+
+/**
+ * Generate greeting for education vertical
+ */
+async function generateEducationGreeting(
+  sessionToken: string,
+  stakeholderName: string | null
+): Promise<string> {
   const { data: participantTokenData } = await supabaseAdmin
     .from('education_participant_tokens')
     .select(`
@@ -589,7 +994,6 @@ async function generateInitialGreeting(
   const participantType = participantToken?.participant_type?.toLowerCase() || stakeholderName?.toLowerCase() || 'student'
   const schoolName = participantToken?.schools?.name || 'your school'
 
-  // Generate personalized greeting based on participant type
   let greeting: string
 
   switch (participantType) {
@@ -609,8 +1013,60 @@ async function generateInitialGreeting(
       greeting = `Hi, I'm Jippity! Thanks for joining me today. I'm here to have a friendly conversation and learn about your experience. Everything you share is completely confidential, and there are no right or wrong answers. How are you doing today?`
   }
 
-  console.log('[voice/chat/completions] Generated greeting for', participantType, '- length:', greeting.length)
+  console.log('[voice/chat/completions] Generated education greeting for', participantType, '- length:', greeting.length)
+  return greeting
+}
 
+/**
+ * Generate greeting for consulting/assessment vertical
+ */
+async function generateConsultingGreeting(sessionToken: string): Promise<string> {
+  const { data: assignment } = await (supabaseAdmin
+    .from('campaign_assignments') as any)
+    .select(`
+      stakeholder_name,
+      campaigns (
+        company_name,
+        facilitator_name
+      )
+    `)
+    .eq('access_token', sessionToken)
+    .single()
+
+  const name = assignment?.stakeholder_name || 'there'
+  const companyName = assignment?.campaigns?.company_name || 'your organization'
+
+  const greeting = `Hello ${name}! Thank you for taking the time to speak with me today. I'm here to learn about your experience and perspective at ${companyName} as part of a digital transformation readiness assessment. This conversation is confidential and should take about 20 to 30 minutes. There are no right or wrong answers; I'm genuinely interested in your honest perspective. How are you doing today?`
+
+  console.log('[voice/chat/completions] Generated consulting greeting - length:', greeting.length)
+  return greeting
+}
+
+/**
+ * Generate greeting for coaching vertical
+ */
+async function generateCoachingGreeting(sessionToken: string): Promise<string> {
+  const { data: session } = await (supabaseAdmin
+    .from('coaching_sessions') as any)
+    .select(`
+      client_name,
+      tenant_profiles:tenant_id (
+        display_name,
+        brand_config
+      )
+    `)
+    .eq('access_token', sessionToken)
+    .single()
+
+  const clientName = session?.client_name || 'there'
+  const coachName = session?.tenant_profiles?.display_name || 'your coach'
+  const welcomeMsg = session?.tenant_profiles?.brand_config?.welcomeMessage
+
+  const greeting = welcomeMsg
+    ? welcomeMsg.replace(/\{name\}/g, clientName)
+    : `Hi ${clientName}! Welcome, and thank you for being here. I'm an AI guide working alongside ${coachName} to help you explore your leadership style. This conversation is a chance for self-discovery, and there are no right or wrong answers. Everything you share is completely confidential. Before we dive in, how are you feeling today?`
+
+  console.log('[voice/chat/completions] Generated coaching greeting - length:', greeting.length)
   return greeting
 }
 

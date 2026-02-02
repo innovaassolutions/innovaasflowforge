@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { notifyCampaignOwner } from '@/lib/services/completion-notification'
 
 /**
  * POST /api/campaigns/[id]/sessions/[sessionId]/complete
@@ -91,6 +92,18 @@ export async function POST(
     }
 
     console.log(`✅ Session ${sessionId} manually completed by facilitator for ${stakeholderSession.stakeholder_name}`)
+
+    // Notify facilitator/consultant
+    try {
+      await notifyCampaignOwner({
+        campaignId,
+        participantName: stakeholderSession.stakeholder_name,
+        assessmentType: 'Industry Assessment',
+        dashboardPath: `/dashboard/campaigns/${campaignId}`,
+      })
+    } catch (notifyErr) {
+      console.error('Failed to send completion notification:', notifyErr)
+    }
 
     return NextResponse.json({
       success: true,

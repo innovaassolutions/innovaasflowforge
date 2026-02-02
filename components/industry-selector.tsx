@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Factory, FlaskConical, GraduationCap, Briefcase } from 'lucide-react'
+import { Heart, GraduationCap, Briefcase } from 'lucide-react'
 import { IndustryKey, industryContent, industryOrder } from '@/lib/industry-content'
 
 interface IndustrySelectorProps {
@@ -12,16 +12,14 @@ interface IndustrySelectorProps {
 
 // Icon mapping for each industry
 const industryIcons: Record<IndustryKey, React.ComponentType<{ className?: string }>> = {
-  manufacturing: Factory,
-  pharma: FlaskConical,
+  coaching: Heart,
   education: GraduationCap,
   'professional-services': Briefcase
 }
 
 // Button labels for each industry
 const industryLabels: Record<IndustryKey, string> = {
-  manufacturing: 'For Industry',
-  pharma: 'For Pharma',
+  coaching: 'For Coaching',
   education: 'For Education',
   'professional-services': 'For Consultants'
 }
@@ -64,7 +62,7 @@ export default function IndustrySelector({
     return (
       <div className="grid grid-cols-2 gap-3
                       sm:gap-4
-                      lg:grid-cols-4">
+                      lg:grid-cols-3">
         {industryOrder.map((key) => {
           const content = industryContent[key]
           const isSelected = selected === key

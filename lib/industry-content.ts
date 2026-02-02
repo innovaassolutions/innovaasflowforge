@@ -1,7 +1,7 @@
 // Industry-specific content configuration for landing page
-// Priority industries: Manufacturing, Pharma, Education, Professional Services
+// Priority industries: Professional Services, Education, Coaching
 
-export type IndustryKey = 'manufacturing' | 'pharma' | 'education' | 'professional-services'
+export type IndustryKey = 'coaching' | 'education' | 'professional-services'
 
 export interface IndustryPainPoint {
   title: string
@@ -49,233 +49,156 @@ export interface IndustryContent {
 }
 
 export const industryContent: Record<IndustryKey, IndustryContent> = {
-  manufacturing: {
-    key: 'manufacturing',
-    name: 'Manufacturing',
-    shortName: 'Manufacturing',
-    accentColor: 'hsl(25, 95%, 53%)', // Industrial orange
-    accentColorLight: 'hsl(25, 95%, 93%)',
-    illustration: '/illustrations/industrialist.png',
-    heroHeadline: 'Accelerate Your Industry 4.0 Transformation',
-    heroHighlight: 'Industry 4.0',
-    heroDescription: 'AI-powered assessment platform that interviews your operations team, identifies digital maturity gaps, and delivers actionable transformation roadmaps in days, not months.',
+  coaching: {
+    key: 'coaching',
+    name: 'Coaching',
+    shortName: 'Coaching',
+    accentColor: 'hsl(340, 65%, 55%)', // Warm rose
+    accentColorLight: 'hsl(340, 65%, 93%)',
+    illustration: '/illustrations/coach.png',
+    heroHeadline: 'Encode Your Coaching Methodology, Scale Self-Discovery',
+    heroHighlight: 'Self-Discovery',
+    heroDescription: 'Put your coaching framework — archetypes, reflection prompts, growth models — into FlowForge. Run guided self-discovery sessions with hundreds of clients simultaneously. Your methodology, their breakthrough moments.',
     valueProps: [
       {
-        title: 'Faster Clarity',
-        description: 'Replace 3-week consultant discovery with 3-day AI assessments'
+        title: 'Your Method, At Scale',
+        description: 'Encode your unique coaching approach — leadership archetypes, reflection sequences, assessment frameworks — and run it with unlimited clients'
       },
       {
-        title: 'Fewer Wrong Decisions',
-        description: 'Cross-stakeholder analysis reveals hidden contradictions before costly investments'
+        title: 'Deeper Than a Session',
+        description: 'AI-guided conversations give clients space to reflect without time pressure, surfacing insights that 60-minute sessions often miss'
       },
       {
-        title: 'Executive Confidence',
-        description: 'Data-driven insights that boards and leadership teams trust'
+        title: 'Beautiful Client Reports',
+        description: 'Archetype profiles, growth maps, and personalized development plans generated automatically from each conversation'
       }
     ],
     personas: [
       {
-        title: 'Operations Directors',
-        description: 'Assess automation readiness and identify bottlenecks across production lines.',
+        title: 'Executive Coaches',
+        description: 'Encode leadership assessment frameworks and run archetype discovery sessions that reveal blind spots and growth edges.',
         benefits: [
-          'Digital maturity scoring',
-          'Process automation gaps',
-          'Technology integration roadmap'
+          'Leadership archetype profiling at scale',
+          'Pre-session discovery that deepens live coaching',
+          'Data-rich client progress tracking'
         ]
       },
       {
-        title: 'Plant Managers',
-        description: 'Evaluate workforce readiness and change management requirements.',
+        title: 'Career Coaches',
+        description: 'Guide clients through structured self-discovery — values clarification, strengths mapping, career vision exercises — asynchronously.',
         benefits: [
-          'Skills gap analysis',
-          'Change resistance mapping',
-          'Training prioritization'
+          'Values and strengths assessment automation',
+          'Career narrative development support',
+          'Scalable intake and discovery process'
         ]
       },
       {
-        title: 'IT/OT Leaders',
-        description: 'Bridge information technology and operational technology for smart factory success.',
+        title: 'Coaching Practices',
+        description: 'Standardize your firm\'s methodology across all coaches while preserving each client\'s unique journey.',
         benefits: [
-          'Systems integration assessment',
-          'Data architecture evaluation',
-          'Cybersecurity readiness'
+          'Consistent methodology across your team',
+          'Client insights shared across coaching engagements',
+          'Institutional knowledge that grows with your practice'
         ]
       }
     ],
     painPoints: [
       {
-        title: 'Stakeholder Misalignment',
-        description: 'Operations says one thing, IT says another. Our AI reveals the truth across all perspectives.'
+        title: 'Your Method Doesn\'t Scale',
+        description: 'Your coaching framework is powerful but lives in your head. FlowForge lets you encode it — your questions, your sequences, your archetypes — and deliver it to every client.'
       },
       {
-        title: 'Consultant Fatigue',
-        description: 'Your teams are tired of repetitive interviews. AI interviews are faster, more consistent, and less disruptive.'
+        title: 'Discovery Takes Too Long',
+        description: 'The first 3-4 sessions are often just getting to know the client. AI-guided self-discovery does the deep work before you even meet.'
       },
       {
-        title: 'Transformation Paralysis',
-        description: 'Too many options, not enough clarity. Get a prioritized roadmap based on your specific constraints.'
+        title: 'Insights Stay in Notebooks',
+        description: 'Client breakthroughs get lost in session notes. FlowForge captures, synthesizes, and tracks growth patterns over time.'
       }
     ],
-    ctaPrimary: 'Start Factory Assessment',
-    ctaSecondary: 'See Manufacturing Demo',
+    ctaPrimary: 'Encode Your Method',
+    ctaSecondary: 'See Coaching Demo',
     stats: [
-      { value: '80%', label: 'Faster than traditional discovery' },
-      { value: '25+', label: 'Stakeholders assessed per engagement' },
-      { value: '3 Days', label: 'From kickoff to executive report' }
+      { value: '10x', label: 'More clients per coach' },
+      { value: '100%', label: 'Your methodology, every session' },
+      { value: '24hrs', label: 'From discovery to archetype profile' }
     ],
-    heroMockup: 'manufacturing'
-  },
-
-  pharma: {
-    key: 'pharma',
-    name: 'Pharmaceutical & Life Sciences',
-    shortName: 'Pharma',
-    accentColor: 'hsl(170, 60%, 45%)', // Medical teal
-    accentColorLight: 'hsl(170, 60%, 93%)',
-    illustration: '/illustrations/chemist-flask.png',
-    heroHeadline: 'Streamline Regulatory Compliance & Digital Health',
-    heroHighlight: 'Digital Health',
-    heroDescription: 'AI-powered assessment platform that evaluates compliance readiness, identifies process gaps, and delivers validated transformation strategies aligned with FDA and EMA requirements.',
-    valueProps: [
-      {
-        title: 'Compliance Confidence',
-        description: 'Identify regulatory gaps before auditors do'
-      },
-      {
-        title: 'Validated Insights',
-        description: 'AI methodology designed for GxP environments'
-      },
-      {
-        title: 'Audit-Ready Documentation',
-        description: 'Every stakeholder response is traceable and timestamped'
-      }
-    ],
-    personas: [
-      {
-        title: 'Quality Assurance Directors',
-        description: 'Assess compliance readiness and identify documentation gaps across departments.',
-        benefits: [
-          'GxP compliance scoring',
-          'CAPA effectiveness review',
-          'Audit preparation roadmap'
-        ]
-      },
-      {
-        title: 'R&D Leadership',
-        description: 'Evaluate digital lab capabilities and data integrity practices.',
-        benefits: [
-          'Lab digitization assessment',
-          'Data integrity evaluation',
-          'Research workflow analysis'
-        ]
-      },
-      {
-        title: 'Manufacturing Excellence',
-        description: 'Bridge batch manufacturing with continuous improvement and digitization.',
-        benefits: [
-          'Process validation status',
-          'Equipment qualification gaps',
-          'Technology transfer readiness'
-        ]
-      }
-    ],
-    painPoints: [
-      {
-        title: 'Regulatory Complexity',
-        description: 'FDA, EMA, and global regulations create assessment paralysis. Get clarity on what matters most.'
-      },
-      {
-        title: 'Siloed Departments',
-        description: 'QA, R&D, and Manufacturing speak different languages. AI synthesis reveals the complete picture.'
-      },
-      {
-        title: 'Validation Burden',
-        description: 'Everything requires documentation. Our platform provides audit-ready assessment trails.'
-      }
-    ],
-    ctaPrimary: 'Start Compliance Assessment',
-    ctaSecondary: 'See Pharma Demo',
-    stats: [
-      { value: '100%', label: 'Audit-trail documentation' },
-      { value: '40+', label: 'Compliance checkpoints assessed' },
-      { value: '21 CFR', label: 'Part 11 compatible platform' }
-    ],
-    heroMockup: 'pharma'
+    heroMockup: 'coaching'
   },
 
   education: {
     key: 'education',
-    name: 'Education & EdTech',
+    name: 'Education',
     shortName: 'Education',
     accentColor: 'hsl(220, 70%, 55%)', // Academic blue
     accentColorLight: 'hsl(220, 70%, 93%)',
     illustration: '/illustrations/educator.png',
-    heroHeadline: 'Transform Learning Outcomes Through Strategic Insight',
-    heroHighlight: 'Learning Outcomes',
-    heroDescription: 'AI-powered assessment platform that interviews faculty, administrators, parents, and staff to identify institutional strengths, gaps, and pathways to educational excellence.',
+    heroHeadline: 'Hear Every Voice — Faculty, Staff, and Families',
+    heroHighlight: 'Every Voice',
+    heroDescription: 'AI-powered conversations that capture what surveys miss — from parent experience and family satisfaction to faculty needs and staff perspectives. Real voices, real insights, real improvement.',
     valueProps: [
       {
-        title: 'Complete Stakeholder Voice',
-        description: 'Hear from faculty, staff, and parents - not just the vocal few'
+        title: 'Parent & Family Voice',
+        description: 'Capture what parents really think about communication, their child\'s progress, and the school experience — in their own words, not checkbox surveys'
       },
       {
-        title: 'Parent Satisfaction Insights',
-        description: 'Understand what drives family engagement and institutional loyalty'
+        title: 'Complete Stakeholder Picture',
+        description: 'Hear from faculty, staff, parents, and administrators — then see where perspectives align and where they diverge'
       },
       {
         title: 'Accreditation Ready',
-        description: 'Documentation that supports continuous improvement requirements'
+        description: 'Rich qualitative evidence that supports continuous improvement requirements and accreditation documentation'
       }
     ],
     personas: [
       {
+        title: 'School Leaders',
+        description: 'Understand what parents and families actually experience — communication quality, child progress visibility, community belonging.',
+        benefits: [
+          'Parent satisfaction drivers revealed',
+          'Communication gap identification',
+          'Enrollment and retention insights'
+        ]
+      },
+      {
         title: 'Academic Leadership',
-        description: 'Assess institutional readiness for curriculum innovation and pedagogical transformation.',
+        description: 'Assess institutional readiness for curriculum innovation and capture faculty perspectives on support and resources.',
         benefits: [
-          'Program effectiveness review',
           'Faculty development needs',
-          'Curriculum alignment analysis'
+          'Curriculum alignment analysis',
+          'Cross-department comparison'
         ]
       },
       {
-        title: 'Parent & Family Engagement',
-        description: 'Capture parent perspectives on educational quality, communication, and institutional value.',
+        title: 'Accreditation Teams',
+        description: 'Build rich evidence portfolios from stakeholder conversations that go far deeper than traditional surveys.',
         benefits: [
-          'Parent satisfaction drivers',
-          'Communication effectiveness',
-          'Enrollment decision factors'
-        ]
-      },
-      {
-        title: 'Department Chairs',
-        description: 'Understand faculty perspectives and identify departmental improvement opportunities.',
-        benefits: [
-          'Teaching load balance',
-          'Research support needs',
-          'Student success barriers'
+          'Qualitative evidence at scale',
+          'Continuous improvement documentation',
+          'Multi-stakeholder perspective synthesis'
         ]
       }
     ],
     painPoints: [
       {
-        title: 'Parent Voice Gap',
-        description: 'Parents influence enrollment and retention but rarely get heard. AI interviews capture what surveys miss.'
+        title: 'Parents Are Silent Until They Leave',
+        description: 'Families who are unhappy rarely speak up — they just don\'t re-enroll. AI conversations capture honest feedback before it\'s too late.'
       },
       {
-        title: 'Accreditation Pressure',
-        description: 'Continuous improvement requires continuous data. Build an evidence base that accreditors trust.'
+        title: 'Surveys Miss What Matters',
+        description: '15% response rates and checkbox answers don\'t tell you why. Conversational AI gets 85%+ participation and rich qualitative depth.'
       },
       {
-        title: 'Change Resistance',
-        description: 'Understand the real barriers to transformation before launching initiatives that fail.'
+        title: 'Accreditation Evidence Is Thin',
+        description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
       }
     ],
-    ctaPrimary: 'Start Institutional Assessment',
+    ctaPrimary: 'Start Listening',
     ctaSecondary: 'See Education Demo',
     stats: [
-      { value: '500+', label: 'Faculty & parent voices' },
-      { value: '85%', label: 'Higher response than surveys' },
-      { value: '2 Weeks', label: 'Complete assessment' }
+      { value: '85%', label: 'Parent participation rate' },
+      { value: '500+', label: 'Voices captured per school' },
+      { value: '2 Weeks', label: 'Complete assessment cycle' }
     ],
     heroMockup: 'education'
   },
@@ -324,11 +247,11 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
         ]
       },
       {
-        title: 'Coaching Practices',
-        description: 'Encode your coaching methodology into guided conversations that reveal patterns, archetypes, and growth opportunities at depth.',
+        title: 'Advisory Practices',
+        description: 'Run strategic assessments, digital readiness evaluations, and transformation diagnostics — all powered by your proprietary methodology.',
         benefits: [
-          'Your coaching framework, available to more clients',
-          'Structured self-discovery that scales',
+          'Assessment-as-a-service product creation',
+          'Client intelligence that compounds over time',
           'Beautiful client-facing reports and insights'
         ]
       }
@@ -361,11 +284,11 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 // Default industry for new visitors
 export const defaultIndustry: IndustryKey = 'professional-services'
 
-// All industries in display order (pharma temporarily hidden)
+// All industries in display order
 export const industryOrder: IndustryKey[] = [
   'professional-services',
   'education',
-  'manufacturing'
+  'coaching'
 ]
 
 // Helper to get industry by key

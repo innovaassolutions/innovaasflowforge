@@ -7,6 +7,7 @@ import {
   EducationCampaign,
   ConversationState
 } from '@/lib/agents/education-interview-agent'
+import { notifyEducationAdmin } from '@/lib/services/completion-notification'
 
 /**
  * POST /api/education/session/[token]/messages
@@ -315,6 +316,21 @@ export async function POST(
         input_token_id: participantToken.id,  // Function expects UUID
         input_module: targetModule
       })
+
+      // Notify school admin/facilitator
+      const participantLabel = participantToken.participant_type
+        ? `${participantToken.participant_type} participant`
+        : 'Participant'
+      try {
+        await notifyEducationAdmin({
+          campaignId: participantToken.campaign_id,
+          participantName: participantLabel,
+          assessmentType: `Education Assessment (${targetModule.replace(/_/g, ' ')})`,
+          dashboardPath: `/dashboard/education`,
+        })
+      } catch (notifyErr) {
+        console.error('Failed to send completion notification:', notifyErr)
+      }
     }
 
     // Update participant activity

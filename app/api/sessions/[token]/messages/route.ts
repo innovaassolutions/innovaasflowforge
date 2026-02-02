@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { processMessage, generateGreeting } from '@/lib/agents/assessment-agent'
+import { notifyCampaignOwner } from '@/lib/services/completion-notification'
 
 /**
  * POST /api/sessions/[token]/messages
@@ -187,6 +188,18 @@ export async function POST(
           console.error('❌ Stakeholder session status update error:', statusUpdateError)
         } else {
           console.log(`✅ Interview completed for ${stakeholderSession.stakeholder_name}`)
+
+          // Notify facilitator/consultant
+          try {
+            await notifyCampaignOwner({
+              campaignId: stakeholderSession.campaign_id,
+              participantName: stakeholderSession.stakeholder_name,
+              assessmentType: 'Industry Assessment',
+              dashboardPath: `/dashboard/campaigns/${stakeholderSession.campaign_id}`,
+            })
+          } catch (notifyErr) {
+            console.error('Failed to send completion notification:', notifyErr)
+          }
         }
       } else {
         console.log(`ℹ️  Session already marked as completed`)

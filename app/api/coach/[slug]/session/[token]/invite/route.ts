@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
-import { resend } from '@/lib/resend'
+import { resend, buildFromAddress } from '@/lib/resend'
 import { CoachingInvitationEmail } from '@/lib/email/templates/coaching-invitation'
 import type { Database } from '@/types/database'
 
@@ -134,9 +134,7 @@ export async function POST(
     // Send the invitation email
     try {
       const senderName = emailConfig?.senderName || tenant.display_name
-      // Use verified domain email if configured, otherwise fall back to Resend test domain
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
-      const fromAddress = `${senderName} <${fromEmail}>`
+      const fromAddress = buildFromAddress(senderName)
 
       console.log(`📧 Sending invite email from: ${fromAddress} to: ${session.client_email}`)
 
