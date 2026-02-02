@@ -441,7 +441,7 @@ const DataFlowIllustration = () => (
     <Path d="M70 25 L80 30 L70 35" fill={COLORS.midGray} />
     {/* Process */}
     <Rect x="85" y="10" width="40" height="40" rx="5" fill={COLORS.secondary} />
-    <Text x="105" y="35" fill={COLORS.white} fontSize="16" textAnchor="middle">AI</Text>
+    <Text x="105" y="35" fill={COLORS.white} style={{ fontSize: 16 }} textAnchor="middle">AI</Text>
     {/* Arrow 2 */}
     <Line x1="130" y1="30" x2="155" y2="30" stroke={COLORS.midGray} strokeWidth="2" />
     <Path d="M150 25 L160 30 L150 35" fill={COLORS.midGray} />
