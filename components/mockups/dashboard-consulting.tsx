@@ -21,168 +21,255 @@ export default function DashboardConsulting() {
         flowforge.ai/dashboard
       </text>
 
-      {/* Sidebar */}
-      <rect y="40" width="180" height="560" fill="#FAF8F3" />
-      <text x="24" y="76" fontSize="15" fontWeight="bold" fill="#F25C05">
-        FlowForge
+      {/* Header Bar */}
+      <rect x="0" y="40" width="800" height="50" fill="#FFFEFB" />
+      <text x="30" y="72" fontSize="18" fontWeight="bold" fill="#171614">
+        Dashboard
+      </text>
+      <text x="630" y="65" fontSize="11" fill="#71706B" textAnchor="end">
+        Good morning, Alex
+      </text>
+      <text x="770" y="65" fontSize="11" fill="#71706B" textAnchor="end">
+        Feb 2, 2026
+      </text>
+      <line x1="0" y1="90" x2="800" y2="90" stroke="#FAF8F3" strokeWidth="1" />
+
+      {/* ===== ROW 1: Client Readiness Cards ===== */}
+      <text x="30" y="113" fontSize="13" fontWeight="600" fill="#171614">
+        Client Readiness Overview
       </text>
 
-      <rect x="14" y="100" width="152" height="32" rx="6" fill="#FFFFFF" />
-      <rect x="14" y="100" width="152" height="32" rx="6" fill="none" stroke="#F25C05" strokeWidth="1" />
-      <text x="28" y="121" fontSize="12" fill="#171614" fontWeight="500">Dashboard</text>
-
-      <text x="28" y="158" fontSize="12" fill="#71706B">Campaigns</text>
-      <text x="28" y="186" fontSize="12" fill="#71706B">Reports</text>
-      <text x="28" y="214" fontSize="12" fill="#71706B">Analytics</text>
-
-      {/* Main Content */}
-      <rect x="180" y="40" width="620" height="560" fill="#FFFEFB" />
-
-      {/* Header */}
-      <text x="204" y="78" fontSize="20" fontWeight="bold" fill="#171614">
-        Practice Overview
+      {/* Acme Corp — 72/100 */}
+      <rect x="20" y="122" width="180" height="95" rx="10" fill="#FAF8F3" />
+      <text x="35" y="142" fontSize="12" fontWeight="600" fill="#171614">
+        Acme Corp
       </text>
-      <text x="204" y="96" fontSize="12" fill="#71706B">
-        January 2026 · 4 Active Engagements
+      <text x="35" y="185" fontSize="28" fontWeight="bold" fill="#22C55E">
+        72
       </text>
+      <text x="72" y="185" fontSize="12" fill="#71706B">/ 100</text>
+      <rect x="35" y="195" width="150" height="5" rx="2" fill="#E8E7E4" />
+      <rect x="35" y="195" width="108" height="5" rx="2" fill="#22C55E">
+        <animate attributeName="width" from="0" to="108" dur="0.8s" fill="freeze" />
+      </rect>
+      <text x="35" y="160" fontSize="9" fill="#22C55E" fontWeight="500">On Track</text>
 
-      {/* Row 1: KPI score cards */}
-      <rect x="204" y="112" width="140" height="80" rx="8" fill="#FFFFFF" />
-      <rect x="204" y="112" width="140" height="80" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="220" y="132" fontSize="10" fill="#71706B">Active Clients</text>
-      <text x="220" y="162" fontSize="30" fontWeight="bold" fill="#F25C05">4</text>
-      <text x="220" y="180" fontSize="10" fill="#22c55e">↑ 1 new this quarter</text>
+      {/* Smith & Co — 58/100 */}
+      <rect x="210" y="122" width="180" height="95" rx="10" fill="#FAF8F3" />
+      <text x="225" y="142" fontSize="12" fontWeight="600" fill="#171614">
+        Smith &amp; Co
+      </text>
+      <text x="225" y="185" fontSize="28" fontWeight="bold" fill="#F59E0B">
+        58
+      </text>
+      <text x="262" y="185" fontSize="12" fill="#71706B">/ 100</text>
+      <rect x="225" y="195" width="150" height="5" rx="2" fill="#E8E7E4" />
+      <rect x="225" y="195" width="87" height="5" rx="2" fill="#F59E0B">
+        <animate attributeName="width" from="0" to="87" dur="0.8s" fill="freeze" />
+      </rect>
+      <text x="225" y="160" fontSize="9" fill="#F59E0B" fontWeight="500">Needs Attention</text>
 
-      <rect x="354" y="112" width="140" height="80" rx="8" fill="#FFFFFF" />
-      <rect x="354" y="112" width="140" height="80" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="370" y="132" fontSize="10" fill="#71706B">Stakeholders</text>
-      <text x="370" y="162" fontSize="30" fontWeight="bold" fill="#1D9BA3">43</text>
-      <text x="370" y="180" fontSize="10" fill="#71706B">across all engagements</text>
+      {/* Meridian Group — 84/100 */}
+      <rect x="400" y="122" width="180" height="95" rx="10" fill="#FAF8F3" />
+      <text x="415" y="142" fontSize="12" fontWeight="600" fill="#171614">
+        Meridian Group
+      </text>
+      <text x="415" y="185" fontSize="28" fontWeight="bold" fill="#22C55E">
+        84
+      </text>
+      <text x="452" y="185" fontSize="12" fill="#71706B">/ 100</text>
+      <rect x="415" y="195" width="150" height="5" rx="2" fill="#E8E7E4" />
+      <rect x="415" y="195" width="126" height="5" rx="2" fill="#22C55E">
+        <animate attributeName="width" from="0" to="126" dur="0.8s" fill="freeze" />
+      </rect>
+      <text x="415" y="160" fontSize="9" fill="#22C55E" fontWeight="500">Strong</text>
 
-      <rect x="504" y="112" width="140" height="80" rx="8" fill="#FFFFFF" />
-      <rect x="504" y="112" width="140" height="80" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="520" y="132" fontSize="10" fill="#71706B">Avg Readiness</text>
-      <text x="520" y="162" fontSize="30" fontWeight="bold" fill="#22c55e">71%</text>
-      <text x="520" y="180" fontSize="10" fill="#22c55e">↑ from 64% last quarter</text>
+      {/* Nova Industries — 41/100 */}
+      <rect x="590" y="122" width="190" height="95" rx="10" fill="#FAF8F3" />
+      <text x="605" y="142" fontSize="12" fontWeight="600" fill="#171614">
+        Nova Industries
+      </text>
+      <text x="605" y="185" fontSize="28" fontWeight="bold" fill="#EF4444">
+        41
+      </text>
+      <text x="635" y="185" fontSize="12" fill="#71706B">/ 100</text>
+      <rect x="605" y="195" width="160" height="5" rx="2" fill="#E8E7E4" />
+      <rect x="605" y="195" width="66" height="5" rx="2" fill="#EF4444">
+        <animate attributeName="width" from="0" to="66" dur="0.8s" fill="freeze" />
+      </rect>
+      <text x="605" y="160" fontSize="9" fill="#EF4444" fontWeight="500">At Risk</text>
 
-      <rect x="654" y="112" width="135" height="80" rx="8" fill="#FFFFFF" />
-      <rect x="654" y="112" width="135" height="80" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="670" y="132" fontSize="10" fill="#71706B">Reports Delivered</text>
-      <text x="670" y="162" fontSize="30" fontWeight="bold" fill="#F25C05">7</text>
-      <text x="670" y="180" fontSize="10" fill="#71706B">this quarter</text>
-
-      {/* Row 2: Client Readiness Scores + Stakeholder Alignment */}
-      {/* Client Readiness Scores */}
-      <rect x="204" y="206" width="280" height="185" rx="8" fill="#FFFFFF" />
-      <rect x="204" y="206" width="280" height="185" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="220" y="230" fontSize="13" fontWeight="bold" fill="#171614">Client Readiness Scores</text>
-
-      {/* Client score bars */}
-      <text x="220" y="258" fontSize="11" fill="#171614">Acme Corp</text>
-      <rect x="310" y="248" width="140" height="10" rx="5" fill="#E7E5E4" />
-      <rect x="310" y="248" width="112" height="10" rx="5" fill="#22c55e" />
-      <text x="460" y="258" fontSize="10" fontWeight="bold" fill="#22c55e">80%</text>
-
-      <text x="220" y="284" fontSize="11" fill="#171614">Smith &amp; Co</text>
-      <rect x="310" y="274" width="140" height="10" rx="5" fill="#E7E5E4" />
-      <rect x="310" y="274" width="98" height="10" rx="5" fill="#1D9BA3" />
-      <text x="460" y="284" fontSize="10" fontWeight="bold" fill="#1D9BA3">70%</text>
-
-      <text x="220" y="310" fontSize="11" fill="#171614">Global Finance</text>
-      <rect x="310" y="300" width="140" height="10" rx="5" fill="#E7E5E4" />
-      <rect x="310" y="300" width="91" height="10" rx="5" fill="#eab308" />
-      <text x="460" y="310" fontSize="10" fontWeight="bold" fill="#eab308">65%</text>
-
-      <text x="220" y="336" fontSize="11" fill="#171614">TechVentures</text>
-      <rect x="310" y="326" width="140" height="10" rx="5" fill="#E7E5E4" />
-      <rect x="310" y="326" width="77" height="10" rx="5" fill="#f97316" />
-      <text x="460" y="336" fontSize="10" fontWeight="bold" fill="#f97316">55%</text>
-
-      {/* Avg line indicator */}
-      <line x1="310" y1="360" x2="460" y2="360" stroke="#E7E5E4" strokeWidth="1" strokeDasharray="4 2" />
-      <text x="220" y="364" fontSize="10" fill="#71706B">Avg: 71%</text>
-      <line x1="409" y1="354" x2="409" y2="368" stroke="#F25C05" strokeWidth="2" />
+      {/* ===== ROW 2: Stakeholder Alignment | Dimension Scores ===== */}
 
       {/* Stakeholder Alignment */}
-      <rect x="496" y="206" width="293" height="185" rx="8" fill="#FFFFFF" />
-      <rect x="496" y="206" width="293" height="185" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="512" y="230" fontSize="13" fontWeight="bold" fill="#171614">Stakeholder Alignment</text>
-      <text x="512" y="246" fontSize="10" fill="#71706B">Leadership vs. operational views</text>
+      <rect x="20" y="228" width="250" height="155" rx="10" fill="#FAF8F3" />
+      <text x="35" y="250" fontSize="13" fontWeight="600" fill="#171614">
+        Stakeholder Alignment
+      </text>
+      {/* Alignment gauge ring */}
+      <circle cx="95" cy="330" r="35" stroke="#E8E7E4" strokeWidth="8" fill="none" />
+      <circle
+        cx="95"
+        cy="330"
+        r="35"
+        stroke="#F59E0B"
+        strokeWidth="8"
+        fill="none"
+        strokeDasharray="220"
+        strokeDashoffset="79"
+        strokeLinecap="round"
+        transform="rotate(-90 95 330)"
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          from="220"
+          to="79"
+          dur="1s"
+          fill="freeze"
+        />
+      </circle>
+      <text x="95" y="334" fontSize="18" fontWeight="bold" fill="#171614" textAnchor="middle">
+        64%
+      </text>
 
-      {/* Alignment gauge per client */}
-      <rect x="512" y="260" width="261" height="34" rx="4" fill="#FAF8F3" />
-      <text x="524" y="276" fontSize="11" fill="#171614">Acme Corp</text>
-      <text x="524" y="290" fontSize="9" fill="#71706B">Leadership ↔ Ops</text>
-      <rect x="650" y="268" width="80" height="8" rx="4" fill="#E7E5E4" />
-      <rect x="650" y="268" width="72" height="8" rx="4" fill="#22c55e" />
-      <text x="740" y="276" fontSize="10" fontWeight="bold" fill="#22c55e">High</text>
+      <text x="150" y="300" fontSize="10" fill="#F59E0B" fontWeight="600">
+        ⚠ Gap Detected
+      </text>
+      <text x="150" y="316" fontSize="9" fill="#71706B">
+        Executive vs Operations
+      </text>
+      <text x="150" y="330" fontSize="9" fill="#71706B">
+        misaligned on timeline
+      </text>
+      <text x="150" y="350" fontSize="9" fill="#71706B">
+        Avg across 4 clients
+      </text>
 
-      <rect x="512" y="300" width="261" height="34" rx="4" fill="transparent" />
-      <text x="524" y="316" fontSize="11" fill="#171614">Smith &amp; Co</text>
-      <text x="524" y="330" fontSize="9" fill="#71706B">Leadership ↔ Ops</text>
-      <rect x="650" y="308" width="80" height="8" rx="4" fill="#E7E5E4" />
-      <rect x="650" y="308" width="48" height="8" rx="4" fill="#eab308" />
-      <text x="740" y="316" fontSize="10" fontWeight="bold" fill="#eab308">Med</text>
+      {/* Dimension Scores — Bar Chart */}
+      <rect x="280" y="228" width="310" height="155" rx="10" fill="#FAF8F3" />
+      <text x="295" y="250" fontSize="13" fontWeight="600" fill="#171614">
+        Dimension Scores (Avg)
+      </text>
 
-      <rect x="512" y="340" width="261" height="34" rx="4" fill="transparent" />
-      <text x="524" y="356" fontSize="11" fill="#171614">Global Finance</text>
-      <text x="524" y="370" fontSize="9" fill="#71706B">Leadership ↔ Ops</text>
-      <rect x="650" y="348" width="80" height="8" rx="4" fill="#E7E5E4" />
-      <rect x="650" y="348" width="28" height="8" rx="4" fill="#ef4444" />
-      <text x="740" y="356" fontSize="10" fontWeight="bold" fill="#ef4444">Low</text>
+      {/* Technology */}
+      <text x="295" y="276" fontSize="10" fill="#171614">Technology</text>
+      <rect x="370" y="267" width="180" height="11" rx="3" fill="#E8E7E4" />
+      <rect x="370" y="267" width="126" height="11" rx="3" fill="#1D9BA3">
+        <animate attributeName="width" from="0" to="126" dur="0.7s" fill="freeze" />
+      </rect>
+      <text x="558" y="276" fontSize="9" fill="#171614" fontWeight="500">70</text>
 
-      {/* Row 3: Key Findings + Risk/Opportunity */}
-      {/* Key Findings Summary */}
-      <rect x="204" y="405" width="390" height="185" rx="8" fill="#FFFFFF" />
-      <rect x="204" y="405" width="390" height="185" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="220" y="429" fontSize="13" fontWeight="bold" fill="#171614">Key Findings Across Clients</text>
+      {/* Process */}
+      <text x="295" y="298" fontSize="10" fill="#171614">Process</text>
+      <rect x="370" y="289" width="180" height="11" rx="3" fill="#E8E7E4" />
+      <rect x="370" y="289" width="108" height="11" rx="3" fill="#F59E0B">
+        <animate attributeName="width" from="0" to="108" dur="0.7s" fill="freeze" />
+      </rect>
+      <text x="558" y="298" fontSize="9" fill="#171614" fontWeight="500">60</text>
 
-      <rect x="220" y="444" width="358" height="38" rx="4" fill="#FAF8F3" />
-      <rect x="228" y="452" width="4" height="22" rx="2" fill="#22c55e" />
-      <text x="244" y="462" fontSize="11" fill="#171614" fontWeight="500">Technology infrastructure is strong</text>
-      <text x="244" y="476" fontSize="9" fill="#71706B">3 of 4 clients score &gt;70% on technology readiness</text>
+      {/* People */}
+      <text x="295" y="320" fontSize="10" fill="#171614">People</text>
+      <rect x="370" y="311" width="180" height="11" rx="3" fill="#E8E7E4" />
+      <rect x="370" y="311" width="140" height="11" rx="3" fill="#22C55E">
+        <animate attributeName="width" from="0" to="140" dur="0.7s" fill="freeze" />
+      </rect>
+      <text x="558" y="320" fontSize="9" fill="#171614" fontWeight="500">78</text>
 
-      <rect x="220" y="488" width="358" height="38" rx="4" fill="transparent" />
-      <rect x="228" y="496" width="4" height="22" rx="2" fill="#f97316" />
-      <text x="244" y="506" fontSize="11" fill="#171614" fontWeight="500">Change management is the top gap</text>
-      <text x="244" y="520" fontSize="9" fill="#71706B">Avg 48% across all engagements — consistent weakness</text>
+      {/* Data */}
+      <text x="295" y="342" fontSize="10" fill="#171614">Data</text>
+      <rect x="370" y="333" width="180" height="11" rx="3" fill="#E8E7E4" />
+      <rect x="370" y="333" width="90" height="11" rx="3" fill="#EF4444">
+        <animate attributeName="width" from="0" to="90" dur="0.7s" fill="freeze" />
+      </rect>
+      <text x="558" y="342" fontSize="9" fill="#171614" fontWeight="500">50</text>
 
-      <rect x="220" y="532" width="358" height="38" rx="4" fill="transparent" />
-      <rect x="228" y="540" width="4" height="22" rx="2" fill="#1D9BA3" />
-      <text x="244" y="550" fontSize="11" fill="#171614" fontWeight="500">Data governance improving quarter-over-quarter</text>
-      <text x="244" y="564" fontSize="9" fill="#71706B">Up 12 pts avg since initial assessments</text>
+      {/* Strategy */}
+      <text x="295" y="364" fontSize="10" fill="#171614">Strategy</text>
+      <rect x="370" y="355" width="180" height="11" rx="3" fill="#E8E7E4" />
+      <rect x="370" y="355" width="133" height="11" rx="3" fill="#1D9BA3">
+        <animate attributeName="width" from="0" to="133" dur="0.7s" fill="freeze" />
+      </rect>
+      <text x="558" y="364" fontSize="9" fill="#171614" fontWeight="500">74</text>
 
-      {/* Risk / Opportunity Indicators */}
-      <rect x="604" y="405" width="185" height="185" rx="8" fill="#FFFFFF" />
-      <rect x="604" y="405" width="185" height="185" rx="8" fill="none" stroke="#E7E5E4" strokeWidth="1" />
-      <text x="620" y="429" fontSize="13" fontWeight="bold" fill="#171614">Signals</text>
+      {/* Assessments This Quarter */}
+      <rect x="600" y="228" width="180" height="155" rx="10" fill="#FAF8F3" />
+      <text x="615" y="250" fontSize="11" fill="#71706B" fontWeight="500">
+        Assessments This Quarter
+      </text>
+      <text x="690" y="305" fontSize="36" fontWeight="bold" fill="#F25C05" textAnchor="middle">
+        12
+      </text>
+      <text x="690" y="322" fontSize="11" fill="#71706B" textAnchor="middle">
+        completed
+      </text>
+      {/* Mini completion bar */}
+      <rect x="630" y="340" width="120" height="8" rx="4" fill="#E8E7E4" />
+      <rect x="630" y="340" width="100" height="8" rx="4" fill="#22C55E">
+        <animate attributeName="width" from="0" to="100" dur="0.8s" fill="freeze" />
+      </rect>
+      <text x="690" y="364" fontSize="10" fill="#71706B" textAnchor="middle">
+        83% completion rate
+      </text>
 
-      <text x="620" y="452" fontSize="10" fontWeight="bold" fill="#ef4444">⚠ Risks</text>
+      {/* ===== ROW 3: Risk Indicators | Pipeline ===== */}
 
-      <circle cx="628" cy="468" r="3" fill="#ef4444" />
-      <text x="638" y="472" fontSize="10" fill="#171614">Global Finance misalignment</text>
+      {/* Risk Indicators */}
+      <rect x="20" y="395" width="470" height="110" rx="10" fill="#FAF8F3" />
+      <text x="35" y="417" fontSize="13" fontWeight="600" fill="#171614">
+        Risk Indicators
+      </text>
 
-      <circle cx="628" cy="488" r="3" fill="#f97316" />
-      <text x="638" y="492" fontSize="10" fill="#171614">TechVentures stalled at 55%</text>
+      {/* Risk item 1 */}
+      <rect x="35" y="428" width="440" height="30" rx="6" fill="#FEF2F2" />
+      <circle cx="52" cy="443" r="5" fill="#EF4444">
+        <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
+      </circle>
+      <text x="64" y="447" fontSize="10" fill="#171614" fontWeight="500">
+        Smith &amp; Co: IT and Operations misaligned on digital priorities
+      </text>
+      <text x="430" y="447" fontSize="9" fill="#EF4444" fontWeight="600">
+        HIGH
+      </text>
 
-      <text x="620" y="518" fontSize="10" fontWeight="bold" fill="#22c55e">✦ Opportunities</text>
+      {/* Risk item 2 */}
+      <rect x="35" y="464" width="440" height="30" rx="6" fill="#FFFBEB" />
+      <circle cx="52" cy="479" r="5" fill="#F59E0B" />
+      <text x="64" y="483" fontSize="10" fill="#171614" fontWeight="500">
+        Nova Industries: Executive sponsor disengaged — 3 missed sessions
+      </text>
+      <text x="430" y="483" fontSize="9" fill="#F59E0B" fontWeight="600">
+        MEDIUM
+      </text>
 
-      <circle cx="628" cy="534" r="3" fill="#22c55e" />
-      <text x="638" y="538" fontSize="10" fill="#171614">Acme ready for Phase 2</text>
+      {/* Quick Stats */}
+      <rect x="500" y="395" width="280" height="110" rx="10" fill="#FAF8F3" />
+      <text x="515" y="417" fontSize="13" fontWeight="600" fill="#171614">
+        Pipeline Summary
+      </text>
 
-      <circle cx="628" cy="554" r="3" fill="#1D9BA3" />
-      <text x="638" y="558" fontSize="10" fill="#171614">Smith &amp; Co upsell potential</text>
+      <text x="515" y="443" fontSize="10" fill="#71706B">Active Engagements</text>
+      <text x="710" y="443" fontSize="14" fontWeight="bold" fill="#171614" textAnchor="end">4</text>
 
-      <circle cx="628" cy="574" r="3" fill="#22c55e" />
-      <text x="638" y="578" fontSize="10" fill="#171614">Q1 pipeline: 2 new leads</text>
+      <text x="515" y="463" fontSize="10" fill="#71706B">Proposals Pending</text>
+      <text x="710" y="463" fontSize="14" fontWeight="bold" fill="#F25C05" textAnchor="end">2</text>
 
-      {/* Gradient Definition */}
-      <defs>
-        <linearGradient id="dashGradConsulting" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f25c05" />
-          <stop offset="100%" stopColor="#1d9ba3" />
-        </linearGradient>
-      </defs>
+      <text x="515" y="483" fontSize="10" fill="#71706B">Revenue This Quarter</text>
+      <text x="710" y="483" fontSize="14" fontWeight="bold" fill="#22C55E" textAnchor="end">$142K</text>
+
+      {/* Bottom bar */}
+      <rect x="20" y="518" width="760" height="36" rx="8" fill="#FAF8F3" />
+      <text x="40" y="541" fontSize="10" fill="#71706B">
+        Last sync: 15 min ago
+      </text>
+      <text x="280" y="541" fontSize="10" fill="#71706B">
+        Next review: Smith &amp; Co — Feb 5, 10:00 AM
+      </text>
+      <text x="580" y="541" fontSize="10" fill="#71706B">
+        2 reports ready to export
+      </text>
+
+      {/* Border */}
+      <rect width="800" height="600" rx="12" fill="none" stroke="#E8E7E4" strokeWidth="1" />
     </svg>
   )
 }
