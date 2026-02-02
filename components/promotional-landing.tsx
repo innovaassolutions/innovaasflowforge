@@ -432,18 +432,18 @@ export default function PromotionalLanding() {
                 <h3 className="text-xl font-bold text-foreground mb-3
                                md:text-2xl">
                   {industry === 'coaching'
-                    ? 'Client & Program Management'
+                    ? 'Practice Health at a Glance'
                     : industry === 'education'
-                    ? 'Institutional Survey Dashboard'
-                    : 'Centralized Campaign Management'}
+                    ? 'School Health at a Glance'
+                    : 'Practice Health at a Glance'}
                 </h3>
                 <p className="text-muted-foreground
                               md:text-lg">
                   {industry === 'coaching'
-                    ? 'Track coaching programs, monitor client progress across cohorts, and manage discovery sessions from a unified dashboard.'
+                    ? 'See client progress, archetype distributions, growth edge trends, and satisfaction scores — your entire coaching practice in one view.'
                     : industry === 'education'
-                    ? 'Manage parent surveys, faculty reviews, and staff assessments across your institution with real-time participation tracking.'
-                    : 'Track multiple client engagements, monitor stakeholder participation, and manage interview progress from a unified dashboard.'}
+                    ? 'Parent satisfaction scores, faculty alignment, student retention risks, and department health — your institution\'s vital signs at a glance.'
+                    : 'Client readiness scores, stakeholder alignment, risk signals, and key findings across all engagements — your consulting practice in one view.'}
                 </p>
               </div>
             )}
