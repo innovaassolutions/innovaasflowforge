@@ -131,7 +131,33 @@ export default function CoachingClientsPage() {
         setError(`Failed to load clients: ${clientsError.message || clientsError.code}`)
         console.error('Clients error:', clientsError)
       } else {
-        setClients(clientsData || [])
+        const clients = clientsData || []
+
+        // Self-heal: fix sessions that have completed_at but wrong client_status
+        for (const session of clients) {
+          if (session.completed_at && session.client_status !== 'completed') {
+            console.warn(`Self-healing client_status for session ${session.id}: ${session.client_status} -> completed`)
+            session.client_status = 'completed'
+            // Fire-and-forget DB correction
+            ;(client.from('coaching_sessions') as any)
+              .update({ client_status: 'completed' })
+              .eq('id', session.id)
+              .then(({ error: fixError }: { error: Error | null }) => {
+                if (fixError) console.error('Failed to self-heal session status:', fixError)
+              })
+          } else if (session.started_at && session.client_status === 'registered') {
+            console.warn(`Self-healing client_status for session ${session.id}: registered -> in_progress`)
+            session.client_status = 'in_progress'
+            ;(client.from('coaching_sessions') as any)
+              .update({ client_status: 'in_progress' })
+              .eq('id', session.id)
+              .then(({ error: fixError }: { error: Error | null }) => {
+                if (fixError) console.error('Failed to self-heal session status:', fixError)
+              })
+          }
+        }
+
+        setClients(clients)
       }
     } catch (err) {
       setError('Error loading data')

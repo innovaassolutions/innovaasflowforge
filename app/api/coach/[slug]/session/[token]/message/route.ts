@@ -13,6 +13,8 @@ import { processArchetypeMessage, TenantContext } from '@/lib/agents/archetype-i
 import { ArchetypeSessionState } from '@/lib/agents/archetype-constitution'
 import { logUsageEvent, logLLMUsage } from '@/lib/usage/log-usage'
 import { checkUsageLimit, createUsageLimitError } from '@/lib/services/usage-tracker'
+import { resend } from '@/lib/resend'
+import { SessionCompletedNotification } from '@/lib/email/templates/session-completed-notification'
 
 function getServiceClient() {
   return createClient(
@@ -226,10 +228,23 @@ export async function POST(
       }, supabase)
     }
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('coaching_sessions')
       .update(updates)
       .eq('id', session.id)
+
+    if (updateError) {
+      console.error('Failed to update coaching session status:', updateError, { sessionId: session.id, updates })
+    }
+
+    // Notify coach when session completes (awaited so serverless doesn't kill it)
+    if (agentResponse.isComplete) {
+      try {
+        await notifyCoachOfCompletion(supabase, tenant, session, slug)
+      } catch (err) {
+        console.error('Failed to send coach completion notification:', err)
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -286,4 +301,90 @@ async function getOrCreateAgentSession(
   }
 
   return newSession
+}
+
+async function notifyCoachOfCompletion(
+  supabase: ReturnType<typeof getServiceClient>,
+  tenant: { id: string; display_name: string; brand_config: unknown },
+  session: { id: string; client_name: string },
+  slug: string
+) {
+  // Fetch coach's user_id and email_config from tenant_profiles
+  const { data: tenantProfile } = await supabase
+    .from('tenant_profiles')
+    .select('user_id, brand_config, email_config')
+    .eq('id', tenant.id)
+    .single()
+
+  if (!tenantProfile?.user_id) {
+    console.error('Coach notification: no user_id found for tenant', tenant.id)
+    return
+  }
+
+  // Fetch coach email from auth.users
+  const { data: coachUser } = await supabase.auth.admin.getUserById(tenantProfile.user_id)
+  const coachEmail = coachUser?.user?.email
+  if (!coachEmail) {
+    console.error('Coach notification: no email found for user', tenantProfile.user_id)
+    return
+  }
+
+  const brandConfig = (tenantProfile.brand_config || {}) as {
+    logo?: { url: string; alt?: string }
+    colors?: {
+      primary?: string
+      background?: string
+      text?: string
+      textMuted?: string
+    }
+    tagline?: string
+  }
+
+  const emailConfig = (tenantProfile.email_config || {}) as {
+    senderName?: string
+    emailFooter?: string
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const dashboardUrl = `${baseUrl}/dashboard/clients`
+  const completedAt = new Date().toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+
+  const senderName = emailConfig.senderName || tenant.display_name || 'FlowForge'
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+  const fromAddress = `${senderName} <${fromEmail}>`
+
+  const result = await resend.emails.send({
+    from: fromAddress,
+    to: coachEmail,
+    subject: `Session Completed: ${session.client_name}`,
+    react: SessionCompletedNotification({
+      clientName: session.client_name,
+      assessmentType: 'Leadership Archetype',
+      completedAt,
+      dashboardUrl,
+      brandConfig: {
+        logo: brandConfig.logo,
+        colors: {
+          primary: brandConfig.colors?.primary,
+          background: brandConfig.colors?.background,
+          text: brandConfig.colors?.text,
+          textMuted: brandConfig.colors?.textMuted,
+        },
+        tagline: brandConfig.tagline,
+      },
+      emailConfig: {
+        senderName: emailConfig.senderName,
+        emailFooter: emailConfig.emailFooter,
+      },
+    }),
+  })
+
+  if (result.error) {
+    console.error('Coach notification email error:', result.error)
+  } else {
+    console.log(`Coach notification sent to ${coachEmail} (email ID: ${result.data?.id})`)
+  }
 }
