@@ -1,0 +1,229 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+
+interface ContactFormProps {
+  /** Override the submit button text */
+  submitLabel?: string
+  /** Compact mode for modal usage */
+  compact?: boolean
+  /** Called after successful submission */
+  onSuccess?: () => void
+}
+
+interface FormData {
+  name: string
+  email: string
+  organization_name: string
+  role: string
+  notes: string
+}
+
+type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
+
+const NOVACRM_API_URL =
+  process.env.NEXT_PUBLIC_NOVACRM_API_URL || 'https://nova-cyan-mu.vercel.app'
+const NOVACRM_API_KEY =
+  process.env.NEXT_PUBLIC_NOVACRM_LEAD_API_KEY || ''
+
+export default function ContactForm({ submitLabel = 'Request a Demo', compact = false, onSuccess }: ContactFormProps) {
+  const [form, setForm] = useState<FormData>({
+    name: '',
+    email: '',
+    organization_name: '',
+    role: '',
+    notes: '',
+  })
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setStatus('submitting')
+    setErrorMsg('')
+
+    try {
+      const res = await fetch(`${NOVACRM_API_URL}/api/leads/capture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(NOVACRM_API_KEY ? { 'X-Api-Key': NOVACRM_API_KEY } : {}),
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          organization_name: form.organization_name || undefined,
+          role: form.role || undefined,
+          notes: form.notes || undefined,
+          page_slug: 'flowforge',
+          source: 'flowforge-landing',
+        }),
+      })
+
+      if (!res.ok) {
+        const body = await res.text()
+        throw new Error(body || `Request failed (${res.status})`)
+      }
+
+      setStatus('success')
+      onSuccess?.()
+    } catch (err: unknown) {
+      setStatus('error')
+      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    }
+  }
+
+  // ── Success State ──
+  if (status === 'success') {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 animate-in fade-in-0 zoom-in-95 duration-500">
+        <div className="w-16 h-16 rounded-full bg-[hsl(var(--success))]/20 flex items-center justify-center mb-4
+                        animate-in zoom-in-50 duration-700">
+          <CheckCircle2 className="w-8 h-8 text-[hsl(var(--success))]" />
+        </div>
+        <h3 className="text-xl font-bold text-foreground mb-2 md:text-2xl">
+          Thanks! We&apos;ll be in touch shortly.
+        </h3>
+        <p className="text-muted-foreground text-center max-w-md">
+          We&apos;ve received your request and a member of our team will reach out within one business day.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className={`grid gap-4 ${compact ? 'gap-3' : 'gap-5'}`}
+    >
+      {/* Name & Email — side by side on desktop */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="cf-name" className="block text-sm font-medium text-foreground mb-1.5">
+            Full Name <span className="text-primary">*</span>
+          </label>
+          <input
+            id="cf-name"
+            name="name"
+            type="text"
+            required
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Jane Smith"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
+                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+          />
+        </div>
+        <div>
+          <label htmlFor="cf-email" className="block text-sm font-medium text-foreground mb-1.5">
+            Work Email <span className="text-primary">*</span>
+          </label>
+          <input
+            id="cf-email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            placeholder="jane@company.com"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
+                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      {/* Company & Role — side by side */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="cf-org" className="block text-sm font-medium text-foreground mb-1.5">
+            Company Name
+          </label>
+          <input
+            id="cf-org"
+            name="organization_name"
+            type="text"
+            value={form.organization_name}
+            onChange={handleChange}
+            placeholder="Acme Corp"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
+                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+          />
+        </div>
+        <div>
+          <label htmlFor="cf-role" className="block text-sm font-medium text-foreground mb-1.5">
+            Job Title / Role
+          </label>
+          <input
+            id="cf-role"
+            name="role"
+            type="text"
+            value={form.role}
+            onChange={handleChange}
+            placeholder="Head of Strategy"
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
+                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      {/* Message */}
+      <div>
+        <label htmlFor="cf-notes" className="block text-sm font-medium text-foreground mb-1.5">
+          What are you looking for?
+        </label>
+        <textarea
+          id="cf-notes"
+          name="notes"
+          rows={compact ? 3 : 4}
+          value={form.notes}
+          onChange={handleChange}
+          placeholder="Tell us about your assessment needs, team size, or anything else..."
+          className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground resize-none
+                     focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+        />
+      </div>
+
+      {/* Error message */}
+      {status === 'error' && (
+        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-400/10 rounded-lg px-4 py-3
+                        animate-in fade-in-0 slide-in-from-top-2 duration-300">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={status === 'submitting'}
+        className="w-full px-6 py-3.5 bg-primary text-primary-foreground font-semibold rounded-lg text-base
+                   hover:bg-[hsl(var(--accent-hover))] transition-all flex items-center justify-center gap-2
+                   disabled:opacity-60 disabled:cursor-not-allowed
+                   md:text-lg md:py-4"
+      >
+        {status === 'submitting' ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Sending…
+          </>
+        ) : (
+          <>
+            {submitLabel}
+            <Send className="w-4 h-4" />
+          </>
+        )}
+      </button>
+
+      <p className="text-xs text-muted-foreground text-center">
+        We respect your privacy and will never share your information.
+      </p>
+    </form>
+  )
+}

@@ -20,10 +20,19 @@ import DashboardMockup from './mockups/dashboard-mockup-index'
 import InterviewMockup from './mockups/interview-mockup-index'
 import ReportMockup from './mockups/report-mockup-index'
 import HeroBackground from './mockups/hero-background'
+import ContactForm from './contact-form'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 
 export default function PromotionalLanding() {
   const { industry, setIndustry, isLoaded } = useIndustryPreference()
   const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
+  const [contactModalOpen, setContactModalOpen] = useState(false)
 
   // Analytics tracking for CRM dashboard
   useLandingAnalytics({
@@ -45,6 +54,28 @@ export default function PromotionalLanding() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Contact Form Modal */}
+      <Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
+        <DialogContent className="max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto sm:max-w-xl
+                                  bg-background border-border">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold md:text-2xl">
+              {content.ctaPrimary}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Tell us about your needs and we&apos;ll show you how FlowForge can help.
+            </DialogDescription>
+          </DialogHeader>
+          <ContactForm
+            submitLabel={content.ctaPrimary}
+            compact
+            onSuccess={() => {
+              // Keep modal open to show success state
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
       {/* Industry Selector Bar - Prominent */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-brand-teal/10 border-b-2 border-primary/20 py-4 px-4
                       sm:py-5">
@@ -109,15 +140,15 @@ export default function PromotionalLanding() {
                               sm:flex-row sm:justify-center
                               lg:justify-start
                               md:gap-4">
-                <Link
-                  href="/auth/signup"
+                <button
+                  onClick={() => setContactModalOpen(true)}
                   className="w-full px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg
                              hover:bg-[hsl(var(--accent-hover))] transition-colors flex items-center justify-center gap-2
                              sm:w-auto
                              md:px-8 md:py-4 md:text-lg">
                   {content.ctaPrimary}
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
 
                 <Link
                   href="#how-it-works"
@@ -585,50 +616,32 @@ export default function PromotionalLanding() {
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-12 bg-gradient-to-br from-card via-muted to-card
-                          md:py-16
-                          lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 text-center
+      {/* Contact / Let's Talk Section (inline form) */}
+      <section id="contact" className="py-12 bg-gradient-to-br from-card via-muted to-card
+                                        md:py-16
+                                        lg:py-24">
+        <div className="max-w-3xl mx-auto px-6
                         lg:px-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4
-                         md:text-3xl
-                         lg:text-4xl lg:mb-6">
-            Ready to Transform Your Assessment Process?
-          </h2>
-
-          <p className="text-base text-muted-foreground mb-6
-                        md:text-lg
-                        lg:text-xl lg:mb-10">
-            Join {content.name.toLowerCase()} leaders who are leveraging AI to accelerate strategic insights.
-          </p>
-
-          <div className="flex flex-col gap-4 items-center
-                          sm:flex-row sm:justify-center
-                          md:gap-6">
-            <Link
-              href="/auth/signup"
-              className="w-full px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg
-                         hover:bg-[hsl(var(--accent-hover))] transition-colors flex items-center justify-center gap-2
-                         sm:w-auto
-                         md:px-10 md:py-5 md:text-xl">
-              {content.ctaPrimary}
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-
-            <Link
-              href="/auth/login"
-              className="w-full px-8 py-4 border-2 border-border bg-card text-foreground font-bold rounded-lg text-lg
-                         hover:bg-muted hover:border-primary transition-colors
-                         sm:w-auto
-                         md:px-10 md:py-5 md:text-xl">
-              Sign In
-            </Link>
+          <div className="text-center mb-8 md:mb-10">
+            <h2 className="text-2xl font-bold text-foreground mb-4
+                           md:text-3xl
+                           lg:text-4xl">
+              Let&apos;s Talk
+            </h2>
+            <p className="text-base text-muted-foreground max-w-xl mx-auto
+                          md:text-lg">
+              Tell us about your needs and we&apos;ll show you how FlowForge can help.
+            </p>
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground
+          <div className="bg-card border border-border rounded-xl p-6 shadow-lg
+                          md:p-10">
+            <ContactForm submitLabel={content.ctaPrimary} />
+          </div>
+
+          <p className="mt-6 text-sm text-muted-foreground text-center
                         md:text-base">
-            No credit card required • Set up in minutes • Enterprise-ready security
+            No credit card required • Enterprise-ready security
           </p>
         </div>
       </section>

@@ -116,7 +116,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
         description: 'Client breakthroughs get lost in session notes. FlowForge captures, synthesizes, and tracks growth patterns over time.'
       }
     ],
-    ctaPrimary: 'Encode Your Method',
+    ctaPrimary: 'Request a Demo',
     ctaSecondary: 'See Coaching Demo',
     stats: [
       { value: '10x', label: 'More clients per coach' },
@@ -193,7 +193,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
         description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
       }
     ],
-    ctaPrimary: 'Start Listening',
+    ctaPrimary: 'Request a Demo',
     ctaSecondary: 'See Education Demo',
     stats: [
       { value: '85%', label: 'Parent participation rate' },
@@ -270,7 +270,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
         description: 'You spend more time organizing notes than advising clients. Let AI synthesize — you focus on the insights only you can deliver.'
       }
     ],
-    ctaPrimary: 'Encode Your Expertise',
+    ctaPrimary: 'Request a Demo',
     ctaSecondary: 'See How It Works',
     stats: [
       { value: '3-5x', label: 'More engagements per consultant' },
