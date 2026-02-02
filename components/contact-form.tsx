@@ -17,8 +17,17 @@ interface FormData {
   email: string
   organization_name: string
   role: string
+  interest: string
   notes: string
 }
+
+const INTEREST_OPTIONS = [
+  { value: '', label: 'Select an option…' },
+  { value: 'consulting', label: 'Consulting & Advisory' },
+  { value: 'education', label: 'Education & Schools' },
+  { value: 'coaching', label: 'Coaching & Leadership' },
+  { value: 'other', label: 'Something else' },
+]
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -33,13 +42,14 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
     email: '',
     organization_name: '',
     role: '',
+    interest: '',
     notes: '',
   })
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
@@ -60,6 +70,7 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
           email: form.email,
           organization_name: form.organization_name || undefined,
           role: form.role || undefined,
+          interest: form.interest || undefined,
           notes: form.notes || undefined,
           page_slug: 'flowforge',
           source: 'flowforge-landing',
@@ -173,10 +184,32 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
         </div>
       </div>
 
+      {/* Interest */}
+      <div>
+        <label htmlFor="cf-interest" className="block text-sm font-medium text-foreground mb-1.5">
+          What are you interested in?
+        </label>
+        <select
+          id="cf-interest"
+          name="interest"
+          value={form.interest}
+          onChange={handleChange}
+          className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground
+                     focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors
+                     appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
+        >
+          {INTEREST_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value} disabled={opt.value === ''}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Message */}
       <div>
         <label htmlFor="cf-notes" className="block text-sm font-medium text-foreground mb-1.5">
-          What are you looking for?
+          Anything else you&apos;d like us to know?
         </label>
         <textarea
           id="cf-notes"
