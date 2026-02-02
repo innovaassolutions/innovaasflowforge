@@ -17,7 +17,7 @@ import { getIndustryContent, IndustryKey } from '@/lib/industry-content'
 import IndustrySelector from './industry-selector'
 import IndustryHeroMockup from './mockups/industry-hero-index'
 import DashboardMockup from './mockups/dashboard-mockup'
-import ManufacturingMockup from './mockups/manufacturing-mockup'
+import InterviewMockup from './mockups/interview-mockup-index'
 import ReportMockup from './mockups/report-mockup'
 import HeroBackground from './mockups/hero-background'
 
@@ -420,7 +420,7 @@ export default function PromotionalLanding() {
           {/* Mockup Display */}
           <div className="max-w-5xl mx-auto">
             {selectedMockup === 'dashboard' && <DashboardMockup />}
-            {selectedMockup === 'interview' && <ManufacturingMockup />}
+            {selectedMockup === 'interview' && <InterviewMockup industry={industry} />}
             {selectedMockup === 'report' && <ReportMockup />}
           </div>
 

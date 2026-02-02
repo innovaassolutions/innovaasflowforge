@@ -1,14 +1,12 @@
 // Index file for industry-specific hero mockups
 import { IndustryKey } from '@/lib/industry-content'
-import IndustryHeroManufacturing from './industry-hero-manufacturing'
-import IndustryHeroPharma from './industry-hero-pharma'
+import IndustryHeroCoaching from './industry-hero-coaching'
 import IndustryHeroEducation from './industry-hero-education'
 import IndustryHeroProfessionalServices from './industry-hero-professional-services'
 
 // Map industry keys to their hero mockup components
 const industryHeroMockups: Record<IndustryKey, React.ComponentType> = {
-  manufacturing: IndustryHeroManufacturing,
-  pharma: IndustryHeroPharma,
+  coaching: IndustryHeroCoaching,
   education: IndustryHeroEducation,
   'professional-services': IndustryHeroProfessionalServices
 }
@@ -24,8 +22,7 @@ export default function IndustryHeroMockup({ industry }: IndustryHeroMockupProps
 
 // Export individual mockups for direct use
 export {
-  IndustryHeroManufacturing,
-  IndustryHeroPharma,
+  IndustryHeroCoaching,
   IndustryHeroEducation,
   IndustryHeroProfessionalServices
 }
