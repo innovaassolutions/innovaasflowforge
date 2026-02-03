@@ -8,9 +8,31 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = 'https://flowforge.innovaas.co'
+const siteTitle = 'FlowForge — Encode Your Expertise, Scale Your Impact'
+const siteDescription =
+  'Encode your consulting methodology, frameworks, and questioning approach into AI — then run it across multiple clients simultaneously. Your brain, multiplied. Your expertise, at scale.'
+
 export const metadata: Metadata = {
-  title: "FlowForge — Encode Your Expertise, Scale Your Impact",
-  description: "Encode your consulting methodology, frameworks, and questioning approach into AI — then run it across multiple clients simultaneously. Your brain, multiplied. Your expertise, at scale.",
+  title: siteTitle,
+  description: siteDescription,
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    url: siteUrl,
+    siteName: 'FlowForge',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+  },
   icons: {
     icon: [
       { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
@@ -21,6 +43,27 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'FlowForge',
+  url: siteUrl,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description: siteDescription,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/OnlineOnly',
+  },
+  creator: {
+    '@type': 'Organization',
+    name: 'Innovaas',
+    url: 'https://innovaas.co',
+  },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +72,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <GlobalHeader />
         {children}
       </body>
