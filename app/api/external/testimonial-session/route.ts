@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
 
     const body: CreateTestimonialSessionRequest = await request.json()
 
-    // Validate required fields
-    const requiredFields = ['project_id', 'contact_name', 'contact_email', 'contact_title', 'company_name', 'callback_url']
+    // Validate required fields (contact_title is optional)
+    const requiredFields = ['project_id', 'contact_name', 'contact_email', 'company_name', 'callback_url']
     for (const field of requiredFields) {
       if (!body[field as keyof CreateTestimonialSessionRequest]) {
         return NextResponse.json(
