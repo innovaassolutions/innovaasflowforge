@@ -97,10 +97,10 @@ export default function IndustryHeroEducation() {
 
 			{/* Department bars */}
 			<g transform="translate(510, 100)">
-				<text x="0" y="0" fontSize="11" fontWeight="600" fill="#71706B">DIGITAL READINESS BY DEPARTMENT</text>
+				<text x="0" y="0" fontSize="11" fontWeight="600" fill="#71706B">INSTITUTIONAL LAYERS</text>
 
 				{/* Business */}
-				<text x="0" y="30" fontSize="11" fill="#171614">Business</text>
+				<text x="0" y="30" fontSize="11" fill="#171614">Parents</text>
 				<rect x="100" y="18" width="200" height="18" rx="4" fill="#E7E5E4" />
 				<rect x="100" y="18" width="170" height="18" rx="4" fill="#22C55E">
 					<animate attributeName="width" from="0" to="170" dur="0.8s" fill="freeze" />
@@ -108,7 +108,7 @@ export default function IndustryHeroEducation() {
 				<text x="310" y="31" fontSize="11" fontWeight="600" fill="#22C55E">85%</text>
 
 				{/* STEM */}
-				<text x="0" y="60" fontSize="11" fill="#171614">STEM</text>
+				<text x="0" y="60" fontSize="11" fill="#171614">Students</text>
 				<rect x="100" y="48" width="200" height="18" rx="4" fill="#E7E5E4" />
 				<rect x="100" y="48" width="156" height="18" rx="4" fill="#3B82F6">
 					<animate attributeName="width" from="0" to="156" dur="0.8s" fill="freeze" begin="0.1s" />
@@ -116,7 +116,7 @@ export default function IndustryHeroEducation() {
 				<text x="310" y="61" fontSize="11" fontWeight="600" fill="#3B82F6">78%</text>
 
 				{/* Arts & Humanities */}
-				<text x="0" y="90" fontSize="11" fill="#171614">Arts & Humanities</text>
+				<text x="0" y="90" fontSize="11" fill="#171614">Teachers</text>
 				<rect x="100" y="78" width="200" height="18" rx="4" fill="#E7E5E4" />
 				<rect x="100" y="78" width="130" height="18" rx="4" fill="#6366F1">
 					<animate attributeName="width" from="0" to="130" dur="0.8s" fill="freeze" begin="0.2s" />
@@ -124,7 +124,7 @@ export default function IndustryHeroEducation() {
 				<text x="310" y="91" fontSize="11" fontWeight="600" fill="#6366F1">65%</text>
 
 				{/* Education */}
-				<text x="0" y="120" fontSize="11" fill="#171614">Education</text>
+				<text x="0" y="120" fontSize="11" fill="#171614">Leadership</text>
 				<rect x="100" y="108" width="200" height="18" rx="4" fill="#E7E5E4" />
 				<rect x="100" y="108" width="144" height="18" rx="4" fill="#8B5CF6">
 					<animate attributeName="width" from="0" to="144" dur="0.8s" fill="freeze" begin="0.3s" />
@@ -132,7 +132,7 @@ export default function IndustryHeroEducation() {
 				<text x="310" y="121" fontSize="11" fontWeight="600" fill="#8B5CF6">72%</text>
 
 				{/* Health Sciences */}
-				<text x="0" y="150" fontSize="11" fill="#171614">Health Sciences</text>
+				<text x="0" y="150" fontSize="11" fill="#171614">Operations</text>
 				<rect x="100" y="138" width="200" height="18" rx="4" fill="#E7E5E4" />
 				<rect x="100" y="138" width="116" height="18" rx="4" fill="#F59E0B">
 					<animate attributeName="width" from="0" to="116" dur="0.8s" fill="freeze" begin="0.4s" />
