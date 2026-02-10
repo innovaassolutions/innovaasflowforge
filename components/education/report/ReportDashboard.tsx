@@ -10,8 +10,9 @@
  * Epic: 2 - Education Synthesis Reports
  */
 
+import { useState } from 'react';
 import Image from 'next/image';
-import { Calendar, FileText, Building2 } from 'lucide-react';
+import { Calendar, FileText, Building2, Download, Loader2 } from 'lucide-react';
 import {
   EducationSynthesisResult,
   LongitudinalComparisonResult,
@@ -42,6 +43,7 @@ interface ReportDashboardProps {
   hasSafeguardingSignals: boolean;
   generatedAt: string;
   longitudinalData: LongitudinalComparisonResult | null;
+  accessToken: string;
 }
 
 const MODULE_LABELS: Record<string, string> = {
@@ -59,13 +61,38 @@ export default function ReportDashboard({
   hasSafeguardingSignals,
   generatedAt,
   longitudinalData,
+  accessToken,
 }: ReportDashboardProps) {
+  const [isDownloading, setIsDownloading] = useState(false);
   const moduleName = MODULE_LABELS[module] || module.replace(/_/g, ' ');
   const formattedDate = new Date(generatedAt).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true);
+    try {
+      const response = await fetch(`/api/education/reports/${accessToken}/download-pdf`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${school.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${module.replace(/_/g, '-')}-report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('PDF download failed:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,9 +130,26 @@ export default function ReportDashboard({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4" />
-              <span>{formattedDate}</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>{formattedDate}</span>
+              </div>
+              <button
+                onClick={handleDownloadPdf}
+                disabled={isDownloading}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
+                           bg-accent text-white rounded-lg hover:bg-accent-hover
+                           disabled:opacity-60 disabled:cursor-not-allowed
+                           transition-colors"
+              >
+                {isDownloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                {isDownloading ? 'Generating...' : 'Download PDF'}
+              </button>
             </div>
           </div>
         </div>

@@ -202,6 +202,7 @@ export default async function EducationReportPage({ params }: ReportPageProps) {
       hasSafeguardingSignals={reportData.has_safeguarding_signals}
       generatedAt={reportData.generated_at}
       longitudinalData={reportData.longitudinal}
+      accessToken={token}
     />
   );
 }
