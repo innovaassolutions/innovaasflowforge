@@ -175,16 +175,16 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		],
 		valueProps: [
 			{
-				title: 'Parent & Family Voice',
-				description: 'Capture what parents really think about communication, their child\'s progress, and the school experience — in their own words, not checkbox surveys'
+				title: 'Stakeholder Signal, Not Noise',
+				description: 'Structured insight from parents, staff, and leadership — synthesized into patterns leadership can act on.'
 			},
 			{
-				title: 'Complete Stakeholder Picture',
-				description: 'Hear from faculty, staff, parents, and administrators — then see where perspectives align and where they diverge'
+				title: 'Institutional Coherence & Alignment',
+				description: 'See where perspectives align, diverge, or quietly erode across departments and terms.'
 			},
 			{
-				title: 'Accreditation Ready',
-				description: 'Rich qualitative evidence that supports continuous improvement requirements and accreditation documentation'
+				title: 'Inspection- and Board-Ready Evidence',
+				description: 'Continuously generated qualitative evidence that supports governance oversight and accreditation without last-minute scrambling.'
 			}
 		],
 		personas: [
