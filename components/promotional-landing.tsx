@@ -60,15 +60,22 @@ export default function PromotionalLanding() {
                                   bg-background border-border">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold md:text-2xl">
-              {content.ctaPrimary}
+              {content.contactForm.dialogTitle}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Tell us about your needs and we&apos;ll show you how FlowForge can help.
+              {content.contactForm.dialogDescription}
             </DialogDescription>
           </DialogHeader>
           <ContactForm
             submitLabel={content.ctaPrimary}
             compact
+            interest={content.contactForm.interest}
+            organizationLabel={content.contactForm.organizationLabel}
+            organizationPlaceholder={content.contactForm.organizationPlaceholder}
+            roleLabel={content.contactForm.roleLabel}
+            rolePlaceholder={content.contactForm.rolePlaceholder}
+            notesPlaceholder={content.contactForm.notesPlaceholder}
+            source={content.contactForm.source}
             onSuccess={() => {
               // Keep modal open to show success state
             }}
@@ -633,17 +640,26 @@ export default function PromotionalLanding() {
             <h2 className="text-2xl font-bold text-foreground mb-4
                            md:text-3xl
                            lg:text-4xl">
-              Let&apos;s Talk
+              {content.contactForm.dialogTitle}
             </h2>
             <p className="text-base text-muted-foreground max-w-xl mx-auto
                           md:text-lg">
-              Tell us about your needs and we&apos;ll show you how FlowForge can help.
+              {content.contactForm.dialogDescription}
             </p>
           </div>
 
           <div className="bg-card border border-border rounded-xl p-6 shadow-lg
                           md:p-10">
-            <ContactForm submitLabel={content.ctaPrimary} />
+            <ContactForm
+              submitLabel={content.ctaPrimary}
+              interest={content.contactForm.interest}
+              organizationLabel={content.contactForm.organizationLabel}
+              organizationPlaceholder={content.contactForm.organizationPlaceholder}
+              roleLabel={content.contactForm.roleLabel}
+              rolePlaceholder={content.contactForm.rolePlaceholder}
+              notesPlaceholder={content.contactForm.notesPlaceholder}
+              source={content.contactForm.source}
+            />
           </div>
 
         </div>

@@ -10,6 +10,20 @@ interface ContactFormProps {
   compact?: boolean
   /** Called after successful submission */
   onSuccess?: () => void
+  /** Pre-set interest value (hides the dropdown) */
+  interest?: string
+  /** Custom label for organization field */
+  organizationLabel?: string
+  /** Custom placeholder for organization field */
+  organizationPlaceholder?: string
+  /** Custom label for role field */
+  roleLabel?: string
+  /** Custom placeholder for role field */
+  rolePlaceholder?: string
+  /** Custom placeholder for notes textarea */
+  notesPlaceholder?: string
+  /** Source tag for CRM tracking */
+  source?: string
 }
 
 interface FormData {
@@ -36,13 +50,24 @@ const NOVACRM_API_URL =
 const NOVACRM_API_KEY =
   process.env.NEXT_PUBLIC_NOVACRM_LEAD_API_KEY || ''
 
-export default function ContactForm({ submitLabel = 'Request a Demo', compact = false, onSuccess }: ContactFormProps) {
+export default function ContactForm({
+  submitLabel = 'Request a Demo',
+  compact = false,
+  onSuccess,
+  interest: presetInterest,
+  organizationLabel = 'Company Name',
+  organizationPlaceholder = 'Acme Corp',
+  roleLabel = 'Job Title / Role',
+  rolePlaceholder = 'Head of Strategy',
+  notesPlaceholder = 'Tell us about your assessment needs, team size, or anything else...',
+  source = 'flowforge-landing',
+}: ContactFormProps) {
   const [form, setForm] = useState<FormData>({
     name: '',
     email: '',
     organization_name: '',
     role: '',
-    interest: '',
+    interest: presetInterest || '',
     notes: '',
   })
   const [status, setStatus] = useState<FormStatus>('idle')
@@ -73,7 +98,7 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
           interest: form.interest || undefined,
           notes: form.notes || undefined,
           page_slug: 'flowforge',
-          source: 'flowforge-landing',
+          source,
         }),
       })
 
@@ -154,7 +179,7 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="cf-org" className="block text-sm font-medium text-foreground mb-1.5">
-            Company Name
+            {organizationLabel}
           </label>
           <input
             id="cf-org"
@@ -162,14 +187,14 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
             type="text"
             value={form.organization_name}
             onChange={handleChange}
-            placeholder="Acme Corp"
+            placeholder={organizationPlaceholder}
             className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
           />
         </div>
         <div>
           <label htmlFor="cf-role" className="block text-sm font-medium text-foreground mb-1.5">
-            Job Title / Role
+            {roleLabel}
           </label>
           <input
             id="cf-role"
@@ -177,34 +202,36 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
             type="text"
             value={form.role}
             onChange={handleChange}
-            placeholder="Head of Strategy"
+            placeholder={rolePlaceholder}
             className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
           />
         </div>
       </div>
 
-      {/* Interest */}
-      <div>
-        <label htmlFor="cf-interest" className="block text-sm font-medium text-foreground mb-1.5">
-          What are you interested in?
-        </label>
-        <select
-          id="cf-interest"
-          name="interest"
-          value={form.interest}
-          onChange={handleChange}
-          className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground
-                     focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors
-                     appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
-        >
-          {INTEREST_OPTIONS.map(opt => (
-            <option key={opt.value} value={opt.value} disabled={opt.value === ''}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Interest — hidden when pre-set by vertical */}
+      {!presetInterest && (
+        <div>
+          <label htmlFor="cf-interest" className="block text-sm font-medium text-foreground mb-1.5">
+            What are you interested in?
+          </label>
+          <select
+            id="cf-interest"
+            name="interest"
+            value={form.interest}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground
+                       focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors
+                       appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
+          >
+            {INTEREST_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value} disabled={opt.value === ''}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Message */}
       <div>
@@ -217,7 +244,7 @@ export default function ContactForm({ submitLabel = 'Request a Demo', compact = 
           rows={compact ? 3 : 4}
           value={form.notes}
           onChange={handleChange}
-          placeholder="Tell us about your assessment needs, team size, or anything else..."
+          placeholder={notesPlaceholder}
           className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground resize-none
                      focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
         />

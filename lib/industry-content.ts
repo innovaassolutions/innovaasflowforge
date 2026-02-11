@@ -14,6 +14,27 @@ export interface IndustryPersona {
 	benefits: string[]
 }
 
+export interface IndustryContactForm {
+	/** Pre-set interest value sent to CRM (hides dropdown) */
+	interest: string
+	/** Dialog title when opened from CTA */
+	dialogTitle: string
+	/** Dialog description below title */
+	dialogDescription: string
+	/** Label for the organization/company field */
+	organizationLabel: string
+	/** Placeholder for the organization/company field */
+	organizationPlaceholder: string
+	/** Label for the role field */
+	roleLabel: string
+	/** Placeholder for the role field */
+	rolePlaceholder: string
+	/** Placeholder for the notes textarea */
+	notesPlaceholder: string
+	/** Source tag for CRM tracking */
+	source: string
+}
+
 export interface IndustryContent {
 	key: IndustryKey
 	name: string
@@ -46,6 +67,8 @@ export interface IndustryContent {
 	}[]
 	// Mockup reference (component name)
 	heroMockup: string
+	// Vertical-specific contact form configuration
+	contactForm: IndustryContactForm
 }
 
 export const industryContent: Record<IndustryKey, IndustryContent> = {
@@ -116,14 +139,25 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'Client breakthroughs get lost in session notes. FlowForge captures, synthesizes, and tracks growth patterns over time.'
 			}
 		],
-		ctaPrimary: 'Contact Us to Learn More',
+		ctaPrimary: 'Explore Coaching Solutions',
 		ctaSecondary: 'See Coaching Demo',
 		stats: [
 			{ value: '10x', label: 'More clients per coach' },
 			{ value: '100%', label: 'Your methodology, every session' },
 			{ value: '24hrs', label: 'From discovery to archetype profile' }
 		],
-		heroMockup: 'coaching'
+		heroMockup: 'coaching',
+		contactForm: {
+			interest: 'coaching',
+			dialogTitle: 'Explore Coaching Solutions',
+			dialogDescription: 'Tell us about your coaching practice and we\'ll show you how FlowForge can scale your methodology.',
+			organizationLabel: 'Practice / Firm Name',
+			organizationPlaceholder: 'Bright Path Coaching',
+			roleLabel: 'Your Role',
+			rolePlaceholder: 'Executive Coach',
+			notesPlaceholder: 'Tell us about your coaching methodology, number of clients, or what you\'d like to scale...',
+			source: 'flowforge-coaching',
+		}
 	},
 
 	education: {
@@ -196,14 +230,25 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
 			}
 		],
-		ctaPrimary: 'Contact Us to Learn More',
+		ctaPrimary: 'Request a School Pilot',
 		ctaSecondary: 'See Education Demo',
 		stats: [
 			{ value: '85%', label: 'Parent participation rate' },
 			{ value: '500+', label: 'Voices captured per school' },
 			{ value: '2 Weeks', label: 'Complete assessment cycle' }
 		],
-		heroMockup: 'education'
+		heroMockup: 'education',
+		contactForm: {
+			interest: 'education',
+			dialogTitle: 'Request a School Pilot',
+			dialogDescription: 'Tell us about your institution and we\'ll set up a pilot to capture stakeholder voice across your school community.',
+			organizationLabel: 'School / Institution Name',
+			organizationPlaceholder: 'Westlake Academy',
+			roleLabel: 'Your Role',
+			rolePlaceholder: 'Head of School',
+			notesPlaceholder: 'Tell us about your school, enrollment size, or what stakeholder insights you\'re looking for...',
+			source: 'flowforge-education',
+		}
 	},
 
 	'professional-services': {
@@ -273,14 +318,25 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'You spend more time organizing notes than advising clients. Let AI synthesize — you focus on the insights only you can deliver.'
 			}
 		],
-		ctaPrimary: 'Contact Us to Learn More',
+		ctaPrimary: 'Book a Consultation',
 		ctaSecondary: 'See How It Works',
 		stats: [
 			{ value: '3-5x', label: 'More engagements per consultant' },
 			{ value: '100%', label: 'Your methodology, every time' },
 			{ value: '48hrs', label: 'From interviews to deliverable' }
 		],
-		heroMockup: 'professional-services'
+		heroMockup: 'professional-services',
+		contactForm: {
+			interest: 'consulting',
+			dialogTitle: 'Book a Consultation',
+			dialogDescription: 'Tell us about your consulting practice and we\'ll show you how FlowForge can multiply your capacity.',
+			organizationLabel: 'Firm / Company Name',
+			organizationPlaceholder: 'Acme Consulting',
+			roleLabel: 'Your Role',
+			rolePlaceholder: 'Managing Partner',
+			notesPlaceholder: 'Tell us about your consulting engagements, team size, or the assessments you\'d like to scale...',
+			source: 'flowforge-consulting',
+		}
 	}
 }
 
