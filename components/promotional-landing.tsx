@@ -504,81 +504,31 @@ export default function PromotionalLanding() {
 					<div className="grid grid-cols-1 gap-6
                           md:grid-cols-2
                           lg:gap-10">
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
-                              md:w-12 md:h-12">
-								<Clock className="w-5 h-5 text-primary-foreground
-                                 md:w-6 md:h-6" />
-							</div>
-							<div>
-								<h3 className="text-lg font-bold text-foreground mb-2
-                               md:text-xl">
-									Save 80% of Assessment Time
-								</h3>
-								<p className="text-muted-foreground text-sm
-                              md:text-base">
-									Automate stakeholder interviews while maintaining depth and quality.
-									What used to take weeks now takes days.
-								</p>
-							</div>
-						</div>
-
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
-                              md:w-12 md:h-12">
-								<Shield className="w-5 h-5 text-primary-foreground
-                                  md:w-6 md:h-6" />
-							</div>
-							<div>
-								<h3 className="text-lg font-bold text-foreground mb-2
-                               md:text-xl">
-									Eliminate Interview Bias
-								</h3>
-								<p className="text-muted-foreground text-sm
-                              md:text-base">
-									Consistent, structured questioning ensures every stakeholder receives
-									the same rigorous assessment experience.
-								</p>
-							</div>
-						</div>
-
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
-                              md:w-12 md:h-12">
-								<TrendingUp className="w-5 h-5 text-primary-foreground
-                                      md:w-6 md:h-6" />
-							</div>
-							<div>
-								<h3 className="text-lg font-bold text-foreground mb-2
-                               md:text-xl">
-									Scale Without Limits
-								</h3>
-								<p className="text-muted-foreground text-sm
-                              md:text-base">
-									Conduct assessments with 10 or 1,000 stakeholders simultaneously.
-									Your capacity is no longer bottlenecked by interviewer availability.
-								</p>
-							</div>
-						</div>
-
-						<div className="flex gap-4">
-							<div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
-                              md:w-12 md:h-12">
-								<Brain className="w-5 h-5 text-primary-foreground
-                                 md:w-6 md:h-6" />
-							</div>
-							<div>
-								<h3 className="text-lg font-bold text-foreground mb-2
-                               md:text-xl">
-									Data-Driven Insights
-								</h3>
-								<p className="text-muted-foreground text-sm
-                              md:text-base">
-									AI synthesis identifies patterns, themes, and strategic opportunities
-									across hundreds of interview transcripts instantly.
-								</p>
-							</div>
-						</div>
+						{content.benefits.map((benefit, index) => {
+							const IconComponent = benefit.icon === 'clock' ? Clock
+								: benefit.icon === 'shield' ? Shield
+								: benefit.icon === 'trending-up' ? TrendingUp
+								: Brain
+							return (
+								<div key={index} className="flex gap-4">
+									<div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center
+                                      md:w-12 md:h-12">
+										<IconComponent className="w-5 h-5 text-primary-foreground
+                                                        md:w-6 md:h-6" />
+									</div>
+									<div>
+										<h3 className="text-lg font-bold text-foreground mb-2
+                                           md:text-xl">
+											{benefit.title}
+										</h3>
+										<p className="text-muted-foreground text-sm
+                                          md:text-base">
+											{benefit.description}
+										</p>
+									</div>
+								</div>
+							)
+						})}
 					</div>
 				</div>
 			</section>

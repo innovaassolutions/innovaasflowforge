@@ -64,6 +64,12 @@ export interface IndustryContent {
 		description: string
 		bullets: string[]
 	}[]
+	// Why FlowForge benefits
+	benefits: {
+		title: string
+		description: string
+		icon: 'clock' | 'shield' | 'trending-up' | 'brain'
+	}[]
 	// CTA text
 	ctaPrimary: string
 	ctaSecondary: string
@@ -163,6 +169,12 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'AI analyzes all interviews and generates comprehensive readiness assessments.',
 				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
 			}
+		],
+		benefits: [
+			{ title: 'Save 80% of Assessment Time', description: 'Automate stakeholder interviews while maintaining depth and quality. What used to take weeks now takes days.', icon: 'clock' },
+			{ title: 'Eliminate Interview Bias', description: 'Consistent, structured questioning ensures every stakeholder receives the same rigorous assessment experience.', icon: 'shield' },
+			{ title: 'Scale Without Limits', description: 'Conduct assessments with 10 or 1,000 stakeholders simultaneously. Your capacity is no longer bottlenecked by interviewer availability.', icon: 'trending-up' },
+			{ title: 'Data-Driven Insights', description: 'AI synthesis identifies patterns, themes, and strategic opportunities across hundreds of interview transcripts instantly.', icon: 'brain' },
 		],
 		ctaPrimary: 'Explore Coaching Solutions',
 		ctaSecondary: 'See Coaching Demo',
@@ -273,6 +285,12 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
 			}
 		],
+		benefits: [
+			{ title: 'Replace Episodic Insight with Continuity', description: 'Automate stakeholder interviews while maintaining depth and quality. What used to take weeks now takes days.', icon: 'clock' },
+			{ title: 'Reduce Reputational and Governance Risk', description: 'Consistent, structured questioning ensures every stakeholder receives the same rigorous assessment experience.', icon: 'shield' },
+			{ title: 'Scale Without Limits', description: 'Conduct assessments with 10 or 1,000 stakeholders simultaneously. Your capacity is no longer bottlenecked by interviewer availability.', icon: 'trending-up' },
+			{ title: 'Data-Driven Insights', description: 'AI synthesis identifies patterns, themes, and strategic opportunities across hundreds of interview transcripts instantly.', icon: 'brain' },
+		],
 		ctaPrimary: 'Request an Executive Overview',
 		ctaSecondary: 'See Education Demo',
 		stats: [
@@ -378,6 +396,12 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'AI analyzes all interviews and generates comprehensive readiness assessments.',
 				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
 			}
+		],
+		benefits: [
+			{ title: 'Save 80% of Assessment Time', description: 'Automate stakeholder interviews while maintaining depth and quality. What used to take weeks now takes days.', icon: 'clock' },
+			{ title: 'Eliminate Interview Bias', description: 'Consistent, structured questioning ensures every stakeholder receives the same rigorous assessment experience.', icon: 'shield' },
+			{ title: 'Scale Without Limits', description: 'Conduct assessments with 10 or 1,000 stakeholders simultaneously. Your capacity is no longer bottlenecked by interviewer availability.', icon: 'trending-up' },
+			{ title: 'Data-Driven Insights', description: 'AI synthesis identifies patterns, themes, and strategic opportunities across hundreds of interview transcripts instantly.', icon: 'brain' },
 		],
 		ctaPrimary: 'Book a Consultation',
 		ctaSecondary: 'See How It Works',
