@@ -240,7 +240,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		heroMockup: 'education',
 		contactForm: {
 			interest: 'education',
-			dialogTitle: 'Request a School Pilot',
+			dialogTitle: 'Request an Executive Overview',
 			dialogDescription: 'Tell us about your institution and we\'ll set up a pilot to capture stakeholder voice across your school community.',
 			organizationLabel: 'School / Institution Name',
 			organizationPlaceholder: 'Westlake Academy',
