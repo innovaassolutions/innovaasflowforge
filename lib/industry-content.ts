@@ -230,7 +230,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
 			}
 		],
-		ctaPrimary: 'Request a School Pilot',
+		ctaPrimary: 'Request an Executive Overview',
 		ctaSecondary: 'See Education Demo',
 		stats: [
 			{ value: '85%', label: 'Parent participation rate' },
