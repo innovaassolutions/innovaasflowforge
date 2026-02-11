@@ -113,11 +113,18 @@ export default function PromotionalLanding() {
                 {content.heroHeadline.split(content.heroHighlight)[1]}
               </h1>
 
-              <p className="text-base text-muted-foreground mb-6 max-w-xl mx-auto
+              <div className="text-base text-muted-foreground mb-6 max-w-xl mx-auto
                             md:text-lg
                             lg:text-xl lg:mx-0">
-                {content.heroDescription}
-              </p>
+                {Array.isArray(content.heroDescription)
+                  ? content.heroDescription.map((paragraph, i) => (
+                      <p key={i} className={i < content.heroDescription.length - 1 ? 'mb-3' : ''}>
+                        {paragraph}
+                      </p>
+                    ))
+                  : <p>{content.heroDescription}</p>
+                }
+              </div>
 
               {/* Stats row */}
               <div className="flex flex-wrap justify-center gap-6 mb-8

@@ -26,7 +26,7 @@ export interface IndustryContent {
 	// Hero section
 	heroHeadline: string
 	heroHighlight: string
-	heroDescription: string
+	heroDescription: string | string[]
 	// Value propositions
 	valueProps: {
 		title: string
@@ -135,7 +135,11 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		illustration: '/illustrations/educator.png',
 		heroHeadline: 'Hear Every Voice — See the whole institution',
 		heroHighlight: 'Every Voice',
-		heroDescription: 'FlowForge provides leadership and governance teams with a clear, longitudinal view of institutional health — beyond surveys, anecdotes or annual hindsight. It captures how policies, decisions and change are actually experienced across staff, families, and students and translates that reality into leadership-ready insight. Not feedback. Not performance scores. Institutional intelligence — built for continuity, trust  and governance.',
+		heroDescription: [
+			'FlowForge provides leadership and governance teams with a clear, longitudinal view of institutional health — beyond surveys, anecdotes or annual hindsight.',
+			'It captures how policies, decisions and change are actually experienced across staff, families, and students and translates that reality into leadership-ready insight.',
+			'Not feedback. Not performance scores. Institutional intelligence — built for continuity, trust and governance.'
+		],
 		valueProps: [
 			{
 				title: 'Parent & Family Voice',
