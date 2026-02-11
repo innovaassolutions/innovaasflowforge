@@ -57,6 +57,13 @@ export interface IndustryContent {
 	personas: IndustryPersona[]
 	// Industry-specific pain points
 	painPoints: IndustryPainPoint[]
+	// How it works steps
+	stepsHeading: string
+	steps: {
+		title: string
+		description: string
+		bullets: string[]
+	}[]
 	// CTA text
 	ctaPrimary: string
 	ctaSecondary: string
@@ -137,6 +144,24 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 			{
 				title: 'Insights Stay in Notebooks',
 				description: 'Client breakthroughs get lost in session notes. FlowForge captures, synthesizes, and tracks growth patterns over time.'
+			}
+		],
+		stepsHeading: 'Three Steps to Strategic Clarity',
+		steps: [
+			{
+				title: 'Create Campaign',
+				description: 'Define your assessment scope and invite stakeholders via secure, personalized links.',
+				bullets: ['Multi-stakeholder coordination', 'Flexible methodology selection', 'Progress tracking dashboard']
+			},
+			{
+				title: 'AI-Facilitated Interviews',
+				description: 'Stakeholders engage in intelligent conversations that adapt based on their responses.',
+				bullets: ['Context-aware questioning', 'Natural conversation flow', 'Anonymous response options']
+			},
+			{
+				title: 'Strategic Synthesis',
+				description: 'AI analyzes all interviews and generates comprehensive readiness assessments.',
+				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
 			}
 		],
 		ctaPrimary: 'Explore Coaching Solutions',
@@ -230,6 +255,24 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
 			}
 		],
+		stepsHeading: 'How FlowForge for Schools Operates',
+		steps: [
+			{
+				title: 'Define the Institutional Lens',
+				description: 'Leadership selects focus areas aligned to governance priorities and upcoming terms.',
+				bullets: ['Multi-stakeholder coordination', 'Flexible methodology selection', 'Progress tracking dashboard']
+			},
+			{
+				title: 'Structured Stakeholder Input',
+				description: 'Anonymized, role-specific input collected across the institution.',
+				bullets: ['Context-aware questioning', 'Natural conversation flow', 'Anonymous response options']
+			},
+			{
+				title: 'Institutional Intelligence Synthesis',
+				description: 'Patterns, risks and continuity signals surfaced in leadership-ready language.',
+				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
+			}
+		],
 		ctaPrimary: 'Request an Executive Overview',
 		ctaSecondary: 'See Education Demo',
 		stats: [
@@ -316,6 +359,24 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 			{
 				title: 'Synthesis Eats Your Strategy Time',
 				description: 'You spend more time organizing notes than advising clients. Let AI synthesize — you focus on the insights only you can deliver.'
+			}
+		],
+		stepsHeading: 'Three Steps to Strategic Clarity',
+		steps: [
+			{
+				title: 'Create Campaign',
+				description: 'Define your assessment scope and invite stakeholders via secure, personalized links.',
+				bullets: ['Multi-stakeholder coordination', 'Flexible methodology selection', 'Progress tracking dashboard']
+			},
+			{
+				title: 'AI-Facilitated Interviews',
+				description: 'Stakeholders engage in intelligent conversations that adapt based on their responses.',
+				bullets: ['Context-aware questioning', 'Natural conversation flow', 'Anonymous response options']
+			},
+			{
+				title: 'Strategic Synthesis',
+				description: 'AI analyzes all interviews and generates comprehensive readiness assessments.',
+				bullets: ['Multi-dimensional analysis', 'Visual data representations', 'Actionable recommendations']
 			}
 		],
 		ctaPrimary: 'Book a Consultation',
