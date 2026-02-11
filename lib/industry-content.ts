@@ -219,14 +219,14 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		painPoints: [
 			{
 				title: 'Parents Are Silent Until They Leave',
-				description: 'Families who are unhappy rarely speak up — they just don\'t re-enroll. AI conversations capture honest feedback before it\'s too late.'
+				description: 'Risk emerges quietly, then expensively. Families who are unhappy rarely speak up — they just don\'t re-enroll.'
 			},
 			{
-				title: 'Surveys Miss What Matters',
+				title: 'Institutions Track Data, Not Continuity',
 				description: '15% response rates and checkbox answers don\'t tell you why. Conversational AI gets 85%+ participation and rich qualitative depth.'
 			},
 			{
-				title: 'Accreditation Evidence Is Thin',
+				title: 'Governance Requires Longitudinal Proof',
 				description: 'You need evidence of stakeholder voice and continuous improvement. FlowForge delivers both, automatically documented and synthesized.'
 			}
 		],
