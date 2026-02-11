@@ -204,7 +204,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		accentColor: 'hsl(220, 70%, 55%)', // Academic blue
 		accentColorLight: 'hsl(220, 70%, 93%)',
 		illustration: '/illustrations/educator.png',
-		heroHeadline: 'Hear Every Voice — See the whole institution',
+		heroHeadline: 'Hear Every Voice — See The Whole Institution',
 		heroHighlight: 'Every Voice',
 		heroDescription: [
 			'FlowForge provides leadership and governance teams with a clear, longitudinal view of institutional health — beyond surveys, anecdotes or annual hindsight.',
@@ -286,7 +286,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 			}
 		],
 		benefits: [
-			{ title: 'Replace Episodic Insight with Continuity', description: 'Automate stakeholder interviews while maintaining depth and quality. What used to take weeks now takes days.', icon: 'clock' },
+			{ title: 'Episodic Insight with Continuity', description: 'Automate stakeholder interviews while maintaining depth and quality. What used to take weeks now takes days.', icon: 'clock' },
 			{ title: 'Reduce Reputational and Governance Risk', description: 'Consistent, structured questioning ensures every stakeholder receives the same rigorous assessment experience.', icon: 'shield' },
 			{ title: 'Scale Without Limits', description: 'Conduct assessments with 10 or 1,000 stakeholders simultaneously. Your capacity is no longer bottlenecked by interviewer availability.', icon: 'trending-up' },
 			{ title: 'Data-Driven Insights', description: 'AI synthesis identifies patterns, themes, and strategic opportunities across hundreds of interview transcripts instantly.', icon: 'brain' },
