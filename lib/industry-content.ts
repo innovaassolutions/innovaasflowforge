@@ -189,8 +189,8 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		],
 		personas: [
 			{
-				title: 'School Leaders',
-				description: 'Understand what parents and families actually experience — communication quality, child progress visibility, community belonging.',
+				title: 'Heads of School & Executive Leadership',
+				description: 'Maintain institutional continuity, parent confidence and leadership alignment across terms of change.',
 				benefits: [
 					'Parent satisfaction drivers revealed',
 					'Communication gap identification',
@@ -198,8 +198,8 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				]
 			},
 			{
-				title: 'Academic Leadership',
-				description: 'Assess institutional readiness for curriculum innovation and capture faculty perspectives on support and resources.',
+				title: 'Boards & Governance Committees',
+				description: 'Access a defensible, evidence-based view of institutional health beyond anecdote or operational reporting.',
 				benefits: [
 					'Faculty development needs',
 					'Curriculum alignment analysis',
@@ -207,8 +207,8 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 				]
 			},
 			{
-				title: 'Accreditation Teams',
-				description: 'Build rich evidence portfolios from stakeholder conversations that go far deeper than traditional surveys.',
+				title: 'Accreditation & Inspection Preparation',
+				description: 'Generate inspection-safe evidence continuously, not retroactively.',
 				benefits: [
 					'Qualitative evidence at scale',
 					'Continuous improvement documentation',
