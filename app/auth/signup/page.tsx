@@ -1,13 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { UserCircle, Briefcase, Building2, ArrowLeft } from 'lucide-react'
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
 
 // Disable static generation for auth pages
 export const dynamic = 'force-dynamic'
@@ -48,15 +45,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
-
-  useEffect(() => {
-    setSupabase(createClient())
-  }, [])
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
-    if (!supabase) return
 
     setLoading(true)
     setError(null)
@@ -80,19 +71,21 @@ export default function SignupPage() {
     }
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            user_type: accountType,
-          },
-        },
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          accountType,
+        }),
       })
 
-      if (signUpError) {
-        setError(signUpError.message)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'An unexpected error occurred')
         return
       }
 
