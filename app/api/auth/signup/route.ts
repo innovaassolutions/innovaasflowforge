@@ -16,8 +16,9 @@ interface SignupInput {
  *
  * Handles self-registration:
  * 1. Creates the user via Supabase Admin API (unconfirmed)
- * 2. Generates a confirmation link via generateLink()
- * 3. Sends a branded confirmation email via Resend
+ * 2. Ensures user_profiles and tenant_profiles exist (safety net for trigger failures)
+ * 3. Generates a confirmation link via generateLink()
+ * 4. Sends a branded confirmation email via Resend
  */
 export async function POST(request: NextRequest) {
   try {
@@ -70,7 +71,6 @@ export async function POST(request: NextRequest) {
     if (createError) {
       console.error('Signup user creation error:', createError)
 
-      // Return user-friendly messages for common errors
       if (createError.message.includes('already been registered')) {
         return NextResponse.json(
           { error: 'An account with this email already exists' },
@@ -84,7 +84,124 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate a confirmation link (does NOT send Supabase's built-in email)
+    const userId = newUser.user.id
+
+    // ---------------------------------------------------------------
+    // Ensure user_profiles exists (safety net if trigger failed)
+    // ---------------------------------------------------------------
+    const { data: existingProfile } = await (supabaseAdmin
+      .from('user_profiles') as any)
+      .select('id')
+      .eq('id', userId)
+      .single()
+
+    if (!existingProfile) {
+      console.log(`Trigger did not create user_profiles for ${body.email} — creating manually`)
+
+      // Create an organization first
+      const orgSlug = body.fullName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        + '-' + Math.random().toString(36).substring(2, 8)
+
+      const { data: org } = await (supabaseAdmin
+        .from('organizations') as any)
+        .insert({
+          name: 'My Organization',
+          slug: orgSlug,
+          plan: 'free',
+          subscription_status: 'active',
+        })
+        .select('id')
+        .single()
+
+      await (supabaseAdmin
+        .from('user_profiles') as any)
+        .insert({
+          id: userId,
+          organization_id: org?.id,
+          full_name: body.fullName,
+          email: body.email,
+          role: 'owner',
+          status: 'active',
+          user_type: body.accountType,
+        })
+    }
+
+    // ---------------------------------------------------------------
+    // Ensure tenant_profiles exists (safety net if trigger failed)
+    // ---------------------------------------------------------------
+    const { data: existingTenant } = await (supabaseAdmin
+      .from('tenant_profiles') as any)
+      .select('id')
+      .eq('user_id', userId)
+      .single()
+
+    if (!existingTenant) {
+      console.log(`Trigger did not create tenant_profiles for ${body.email} — creating manually`)
+
+      const tenantType = body.accountType === 'company' ? 'school' : body.accountType
+      let tenantSlug = body.fullName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
+      if (tenantSlug.length < 3) {
+        tenantSlug += '-' + Math.random().toString(36).substring(2, 8)
+      }
+
+      // Ensure slug uniqueness
+      const { data: slugExists } = await (supabaseAdmin
+        .from('tenant_profiles') as any)
+        .select('id')
+        .eq('slug', tenantSlug)
+        .single()
+
+      if (slugExists) {
+        tenantSlug += '-' + Math.random().toString(36).substring(2, 8)
+      }
+
+      const enabledAssessments =
+        tenantType === 'coach' ? ['archetype'] :
+        tenantType === 'school' ? ['education'] :
+        ['industry4']
+
+      await (supabaseAdmin
+        .from('tenant_profiles') as any)
+        .insert({
+          user_id: userId,
+          slug: tenantSlug,
+          display_name: body.fullName,
+          tenant_type: tenantType,
+          brand_config: {
+            logo: null,
+            colors: {
+              primary: '#F25C05',
+              primaryHover: '#DC5204',
+              secondary: '#1D9BA3',
+              background: '#FFFEFB',
+              backgroundSubtle: '#FAF8F3',
+              text: '#171614',
+              textMuted: '#71706B',
+              border: '#E6E2D6',
+            },
+            fonts: { heading: 'Inter', body: 'Inter' },
+            showPoweredBy: true,
+          },
+          email_config: {
+            replyTo: body.email,
+            senderName: body.fullName,
+          },
+          enabled_assessments: enabledAssessments,
+          subscription_tier: 'starter',
+          is_active: true,
+        })
+    }
+
+    // ---------------------------------------------------------------
+    // Generate confirmation link and send email
+    // ---------------------------------------------------------------
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
@@ -98,15 +215,12 @@ export async function POST(request: NextRequest) {
 
     if (linkError || !linkData) {
       console.error('Generate link error:', linkError)
-      // User was created but link failed — they can use "Resend confirmation" later
       return NextResponse.json(
         { error: 'Account created but confirmation email could not be sent. Please try logging in or contact support.' },
         { status: 500 }
       )
     }
 
-    // Build the confirmation URL using the token hash from the generated link
-    // The generated link points to Supabase's domain — we need to redirect through our app
     const confirmationUrl = `${baseUrl}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=signup`
 
     // Send branded confirmation email via Resend
@@ -131,7 +245,6 @@ export async function POST(request: NextRequest) {
       console.log(`Confirmation email sent to ${body.email}`)
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError)
-      // Don't fail — user is created, they can request a new link
     }
 
     return NextResponse.json({
