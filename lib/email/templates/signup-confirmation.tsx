@@ -33,7 +33,7 @@ export function SignupConfirmationEmail({
   accountType,
 }: SignupConfirmationEmailProps) {
   const accountLabel =
-    accountType === 'company' ? 'Institution' :
+    accountType === 'company' ? 'Company' :
     accountType === 'coach' ? 'Coach' : 'Consultant'
 
   return (

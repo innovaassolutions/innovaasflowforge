@@ -26,8 +26,8 @@ const ACCOUNT_TYPES = [
   },
   {
     value: 'company' as AccountType,
-    label: 'Institution',
-    description: 'Schools, universities, and organizations',
+    label: 'Company',
+    description: 'Internal operational excellence assessments for your organization',
     icon: Building2,
   },
 ]
