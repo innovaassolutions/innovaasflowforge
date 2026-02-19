@@ -77,7 +77,7 @@ export default function DashboardLayout({
         full_name: string
         email: string
         role: string
-        user_type: 'consultant' | 'company' | 'admin' | null
+        user_type: 'consultant' | 'company' | 'admin' | 'coach' | null
         permissions?: UserProfile['permissions']
         verticals?: ('industry' | 'education')[]
       }
