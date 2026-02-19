@@ -358,6 +358,16 @@ export default function NotificationsPage() {
                 </div>
                 {prefs.channels.slack.enabled && (
                   <div className="ml-[52px] space-y-3">
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm text-purple-800">
+                      <p className="font-medium mb-1">Setup Instructions</p>
+                      <ol className="list-decimal list-inside space-y-1 text-purple-700">
+                        <li>Go to <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" className="underline font-medium">api.slack.com/apps</a> and click &quot;Create New App&quot; &rarr; &quot;From scratch&quot;</li>
+                        <li>Name it (e.g. &quot;FlowForge Notifications&quot;) and select your workspace</li>
+                        <li>Under &quot;Features&quot;, click <strong>Incoming Webhooks</strong> and toggle it on</li>
+                        <li>Click &quot;Add New Webhook to Workspace&quot; and choose a channel</li>
+                        <li>Copy the Webhook URL and paste it below</li>
+                      </ol>
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
                         Webhook URL
@@ -433,11 +443,14 @@ export default function NotificationsPage() {
                     <div className="bg-sky-50 border border-sky-200 rounded-lg p-3 text-sm text-sky-800">
                       <p className="font-medium mb-1">Setup Instructions</p>
                       <ol className="list-decimal list-inside space-y-1 text-sky-700">
-                        <li>Message @BotFather on Telegram to create a bot</li>
-                        <li>Copy the bot token you receive</li>
-                        <li>Start a chat with your bot, then send any message</li>
-                        <li>Get your chat ID from the bot API updates</li>
+                        <li>Open Telegram and search for <strong>@BotFather</strong></li>
+                        <li>Send <code className="bg-sky-100 px-1 rounded">/newbot</code> and follow the prompts to name your bot</li>
+                        <li>Copy the <strong>bot token</strong> BotFather gives you (paste it below)</li>
+                        <li>Find your bot in Telegram and send it any message</li>
+                        <li>Visit <code className="bg-sky-100 px-1 rounded text-xs">https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code> in your browser (replace &lt;TOKEN&gt; with your bot token)</li>
+                        <li>Find <code className="bg-sky-100 px-1 rounded">&quot;chat&quot;:{`{`}&quot;id&quot;:</code> in the response &mdash; that number is your Chat ID</li>
                       </ol>
+                      <p className="mt-2 text-sky-600 text-xs">For group chats, add the bot to the group first, then check getUpdates. Group chat IDs start with a minus sign.</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
@@ -512,11 +525,13 @@ export default function NotificationsPage() {
                 {prefs.channels.whatsapp.enabled && (
                   <div className="ml-[52px] space-y-3">
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-                      <p className="font-medium">Cost Notice</p>
-                      <p className="text-amber-700 mt-1">
-                        WhatsApp messages cost approximately $0.05 - $0.08 per notification via Twilio.
-                        Requires platform-level Twilio configuration.
-                      </p>
+                      <p className="font-medium mb-1">Important Notes</p>
+                      <ul className="list-disc list-inside space-y-1 text-amber-700">
+                        <li>WhatsApp notifications are powered by Twilio and must be enabled at the platform level by your administrator</li>
+                        <li>Each notification costs approximately $0.05 - $0.08 (tracked in your delivery log)</li>
+                        <li>Enter the phone number where you want to receive notifications in E.164 format (e.g. +14155238886)</li>
+                      </ul>
+                      <p className="mt-2 text-amber-600 text-xs">Contact support if WhatsApp is not yet available for your account.</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
