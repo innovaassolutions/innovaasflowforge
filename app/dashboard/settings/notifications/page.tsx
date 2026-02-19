@@ -1,175 +1,269 @@
 'use client'
 
 /**
- * Usage Notifications History Page
+ * Notification Settings Page
  *
- * Displays past usage notifications for the tenant.
- * Allows acknowledging/dismissing notifications.
- * Story: billing-3-3-tenant-notification-history
+ * Allows tenants to configure multi-channel notifications:
+ * - Channel setup (Email, Slack, Telegram, WhatsApp)
+ * - Event preferences (session completions, usage warnings)
+ * - Delivery log / audit trail
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import {
   ArrowLeft,
   Bell,
-  BellOff,
   Mail,
-  Monitor,
+  Hash,
+  Send,
+  Phone,
+  Settings,
+  History,
+  Save,
   Loader2,
-  AlertCircle,
   CheckCircle,
-  AlertTriangle,
+  AlertCircle,
   XCircle,
-  Filter,
+  Eye,
+  EyeOff,
+  Zap,
 } from 'lucide-react'
 
-type NotificationType = '75_percent' | '90_percent' | '100_percent'
-type DeliveryMethod = 'in_app' | 'email' | 'both'
+interface NotificationPreferences {
+  channels: {
+    email: { enabled: boolean }
+    slack: { enabled: boolean; webhook_url?: string | null; channel_name?: string | null }
+    telegram: { enabled: boolean; bot_token?: string | null; chat_id?: string | null }
+    whatsapp: { enabled: boolean; phone_number?: string | null }
+  }
+  notify_on_session_complete: boolean
+  notify_on_usage_warning: boolean
+}
 
-interface Notification {
+interface LogEntry {
   id: string
-  type: NotificationType
-  billingPeriod: string
-  sentAt: string
-  deliveryMethod: DeliveryMethod
-  acknowledgedAt: string | null
+  event_type: string
+  channel: string
+  status: string
+  error_message: string | null
+  estimated_cost_usd: number
+  recipient: string
+  metadata: Record<string, unknown>
+  created_at: string
+}
+
+const DEFAULT_PREFS: NotificationPreferences = {
+  channels: {
+    email: { enabled: true },
+    slack: { enabled: false, webhook_url: null, channel_name: null },
+    telegram: { enabled: false, bot_token: null, chat_id: null },
+    whatsapp: { enabled: false, phone_number: null },
+  },
+  notify_on_session_complete: true,
+  notify_on_usage_warning: true,
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [testing, setTesting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [acknowledging, setAcknowledging] = useState<string | null>(null)
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('all')
+  const [success, setSuccess] = useState<string | null>(null)
+  const [tenantId, setTenantId] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string>('')
+  const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_PREFS)
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [logsLoading, setLogsLoading] = useState(false)
+
+  // Password field visibility
+  const [showSlackUrl, setShowSlackUrl] = useState(false)
+  const [showBotToken, setShowBotToken] = useState(false)
 
   useEffect(() => {
-    fetchNotifications()
+    loadSettings()
   }, [])
 
-  async function fetchNotifications() {
+  const loadLogs = useCallback(async (tid: string) => {
+    setLogsLoading(true)
     try {
-      setLoading(true)
-      const response = await fetch('/api/tenant/notifications')
+      const response = await fetch(`/api/tenant/notifications/log?tenant_id=${tid}&limit=20`)
       const data = await response.json()
+      if (data.success) {
+        setLogs(data.logs || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch logs:', err)
+    } finally {
+      setLogsLoading(false)
+    }
+  }, [])
 
-      if (!data.success) {
-        setError(data.error || 'Failed to fetch notifications')
+  async function loadSettings() {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/auth/login')
         return
       }
 
-      setNotifications(data.notifications || [])
+      setUserEmail(user.email || '')
+
+      const { data: tenantData, error: tenantError } = await (supabase
+        .from('tenant_profiles') as any)
+        .select('id, notification_preferences')
+        .eq('user_id', user.id)
+        .single()
+
+      if (tenantError || !tenantData) {
+        setError('No tenant profile found. Please contact support.')
+        setLoading(false)
+        return
+      }
+
+      setTenantId(tenantData.id)
+
+      const savedPrefs = tenantData.notification_preferences
+      if (savedPrefs) {
+        setPrefs({
+          ...DEFAULT_PREFS,
+          ...savedPrefs,
+          channels: {
+            ...DEFAULT_PREFS.channels,
+            ...savedPrefs.channels,
+          },
+        })
+      }
+
+      loadLogs(tenantData.id)
     } catch (err) {
-      console.error('Failed to fetch notifications:', err)
-      setError('Failed to load notifications')
+      console.error('Error loading settings:', err)
+      setError('Failed to load notification settings')
     } finally {
       setLoading(false)
     }
   }
 
-  async function handleAcknowledge(notification: Notification) {
-    if (notification.acknowledgedAt) return
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
+    setSaving(true)
 
     try {
-      setAcknowledging(notification.id)
-      const response = await fetch('/api/tenant/notifications/acknowledge', {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user || !tenantId) {
+        setError('Authentication required')
+        return
+      }
+
+      const { error: updateError } = await (supabase
+        .from('tenant_profiles') as any)
+        .update({ notification_preferences: prefs })
+        .eq('id', tenantId)
+
+      if (updateError) {
+        setError('Failed to save notification settings')
+        return
+      }
+
+      setSuccess('Notification settings saved successfully')
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err) {
+      console.error('Error saving settings:', err)
+      setError('Failed to save notification settings')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleTestChannel(channel: string) {
+    setTesting(channel)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const channelConfig = prefs.channels[channel as keyof typeof prefs.channels]
+      const response = await fetch('/api/tenant/notifications/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          notificationType: notification.type,
-          billingPeriod: notification.billingPeriod,
-        }),
+        body: JSON.stringify({ channel, config: channelConfig }),
       })
 
       const data = await response.json()
-
       if (data.success) {
-        // Update local state
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === notification.id
-              ? { ...n, acknowledgedAt: new Date().toISOString() }
-              : n
-          )
-        )
+        setSuccess(`Test notification sent to ${channel} successfully`)
+      } else {
+        setError(data.error || `Test failed for ${channel}`)
       }
+      setTimeout(() => { setSuccess(null); setError(null) }, 4000)
     } catch (err) {
-      console.error('Failed to acknowledge notification:', err)
+      console.error('Test failed:', err)
+      setError(`Test connection failed for ${channel}`)
     } finally {
-      setAcknowledging(null)
+      setTesting(null)
     }
   }
 
-  // Get unique billing periods for filter
-  const billingPeriods = Array.from(
-    new Set(notifications.map((n) => n.billingPeriod))
-  ).sort().reverse()
-
-  // Filter notifications
-  const filteredNotifications =
-    selectedPeriod === 'all'
-      ? notifications
-      : notifications.filter((n) => n.billingPeriod === selectedPeriod)
-
-  const getTypeInfo = (type: NotificationType) => {
-    switch (type) {
-      case '75_percent':
-        return {
-          label: '75% Warning',
-          color: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-          icon: AlertTriangle,
-        }
-      case '90_percent':
-        return {
-          label: '90% Warning',
-          color: 'text-orange-600 bg-orange-50 border-orange-200',
-          icon: AlertCircle,
-        }
-      case '100_percent':
-        return {
-          label: 'Limit Reached',
-          color: 'text-red-600 bg-red-50 border-red-200',
-          icon: XCircle,
-        }
-    }
-  }
-
-  const getDeliveryIcon = (method: DeliveryMethod) => {
-    switch (method) {
-      case 'in_app':
-        return Monitor
-      case 'email':
-        return Mail
-      case 'both':
-        return Bell
-    }
-  }
-
-  const getDeliveryLabel = (method: DeliveryMethod) => {
-    switch (method) {
-      case 'in_app':
-        return 'In-app'
-      case 'email':
-        return 'Email'
-      case 'both':
-        return 'Email + In-app'
-    }
+  function updateChannel<K extends keyof NotificationPreferences['channels']>(
+    channel: K,
+    updates: Partial<NotificationPreferences['channels'][K]>
+  ) {
+    setPrefs(prev => ({
+      ...prev,
+      channels: {
+        ...prev.channels,
+        [channel]: { ...prev.channels[channel], ...updates },
+      },
+    }))
   }
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
     })
   }
 
-  const formatPeriod = (period: string) => {
-    const date = new Date(period)
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric',
-    })
+  const channelIcon = (channel: string) => {
+    switch (channel) {
+      case 'email': return Mail
+      case 'slack': return Hash
+      case 'telegram': return Send
+      case 'whatsapp': return Phone
+      default: return Bell
+    }
+  }
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-green-50 text-green-700 border border-green-200"><CheckCircle className="w-3 h-3" /> Sent</span>
+      case 'failed':
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-red-50 text-red-700 border border-red-200"><XCircle className="w-3 h-3" /> Failed</span>
+      case 'skipped':
+        return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-50 text-gray-600 border border-gray-200">Skipped</span>
+      default:
+        return <span className="text-xs text-[var(--text-muted)]">{status}</span>
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-[var(--accent)]" />
+        <span className="ml-2 text-[var(--text-muted)]">Loading settings...</span>
+      </div>
+    )
   }
 
   return (
@@ -185,134 +279,403 @@ export default function NotificationsPage() {
             Back to Dashboard
           </Link>
           <h1 className="text-2xl font-semibold text-[var(--text)]">
-            Usage Notifications
+            Notification Settings
           </h1>
           <p className="text-[var(--text-muted)] mt-1">
-            View your past usage notifications and warnings
+            Configure how you receive notifications when sessions complete
           </p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-[var(--accent)]" />
-            <span className="ml-2 text-[var(--text-muted)]">Loading notifications...</span>
-          </div>
-        ) : error ? (
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+        {/* Status messages */}
+        {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-            <div>
-              <p className="font-medium text-red-800">Error loading notifications</p>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
-            </div>
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+            <p className="text-sm text-red-700">{error}</p>
           </div>
-        ) : notifications.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto bg-[var(--bg-subtle)] rounded-full flex items-center justify-center mb-4">
-              <BellOff className="w-8 h-8 text-[var(--text-muted)]" />
-            </div>
-            <h2 className="text-lg font-medium text-[var(--text)]">No notifications yet</h2>
-            <p className="text-[var(--text-muted)] mt-2">
-              You&apos;ll see usage warnings here when you approach your monthly limits.
-            </p>
+        )}
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
+            <p className="text-sm text-green-700">{success}</p>
           </div>
-        ) : (
-          <>
-            {/* Filter */}
-            {billingPeriods.length > 1 && (
-              <div className="mb-6 flex items-center gap-2">
-                <Filter className="w-4 h-4 text-[var(--text-muted)]" />
-                <select
-                  value={selectedPeriod}
-                  onChange={(e) => setSelectedPeriod(e.target.value)}
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text)] text-sm
-                             focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
-                >
-                  <option value="all">All Periods</option>
-                  {billingPeriods.map((period) => (
-                    <option key={period} value={period}>
-                      {formatPeriod(period)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+        )}
 
-            {/* Notification List */}
-            <div className="space-y-3">
-              {filteredNotifications.map((notification) => {
-                const typeInfo = getTypeInfo(notification.type)
-                const DeliveryIcon = getDeliveryIcon(notification.deliveryMethod)
-                const TypeIcon = typeInfo.icon
-                const isAcknowledged = !!notification.acknowledgedAt
+        <form onSubmit={handleSave}>
+          {/* =============== Section 1: Notification Channels =============== */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Bell className="w-5 h-5 text-[var(--text)]" />
+              <h2 className="text-lg font-semibold text-[var(--text)]">Notification Channels</h2>
+            </div>
+            <div className="space-y-4">
 
-                return (
-                  <div
-                    key={notification.id}
-                    className={`border rounded-lg p-4 transition-all ${
-                      isAcknowledged
-                        ? 'bg-[var(--bg-muted)] border-[var(--border)] opacity-60'
-                        : `${typeInfo.color}`
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <TypeIcon
-                          className={`w-5 h-5 mt-0.5 ${
-                            isAcknowledged ? 'text-[var(--text-muted)]' : ''
-                          }`}
-                        />
-                        <div>
-                          <h3
-                            className={`font-medium ${
-                              isAcknowledged
-                                ? 'text-[var(--text-muted)]'
-                                : 'text-[var(--text)]'
-                            }`}
-                          >
-                            {typeInfo.label}
-                          </h3>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-[var(--text-muted)]">
-                            <span>{formatDate(notification.sentAt)}</span>
-                            <span className="flex items-center gap-1">
-                              <DeliveryIcon className="w-4 h-4" />
-                              {getDeliveryLabel(notification.deliveryMethod)}
-                            </span>
-                          </div>
-                          <p className="text-xs text-[var(--text-muted)] mt-1">
-                            Billing period: {formatPeriod(notification.billingPeriod)}
-                          </p>
-                        </div>
-                      </div>
-
-                      {isAcknowledged ? (
-                        <div className="flex items-center gap-1 text-[var(--text-muted)] text-sm">
-                          <CheckCircle className="w-4 h-4" />
-                          Acknowledged
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleAcknowledge(notification)}
-                          disabled={acknowledging === notification.id}
-                          className="px-3 py-1.5 text-sm font-medium rounded-md border border-current
-                                     hover:bg-white/50 transition-colors disabled:opacity-50"
-                        >
-                          {acknowledging === notification.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            'Dismiss'
-                          )}
-                        </button>
-                      )}
+              {/* Email Channel - Always enabled */}
+              <div className="border border-[var(--border)] rounded-xl p-5 bg-[var(--bg-subtle)]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-[var(--text)]">Email</h3>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Notifications sent to {userEmail || 'your account email'}
+                      </p>
                     </div>
                   </div>
-                )
-              })}
+                  <span className="text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-full">
+                    Always On
+                  </span>
+                </div>
+              </div>
+
+              {/* Slack Channel */}
+              <div className="border border-[var(--border)] rounded-xl p-5 bg-[var(--bg-subtle)]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                      <Hash className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-[var(--text)]">Slack</h3>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Post to a Slack channel via incoming webhook
+                      </p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={prefs.channels.slack.enabled}
+                      onChange={(e) => updateChannel('slack', { enabled: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--accent)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                  </label>
+                </div>
+                {prefs.channels.slack.enabled && (
+                  <div className="ml-[52px] space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
+                        Webhook URL
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showSlackUrl ? 'text' : 'password'}
+                          value={prefs.channels.slack.webhook_url || ''}
+                          onChange={(e) => updateChannel('slack', { webhook_url: e.target.value || null })}
+                          placeholder="https://hooks.slack.com/services/..."
+                          className="w-full px-3 py-2 pr-10 rounded-lg border border-[var(--border)] bg-white text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowSlackUrl(!showSlackUrl)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                        >
+                          {showSlackUrl ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
+                        Channel Name (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={prefs.channels.slack.channel_name || ''}
+                        onChange={(e) => updateChannel('slack', { channel_name: e.target.value || null })}
+                        placeholder="#notifications"
+                        className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestChannel('slack')}
+                      disabled={testing === 'slack' || !prefs.channels.slack.webhook_url}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white transition-colors disabled:opacity-50"
+                    >
+                      {testing === 'slack' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                      Test Connection
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Telegram Channel */}
+              <div className="border border-[var(--border)] rounded-xl p-5 bg-[var(--bg-subtle)]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-sky-50 flex items-center justify-center">
+                      <Send className="w-5 h-5 text-sky-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-[var(--text)]">Telegram</h3>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Receive messages via a Telegram bot
+                      </p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={prefs.channels.telegram.enabled}
+                      onChange={(e) => updateChannel('telegram', { enabled: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--accent)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                  </label>
+                </div>
+                {prefs.channels.telegram.enabled && (
+                  <div className="ml-[52px] space-y-3">
+                    <div className="bg-sky-50 border border-sky-200 rounded-lg p-3 text-sm text-sky-800">
+                      <p className="font-medium mb-1">Setup Instructions</p>
+                      <ol className="list-decimal list-inside space-y-1 text-sky-700">
+                        <li>Message @BotFather on Telegram to create a bot</li>
+                        <li>Copy the bot token you receive</li>
+                        <li>Start a chat with your bot, then send any message</li>
+                        <li>Get your chat ID from the bot API updates</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
+                        Bot Token
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showBotToken ? 'text' : 'password'}
+                          value={prefs.channels.telegram.bot_token || ''}
+                          onChange={(e) => updateChannel('telegram', { bot_token: e.target.value || null })}
+                          placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+                          className="w-full px-3 py-2 pr-10 rounded-lg border border-[var(--border)] bg-white text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowBotToken(!showBotToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                        >
+                          {showBotToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
+                        Chat ID
+                      </label>
+                      <input
+                        type="text"
+                        value={prefs.channels.telegram.chat_id || ''}
+                        onChange={(e) => updateChannel('telegram', { chat_id: e.target.value || null })}
+                        placeholder="-1001234567890"
+                        className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestChannel('telegram')}
+                      disabled={testing === 'telegram' || !prefs.channels.telegram.bot_token || !prefs.channels.telegram.chat_id}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white transition-colors disabled:opacity-50"
+                    >
+                      {testing === 'telegram' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                      Test Connection
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* WhatsApp Channel */}
+              <div className="border border-[var(--border)] rounded-xl p-5 bg-[var(--bg-subtle)]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-[var(--text)]">WhatsApp</h3>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Receive messages via WhatsApp Business
+                      </p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={prefs.channels.whatsapp.enabled}
+                      onChange={(e) => updateChannel('whatsapp', { enabled: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--accent)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                  </label>
+                </div>
+                {prefs.channels.whatsapp.enabled && (
+                  <div className="ml-[52px] space-y-3">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                      <p className="font-medium">Cost Notice</p>
+                      <p className="text-amber-700 mt-1">
+                        WhatsApp messages cost approximately $0.05 - $0.08 per notification via Twilio.
+                        Requires platform-level Twilio configuration.
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">
+                        Phone Number (E.164 format)
+                      </label>
+                      <input
+                        type="tel"
+                        value={prefs.channels.whatsapp.phone_number || ''}
+                        onChange={(e) => updateChannel('whatsapp', { phone_number: e.target.value || null })}
+                        placeholder="+14155238886"
+                        className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestChannel('whatsapp')}
+                      disabled={testing === 'whatsapp' || !prefs.channels.whatsapp.phone_number}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white transition-colors disabled:opacity-50"
+                    >
+                      {testing === 'whatsapp' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                      Test Connection
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </>
-        )}
+          </div>
+
+          {/* =============== Section 2: Notification Events =============== */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings className="w-5 h-5 text-[var(--text)]" />
+              <h2 className="text-lg font-semibold text-[var(--text)]">Notification Events</h2>
+            </div>
+            <div className="border border-[var(--border)] rounded-xl bg-[var(--bg-subtle)] divide-y divide-[var(--border)]">
+              <div className="flex items-center justify-between p-5">
+                <div>
+                  <h3 className="font-medium text-[var(--text)]">Session Completions</h3>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    Notify when a participant completes an interview or assessment
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={prefs.notify_on_session_complete}
+                    onChange={(e) => setPrefs(prev => ({ ...prev, notify_on_session_complete: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--accent)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                </label>
+              </div>
+              <div className="flex items-center justify-between p-5">
+                <div>
+                  <h3 className="font-medium text-[var(--text)]">Usage Warnings</h3>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    Notify when approaching monthly usage limits (75%, 90%, 100%)
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={prefs.notify_on_usage_warning}
+                    onChange={(e) => setPrefs(prev => ({ ...prev, notify_on_usage_warning: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--accent)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="mb-10">
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--accent)] text-white font-medium rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Settings
+            </button>
+          </div>
+        </form>
+
+        {/* =============== Section 3: Delivery Log =============== */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <History className="w-5 h-5 text-[var(--text)]" />
+            <h2 className="text-lg font-semibold text-[var(--text)]">Delivery Log</h2>
+          </div>
+
+          {logsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-5 h-5 animate-spin text-[var(--accent)]" />
+              <span className="ml-2 text-sm text-[var(--text-muted)]">Loading log...</span>
+            </div>
+          ) : logs.length === 0 ? (
+            <div className="border border-[var(--border)] rounded-xl bg-[var(--bg-subtle)] p-8 text-center">
+              <History className="w-8 h-8 text-[var(--text-muted)] mx-auto mb-2" />
+              <p className="text-[var(--text-muted)]">No notifications sent yet</p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">
+                Delivery history will appear here once sessions are completed.
+              </p>
+            </div>
+          ) : (
+            <div className="border border-[var(--border)] rounded-xl bg-[var(--bg-subtle)] overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--border)] bg-[var(--bg-muted)]">
+                      <th className="text-left px-4 py-3 font-medium text-[var(--text-muted)]">Date</th>
+                      <th className="text-left px-4 py-3 font-medium text-[var(--text-muted)]">Event</th>
+                      <th className="text-left px-4 py-3 font-medium text-[var(--text-muted)]">Channel</th>
+                      <th className="text-left px-4 py-3 font-medium text-[var(--text-muted)]">Status</th>
+                      <th className="text-left px-4 py-3 font-medium text-[var(--text-muted)]">Recipient</th>
+                      <th className="text-right px-4 py-3 font-medium text-[var(--text-muted)]">Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)]">
+                    {logs.map((log) => {
+                      const ChannelIcon = channelIcon(log.channel)
+                      return (
+                        <tr key={log.id} className="hover:bg-[var(--bg-muted)] transition-colors">
+                          <td className="px-4 py-3 text-[var(--text-muted)] whitespace-nowrap">
+                            {formatDate(log.created_at)}
+                          </td>
+                          <td className="px-4 py-3 text-[var(--text)]">
+                            {log.event_type.replace(/_/g, ' ')}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="inline-flex items-center gap-1.5 text-[var(--text)]">
+                              <ChannelIcon className="w-3.5 h-3.5" />
+                              {log.channel}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {statusBadge(log.status)}
+                            {log.error_message && (
+                              <p className="text-xs text-red-600 mt-1 max-w-[200px] truncate" title={log.error_message}>
+                                {log.error_message}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-[var(--text-muted)] font-mono text-xs">
+                            {log.recipient}
+                          </td>
+                          <td className="px-4 py-3 text-right text-[var(--text-muted)]">
+                            {log.estimated_cost_usd > 0 ? `$${log.estimated_cost_usd.toFixed(4)}` : '--'}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

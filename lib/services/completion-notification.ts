@@ -1,15 +1,17 @@
 /**
  * Session Completion Notification Service
  *
- * Sends email notifications to coaches, consultants, and school admins
+ * Sends multi-channel notifications to coaches, consultants, and school admins
  * when a participant completes an interview or assessment.
  *
  * Works across all verticals: coaching, consulting, and education.
+ * Dispatches to all enabled channels (email, Slack, Telegram, WhatsApp)
+ * based on tenant notification preferences.
  */
 
 import { createClient } from '@supabase/supabase-js'
-import { resend, buildFromAddress } from '@/lib/resend'
-import { SessionCompletedNotification } from '@/lib/email/templates/session-completed-notification'
+import { dispatchNotification, dispatchEmailOnly } from './notification-dispatcher'
+import type { NotificationPayload } from './notification-channels'
 
 // ============================================================================
 // Types
@@ -50,6 +52,7 @@ function getServiceClient(): SupabaseClient {
 /**
  * Notify a coach when a coaching session completes.
  * Looks up the coach email via tenant_profiles -> auth.users.
+ * Dispatches to all enabled notification channels.
  */
 export async function notifyTenantOwner(
   params: TenantNotificationParams,
@@ -93,21 +96,40 @@ export async function notifyTenantOwner(
   }
 
   const senderName = emailConfig.senderName || tenantProfile.display_name || 'FlowForge'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-  await sendNotification({
-    recipientEmail,
-    senderName,
+  const payload: NotificationPayload = {
+    eventType: 'session_completed',
+    tenantId: params.tenantId,
     participantName: params.participantName,
     assessmentType: params.assessmentType,
-    dashboardPath: params.dashboardPath,
+    dashboardUrl: `${baseUrl}${params.dashboardPath}`,
+    completedAt: new Date().toLocaleString('en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }),
+  }
+
+  const results = await dispatchNotification(params.tenantId, recipientEmail, payload, {
     brandConfig,
     emailConfig,
+    senderName,
+    supabase: client,
   })
+
+  for (const r of results) {
+    if (r.status === 'failed') {
+      console.error(`[CompletionNotification] ${r.channel} failed:`, r.error)
+    } else {
+      console.log(`[CompletionNotification] ${r.channel} sent to ${r.recipient}`)
+    }
+  }
 }
 
 /**
  * Notify a consultant/facilitator when a campaign interview completes.
- * Looks up the facilitator email from the campaigns table.
+ * If the campaign has a tenant_id, dispatches to all enabled channels.
+ * Otherwise, falls back to email-only (legacy behavior).
  */
 export async function notifyCampaignOwner(
   params: CampaignNotificationParams,
@@ -117,7 +139,7 @@ export async function notifyCampaignOwner(
 
   const { data: campaign } = await (client
     .from('campaigns') as any)
-    .select('facilitator_name, facilitator_email, created_by')
+    .select('facilitator_name, facilitator_email, created_by, tenant_id')
     .eq('id', params.campaignId)
     .single()
 
@@ -132,20 +154,54 @@ export async function notifyCampaignOwner(
     return
   }
 
-  await sendNotification({
-    recipientEmail,
-    senderName: campaign.facilitator_name || 'FlowForge',
+  const senderName = campaign.facilitator_name || 'FlowForge'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+  const payload: NotificationPayload = {
+    eventType: 'session_completed',
+    tenantId: campaign.tenant_id || '',
     participantName: params.participantName,
     assessmentType: params.assessmentType,
-    dashboardPath: params.dashboardPath,
-    brandConfig: {},
-    emailConfig: {},
-  })
+    dashboardUrl: `${baseUrl}${params.dashboardPath}`,
+    completedAt: new Date().toLocaleString('en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }),
+    metadata: { campaign_id: params.campaignId },
+  }
+
+  if (campaign.tenant_id) {
+    const results = await dispatchNotification(campaign.tenant_id, recipientEmail, payload, {
+      senderName,
+      supabase: client,
+    })
+
+    for (const r of results) {
+      if (r.status === 'failed') {
+        console.error(`[CompletionNotification] ${r.channel} failed:`, r.error)
+      } else {
+        console.log(`[CompletionNotification] ${r.channel} sent to ${r.recipient}`)
+      }
+    }
+  } else {
+    // Fallback: email-only for campaigns without tenant_id
+    const result = await dispatchEmailOnly(recipientEmail, payload, {
+      senderName,
+      supabase: client,
+    })
+
+    if (result.status === 'failed') {
+      console.error('[CompletionNotification] Email send error:', result.error)
+    } else {
+      console.log(`[CompletionNotification] Sent to ${result.recipient} (email only)`)
+    }
+  }
 }
 
 /**
  * Notify a school admin when an education interview completes.
- * Looks up the admin from the campaign's created_by user.
+ * If the campaign has a tenant_id, dispatches to all enabled channels.
+ * Otherwise, falls back to email-only (legacy behavior).
  */
 export async function notifyEducationAdmin(
   params: CampaignNotificationParams,
@@ -155,7 +211,7 @@ export async function notifyEducationAdmin(
 
   const { data: campaign } = await (client
     .from('campaigns') as any)
-    .select('created_by, name, facilitator_name, facilitator_email')
+    .select('created_by, name, facilitator_name, facilitator_email, tenant_id')
     .eq('id', params.campaignId)
     .single()
 
@@ -176,82 +232,45 @@ export async function notifyEducationAdmin(
     return
   }
 
-  await sendNotification({
-    recipientEmail,
-    senderName: campaign.facilitator_name || 'FlowForge',
+  const senderName = campaign.facilitator_name || 'FlowForge'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+  const payload: NotificationPayload = {
+    eventType: 'session_completed',
+    tenantId: campaign.tenant_id || '',
     participantName: params.participantName,
     assessmentType: params.assessmentType,
-    dashboardPath: params.dashboardPath,
-    brandConfig: {},
-    emailConfig: {},
-  })
-}
-
-// ============================================================================
-// Internal
-// ============================================================================
-
-interface SendNotificationParams {
-  recipientEmail: string
-  senderName: string
-  participantName: string
-  assessmentType: string
-  dashboardPath: string
-  brandConfig: {
-    logo?: { url: string; alt?: string }
-    colors?: {
-      primary?: string
-      background?: string
-      text?: string
-      textMuted?: string
-    }
-    tagline?: string
-  }
-  emailConfig: {
-    senderName?: string
-    emailFooter?: string
-  }
-}
-
-async function sendNotification(params: SendNotificationParams): Promise<void> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const dashboardUrl = `${baseUrl}${params.dashboardPath}`
-  const completedAt = new Date().toLocaleString('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
-
-  const fromAddress = buildFromAddress(params.senderName)
-
-  const result = await resend.emails.send({
-    from: fromAddress,
-    to: params.recipientEmail,
-    subject: `Session Completed: ${params.participantName}`,
-    react: SessionCompletedNotification({
-      clientName: params.participantName,
-      assessmentType: params.assessmentType,
-      completedAt,
-      dashboardUrl,
-      brandConfig: {
-        logo: params.brandConfig.logo,
-        colors: {
-          primary: params.brandConfig.colors?.primary,
-          background: params.brandConfig.colors?.background,
-          text: params.brandConfig.colors?.text,
-          textMuted: params.brandConfig.colors?.textMuted,
-        },
-        tagline: params.brandConfig.tagline,
-      },
-      emailConfig: {
-        senderName: params.emailConfig.senderName,
-        emailFooter: params.emailConfig.emailFooter,
-      },
+    dashboardUrl: `${baseUrl}${params.dashboardPath}`,
+    completedAt: new Date().toLocaleString('en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
     }),
-  })
+    metadata: { campaign_id: params.campaignId },
+  }
 
-  if (result.error) {
-    console.error('[CompletionNotification] Email send error:', result.error)
+  if (campaign.tenant_id) {
+    const results = await dispatchNotification(campaign.tenant_id, recipientEmail, payload, {
+      senderName,
+      supabase: client,
+    })
+
+    for (const r of results) {
+      if (r.status === 'failed') {
+        console.error(`[CompletionNotification] ${r.channel} failed:`, r.error)
+      } else {
+        console.log(`[CompletionNotification] ${r.channel} sent to ${r.recipient}`)
+      }
+    }
   } else {
-    console.log(`[CompletionNotification] Sent to ${params.recipientEmail} (email ID: ${result.data?.id})`)
+    const result = await dispatchEmailOnly(recipientEmail, payload, {
+      senderName,
+      supabase: client,
+    })
+
+    if (result.status === 'failed') {
+      console.error('[CompletionNotification] Email send error:', result.error)
+    } else {
+      console.log(`[CompletionNotification] Sent to ${result.recipient} (email only)`)
+    }
   }
 }

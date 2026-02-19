@@ -20,6 +20,7 @@ import {
   Activity,
   DollarSign,
   MessageSquare,
+  Bell,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
@@ -175,6 +176,16 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
+  // Notifications settings - shown for all tenant users (coaches, consultants, schools)
+  const notificationNavItems = (isCoach || isSchool || isConsultantOrAdmin) && userProfile?.user_type !== 'admin' ? [
+    {
+      name: 'Notifications',
+      href: '/dashboard/settings/notifications',
+      icon: Bell,
+      matchPaths: ['/dashboard/settings/notifications']
+    }
+  ] : []
+
   // Conversations - shown for all user types
   const conversationsNavItems = userProfile?.user_type ? [
     {
@@ -185,7 +196,7 @@ export default function DashboardSidebar({ userProfile, onLogout, isMobileOpen, 
     }
   ] : []
 
-  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...brandingNavItems, ...conversationsNavItems]
+  const navItems = [...baseNavItems, ...coachNavItems, ...schoolNavItems, ...industryNavItems, ...educationNavItems, ...campaignNavItems, ...brandingNavItems, ...notificationNavItems, ...conversationsNavItems]
 
   // Admin-only nav items (check user_type for platform admin access)
   const adminNavItems = userProfile?.user_type === 'admin' ? [
