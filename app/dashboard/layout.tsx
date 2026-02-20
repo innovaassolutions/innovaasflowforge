@@ -71,7 +71,7 @@ export default function DashboardLayout({
         .select('slug')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single() as { data: { slug: string } | null }
+        .maybeSingle() as { data: { slug: string } | null }
 
       const profileData = profile as {
         full_name: string
@@ -148,9 +148,11 @@ export default function DashboardLayout({
         <div className="flex-1 lg:ml-16 flex flex-col min-h-[calc(100vh-4rem)]">
           <div className="flex-1">
             {/* Usage Warning Banner - shows for tenants approaching limits */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-              <UsageBanner />
-            </div>
+            {userProfile?.tenant_slug && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+                <UsageBanner />
+              </div>
+            )}
             {children}
           </div>
 
