@@ -40,11 +40,12 @@ const illustrationConfig: Record<IndustryKey, { container: string; width: number
 	},
 	education: {
 		// educator.png: 1024x1024 (square — character ~50% width, ~85% height)
-		// Uses object-cover to crop whitespace so character matches portrait sizes
-		container: '-right-28 bottom-0 w-52 h-[24rem] lg:-right-36 lg:w-64 lg:h-[28rem] xl:-right-44 xl:w-72 xl:h-[33rem]',
+		// object-cover crops side whitespace; object-bottom anchors feet;
+		// negative bottom offset compensates for ~8% whitespace below feet
+		container: '-right-24 -bottom-8 w-48 h-96 lg:-right-32 lg:-bottom-9 lg:w-56 lg:h-[28rem] xl:-right-40 xl:-bottom-10 xl:w-64 xl:h-[33rem]',
 		width: 1024,
 		height: 1024,
-		imageClass: 'object-cover',
+		imageClass: 'object-cover object-bottom',
 	},
 	coaching: {
 		// careercoach.png: 296x886 (portrait ~1:3)
