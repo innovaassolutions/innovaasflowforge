@@ -29,31 +29,13 @@ import {
 	DialogDescription,
 } from '@/components/ui/dialog'
 
-// Per-industry illustration container sizing (images have different aspect ratios)
-const illustrationConfig: Record<IndustryKey, { container: string; width: number; height: number; imageClass: string }> = {
-	'professional-services': {
-		// consultant.png: 291x695 (portrait ~1:2.4)
-		container: '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]',
-		width: 291,
-		height: 695,
-		imageClass: 'object-contain',
-	},
-	education: {
-		// educator.png: 1024x1024 (square — character ~50% width, ~85% height)
-		// object-cover crops side whitespace; object-bottom anchors feet;
-		// negative bottom offset compensates for ~8% whitespace below feet
-		container: '-right-24 -bottom-8 w-48 h-96 lg:-right-32 lg:-bottom-9 lg:w-56 lg:h-[28rem] xl:-right-40 xl:-bottom-10 xl:w-64 xl:h-[33rem]',
-		width: 1024,
-		height: 1024,
-		imageClass: 'object-cover object-bottom',
-	},
-	coaching: {
-		// careercoach.png: 296x886 (portrait ~1:3)
-		container: '-right-16 bottom-0 w-32 h-[20rem] lg:-right-24 lg:w-40 lg:h-[24rem] xl:-right-28 xl:w-44 xl:h-[28rem]',
-		width: 296,
-		height: 886,
-		imageClass: 'object-contain',
-	},
+// Shared illustration container: all industries use the same sizing/positioning
+const illustrationContainer = '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]'
+
+const illustrationConfig: Record<IndustryKey, { width: number; height: number }> = {
+	'professional-services': { width: 291, height: 695 },
+	education: { width: 1024, height: 1024 },
+	coaching: { width: 296, height: 886 },
 }
 
 export default function PromotionalLanding() {
@@ -205,13 +187,13 @@ export default function PromotionalLanding() {
 						{/* Right: Industry Illustration + Mockup */}
 						<div className="relative">
 							{/* Character Illustration - positioned right side, aligned with mockup */}
-							<div className={`absolute z-10 hidden md:block ${illustrationConfig[industry].container}`}>
+							<div className={`absolute z-10 hidden md:block ${illustrationContainer}`}>
 								<Image
 									src={content.illustration}
 									alt={`${content.name} professional`}
 									width={illustrationConfig[industry].width}
 									height={illustrationConfig[industry].height}
-									className={`${illustrationConfig[industry].imageClass} drop-shadow-2xl`}
+									className="object-contain drop-shadow-2xl"
 									unoptimized
 								/>
 							</div>
