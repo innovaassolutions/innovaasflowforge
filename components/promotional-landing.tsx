@@ -29,6 +29,28 @@ import {
 	DialogDescription,
 } from '@/components/ui/dialog'
 
+// Per-industry illustration container sizing (images have different aspect ratios)
+const illustrationConfig: Record<IndustryKey, { container: string; width: number; height: number }> = {
+	'professional-services': {
+		// consultant.png: 291x695 (portrait ~1:2.4)
+		container: '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]',
+		width: 291,
+		height: 695,
+	},
+	education: {
+		// educator.png: 1024x1024 (square — character centered with whitespace)
+		container: '-right-36 bottom-2 w-56 h-56 lg:-right-44 lg:w-72 lg:h-72 xl:-right-52 xl:w-80 xl:h-80',
+		width: 1024,
+		height: 1024,
+	},
+	coaching: {
+		// coach.png: 296x886 (portrait ~1:3)
+		container: '-right-16 bottom-0 w-32 h-[20rem] lg:-right-24 lg:w-40 lg:h-[24rem] xl:-right-28 xl:w-44 xl:h-[28rem]',
+		width: 296,
+		height: 886,
+	},
+}
+
 export default function PromotionalLanding() {
 	const { industry, setIndustry, isLoaded } = useIndustryPreference()
 	const [selectedMockup, setSelectedMockup] = useState<'dashboard' | 'interview' | 'report'>('interview')
@@ -178,14 +200,12 @@ export default function PromotionalLanding() {
 						{/* Right: Industry Illustration + Mockup */}
 						<div className="relative">
 							{/* Character Illustration - positioned right side, aligned with mockup */}
-							<div className="absolute z-10 hidden md:block -right-40 bottom-4 w-52 h-52
-                              lg:-right-52 lg:bottom-6 lg:w-64 lg:h-64
-                              xl:-right-60 xl:bottom-8 xl:w-72 xl:h-72">
+							<div className={`absolute z-10 hidden md:block ${illustrationConfig[industry].container}`}>
 								<Image
 									src={content.illustration}
 									alt={`${content.name} professional`}
-									width={416}
-									height={416}
+									width={illustrationConfig[industry].width}
+									height={illustrationConfig[industry].height}
 									className="object-contain drop-shadow-2xl"
 									unoptimized
 								/>
