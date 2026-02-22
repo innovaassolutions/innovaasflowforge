@@ -38,8 +38,9 @@ const illustrationConfig: Record<IndustryKey, { container: string; width: number
 		height: 695,
 	},
 	education: {
-		// educator.png: 1024x1024 (square — character centered with whitespace)
-		container: '-right-36 bottom-2 w-56 h-56 lg:-right-44 lg:w-72 lg:h-72 xl:-right-52 xl:w-80 xl:h-80',
+		// educator.png: 1024x1024 (square — character ~50% width, ~85% height of canvas)
+		// Needs larger container to match perceived size of portrait illustrations
+		container: '-right-64 bottom-0 w-96 h-96 lg:-right-80 lg:w-[28rem] lg:h-[28rem] xl:-right-96 xl:w-[33rem] xl:h-[33rem]',
 		width: 1024,
 		height: 1024,
 	},

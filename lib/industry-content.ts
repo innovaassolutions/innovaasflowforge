@@ -91,7 +91,7 @@ export const industryContent: Record<IndustryKey, IndustryContent> = {
 		shortName: 'Coaching',
 		accentColor: 'hsl(340, 65%, 55%)', // Warm rose
 		accentColorLight: 'hsl(340, 65%, 93%)',
-		illustration: '/illustrations/coach.png',
+		illustration: '/illustrations/careercoach.png',
 		heroHeadline: 'Encode Your Coaching Methodology, Scale Self-Discovery',
 		heroHighlight: 'Self-Discovery',
 		heroDescription: 'Put your coaching framework — archetypes, reflection prompts, growth models — into FlowForge. Run guided self-discovery sessions with hundreds of clients simultaneously. Your methodology, their breakthrough moments.',
