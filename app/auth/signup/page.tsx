@@ -130,13 +130,12 @@ export default function SignupPage() {
               </div>
               <div className="hidden md:flex md:items-center md:justify-center">
                 <Image
-                  src="https://www.innovaas.co/illustrations/welcome-greeter.png"
+                  src="/illustrations/welcome.png"
                   alt="Welcome"
                   width={280}
                   height={280}
                   className="object-contain"
                   priority
-                  unoptimized
                 />
               </div>
             </div>
@@ -363,13 +362,12 @@ export default function SignupPage() {
             {/* Right side - Illustration */}
             <div className="hidden md:flex md:items-center md:justify-center">
               <Image
-                src="https://www.innovaas.co/illustrations/welcome-greeter.png"
+                src="/illustrations/welcome.png"
                 alt="Welcome"
                 width={280}
                 height={280}
                 className="object-contain"
                 priority
-                unoptimized
               />
             </div>
           </div>

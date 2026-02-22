@@ -140,16 +140,15 @@ export default function LoginPage() {
               </form>
             </div>
 
-            {/* Right side - Soldier illustration */}
+            {/* Right side - Welcome illustration */}
             <div className="hidden md:flex md:items-center md:justify-center">
               <Image
-                src="https://www.innovaas.co/illustrations/soldier-guard.png"
-                alt="Security guard illustration"
-                width={320}
-                height={400}
+                src="/illustrations/welcome.png"
+                alt="Welcome illustration"
+                width={280}
+                height={280}
                 className="object-contain"
                 priority
-                unoptimized
               />
             </div>
           </div>
