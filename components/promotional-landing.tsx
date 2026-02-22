@@ -30,25 +30,28 @@ import {
 } from '@/components/ui/dialog'
 
 // Per-industry illustration container sizing (images have different aspect ratios)
-const illustrationConfig: Record<IndustryKey, { container: string; width: number; height: number }> = {
+const illustrationConfig: Record<IndustryKey, { container: string; width: number; height: number; imageClass: string }> = {
 	'professional-services': {
 		// consultant.png: 291x695 (portrait ~1:2.4)
 		container: '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]',
 		width: 291,
 		height: 695,
+		imageClass: 'object-contain',
 	},
 	education: {
-		// educator.png: 1024x1024 (square — character ~50% width, ~85% height of canvas)
-		// Needs larger container to match perceived size of portrait illustrations
-		container: '-right-64 bottom-0 w-96 h-96 lg:-right-80 lg:w-[28rem] lg:h-[28rem] xl:-right-96 xl:w-[33rem] xl:h-[33rem]',
+		// educator.png: 1024x1024 (square — character ~50% width, ~85% height)
+		// Uses object-cover to crop whitespace so character matches portrait sizes
+		container: '-right-28 bottom-0 w-52 h-[24rem] lg:-right-36 lg:w-64 lg:h-[28rem] xl:-right-44 xl:w-72 xl:h-[33rem]',
 		width: 1024,
 		height: 1024,
+		imageClass: 'object-cover',
 	},
 	coaching: {
-		// coach.png: 296x886 (portrait ~1:3)
+		// careercoach.png: 296x886 (portrait ~1:3)
 		container: '-right-16 bottom-0 w-32 h-[20rem] lg:-right-24 lg:w-40 lg:h-[24rem] xl:-right-28 xl:w-44 xl:h-[28rem]',
 		width: 296,
 		height: 886,
+		imageClass: 'object-contain',
 	},
 }
 
@@ -207,7 +210,7 @@ export default function PromotionalLanding() {
 									alt={`${content.name} professional`}
 									width={illustrationConfig[industry].width}
 									height={illustrationConfig[industry].height}
-									className="object-contain drop-shadow-2xl"
+									className={`${illustrationConfig[industry].imageClass} drop-shadow-2xl`}
 									unoptimized
 								/>
 							</div>
