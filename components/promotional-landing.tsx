@@ -29,13 +29,25 @@ import {
 	DialogDescription,
 } from '@/components/ui/dialog'
 
-// Shared illustration container: all industries use the same sizing/positioning
-const illustrationContainer = '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]'
-
-const illustrationConfig: Record<IndustryKey, { width: number; height: number }> = {
-	'professional-services': { width: 291, height: 695 },
-	education: { width: 1024, height: 1024 },
-	coaching: { width: 296, height: 886 },
+// Per-industry illustration positioning (uses Image fill to let container control size)
+// Consultant is the reference: character same height as mockup, feet at bottom, slight right overlap
+const illustrationConfig: Record<IndustryKey, { container: string; imageClass: string }> = {
+	'professional-services': {
+		// consultant.png: 291x695 (portrait ~1:2.4) — reference sizing
+		container: '-right-20 bottom-0 w-36 h-[20rem] lg:-right-28 lg:w-44 lg:h-[24rem] xl:-right-32 xl:w-48 xl:h-[28rem]',
+		imageClass: 'object-contain',
+	},
+	education: {
+		// educator.png: 1024x1024 (square) — object-cover crops side whitespace to portrait shape
+		// Taller container compensates for ~15% internal whitespace; negative bottom aligns feet
+		container: '-right-20 -bottom-8 w-36 h-[24rem] lg:-right-28 lg:-bottom-9 lg:w-44 lg:h-[28rem] xl:-right-32 xl:-bottom-10 xl:w-48 xl:h-[33rem]',
+		imageClass: 'object-cover object-bottom',
+	},
+	coaching: {
+		// careercoach.png: 296x886 (portrait ~1:3) — slightly more right offset to reduce overlap
+		container: '-right-24 bottom-0 w-36 h-[20rem] lg:-right-32 lg:w-44 lg:h-[24rem] xl:-right-36 xl:w-48 xl:h-[28rem]',
+		imageClass: 'object-contain',
+	},
 }
 
 export default function PromotionalLanding() {
@@ -187,15 +199,16 @@ export default function PromotionalLanding() {
 						{/* Right: Industry Illustration + Mockup */}
 						<div className="relative">
 							{/* Character Illustration - positioned right side, aligned with mockup */}
-							<div className={`absolute z-10 hidden md:block ${illustrationContainer}`}>
-								<Image
-									src={content.illustration}
-									alt={`${content.name} professional`}
-									width={illustrationConfig[industry].width}
-									height={illustrationConfig[industry].height}
-									className="object-contain drop-shadow-2xl"
-									unoptimized
-								/>
+							<div className={`absolute z-10 hidden md:block ${illustrationConfig[industry].container}`}>
+								<div className="relative w-full h-full">
+									<Image
+										src={content.illustration}
+										alt={`${content.name} professional`}
+										fill
+										className={`${illustrationConfig[industry].imageClass} drop-shadow-2xl`}
+										unoptimized
+									/>
+								</div>
 							</div>
 							<div className="rounded-lg overflow-hidden shadow-2xl">
 								<IndustryHeroMockup industry={industry} />
